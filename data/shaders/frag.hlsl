@@ -11,12 +11,33 @@ struct PS_Input
 
 float4 fs_main(PS_Input i) : SV_TARGET
 {
-    float3 ligthPos = float3(2.0f, 1.0f, 1);
-    float3 ligthDir = normalize(ligthPos - i.fragPos);
+    float3 ambient = float3(0.2f, 0.2f, 0.2f);
+
+    float3 ligthPos0 = float3(2.0f, 0.5f, 0.0f);
+    float3 ligthDir0 = normalize(ligthPos0 - i.fragPos);
+    float3 lightColor0 = float3(2.0f, 0.2f, 0.2f);
+
+    float3 ligthPos1 = float3(0.0f, 0.5f, -2.0f);
+    float3 ligthDir1 = normalize(ligthPos1 - i.fragPos);
+    float3 lightColor1 = float3(0.2f, 0.2f, 2.0f);
+    
+    float3 ligthPos2 = float3(0.0f, 0.5f, 2.0f);
+    float3 ligthDir2 = normalize(ligthPos2 - i.fragPos);
+    float3 lightColor2 = float3(0.2f, 2.0f, 0.2f);
+
+    float3 ligthPos3 = float3(-2.0f, 0.5f, 0.0f);
+    float3 ligthDir3 = normalize(ligthPos3 - i.fragPos);
+    float3 lightColor3 = float3(2.0f, 2.0f, 0.2f);
+
     float3 color = srv.Sample(samplerState, i.uv).rgb;
 
     float3 n = normalize(i.nor);
-    float diffuse = max(dot(ligthDir, n), 0.2f);
+    float diffuse0 = max(dot(ligthDir0, n), 0.0f);
+    float diffuse1 = max(dot(ligthDir1, n), 0.0f);
+    float diffuse2 = max(dot(ligthDir2, n), 0.0f);
+    float diffuse3 = max(dot(ligthDir3, n), 0.0f);
 
-    return float4(color * diffuse, 1.0f);
+    float3 finalColor = color * ((lightColor0 * diffuse0) + (lightColor1 * diffuse1) + (lightColor2 * diffuse2) + (lightColor3 * diffuse3));
+
+    return float4(finalColor, 1.0f);
 }

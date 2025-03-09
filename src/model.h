@@ -16,6 +16,8 @@ private:
      u32 indicesCount;
 public:
      void Init(const char *filepath, Arena *arena);
+     void Init(Vertex *vertices, u32 verticesCount,
+               u32 *indices, u32 indicesCount);
      void Terminate();
      void Draw();
 };

@@ -28,8 +28,9 @@ void RenderSystem::Render(ActorManager *am, f32 dt)
           mat3 rot = mat3(right, up, front);
           mat4 ori = mat4(rot);
           ori[3][3] = 1.0f;
-          ubo.model = tra * ori * sca;
+          ubo.model =  tra * ori * sca;
           GraphicsManager::UniformBufferUpdate(uniformBuffer, &ubo);
+          GraphicsManager::TextureBind(render->texture, 0);
           render->model.Draw();
      }
 }

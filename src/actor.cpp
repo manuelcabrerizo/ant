@@ -79,10 +79,11 @@ void ActorManager::AddTransformComponent(SlotmapKey<Actor> actorKey,
      actor->transform = key;
 }
 
-void ActorManager::AddRenderComponent(SlotmapKey<Actor> actorKey, Model model)
+void ActorManager::AddRenderComponent(SlotmapKey<Actor> actorKey, Model model, Texture texture)
 {
      RenderComponent render;
      render.model = model;
+     render.texture = texture;
      render.owner = actorKey;
      SlotmapKey<RenderComponent> key = renderComponents.Add(render);
      Actor *actor = GetActor(actorKey);

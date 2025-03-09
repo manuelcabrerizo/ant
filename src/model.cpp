@@ -2,11 +2,11 @@ static Assimp::Importer gImporter;
 
 void Model::Init(const char *filepath, Arena *arena)
 {
-     const aiScene *scene = gImporter.ReadFile(filepath,
-                                               aiProcess_Triangulate|
-                                               aiProcess_FlipWindingOrder|
-                                               aiProcess_FlipUVs/*|
-                                               aiProcess_MakeLeftHanded*/);
+/*
+     aiProcess_MakeLeftHanded |
+     aiProcess_FlipUVs | 
+     aiProcess_FlipWindingOrder*/
+     const aiScene *scene = gImporter.ReadFile(filepath, /*aiProcess_ConvertToLeftHanded*/0);
      i32 totalVerticesCount = 0;
      i32 totalIndicesCount = 0;
      for(i32 i = 0; i < scene->mNumMeshes; i++)
@@ -28,8 +28,8 @@ void Model::Init(const char *filepath, Arena *arena)
           for(i32 i = 0; i < mesh->mNumVertices; i++)
           {
                Vertex *vertex = vertices + verticesCount++;
-               vertex->pos = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
-               vertex->nor = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+               vertex->pos = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z*-1.0f };
+               vertex->nor = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z*-1.0f };
                vertex->uvs = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
           }
      
@@ -47,6 +47,15 @@ void Model::Init(const char *filepath, Arena *arena)
      ASSERT(verticesCount == totalVerticesCount);
      ASSERT(indicesCount == totalIndicesCount);
      
+     vertexBuffer = GraphicsManager::VertexBufferAlloc((void *)vertices, verticesCount, sizeof(Vertex));
+     indexBuffer = GraphicsManager::IndexBufferAlloc(indices, indicesCount);
+}
+
+void Model::Init(Vertex *vertices, u32 verticesCount_,
+                 u32 *indices, u32 indicesCount_)
+{
+     verticesCount = verticesCount_;
+     indicesCount = indicesCount_;
      vertexBuffer = GraphicsManager::VertexBufferAlloc((void *)vertices, verticesCount, sizeof(Vertex));
      indexBuffer = GraphicsManager::IndexBufferAlloc(indices, indicesCount);
 }

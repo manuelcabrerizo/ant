@@ -1,7 +1,7 @@
 #pragma once
 
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
 
 #define GRAPHICS_MANAGER_MEMORY_SIZE KB(100)
 #define MAX_VERTEX_BUFFER_COUNT  10
@@ -50,6 +50,11 @@ public:
 
      static void Draw(u32 verticesCount);
      static void DrawIndexed(u32 indexCount);
+
+     static void SetRasterizerStateCullBack();
+     static void SetRasterizerStateCullFront();
+     static void SetRasterizerStateCullNone();
+     static void SetRasterizerStateWireframe();
      
      static VertexBuffer VertexBufferAlloc(void *vertices, u32 count, u32 stride);
      static void VertexBufferFree(VertexBuffer vertexBuffer);

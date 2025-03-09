@@ -125,11 +125,14 @@ static void DirectXCreateDeviceAndSwapChain(GraphicsManagerState *state)
      swapChainDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
      swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
      swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+     swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+     swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
      swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
      swapChainDesc.OutputWindow = *state->window;
      swapChainDesc.Windowed = true;
      swapChainDesc.SampleDesc.Count = 1;
      swapChainDesc.SampleDesc.Quality = 0;
+     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
      D3D_FEATURE_LEVEL featureLevel;
      D3D_DRIVER_TYPE driverType;
@@ -300,6 +303,49 @@ static void DirectXCreateSamplerStates(GraphicsManagerState *state)
      }
 }
 
+static void DirectX11CreateRasterizerStates(GraphicsManagerState *state)
+{
+     D3D11_RASTERIZER_DESC fillRasterizerFrontDesc;
+     ZeroMemory(&fillRasterizerFrontDesc, sizeof(fillRasterizerFrontDesc));
+     fillRasterizerFrontDesc.FillMode = D3D11_FILL_SOLID;
+     fillRasterizerFrontDesc.CullMode = D3D11_CULL_FRONT;
+     fillRasterizerFrontDesc.FrontCounterClockwise = true;
+     fillRasterizerFrontDesc.DepthClipEnable = true;
+     fillRasterizerFrontDesc.AntialiasedLineEnable = true;
+     fillRasterizerFrontDesc.MultisampleEnable = true;
+     state->device->CreateRasterizerState(&fillRasterizerFrontDesc, &state->fillRasterizerCullFront);
+
+     D3D11_RASTERIZER_DESC fillRasterizerBackDesc;
+     ZeroMemory(&fillRasterizerBackDesc, sizeof(fillRasterizerBackDesc));
+     fillRasterizerBackDesc.FillMode = D3D11_FILL_SOLID;
+     fillRasterizerBackDesc.CullMode = D3D11_CULL_BACK;
+     fillRasterizerBackDesc.FrontCounterClockwise = true;
+     fillRasterizerBackDesc.DepthClipEnable = true;
+     fillRasterizerBackDesc.AntialiasedLineEnable = true;
+     fillRasterizerBackDesc.MultisampleEnable = true;
+     state->device->CreateRasterizerState(&fillRasterizerBackDesc, &state->fillRasterizerCullBack);
+
+     D3D11_RASTERIZER_DESC fillRasterizerNoneDesc;
+     ZeroMemory(&fillRasterizerNoneDesc, sizeof(fillRasterizerNoneDesc));
+     fillRasterizerNoneDesc.FillMode = D3D11_FILL_SOLID;
+     fillRasterizerNoneDesc.CullMode = D3D11_CULL_NONE;
+     fillRasterizerNoneDesc.FrontCounterClockwise = true;
+     fillRasterizerNoneDesc.DepthClipEnable = true;
+     fillRasterizerNoneDesc.AntialiasedLineEnable = true;
+     fillRasterizerNoneDesc.MultisampleEnable = true;
+     state->device->CreateRasterizerState(&fillRasterizerNoneDesc, &state->fillRasterizerCullNone);
+
+     D3D11_RASTERIZER_DESC wireFrameRasterizerDesc;
+     ZeroMemory(&wireFrameRasterizerDesc, sizeof(wireFrameRasterizerDesc));
+     wireFrameRasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+     wireFrameRasterizerDesc.CullMode = D3D11_CULL_NONE;
+     wireFrameRasterizerDesc.FrontCounterClockwise = true;
+     wireFrameRasterizerDesc.DepthClipEnable = true;
+     wireFrameRasterizerDesc.AntialiasedLineEnable = true;
+     wireFrameRasterizerDesc.MultisampleEnable = true;
+     state->device->CreateRasterizerState(&wireFrameRasterizerDesc, &state->wireFrameRasterizer);
+}
+
 static void DirectX11Init(void *osWindow, i32 width, i32 height)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
@@ -307,18 +353,18 @@ static void DirectX11Init(void *osWindow, i32 width, i32 height)
      state->windowWidth = width;
      state->windowHeight = height;
      
-     //DirectXCreateDevice(state);
-     //DirectXCreateSwapChain(state);
-
      DirectXCreateDeviceAndSwapChain(state);
      
      DirectXCreateRenderTargetView(state);
      DirectXCreateDepthStencilView(state);
      DirectXCreateSamplerStates(state);
+     DirectX11CreateRasterizerStates(state);
 
      //  Default renderer settings
      state->deviceContext->OMSetRenderTargets(1, &state->renderTargetView, state->depthStencilView);
      state->deviceContext->PSSetSamplers(0, 1, &state->samplerStateLinearWrap);
+
+     GraphicsManager::SetRasterizerStateCullBack();
 
      D3D11_VIEWPORT viewport;
      viewport.TopLeftX = 0;
@@ -346,6 +392,10 @@ static void DirectX11Terminate()
      
      state->arena.Terminate();
 
+     state->wireFrameRasterizer->Release();
+     state->fillRasterizerCullBack->Release();
+     state->fillRasterizerCullFront->Release();
+     state->fillRasterizerCullNone->Release();
      
      state->samplerStateLinearClamp->Release();
      state->samplerStateLinearWrap->Release();
@@ -387,6 +437,30 @@ void GraphicsManager::DrawIndexed(u32 indexCount)
      GraphicsManagerState *state = &gGraphicsManagerState;
      state->deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
      state->deviceContext->DrawIndexed(indexCount, 0, 0);
+}
+
+void GraphicsManager::SetRasterizerStateCullBack()
+{
+     GraphicsManagerState *state = &gGraphicsManagerState;
+     state->deviceContext->RSSetState(state->fillRasterizerCullBack);
+}
+
+void GraphicsManager::SetRasterizerStateCullFront()
+{
+     GraphicsManagerState *state = &gGraphicsManagerState;
+     state->deviceContext->RSSetState(state->fillRasterizerCullFront);
+}
+
+void GraphicsManager::SetRasterizerStateCullNone()
+{
+     GraphicsManagerState *state = &gGraphicsManagerState;
+     state->deviceContext->RSSetState(state->fillRasterizerCullNone);
+}
+
+void GraphicsManager::SetRasterizerStateWireframe()
+{
+     GraphicsManagerState *state = &gGraphicsManagerState;
+     state->deviceContext->RSSetState(state->wireFrameRasterizer);
 }
 
 VertexBuffer GraphicsManager::VertexBufferAlloc(void *vertices, u32 count, u32 stride)
@@ -607,6 +681,8 @@ Texture GraphicsManager::TextureAlloc(const char *filepath)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
      DirectXTexture tx;
+
+     stbi_set_flip_vertically_on_load(true);
 
      int channels;
      void* data = (void*)stbi_load(filepath, &tx.w, &tx.h, &channels, 0);

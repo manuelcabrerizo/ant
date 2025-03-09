@@ -16,9 +16,13 @@ private:
      Model plane;
      Model pistol;
      Model sniper;
+     Model warrior;
+     Model wall;
 
      Shader shader;
+     
      Texture texture;
+     Texture warriorTexture;
 
      SlotmapKey<Actor> player;
      SlotmapKey<Actor> firstWeapon;

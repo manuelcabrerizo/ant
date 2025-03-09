@@ -27,6 +27,6 @@ void WeaponSystem::Update(ActorManager *am, f32 dt)
                front * 0.15f +
                right * 0.05f +
                up * -0.075f;
-          weaponTransform->direction = -transform->direction;
+          weaponTransform->direction = transform->direction;
      }
 }
