@@ -47,6 +47,7 @@ void Slotmap<Type>::Clear()
      erase.size = 0;
      freeList = 0;
      generation = 0;
+     elementCount = 0;
      for(u32 i = 0; i < indices.size; ++i)
      {
           indices.data[i].id = i + 1;
@@ -69,6 +70,8 @@ SlotmapKey<Type> Slotmap<Type>::Add(Type value)
 
      data.Push(value);
      erase.Push(freeIndex);
+
+     elementCount++;
 
      SlotmapKey<Type> key;
      key.id = freeIndex;
@@ -109,4 +112,12 @@ void Slotmap<Type>::Remove(SlotmapKey<Type> key)
      }
      --data.size;
      --erase.size;
+     --elementCount;
+}
+
+template<typename Type>
+i32 Slotmap<Type>::Size()
+{
+     ASSERT(data.size == elementCount);
+     return elementCount;
 }

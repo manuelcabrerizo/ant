@@ -36,8 +36,10 @@ private:
      Array<Type> data;
      Array<u32> erase;
 
-     u32 freeList = 0;
      u64 generation = 0;
+     u32 freeList = 0;
+     u32 elementCount = 0;
+     
 public:
      void Init(u32 size, Arena *arena);
      void Clear();
@@ -46,4 +48,5 @@ public:
      Type *Get(SlotmapKey<Type> key);
      Array<Type> *GetArray() { return &data; };
      void Remove(SlotmapKey<Type> key);
+     i32 Size();
 };

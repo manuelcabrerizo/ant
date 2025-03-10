@@ -5,7 +5,15 @@ constexpr u32 MOUSE_BUTTON_COUNT = 3;
 
 class InputManager
 {
+private:
+     InputManager() {}
+     static InputManager instance;
+     static bool initialize;
 public:
+     static void Init();
+     static void Terminate();
+     static InputManager *Get();
+     
      bool KeyDown(u32 key);
      bool KeyJustDown(u32 key);
      bool KeyJustUp(u32 key);

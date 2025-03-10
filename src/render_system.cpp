@@ -1,13 +1,13 @@
 void RenderSystem::Init()
 {
      ubo.model = mat4(1.0f);
-     uniformBuffer = GraphicsManager::UniformBufferAlloc(BIND_TO_VS, &ubo, sizeof(ubo), 1);
-     GraphicsManager::UniformBufferBind(uniformBuffer);
+     uniformBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_VS, &ubo, sizeof(ubo), 1);
+     GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
 }
 
 void RenderSystem::Terminate()
 {
-     GraphicsManager::UniformBufferFree(uniformBuffer);
+     GraphicsManager::Get()->UniformBufferFree(uniformBuffer);
 }
 
 void RenderSystem::Render(ActorManager *am, f32 dt)
@@ -29,8 +29,8 @@ void RenderSystem::Render(ActorManager *am, f32 dt)
           mat4 ori = mat4(rot);
           ori[3][3] = 1.0f;
           ubo.model =  tra * ori * sca;
-          GraphicsManager::UniformBufferUpdate(uniformBuffer, &ubo);
-          GraphicsManager::TextureBind(render->texture, 0);
+          GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
+          GraphicsManager::Get()->TextureBind(render->texture, 0);
           render->model.Draw();
      }
 }

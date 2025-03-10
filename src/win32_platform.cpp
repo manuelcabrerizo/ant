@@ -72,7 +72,7 @@ static i32 gWindowHeight;
 
 LRESULT Wndproc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
-     InputManager* im = (InputManager *)(GetWindowLongPtrA(window, GWLP_USERDATA));
+     InputManager* im = InputManager::Get();
      
      LRESULT result = 0;
      
@@ -149,15 +149,11 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 #ifdef ANT_CONSOLE
      HINSTANCE hInstance = GetModuleHandle(0);
 #endif
-     
-     InputManager inputManager;
-     memset(&inputManager, 0, sizeof(InputManager));
-
      WNDCLASS wndClass = {};
      wndClass.style = CS_HREDRAW|CS_VREDRAW|CS_OWNDC;
      wndClass.lpfnWndProc = Wndproc;
      wndClass.cbClsExtra = 0;
-     wndClass.cbWndExtra = sizeof(InputManager *);
+     wndClass.cbWndExtra = 0;
      wndClass.hInstance = hInstance;
      wndClass.hIcon = 0;
      wndClass.hCursor = 0;
@@ -165,6 +161,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
      wndClass.lpszMenuName = 0;
      wndClass.lpszClassName = "AntWindowClass";
 
+     InputManager::Init();               
+     
      if(RegisterClassA(&wndClass))
      {
           HWND window = CreateWindowA(wndClass.lpszClassName,
@@ -174,10 +172,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                                       0, 0, hInstance, 0);
           if(window)
           {
-               SetWindowLongPtrA(window, GWLP_USERDATA, (LONG_PTR)&inputManager);
+               GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-               DirectX11Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT);
-               
                Game game;
                game.Init();
                
@@ -203,7 +199,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 
                     //printf("FPS: %d\n", (i32)(1.0f/dt));
                     
-                    inputManager.Process();  
+                    InputManager::Get()->Process();  
                     while(PeekMessageA(&message, window, 0, 0, PM_REMOVE))
                     {
                          TranslateMessage(&message);
@@ -211,13 +207,13 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                     }
                     if(!pause)
                     {
-                         game.Update(&inputManager, dt);
+                         game.Update(dt);
                          game.Render();
                     }    
                }
                game.Terminate();
 
-               DirectX11Terminate();
+               GraphicsManager::Terminate();
           }
           else
           {
@@ -228,6 +224,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
      {
           // TODO: Logging!
      }
+
+     InputManager::Terminate();
 
      return 0;
 }

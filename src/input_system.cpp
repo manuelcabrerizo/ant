@@ -8,8 +8,9 @@ void InputSystem::Terminate()
 
 }
 
-void InputSystem::Update(InputManager *im, ActorManager *am, float dt)
+void InputSystem::Update(ActorManager *am, float dt)
 {
+     InputManager *im = InputManager::Get();
      Array<InputComponent> *inputs = am->GetInputComponents();
      for(u32 i = 0; i < inputs->size; ++i)
      {

@@ -44,38 +44,47 @@ typedef SlotmapKey<DirectXTexture> Texture;
 
 class GraphicsManager
 {
+private:
+     GraphicsManager() {}
+     static GraphicsManager instance;
+     static bool initialize;
 public:
-     static void BeginFrame(f32 r, f32 g, f32 b);
-     static void EndFrame(i32 vsync);
 
-     static void Draw(u32 verticesCount);
-     static void DrawIndexed(u32 indexCount);
-
-     static void SetRasterizerStateCullBack();
-     static void SetRasterizerStateCullFront();
-     static void SetRasterizerStateCullNone();
-     static void SetRasterizerStateWireframe();
+     static void Init(void *osWindow, i32 width, i32 height);
+     static void Terminate();
+     static GraphicsManager *Get();
      
-     static VertexBuffer VertexBufferAlloc(void *vertices, u32 count, u32 stride);
-     static void VertexBufferFree(VertexBuffer vertexBuffer);
-     static void VertexBufferBind(VertexBuffer vertexBuffer);
+     void BeginFrame(f32 r, f32 g, f32 b);
+     void EndFrame(i32 vsync);
 
-     static IndexBuffer IndexBufferAlloc(u32 *indices, u32 count);
-     static void IndexBufferFree(IndexBuffer indexBuffer);
-     static void IndexBufferBind(IndexBuffer indexBuffer);
+     void Draw(u32 verticesCount);
+     void DrawIndexed(u32 indexCount);
 
-     static UniformBuffer UniformBufferAlloc(u32 bindTo, void *data, u32 dataSize, u32 slot);
-     static void UniformBufferFree(UniformBuffer uniformBuffer);
-     static void UniformBufferBind(UniformBuffer uniformBuffer);
-     static void UniformBufferUpdate(UniformBuffer uniformBuffer, void *data);
+     void SetRasterizerStateCullBack();
+     void SetRasterizerStateCullFront();
+     void SetRasterizerStateCullNone();
+     void SetRasterizerStateWireframe();
+     
+     VertexBuffer VertexBufferAlloc(void *vertices, u32 count, u32 stride);
+     void VertexBufferFree(VertexBuffer vertexBuffer);
+     void VertexBufferBind(VertexBuffer vertexBuffer);
 
-     static Shader ShaderAlloc(File vertFilepath, File fragFilepath);
-     static void ShaderFree(Shader shader);
-     static void ShaderBind(Shader shader);
+     IndexBuffer IndexBufferAlloc(u32 *indices, u32 count);
+     void IndexBufferFree(IndexBuffer indexBuffer);
+     void IndexBufferBind(IndexBuffer indexBuffer);
 
-     static Texture TextureAlloc(const char *filepath);
-     static void TextureFree(Texture texture);
-     static void TextureBind(Texture texture, i32 slot);
-     static i32 TextureWidth(Texture texture);
-     static i32 TextureHeight(Texture texture);
+     UniformBuffer UniformBufferAlloc(u32 bindTo, void *data, u32 dataSize, u32 slot);
+     void UniformBufferFree(UniformBuffer uniformBuffer);
+     void UniformBufferBind(UniformBuffer uniformBuffer);
+     void UniformBufferUpdate(UniformBuffer uniformBuffer, void *data);
+
+     Shader ShaderAlloc(File vertFilepath, File fragFilepath);
+     void ShaderFree(Shader shader);
+     void ShaderBind(Shader shader);
+
+     Texture TextureAlloc(const char *filepath);
+     void TextureFree(Texture texture);
+     void TextureBind(Texture texture, i32 slot);
+     i32 TextureWidth(Texture texture);
+     i32 TextureHeight(Texture texture);
 };

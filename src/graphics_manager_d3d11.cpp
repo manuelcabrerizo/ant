@@ -93,7 +93,11 @@ struct GraphicsManagerState
      
 };
 
+// State of the graphics manager
 static GraphicsManagerState gGraphicsManagerState;
+// Behavior of the graphics manager
+GraphicsManager GraphicsManager::instance;
+bool GraphicsManager::initialize = false;
 
 static void DirectXCreateDeviceAndSwapChain(GraphicsManagerState *state)
 {
@@ -346,8 +350,13 @@ static void DirectX11CreateRasterizerStates(GraphicsManagerState *state)
      state->device->CreateRasterizerState(&wireFrameRasterizerDesc, &state->wireFrameRasterizer);
 }
 
-static void DirectX11Init(void *osWindow, i32 width, i32 height)
+void GraphicsManager::Init(void *osWindow, i32 width, i32 height)
 {
+     if(initialize)
+     {
+          ASSERT(!"Error: graphics manager already initialize");
+     }
+     
      GraphicsManagerState *state = &gGraphicsManagerState;
      state->window = (HWND *)osWindow;
      state->windowWidth = width;
@@ -363,8 +372,6 @@ static void DirectX11Init(void *osWindow, i32 width, i32 height)
      //  Default renderer settings
      state->deviceContext->OMSetRenderTargets(1, &state->renderTargetView, state->depthStencilView);
      state->deviceContext->PSSetSamplers(0, 1, &state->samplerStateLinearWrap);
-
-     GraphicsManager::SetRasterizerStateCullBack();
 
      D3D11_VIEWPORT viewport;
      viewport.TopLeftX = 0;
@@ -382,12 +389,20 @@ static void DirectX11Init(void *osWindow, i32 width, i32 height)
      state->frameBuffers.Init(MAX_FRAME_BUFFER_COUNT, &state->arena);
      state->shaders.Init(MAX_SHADER_COUNT, &state->arena);
      state->textures.Init(MAX_TEXTURE_COUNT, &state->arena);
-     
+
+     initialize = true;
      printf("DirectX11 Initialized!\n");
+
+     GraphicsManager::Get()->SetRasterizerStateCullBack();
 }
 
-static void DirectX11Terminate()
+void GraphicsManager::Terminate()
 {
+     if(!initialize)
+     {
+          ASSERT(!"Error: graphics manager has not been initialize");
+     }
+     
      GraphicsManagerState *state = &gGraphicsManagerState;
      
      state->arena.Terminate();
@@ -405,8 +420,18 @@ static void DirectX11Terminate()
      state->swapChain->Release();
      state->deviceContext->Release();
      state->device->Release();
-     
+
+     initialize = false;
      printf("DirectX11 Terminated!\n");
+}
+
+GraphicsManager *GraphicsManager::Get()
+{
+     if(!initialize)
+     {
+          ASSERT(!"Error: graphics manager has not been initialize");
+     }
+     return &instance;
 }
 
 

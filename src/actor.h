@@ -81,4 +81,6 @@ public:
      InputComponent *GetInputComponent(SlotmapKey<Actor> actorKey);
      CameraComponent *GetCameraComponent(SlotmapKey<Actor> actorKey);
      WeaponComponent *GetWeaponComponent(SlotmapKey<Actor> actorKey);
+
+     void PrintActorAndCompoenentState();
 };

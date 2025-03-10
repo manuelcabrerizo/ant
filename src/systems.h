@@ -5,7 +5,7 @@ class InputSystem
 public:
      void Init();
      void Terminate();
-     void Update(InputManager *input, ActorManager *am, f32 dt);
+     void Update(ActorManager *am, f32 dt);
 };
 
 

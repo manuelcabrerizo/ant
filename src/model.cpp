@@ -47,8 +47,8 @@ void Model::Init(const char *filepath, Arena *arena)
      ASSERT(verticesCount == totalVerticesCount);
      ASSERT(indicesCount == totalIndicesCount);
      
-     vertexBuffer = GraphicsManager::VertexBufferAlloc((void *)vertices, verticesCount, sizeof(Vertex));
-     indexBuffer = GraphicsManager::IndexBufferAlloc(indices, indicesCount);
+     vertexBuffer = GraphicsManager::Get()->VertexBufferAlloc((void *)vertices, verticesCount, sizeof(Vertex));
+     indexBuffer = GraphicsManager::Get()->IndexBufferAlloc(indices, indicesCount);
 }
 
 void Model::Init(Vertex *vertices, u32 verticesCount_,
@@ -56,19 +56,19 @@ void Model::Init(Vertex *vertices, u32 verticesCount_,
 {
      verticesCount = verticesCount_;
      indicesCount = indicesCount_;
-     vertexBuffer = GraphicsManager::VertexBufferAlloc((void *)vertices, verticesCount, sizeof(Vertex));
-     indexBuffer = GraphicsManager::IndexBufferAlloc(indices, indicesCount);
+     vertexBuffer = GraphicsManager::Get()->VertexBufferAlloc((void *)vertices, verticesCount, sizeof(Vertex));
+     indexBuffer = GraphicsManager::Get()->IndexBufferAlloc(indices, indicesCount);
 }
 
 void Model::Terminate()
 {
-     GraphicsManager::IndexBufferFree(indexBuffer);
-     GraphicsManager::VertexBufferFree(vertexBuffer);
+     GraphicsManager::Get()->IndexBufferFree(indexBuffer);
+     GraphicsManager::Get()->VertexBufferFree(vertexBuffer);
 }
 
 void Model::Draw()
 {
-     GraphicsManager::VertexBufferBind(vertexBuffer);
-     GraphicsManager::IndexBufferBind(indexBuffer);
-     GraphicsManager::Draw(verticesCount);
+     GraphicsManager::Get()->VertexBufferBind(vertexBuffer);
+     GraphicsManager::Get()->IndexBufferBind(indexBuffer);
+     GraphicsManager::Get()->Draw(verticesCount);
 }

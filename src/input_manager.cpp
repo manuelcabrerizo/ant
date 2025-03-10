@@ -1,3 +1,34 @@
+InputManager InputManager::instance;
+bool InputManager::initialize = false;
+
+void InputManager::Init()
+{
+     if(initialize)
+     {
+          ASSERT(!"Error: input manager already initialize");
+     }
+     memset(&instance, 0, sizeof(InputManager));
+     initialize = true;
+}
+
+void InputManager::Terminate()
+{
+     if(!initialize)
+     {
+          ASSERT(!"Error: input manager has not been initialize");
+     }
+     initialize = false;
+}
+
+InputManager *InputManager::Get()
+{
+     if(!initialize)
+     {
+          ASSERT(!"Error: input manager has not been initialize");
+     }
+     return &instance;
+}
+
 bool InputManager::KeyDown(u32 key)
 {
      return keys[0][key];

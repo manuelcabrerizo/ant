@@ -32,6 +32,6 @@ private:
 public:     
      void Init();
      void Terminate();
-     void Update(InputManager *input, f32 dt);
+     void Update(f32 dt);
      void Render();
 };

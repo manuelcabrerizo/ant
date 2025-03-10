@@ -8,7 +8,7 @@ void Game::Init()
      // Load the shader
      File vertFile = PlatformReadFile("../data/shaders/vert.hlsl", &gameArena);
      File fragFile = PlatformReadFile("../data/shaders/frag.hlsl", &gameArena);
-     shader = GraphicsManager::ShaderAlloc(vertFile, fragFile);
+     shader = GraphicsManager::Get()->ShaderAlloc(vertFile, fragFile);
      
      // Load the models
      cube.Init("../data/models/cube.obj", &gameArena);
@@ -20,8 +20,8 @@ void Game::Init()
 
 
      // Load a texture
-     texture = GraphicsManager::TextureAlloc("../data/textures/texture_13.png");
-     warriorTexture = GraphicsManager::TextureAlloc("../data/textures/warrior.png");
+     texture = GraphicsManager::Get()->TextureAlloc("../data/textures/texture_13.png");
+     warriorTexture = GraphicsManager::Get()->TextureAlloc("../data/textures/warrior.png");
 
      // Reset the memory for runtime use
      gameArena.Clear();
@@ -73,13 +73,14 @@ void Game::Init()
      printf("Allocation count: %d\n", Arena::allocationCount);
 }
 
-void Game::Update(InputManager *input, f32 dt)
+void Game::Update(f32 dt)
 {
-     inputSystem.Update(input, &am, dt);
+     inputSystem.Update(&am, dt);
      cameraSystem.Update(&am, dt);
      weaponSystem.Update(&am, dt);
-     
-     if(input->KeyJustDown(KEY_1) && !usingFirstWeapon)
+
+     InputManager *im = InputManager::Get();
+     if(im->KeyJustDown(KEY_1) && !usingFirstWeapon)
      {
           am.RemoveRenderComponent(secondWeapon);
           am.AddRenderComponent(firstWeapon, sniper, texture);
@@ -88,8 +89,10 @@ void Game::Update(InputManager *input, f32 dt)
           am.AddWeaponComponent(player, firstWeapon);
 
           usingFirstWeapon = true;
+
+          am.PrintActorAndCompoenentState();
      }
-     if(input->KeyJustDown(KEY_2) && usingFirstWeapon)
+     if(im->KeyJustDown(KEY_2) && usingFirstWeapon)
      {
           am.RemoveRenderComponent(firstWeapon);
           am.AddRenderComponent(secondWeapon, pistol, texture);
@@ -98,18 +101,20 @@ void Game::Update(InputManager *input, f32 dt)
           am.AddWeaponComponent(player, secondWeapon);
 
           usingFirstWeapon = false;
+
+          am.PrintActorAndCompoenentState();
      }
 }
 
 void Game::Render()
 {    
-     GraphicsManager::BeginFrame(1.0f, 0.0f, 1.0f);
+     GraphicsManager::Get()->BeginFrame(1.0f, 0.0f, 1.0f);
 
-     GraphicsManager::ShaderBind(shader);
+     GraphicsManager::Get()->ShaderBind(shader);
 
      renderSystem.Render(&am, 0.0f);
      
-     GraphicsManager::EndFrame(1);
+     GraphicsManager::Get()->EndFrame(1);
 }
 
 void Game::Terminate()
@@ -121,9 +126,9 @@ void Game::Terminate()
      
      am.Terminate();
 
-     GraphicsManager::TextureFree(warriorTexture);
-     GraphicsManager::TextureFree(texture);
-     GraphicsManager::ShaderFree(shader);
+     GraphicsManager::Get()->TextureFree(warriorTexture);
+     GraphicsManager::Get()->TextureFree(texture);
+     GraphicsManager::Get()->ShaderFree(shader);
      cube.Terminate();
      plane.Terminate();
      pistol.Terminate();

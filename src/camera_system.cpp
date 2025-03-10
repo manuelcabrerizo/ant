@@ -2,13 +2,13 @@ void CameraSystem::Init()
 {
      ubo.view = lookAt(vec3(0.0f, 4.0f, -4.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
      ubo.proj = perspective(radians(60.0f), (float)WINDOW_WIDTH/WINDOW_HEIGHT, 0.01f, 100.0f);
-     uniformBuffer = GraphicsManager::UniformBufferAlloc(BIND_TO_VS, &ubo, sizeof(ubo), 0);
-     GraphicsManager::UniformBufferBind(uniformBuffer);
+     uniformBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_VS, &ubo, sizeof(ubo), 0);
+     GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
 }
 
 void CameraSystem::Terminate()
 {
-     GraphicsManager::UniformBufferFree(uniformBuffer);
+     GraphicsManager::Get()->UniformBufferFree(uniformBuffer);
 }
 
 void CameraSystem::Update(ActorManager *am, f32 dt)
@@ -23,6 +23,6 @@ void CameraSystem::Update(ActorManager *am, f32 dt)
           camera->SetPosition(transform->position);
           camera->SetDirection(transform->direction);
           ubo.view = camera->GetView();
-          GraphicsManager::UniformBufferUpdate(uniformBuffer, &ubo);
+          GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
      }
 }

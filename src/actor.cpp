@@ -179,3 +179,14 @@ WeaponComponent *ActorManager::GetWeaponComponent(SlotmapKey<Actor> actorKey)
      return weaponComponents.Get(actor->weapon);
 }
 
+
+void ActorManager::PrintActorAndCompoenentState()
+{
+     printf("Actors count: %d\n", actors.Size());
+     printf("transformComponents count: %d\n", transformComponents.Size());
+     printf("renderComponents count: %d\n", renderComponents.Size());
+     printf("inputComponents count: %d\n", inputComponents.Size());
+     printf("cameraComponents count: %d\n", cameraComponents.Size());
+     printf("weaponComponents count: %d\n", weaponComponents.Size());
+}
+
