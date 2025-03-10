@@ -10,7 +10,6 @@ void InputSystem::Terminate()
 
 void InputSystem::Update(ActorManager *am, float dt)
 {
-     InputManager *im = InputManager::Get();
      Array<InputComponent> *inputs = am->GetInputComponents();
      for(u32 i = 0; i < inputs->size; ++i)
      {
@@ -20,19 +19,19 @@ void InputSystem::Update(ActorManager *am, float dt)
           CameraComponent *camera = am->GetCameraComponent(actor);
 
           vec3 playerVel = vec3(0.0f);
-          if(im->KeyDown(KEY_A))
+          if(InputManager::Get()->KeyDown(KEY_A))
           {
                playerVel -= camera->GetRight();
           }
-          if(im->KeyDown(KEY_D))
+          if(InputManager::Get()->KeyDown(KEY_D))
           {
                playerVel += camera->GetRight();
           }
-          if(im->KeyDown(KEY_W))
+          if(InputManager::Get()->KeyDown(KEY_W))
           {
                playerVel += camera->GetWorldFront();
           }
-          if(im->KeyDown(KEY_S))
+          if(InputManager::Get()->KeyDown(KEY_S))
           {
                playerVel -= camera->GetWorldFront();
           }
@@ -42,19 +41,19 @@ void InputSystem::Update(ActorManager *am, float dt)
           }
           transform->position += playerVel * dt;
 
-          if(im->MouseButtonJustDown(MOUSE_BUTTON_RIGHT))
+          if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_RIGHT))
           {
                PlatformShowMouse(false);
           }
-          if(im->MouseButtonJustUp(MOUSE_BUTTON_RIGHT))
+          if(InputManager::Get()->MouseButtonJustUp(MOUSE_BUTTON_RIGHT))
           {
                PlatformShowMouse(true);
           }
           
-          if(im->MouseButtonDown(MOUSE_BUTTON_RIGHT))
+          if(InputManager::Get()->MouseButtonDown(MOUSE_BUTTON_RIGHT))
           {
-               input->yaw += im->MouseXMovement() * 0.0016f;
-               input->pitch += im->MouseYMovement() * 0.0016f;
+               input->yaw += InputManager::Get()->MouseXMovement() * 0.0016f;
+               input->pitch += InputManager::Get()->MouseYMovement() * 0.0016f;
                if(input->pitch > radians(89.0f))
                {
                     input->pitch = radians(89.0f);
@@ -72,8 +71,8 @@ void InputSystem::Update(ActorManager *am, float dt)
                PlaformGetWindowPos(&windowX, &windowY);
                PlatformClientDimensions(&windowW, &windowH);
                PlaformSetCursorPos(windowX + (windowW/2), windowY + (windowH/2)); 
-               im->SetMousePosition(windowW/2, windowH/2);
-               im->SetMouseLastPosition(windowW/2, windowH/2);
+               InputManager::Get()->SetMousePosition(windowW/2, windowH/2);
+               InputManager::Get()->SetMouseLastPosition(windowW/2, windowH/2);
           }          
      }
 }

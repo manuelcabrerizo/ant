@@ -9,6 +9,9 @@ void Game::Init()
      File vertFile = PlatformReadFile("../data/shaders/vert.hlsl", &gameArena);
      File fragFile = PlatformReadFile("../data/shaders/frag.hlsl", &gameArena);
      shader = GraphicsManager::Get()->ShaderAlloc(vertFile, fragFile);
+
+     tinyxml2::XMLDocument doc;
+     doc.LoadFile("../data/xml/test.xml");
      
      // Load the models
      cube.Init("../data/models/cube.obj", &gameArena);
@@ -17,7 +20,6 @@ void Game::Init()
      sniper.Init("../data/models/sniper.obj", &gameArena);
      warrior.Init("../data/models/warrior.dae", &gameArena);
      wall.Init("../data/models/wall.obj", &gameArena);
-
 
      // Load a texture
      texture = GraphicsManager::Get()->TextureAlloc("../data/textures/texture_13.png");
@@ -79,8 +81,7 @@ void Game::Update(f32 dt)
      cameraSystem.Update(&am, dt);
      weaponSystem.Update(&am, dt);
 
-     InputManager *im = InputManager::Get();
-     if(im->KeyJustDown(KEY_1) && !usingFirstWeapon)
+     if(InputManager::Get()->KeyJustDown(KEY_1) && !usingFirstWeapon)
      {
           am.RemoveRenderComponent(secondWeapon);
           am.AddRenderComponent(firstWeapon, sniper, texture);
@@ -92,7 +93,7 @@ void Game::Update(f32 dt)
 
           am.PrintActorAndCompoenentState();
      }
-     if(im->KeyJustDown(KEY_2) && usingFirstWeapon)
+     if(InputManager::Get()->KeyJustDown(KEY_2) && usingFirstWeapon)
      {
           am.RemoveRenderComponent(firstWeapon);
           am.AddRenderComponent(secondWeapon, pistol, texture);

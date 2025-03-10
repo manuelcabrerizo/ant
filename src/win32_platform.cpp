@@ -1,3 +1,7 @@
+// tinyxml2
+#include "tinyxml2.h"
+#include "tinyxml2.cpp"
+
 #include <Windows.h>
 #include <Windowsx.h>
 

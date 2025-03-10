@@ -22,11 +22,7 @@ void WeaponSystem::Update(ActorManager *am, f32 dt)
           vec3 front = normalize(transform->direction);
           vec3 right = normalize(cross(vec3(0.0f, 1.0f, 0.0f), front));
           vec3 up = cross(front, right);
-          weaponTransform->position =
-               transform->position +
-               front * 0.15f +
-               right * 0.05f +
-               up * -0.075f;
+          weaponTransform->position = transform->position + front * 0.15f + right * 0.05f + up * -0.075f;
           weaponTransform->direction = transform->direction;
      }
 }
