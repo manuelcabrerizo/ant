@@ -26,7 +26,7 @@ struct Frame
 #define STACK_LOW 0
 #define STACK_UP 1
 
-class DobleStackAllocator
+class DoubleStackAllocator
 {
 private:
      i32 byteAlignment;
@@ -40,5 +40,4 @@ public:
      void *Alloc(u64 size, i32 stackNum);
      Frame GetFrame(i32 stackNum);
      void ReleaseFrame(Frame frame);
-     
 };

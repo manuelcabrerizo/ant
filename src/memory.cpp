@@ -1,6 +1,6 @@
 #include <memory.h>
 
-void DobleStackAllocator::Init(u64 size, size_t byteAlignment_)
+void DoubleStackAllocator::Init(u64 size, size_t byteAlignment_)
 {
      // first make sure size if a multiple of byteAligment
      size = ALIGNUP(size, byteAlignment_);
@@ -24,12 +24,12 @@ void DobleStackAllocator::Init(u64 size, size_t byteAlignment_)
      head[1] = baseAndCap[1];
 }
 
-void DobleStackAllocator::Terminate()
+void DoubleStackAllocator::Terminate()
 {
      free(memoryBlock);
 }
 
-void *DobleStackAllocator::Alloc(u64 size, i32 stackNum)
+void *DoubleStackAllocator::Alloc(u64 size, i32 stackNum)
 {
      u8 *mem = 0;
 
@@ -61,7 +61,7 @@ void *DobleStackAllocator::Alloc(u64 size, i32 stackNum)
      return (void *)mem;
 }
 
-Frame DobleStackAllocator::GetFrame(i32 stackNum)
+Frame DoubleStackAllocator::GetFrame(i32 stackNum)
 {
      Frame frame;
      frame.frame = head[stackNum];
@@ -69,7 +69,7 @@ Frame DobleStackAllocator::GetFrame(i32 stackNum)
      return frame;
 }
 
-void DobleStackAllocator::ReleaseFrame(Frame frame)
+void DoubleStackAllocator::ReleaseFrame(Frame frame)
 {
      head[frame.stackNum] = frame.frame;
 }
