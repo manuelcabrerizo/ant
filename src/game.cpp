@@ -2,29 +2,29 @@ void Game::Init()
 {
      printf("Game Init!\n");
 
-     Frame frame = gAllocator.GetFrame(STACK_LOW);
+     Frame frame = MemoryManager::Get()->GetFrame(STACK_LOW);
      // Load the shader
      File vertFile = PlatformReadFile("../data/shaders/vert.hlsl", STACK_LOW);
      File fragFile = PlatformReadFile("../data/shaders/frag.hlsl", STACK_LOW);
      shader = GraphicsManager::Get()->ShaderAlloc(vertFile, fragFile);
 
+     MemoryManager::Get()->ReleaseFrame(frame);
+
      tinyxml2::XMLDocument doc;
      doc.LoadFile("../data/xml/test.xml");
      
      // Load the models
-     cube.Init("../data/models/cube.obj", STACK_LOW);
-     plane.Init("../data/models/plane.obj", STACK_LOW);
-     pistol.Init("../data/models/pistol.obj", STACK_LOW);
-     sniper.Init("../data/models/sniper.obj", STACK_LOW);
-     warrior.Init("../data/models/warrior.dae", STACK_LOW);
-     wall.Init("../data/models/wall.obj", STACK_LOW);
+     cube.Init("../data/models/cube.obj");
+     plane.Init("../data/models/plane.obj");
+     pistol.Init("../data/models/pistol.obj");
+     sniper.Init("../data/models/sniper.obj");
+     warrior.Init("../data/models/warrior.dae");
+     wall.Init("../data/models/wall.obj");
 
      // Load a texture
      texture = GraphicsManager::Get()->TextureAlloc("../data/textures/texture_13.png");
      warriorTexture = GraphicsManager::Get()->TextureAlloc("../data/textures/warrior.png");
 
-     // Reset the memory for runtime use
-     gAllocator.ReleaseFrame(frame);
      
      // Initialize the Actor Manager
      am.Init(STACK_UP);
@@ -34,6 +34,9 @@ void Game::Init()
      cameraSystem.Init();
      renderSystem.Init();
      weaponSystem.Init();
+
+     // Register system to be notify
+     NotificationManager::Get()->RegisterListener(&weaponSystem, NOTIFICATION_SHOOT);
 
      // Create sniper
      firstWeapon = am.CreateActor();
@@ -68,7 +71,7 @@ void Game::Init()
      // Create floor
      SlotmapKey<Actor> floor = am.CreateActor();
      am.AddTransformComponent(floor, vec3(0.0f), vec3(1.0f), vec3(0.0f, 0.0f, 1.0f));
-     am.AddRenderComponent(floor, plane, texture);
+     am.AddRenderComponent(floor, plane, texture);     
 }
 
 void Game::Update(f32 dt)

@@ -1,6 +1,6 @@
 static Assimp::Importer gImporter;
 
-void Model::Init(const char *filepath, i32 stackNum)
+void Model::Init(const char *filepath)
 {
 /*
      aiProcess_MakeLeftHanded |
@@ -16,8 +16,9 @@ void Model::Init(const char *filepath, i32 stackNum)
           totalIndicesCount += mesh->mNumFaces * 3;
      }
 
-     Vertex *vertices = (Vertex *)gAllocator.Alloc(totalVerticesCount * sizeof(Vertex), stackNum);
-     u32 *indices = (u32 *)gAllocator.Alloc(totalIndicesCount * sizeof(u32), stackNum);
+     Frame frame = MemoryManager::Get()->GetFrame(STACK_LOW);
+     Vertex *vertices = (Vertex *)MemoryManager::Get()->Alloc(totalVerticesCount * sizeof(Vertex), STACK_LOW);
+     u32 *indices = (u32 *)MemoryManager::Get()->Alloc(totalIndicesCount * sizeof(u32), STACK_LOW);
 
      verticesCount = 0;
      indicesCount = 0;
@@ -49,6 +50,8 @@ void Model::Init(const char *filepath, i32 stackNum)
      
      vertexBuffer = GraphicsManager::Get()->VertexBufferAlloc((void *)vertices, verticesCount, sizeof(Vertex));
      indexBuffer = GraphicsManager::Get()->IndexBufferAlloc(indices, indicesCount);
+
+     MemoryManager::Get()->ReleaseFrame(frame);
 }
 
 void Model::Init(Vertex *vertices, u32 verticesCount_,

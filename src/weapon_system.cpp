@@ -26,3 +26,14 @@ void WeaponSystem::Update(ActorManager *am, f32 dt)
           weaponTransform->direction = transform->direction;
      }
 }
+
+void WeaponSystem::OnNotify(NotificationType type, Notification notification, void *sender)
+{
+     switch(type)
+     {
+     case NOTIFICATION_SHOOT:
+     {
+          printf((const char *)notification.data);
+     } break;
+     }
+}

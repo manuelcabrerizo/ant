@@ -31,9 +31,11 @@ struct File
 // engine
 #include "common.h"
 #include "memory.h"
+#include "memory_manager.h"
 #include "containers.h"
 #include "graphics_manager.h"
 #include "input_manager.h"
+#include "notification_manager.h"
 #include "model.h"
 
 #include "camera_component.h"
@@ -48,13 +50,13 @@ void PlatformShowMouse(bool show);
 void PlatformClientDimensions(i32 *width, i32 *height);
 File PlatformReadFile(const char *filepath, i32 stackNum);
 
-DoubleStackAllocator gAllocator;
-
 // unity build
 #include "memory.cpp"
+#include "memory_manager.cpp"
 #include "containers.cpp"
 #include "graphics_manager_d3d11.cpp"
 #include "input_manager.cpp"
+#include "notification_manager.cpp"
 #include "model.cpp"
 
 #include "camera_component.cpp"
@@ -167,7 +169,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
      wndClass.lpszMenuName = 0;
      wndClass.lpszClassName = "AntWindowClass";
 
-     gAllocator.Init(MB(100), 4);
+     MemoryManager::Init(MB(100), 4);
      InputManager::Init();               
      
      if(RegisterClassA(&wndClass))
@@ -180,6 +182,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
           if(window)
           {
                GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT, STACK_UP);
+               NotificationManager::Init(STACK_UP);
 
                Game game;
                game.Init();
@@ -220,6 +223,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                }
                game.Terminate();
 
+               NotificationManager::Terminate();
                GraphicsManager::Terminate();
           }
           else
@@ -233,7 +237,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
      }
 
      InputManager::Terminate();
-     gAllocator.Terminate();
+     MemoryManager::Terminate();
 
      return 0;
 }
@@ -275,7 +279,7 @@ File PlatformReadFile(const char *filepath, i32 stackNum)
      LARGE_INTEGER size;
      GetFileSizeEx(hFile, &size);
 
-     void *data = gAllocator.Alloc(size.QuadPart + 1, stackNum);
+     void *data = MemoryManager::Get()->Alloc(size.QuadPart + 1, stackNum);
      memset(data, 0, size.QuadPart + 1);
      DWORD bytesRead = 0;
      if(!ReadFile(hFile, data, size.QuadPart, &bytesRead, 0))

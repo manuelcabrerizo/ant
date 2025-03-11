@@ -73,6 +73,14 @@ void InputSystem::Update(ActorManager *am, float dt)
                PlaformSetCursorPos(windowX + (windowW/2), windowY + (windowH/2)); 
                InputManager::Get()->SetMousePosition(windowW/2, windowH/2);
                InputManager::Get()->SetMouseLastPosition(windowW/2, windowH/2);
-          }          
+          }
+          
+          if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
+          {
+               Notification notification = {};
+               const char *message = "te dispare gato\n";
+               memcpy(notification.data, message, strlen(message));
+               NotificationManager::Get()->SendNotification(notification, NOTIFICATION_SHOOT, (void *)this);
+          }  
      }
 }

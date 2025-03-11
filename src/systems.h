@@ -42,10 +42,12 @@ public:
      void Render(ActorManager *am, f32 dt);
 };
 
-class WeaponSystem
+class WeaponSystem : public INotificable
 {
 public:
      void Init();
      void Terminate();
      void Update(ActorManager *am, f32 dt);
+
+     void OnNotify(NotificationType type, Notification notification, void *sender) override;
 };

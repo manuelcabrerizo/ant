@@ -224,7 +224,7 @@ static HRESULT DirectXCreateInputLayoutDescFromVertexShaderSignature(ID3DBlob* p
      pVertexShaderReflection->GetDesc( &shaderDesc );
  
      // Read input layout description from shader info
-     Frame frame = gAllocator.GetFrame(STACK_LOW);
+     Frame frame = MemoryManager::Get()->GetFrame(STACK_LOW);
 
      Array<D3D11_INPUT_ELEMENT_DESC> inputLayoutDesc;
      inputLayoutDesc.Init(shaderDesc.InputParameters, STACK_LOW);
@@ -276,7 +276,7 @@ static HRESULT DirectXCreateInputLayoutDescFromVertexShaderSignature(ID3DBlob* p
      // Try to create Input Layout
      HRESULT hr = state->device->CreateInputLayout(inputLayoutDesc.data, inputLayoutDesc.size, pShaderBlob->GetBufferPointer(), pShaderBlob->GetBufferSize(), pInputLayout);
 
-     gAllocator.ReleaseFrame(frame);
+     MemoryManager::Get()->ReleaseFrame(frame);
      
      //Free allocation shader reflection memory
      pVertexShaderReflection->Release();
