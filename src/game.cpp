@@ -24,7 +24,6 @@ void Game::Init()
      // Load a texture
      texture = GraphicsManager::Get()->TextureAlloc("../data/textures/texture_13.png");
      warriorTexture = GraphicsManager::Get()->TextureAlloc("../data/textures/warrior.png");
-
      
      // Initialize the Actor Manager
      am.Init(STACK_UP);

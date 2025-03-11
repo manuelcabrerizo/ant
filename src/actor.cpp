@@ -41,31 +41,6 @@ Actor *ActorManager::GetActor(SlotmapKey<Actor> actorKey)
      return actors.Get(actorKey);
 }
 
-Array<TransformComponent> *ActorManager::GetTransformComponents()
-{
-     return transformComponents.GetArray();
-}
-
-Array<RenderComponent> *ActorManager::GetRenderComponents()
-{
-     return renderComponents.GetArray();
-}
-
-Array<InputComponent> *ActorManager::GetInputComponents()
-{
-     return inputComponents.GetArray();
-}
-
-Array<CameraComponent> *ActorManager::GetCameraComponents()
-{
-     return cameraComponents.GetArray();
-}
-
-Array<WeaponComponent> *ActorManager::GetWeaponComponents()
-{
-     return weaponComponents.GetArray();
-}
-
 void ActorManager::AddTransformComponent(SlotmapKey<Actor> actorKey,
                                          vec3 position, vec3 scale, vec3 direction)
 {    
@@ -119,66 +94,45 @@ void ActorManager::AddWeaponComponent(SlotmapKey<Actor> actorKey, SlotmapKey<Act
      actor->weapon = key;
 }
 
-void ActorManager::RemoveTransformComponent(SlotmapKey<Actor> actorKey)
-{
-     Actor *actor = GetActor(actorKey);
-     if(actor->transform.gen != INVALID_KEY) transformComponents.Remove(actor->transform);
+#define GetComponentsImp(type, slotmap) \
+Array<type> *ActorManager::Get##type##s() \
+{ \
+     return slotmap.GetArray(); \
 }
 
-void ActorManager::RemoveRenderComponent(SlotmapKey<Actor> actorKey)
-{
-     Actor *actor = GetActor(actorKey);
-     if(actor->render.gen != INVALID_KEY) renderComponents.Remove(actor->render);
+GetComponentsImp(TransformComponent, transformComponents);
+GetComponentsImp(RenderComponent, renderComponents);
+GetComponentsImp(InputComponent, inputComponents);
+GetComponentsImp(CameraComponent, cameraComponents);
+GetComponentsImp(WeaponComponent, weaponComponents);
+
+
+#define RemoveComponentImp(type, slotmapKey, slotmap) \
+void ActorManager::Remove##type(SlotmapKey<Actor> actorKey) \
+{ \
+     Actor *actor = GetActor(actorKey); \
+     if(actor->slotmapKey.gen != INVALID_KEY) slotmap.Remove(actor->slotmapKey); \
 }
 
-void ActorManager::RemoveInputComponent(SlotmapKey<Actor> actorKey)
-{
-     Actor *actor = GetActor(actorKey);;
-     if(actor->input.gen != INVALID_KEY) inputComponents.Remove(actor->input);
+RemoveComponentImp(TransformComponent, transform, transformComponents);
+RemoveComponentImp(RenderComponent, render, renderComponents);
+RemoveComponentImp(InputComponent, input, inputComponents);
+RemoveComponentImp(CameraComponent, camera, cameraComponents);
+RemoveComponentImp(WeaponComponent, weapon, weaponComponents);
+
+
+#define GetComponentImp(type, slotmapKey, slotmap) \
+type *ActorManager::Get##type(SlotmapKey<Actor> actorKey) \
+{ \
+     Actor *actor = GetActor(actorKey); \
+     return slotmap.Get(actor->slotmapKey); \
 }
 
-void ActorManager::RemoveCameraComponent(SlotmapKey<Actor> actorKey)
-{
-     Actor *actor = GetActor(actorKey);
-     if(actor->camera.gen != INVALID_KEY) cameraComponents.Remove(actor->camera);
-}
-
-void ActorManager::RemoveWeaponComponent(SlotmapKey<Actor> actorKey)
-{
-     Actor *actor = GetActor(actorKey);
-     if(actor->weapon.gen != INVALID_KEY) weaponComponents.Remove(actor->weapon);
-}
-
-TransformComponent *ActorManager::GetTransformComponent(SlotmapKey<Actor> actorKey)
-{
-     Actor *actor = GetActor(actorKey);
-     return transformComponents.Get(actor->transform);
-}
-
-RenderComponent *ActorManager::GetRenderComponent(SlotmapKey<Actor> actorKey)
-{
-     Actor *actor = GetActor(actorKey);
-     return renderComponents.Get(actor->render);
-}
-
-InputComponent *ActorManager::GetInputComponent(SlotmapKey<Actor> actorKey)
-{
-     Actor *actor = GetActor(actorKey);
-     return inputComponents.Get(actor->input);
-}
-
-CameraComponent *ActorManager::GetCameraComponent(SlotmapKey<Actor> actorKey)
-{
-     Actor *actor = GetActor(actorKey);
-     return cameraComponents.Get(actor->camera);
-}
-
-WeaponComponent *ActorManager::GetWeaponComponent(SlotmapKey<Actor> actorKey)
-{
-     Actor *actor = GetActor(actorKey);
-     return weaponComponents.Get(actor->weapon);
-}
-
+GetComponentImp(TransformComponent, transform, transformComponents);
+GetComponentImp(RenderComponent, render, renderComponents);
+GetComponentImp(InputComponent, input, inputComponents);
+GetComponentImp(CameraComponent, camera, cameraComponents);
+GetComponentImp(WeaponComponent, weapon, weaponComponents);
 
 void ActorManager::PrintActorAndCompoenentState()
 {
