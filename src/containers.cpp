@@ -1,9 +1,9 @@
 template <typename Type>
-void Array<Type>::Init(u32 capacity_, Arena *arena)
+void Array<Type>::Init(u32 capacity_, i32 stackNum)
 {
      capacity = capacity_;
      size = 0;
-     data = (Type *)arena->PushSize(capacity * sizeof(Type));
+     data = (Type *)gAllocator.Alloc(capacity * sizeof(Type), stackNum);
      memset(data, 0, capacity * sizeof(Type));
 }
 
@@ -24,12 +24,12 @@ Type *Array<Type>::Push(Type value)
 }
 
 template <typename Type>
-void Slotmap<Type>::Init(u32 size, Arena *arena)
+void Slotmap<Type>::Init(u32 size, i32 stackNum)
 {
-     indices.Init(size, arena);
+     indices.Init(size, stackNum);
      indices.size = size;
-     data.Init(size, arena);
-     erase.Init(size, arena);
+     data.Init(size, stackNum);
+     erase.Init(size, stackNum);
 
      freeList = 0;
      generation = 0;

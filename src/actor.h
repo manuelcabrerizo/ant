@@ -50,7 +50,7 @@ private:
      Slotmap<WeaponComponent> weaponComponents;
      
 public:
-     void Init(Arena *arena);
+     void Init(i32 stackNum);
      void Terminate();
 
      SlotmapKey<Actor> CreateActor();

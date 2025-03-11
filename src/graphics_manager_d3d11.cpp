@@ -82,8 +82,7 @@ struct GraphicsManagerState
      ID3D11BlendState *alphaBlendOn;
      ID3D11BlendState *alphaBlendOff;
      ID3D11BlendState *additiveBlending;
-
-     Arena arena;
+     
      Slotmap<DirectXVertexBuffer> vertexBuffers;
      Slotmap<DirectXIndexBuffer> indexBuffers;
      Slotmap<DirectXUniformBuffer> uniformBuffers;
@@ -225,11 +224,10 @@ static HRESULT DirectXCreateInputLayoutDescFromVertexShaderSignature(ID3DBlob* p
      pVertexShaderReflection->GetDesc( &shaderDesc );
  
      // Read input layout description from shader info
-     Arena tempArena;
-     tempArena.Init(sizeof(D3D11_INPUT_ELEMENT_DESC) * shaderDesc.InputParameters);
-     
+     Frame frame = gAllocator.GetFrame(STACK_LOW);
+
      Array<D3D11_INPUT_ELEMENT_DESC> inputLayoutDesc;
-     inputLayoutDesc.Init(shaderDesc.InputParameters, &tempArena);
+     inputLayoutDesc.Init(shaderDesc.InputParameters, STACK_LOW);
      
      for ( uint32 i=0; i< shaderDesc.InputParameters; i++ )
      {
@@ -278,7 +276,7 @@ static HRESULT DirectXCreateInputLayoutDescFromVertexShaderSignature(ID3DBlob* p
      // Try to create Input Layout
      HRESULT hr = state->device->CreateInputLayout(inputLayoutDesc.data, inputLayoutDesc.size, pShaderBlob->GetBufferPointer(), pShaderBlob->GetBufferSize(), pInputLayout);
 
-     tempArena.Terminate();
+     gAllocator.ReleaseFrame(frame);
      
      //Free allocation shader reflection memory
      pVertexShaderReflection->Release();
@@ -350,7 +348,7 @@ static void DirectX11CreateRasterizerStates(GraphicsManagerState *state)
      state->device->CreateRasterizerState(&wireFrameRasterizerDesc, &state->wireFrameRasterizer);
 }
 
-void GraphicsManager::Init(void *osWindow, i32 width, i32 height)
+void GraphicsManager::Init(void *osWindow, i32 width, i32 height, i32 stackNum)
 {
      if(initialize)
      {
@@ -382,13 +380,12 @@ void GraphicsManager::Init(void *osWindow, i32 width, i32 height)
      viewport.MaxDepth = 1.0f;
      state->deviceContext->RSSetViewports(1, &viewport);
         
-     state->arena.Init(GRAPHICS_MANAGER_MEMORY_SIZE);
-     state->vertexBuffers.Init(MAX_VERTEX_BUFFER_COUNT, &state->arena);
-     state->indexBuffers.Init(MAX_INDEX_BUFFER_COUNT, &state->arena);
-     state->uniformBuffers.Init(MAX_UNIFORM_BUFFER_COUNT, &state->arena);
-     state->frameBuffers.Init(MAX_FRAME_BUFFER_COUNT, &state->arena);
-     state->shaders.Init(MAX_SHADER_COUNT, &state->arena);
-     state->textures.Init(MAX_TEXTURE_COUNT, &state->arena);
+     state->vertexBuffers.Init(MAX_VERTEX_BUFFER_COUNT, stackNum);
+     state->indexBuffers.Init(MAX_INDEX_BUFFER_COUNT, stackNum);
+     state->uniformBuffers.Init(MAX_UNIFORM_BUFFER_COUNT, stackNum);
+     state->frameBuffers.Init(MAX_FRAME_BUFFER_COUNT, stackNum);
+     state->shaders.Init(MAX_SHADER_COUNT, stackNum);
+     state->textures.Init(MAX_TEXTURE_COUNT, stackNum);
 
      initialize = true;
      printf("DirectX11 Initialized!\n");
@@ -405,8 +402,6 @@ void GraphicsManager::Terminate()
      
      GraphicsManagerState *state = &gGraphicsManagerState;
      
-     state->arena.Terminate();
-
      state->wireFrameRasterizer->Release();
      state->fillRasterizerCullBack->Release();
      state->fillRasterizerCullFront->Release();

@@ -3,8 +3,6 @@
 class Game
 {
 private:
-     Arena gameArena;
-
      ActorManager am;
 
      InputSystem inputSystem;

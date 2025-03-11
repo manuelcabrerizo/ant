@@ -15,7 +15,7 @@ private:
      u32 verticesCount;
      u32 indicesCount;
 public:
-     void Init(const char *filepath, Arena *arena);
+     void Init(const char *filepath, i32 stackNum);
      void Init(Vertex *vertices, u32 verticesCount,
                u32 *indices, u32 indicesCount);
      void Terminate();

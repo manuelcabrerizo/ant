@@ -1,52 +1,75 @@
 #include <memory.h>
 
-u32 Arena::allocationCount;
-
-void Arena::Init(u64 size_)
+void DobleStackAllocator::Init(u64 size, size_t byteAlignment_)
 {
-     base = malloc(size_);
-     allocated = true;
-     size = size_;
-     used = 0;
-     allocationCount++;
-}
+     // first make sure size if a multiple of byteAligment
+     size = ALIGNUP(size, byteAlignment_);
 
-void Arena::Init(Arena *memory, u64 size_)
-{
-     base = memory->PushSize(size_);
-     allocated = false;
-     size = size_;
-     used = 0;
-}
-
-void Arena::Terminate()
-{
-     if(allocated)
+     // First allocate our memory block
+     memoryBlock = (u8 *)malloc(size + byteAlignment_);
+     if(!memoryBlock)
      {
-          free(base);
-          allocationCount--;
+          ASSERT(!"Error allocating memory");
      }
-     base = 0;
-     size = 0;
-     used = 0;
-     allocated = false;
+     
+     byteAlignment = byteAlignment_;
+
+     // Set up base pointer
+     baseAndCap[0] = AlignPointer<u8>(memoryBlock, byteAlignment);
+     // Set up cap pointer
+     baseAndCap[1] = AlignPointer<u8>(memoryBlock + size, byteAlignment);
+
+     // Finaly initialize the lower and upper frame pointers
+     head[0] = baseAndCap[0];
+     head[1] = baseAndCap[1];
 }
 
-void Arena::Clear()
+void DobleStackAllocator::Terminate()
 {
-     used = 0;
+     free(memoryBlock);
 }
 
-void *Arena::PushSize(u64 size_)
+void *DobleStackAllocator::Alloc(u64 size, i32 stackNum)
 {
-     ASSERT(used + size_ <= size);
-     void *data = (u8 *)base + used;
-     used += size_;
-     return data;
+     u8 *mem = 0;
+
+     // first align the requested size
+     size = ALIGNUP(size, byteAlignment);
+
+     // check for available memory
+     if(head[0] + size > head[1])
+     {
+          // insufficient memory
+          ASSERT(!"insufficient memory");
+          return 0;
+     }
+
+     // now perform the memory allocation
+     if(stackNum)
+     {
+          // Allocating from the upper stack, down
+          head[1] -= size;
+          mem = head[1];
+     }
+     else
+     {
+          // Allocating from the lower stack, up
+          mem = head[0];
+          head[0] += size;
+     }
+     
+     return (void *)mem;
 }
 
-void Arena::PopSize(u64 size_)
+Frame DobleStackAllocator::GetFrame(i32 stackNum)
 {
-     ASSERT(used - size_ >= 0);
-     used -= size_;
+     Frame frame;
+     frame.frame = head[stackNum];
+     frame.stackNum = stackNum;
+     return frame;
+}
+
+void DobleStackAllocator::ReleaseFrame(Frame frame)
+{
+     head[frame.stackNum] = frame.frame;
 }

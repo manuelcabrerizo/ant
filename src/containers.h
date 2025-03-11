@@ -10,7 +10,7 @@ public:
      u32 size = 0;
      Type *data = 0;
      
-     void Init(u32 size, Arena *arena);
+     void Init(u32 size, i32 stackNum);
      void Clear();
 
      Type *Push(Type value);
@@ -41,7 +41,7 @@ private:
      u32 elementCount = 0;
      
 public:
-     void Init(u32 size, Arena *arena);
+     void Init(u32 size, i32 stackNum);
      void Clear();
 
      SlotmapKey<Type> Add(Type value);

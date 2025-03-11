@@ -46,7 +46,9 @@ void PlaformGetWindowPos(i32 *x, i32 *y);
 void PlaformSetCursorPos(i32 x, i32 y);
 void PlatformShowMouse(bool show);
 void PlatformClientDimensions(i32 *width, i32 *height);
-File PlatformReadFile(const char *filepath, Arena *arena);
+File PlatformReadFile(const char *filepath, i32 stackNum);
+
+DobleStackAllocator gAllocator;
 
 // unity build
 #include "memory.cpp"
@@ -165,6 +167,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
      wndClass.lpszMenuName = 0;
      wndClass.lpszClassName = "AntWindowClass";
 
+     gAllocator.Init(MB(100), 4);
      InputManager::Init();               
      
      if(RegisterClassA(&wndClass))
@@ -176,7 +179,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                                       0, 0, hInstance, 0);
           if(window)
           {
-               GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT);
+               GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT, STACK_UP);
 
                Game game;
                game.Init();
@@ -230,6 +233,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
      }
 
      InputManager::Terminate();
+     gAllocator.Terminate();
 
      return 0;
 }
@@ -256,7 +260,7 @@ void PlatformClientDimensions(i32 *width, i32 *height)
      *height = gWindowHeight;
 }
 
-File PlatformReadFile(const char *filepath, Arena *arena)
+File PlatformReadFile(const char *filepath, i32 stackNum)
 {
      HANDLE hFile = CreateFileA(filepath, GENERIC_READ,
                                 FILE_SHARE_READ, 0,
@@ -271,7 +275,7 @@ File PlatformReadFile(const char *filepath, Arena *arena)
      LARGE_INTEGER size;
      GetFileSizeEx(hFile, &size);
 
-     void *data = arena->PushSize(size.QuadPart + 1);
+     void *data = gAllocator.Alloc(size.QuadPart + 1, stackNum);
      memset(data, 0, size.QuadPart + 1);
      DWORD bytesRead = 0;
      if(!ReadFile(hFile, data, size.QuadPart, &bytesRead, 0))

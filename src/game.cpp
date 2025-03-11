@@ -2,34 +2,32 @@ void Game::Init()
 {
      printf("Game Init!\n");
 
-     // Allocate memory for the entire game
-     gameArena.Init(MB(10));
-
+     Frame frame = gAllocator.GetFrame(STACK_LOW);
      // Load the shader
-     File vertFile = PlatformReadFile("../data/shaders/vert.hlsl", &gameArena);
-     File fragFile = PlatformReadFile("../data/shaders/frag.hlsl", &gameArena);
+     File vertFile = PlatformReadFile("../data/shaders/vert.hlsl", STACK_LOW);
+     File fragFile = PlatformReadFile("../data/shaders/frag.hlsl", STACK_LOW);
      shader = GraphicsManager::Get()->ShaderAlloc(vertFile, fragFile);
 
      tinyxml2::XMLDocument doc;
      doc.LoadFile("../data/xml/test.xml");
      
      // Load the models
-     cube.Init("../data/models/cube.obj", &gameArena);
-     plane.Init("../data/models/plane.obj", &gameArena);
-     pistol.Init("../data/models/pistol.obj", &gameArena);
-     sniper.Init("../data/models/sniper.obj", &gameArena);
-     warrior.Init("../data/models/warrior.dae", &gameArena);
-     wall.Init("../data/models/wall.obj", &gameArena);
+     cube.Init("../data/models/cube.obj", STACK_LOW);
+     plane.Init("../data/models/plane.obj", STACK_LOW);
+     pistol.Init("../data/models/pistol.obj", STACK_LOW);
+     sniper.Init("../data/models/sniper.obj", STACK_LOW);
+     warrior.Init("../data/models/warrior.dae", STACK_LOW);
+     wall.Init("../data/models/wall.obj", STACK_LOW);
 
      // Load a texture
      texture = GraphicsManager::Get()->TextureAlloc("../data/textures/texture_13.png");
      warriorTexture = GraphicsManager::Get()->TextureAlloc("../data/textures/warrior.png");
 
      // Reset the memory for runtime use
-     gameArena.Clear();
-
+     gAllocator.ReleaseFrame(frame);
+     
      // Initialize the Actor Manager
-     am.Init(&gameArena);
+     am.Init(STACK_UP);
 
      // Initialize gameplay systems
      inputSystem.Init();
@@ -71,8 +69,6 @@ void Game::Init()
      SlotmapKey<Actor> floor = am.CreateActor();
      am.AddTransformComponent(floor, vec3(0.0f), vec3(1.0f), vec3(0.0f, 0.0f, 1.0f));
      am.AddRenderComponent(floor, plane, texture);
-
-     printf("Allocation count: %d\n", Arena::allocationCount);
 }
 
 void Game::Update(f32 dt)
@@ -136,8 +132,6 @@ void Game::Terminate()
      sniper.Terminate();
      warrior.Terminate();
      wall.Terminate();
-
-     gameArena.Terminate();
      
      printf("Game Terminate!\n");
 }

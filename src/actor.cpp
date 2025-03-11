@@ -1,12 +1,12 @@
 
-void ActorManager::Init(Arena *arena)
+void ActorManager::Init(i32 stackNum)
 {
-     actors.Init(100, arena);
-     transformComponents.Init(100, arena);
-     renderComponents.Init(100, arena);
-     inputComponents.Init(1, arena);
-     cameraComponents.Init(1, arena);
-     weaponComponents.Init(100, arena);
+     actors.Init(100, stackNum);
+     transformComponents.Init(100, stackNum);
+     renderComponents.Init(100, stackNum);
+     inputComponents.Init(1, stackNum);
+     cameraComponents.Init(1, stackNum);
+     weaponComponents.Init(100, stackNum);
 }
 
 void ActorManager::Terminate()

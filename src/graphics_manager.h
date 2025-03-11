@@ -50,7 +50,7 @@ private:
      static bool initialize;
 public:
 
-     static void Init(void *osWindow, i32 width, i32 height);
+     static void Init(void *osWindow, i32 width, i32 height, i32 stackNum);
      static void Terminate();
      static GraphicsManager *Get();
      
