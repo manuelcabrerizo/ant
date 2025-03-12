@@ -1,3 +1,62 @@
+SlotmapKey<Actor> CreateActorFromFile(const char *filepath, ActorManager *am)
+{
+     tinyxml2::XMLDocument doc;
+     doc.LoadFile(filepath);
+
+     SlotmapKey<Actor> actor = am->CreateActor();
+
+     tinyxml2::XMLElement *root = doc.FirstChildElement("Actor");
+
+     tinyxml2::XMLElement *component = root->FirstChildElement();
+     while(component)
+     {
+          const char *componentType = component->Value();
+
+          if(strcmp("TransformComponent", componentType) == 0)
+          {
+               tinyxml2::XMLElement *attributes = component->FirstChildElement();
+               vec3 position;
+               attributes->QueryFloatAttribute("x", &position.x);
+               attributes->QueryFloatAttribute("y", &position.y);
+               attributes->QueryFloatAttribute("z", &position.z);
+               attributes = attributes->NextSiblingElement();
+               vec3 scale;
+               attributes->QueryFloatAttribute("x", &scale.x);
+               attributes->QueryFloatAttribute("y", &scale.y);
+               attributes->QueryFloatAttribute("z", &scale.z);
+               attributes = attributes->NextSiblingElement();
+               vec3 direction;
+               attributes->QueryFloatAttribute("x", &direction.x);
+               attributes->QueryFloatAttribute("y", &direction.y);
+               attributes->QueryFloatAttribute("z", &direction.z);
+               am->AddTransformComponent(actor, position, scale, direction);
+          }
+          else if(strcmp("CameraComponent", componentType) == 0)
+          {
+               tinyxml2::XMLElement *attributes = component->FirstChildElement();
+               vec3 position;
+               attributes->QueryFloatAttribute("x", &position.x);
+               attributes->QueryFloatAttribute("y", &position.y);
+               attributes->QueryFloatAttribute("z", &position.z);
+               attributes = attributes->NextSiblingElement();
+               vec3 direction;
+               attributes->QueryFloatAttribute("x", &direction.x);
+               attributes->QueryFloatAttribute("y", &direction.y);
+               attributes->QueryFloatAttribute("z", &direction.z);
+               am->AddCameraComponent(actor, position, direction);
+          }
+          else if(strcmp("InputComponent", componentType) == 0)
+          {
+               am->AddInputComponent(actor);
+          }
+          
+          component = component->NextSiblingElement();
+     }
+     
+
+     return actor;
+}
+
 void Game::Init()
 {
      printf("Game Init!\n");
@@ -9,9 +68,6 @@ void Game::Init()
      shader = GraphicsManager::Get()->ShaderAlloc(vertFile, fragFile);
 
      MemoryManager::Get()->ReleaseFrame(frame);
-
-     tinyxml2::XMLDocument doc;
-     doc.LoadFile("../data/xml/test.xml");
      
      // Load the models
      cube.Init("../data/models/cube.obj");
@@ -47,10 +103,7 @@ void Game::Init()
      am.AddTransformComponent(secondWeapon, vec3(1.5f, -0.1f, 0.0f), vec3(0.25f, 0.25f, 0.25f), vec3(0.0f, 0.0f, 1.0f));
 
      // Create Player
-     player = am.CreateActor();
-     am.AddTransformComponent(player, vec3(0.0f, 0.25f, -4.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 1.0f));
-     am.AddCameraComponent(player, vec3(0.0f, 0.0f, -4.0f), vec3(0.0f, 0.0f, 1.0f));
-     am.AddInputComponent(player);
+     player = CreateActorFromFile("../data/xml/player.xml", &am);
      am.AddWeaponComponent(player, firstWeapon);
 
      // Create wallRH

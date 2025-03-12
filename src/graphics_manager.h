@@ -11,16 +11,6 @@
 #define MAX_SHADER_COUNT         10
 #define MAX_TEXTURE_COUNT        10
 
-enum GraphicsTypeID
-{
-     VERTEX_BUFFER_TYPE_ID,
-     INDEX_BUFFER_TYPE_ID,
-     UNIFORM_BUFFER_TYPE_ID,
-     FRAME_BUFFER_TYPE_ID,
-     SHADER_TYPE_ID,
-     TEXTURE_TYPE_ID
-};
-
 enum UniformBufferBind
 {
      BIND_TO_VS = (1 << 0),
@@ -35,6 +25,7 @@ struct DirectXFrameBuffer;
 struct DirectXShader;
 struct DirectXTexture;
 
+// if we need something less robust consider use a block allocator
 typedef SlotmapKey<DirectXVertexBuffer> VertexBuffer;
 typedef SlotmapKey<DirectXIndexBuffer> IndexBuffer;
 typedef SlotmapKey<DirectXUniformBuffer> UniformBuffer;
