@@ -10,8 +10,8 @@ struct Vertex
 class Model
 {
 private:
-     VertexBuffer vertexBuffer;
-     IndexBuffer indexBuffer;
+     VertexBuffer *vertexBuffer;
+     IndexBuffer *indexBuffer;
      u32 verticesCount;
      u32 indicesCount;
 public:

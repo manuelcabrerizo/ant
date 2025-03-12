@@ -61,10 +61,10 @@ void Game::Init()
 {
      printf("Game Init!\n");
 
-     Frame frame = MemoryManager::Get()->GetFrame(STACK_LOW);
+     Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
      // Load the shader
-     File vertFile = PlatformReadFile("../data/shaders/vert.hlsl", STACK_LOW);
-     File fragFile = PlatformReadFile("../data/shaders/frag.hlsl", STACK_LOW);
+     File vertFile = PlatformReadFile("../data/shaders/vert.hlsl", FRAME_MEMORY);
+     File fragFile = PlatformReadFile("../data/shaders/frag.hlsl", FRAME_MEMORY);
      shader = GraphicsManager::Get()->ShaderAlloc(vertFile, fragFile);
 
      MemoryManager::Get()->ReleaseFrame(frame);
@@ -82,7 +82,7 @@ void Game::Init()
      warriorTexture = GraphicsManager::Get()->TextureAlloc("../data/textures/warrior.png");
      
      // Initialize the Actor Manager
-     am.Init(STACK_UP);
+     am.Init(STATIC_MEMORY);
 
      // Initialize gameplay systems
      inputSystem.Init();
@@ -123,7 +123,7 @@ void Game::Init()
      // Create floor
      SlotmapKey<Actor> floor = am.CreateActor();
      am.AddTransformComponent(floor, vec3(0.0f), vec3(1.0f), vec3(0.0f, 0.0f, 1.0f));
-     am.AddRenderComponent(floor, plane, texture);     
+     am.AddRenderComponent(floor, plane, texture);
 }
 
 void Game::Update(f32 dt)

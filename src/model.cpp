@@ -16,9 +16,9 @@ void Model::Init(const char *filepath)
           totalIndicesCount += mesh->mNumFaces * 3;
      }
 
-     Frame frame = MemoryManager::Get()->GetFrame(STACK_LOW);
-     Vertex *vertices = (Vertex *)MemoryManager::Get()->Alloc(totalVerticesCount * sizeof(Vertex), STACK_LOW);
-     u32 *indices = (u32 *)MemoryManager::Get()->Alloc(totalIndicesCount * sizeof(u32), STACK_LOW);
+     Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
+     Vertex *vertices = (Vertex *)MemoryManager::Get()->Alloc(totalVerticesCount * sizeof(Vertex), FRAME_MEMORY);
+     u32 *indices = (u32 *)MemoryManager::Get()->Alloc(totalIndicesCount * sizeof(u32), FRAME_MEMORY);
 
      verticesCount = 0;
      indicesCount = 0;

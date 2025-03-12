@@ -54,7 +54,7 @@ void ActorManager::AddTransformComponent(SlotmapKey<Actor> actorKey,
      actor->transform = key;
 }
 
-void ActorManager::AddRenderComponent(SlotmapKey<Actor> actorKey, Model model, Texture texture)
+void ActorManager::AddRenderComponent(SlotmapKey<Actor> actorKey, Model model, Texture *texture)
 {
      RenderComponent render;
      render.model = model;

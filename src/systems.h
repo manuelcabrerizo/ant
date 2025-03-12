@@ -18,7 +18,7 @@ struct CameraUbo
 class CameraSystem
 {
 private:
-     UniformBuffer uniformBuffer;
+     UniformBuffer *uniformBuffer;
      CameraUbo ubo;
 public:
      void Init();
@@ -34,7 +34,7 @@ struct PerDrawUbo
 class RenderSystem
 {
 private:
-     UniformBuffer uniformBuffer;
+     UniformBuffer *uniformBuffer;
      PerDrawUbo ubo;
 public:
      void Init();

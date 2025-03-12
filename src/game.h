@@ -17,10 +17,10 @@ private:
      Model warrior;
      Model wall;
 
-     Shader shader;
+     Shader *shader;
      
-     Texture texture;
-     Texture warriorTexture;
+     Texture *texture;
+     Texture *warriorTexture;
 
      SlotmapKey<Actor> player;
      SlotmapKey<Actor> firstWeapon;

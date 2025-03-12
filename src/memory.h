@@ -23,8 +23,8 @@ struct Frame
      i32 stackNum;
 };
 
-#define STACK_LOW 0
-#define STACK_UP 1
+#define FRAME_MEMORY 0
+#define STATIC_MEMORY 1
 
 class DoubleStackAllocator
 {

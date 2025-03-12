@@ -50,3 +50,24 @@ public:
      void Remove(SlotmapKey<Type> key);
      i32 Size();
 };
+
+
+struct FreeNode
+{
+     FreeNode *next = 0;
+};
+
+template <typename Type>
+class ObjectAllocator
+{
+     static_assert(sizeof(Type) >= sizeof(FreeNode), "Object must be at least 8 bytes large");
+private:
+     i32 stackNum = 0;
+     FreeNode *firstFree = 0;
+public:
+     void Init(i32 stackNum);
+
+     Type *Alloc();
+     void Free(Type *object);
+     
+};

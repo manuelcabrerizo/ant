@@ -13,7 +13,7 @@ struct TransformComponent
 
 struct RenderComponent
 {
-     Texture texture;
+     Texture *texture;
      Model model;
      SlotmapKey<Actor> owner;
 };
@@ -65,7 +65,7 @@ public:
      
      void AddTransformComponent(SlotmapKey<Actor> actorKey,
                                 vec3 position, vec3 scale, vec3 direction);
-     void AddRenderComponent(SlotmapKey<Actor> actorKey, Model model, Texture texture);
+     void AddRenderComponent(SlotmapKey<Actor> actorKey, Model model, Texture *texture);
      void AddInputComponent(SlotmapKey<Actor> actorKey);
      void AddCameraComponent(SlotmapKey<Actor> actorKey, vec3 pos, vec3 dir);
      void AddWeaponComponent(SlotmapKey<Actor> actorKey, SlotmapKey<Actor> weaponKey);

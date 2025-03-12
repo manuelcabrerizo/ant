@@ -121,3 +121,36 @@ i32 Slotmap<Type>::Size()
      ASSERT(data.size == elementCount);
      return elementCount;
 }
+
+template<typename Type>
+void ObjectAllocator<Type>::Init(i32 stackNum_)
+{
+     firstFree = 0;
+     stackNum = stackNum_;
+}
+
+template<typename Type>
+Type *ObjectAllocator<Type>::Alloc()
+{
+     if(firstFree)
+     {
+          void *data = (void *)firstFree;
+          firstFree = firstFree->next;
+          Type *object = new (data) Type; // TODO: test this placement new
+          return object;
+     }
+     else
+     {
+          void *data = MemoryManager::Get()->Alloc(sizeof(Type), stackNum);
+          Type *object = new (data) Type; // TODO: test this placement new
+          return object;
+     }
+}
+
+template<typename Type>
+void ObjectAllocator<Type>::Free(Type *object)
+{
+     FreeNode *free = (FreeNode *)object;
+     free->next = firstFree;
+     firstFree = free;
+}

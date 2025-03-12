@@ -1,7 +1,7 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
 
-struct DirectXVertexBuffer
+struct DirectXVertexBuffer : public VertexBuffer
 {
      ID3D11Buffer *buffer;
      u32 verticesCount;
@@ -9,14 +9,14 @@ struct DirectXVertexBuffer
      u32 offset;
 };
 
-struct DirectXIndexBuffer
+struct DirectXIndexBuffer : public IndexBuffer
 {
      ID3D11Buffer *buffer;
      u32 indicesCount;
      DXGI_FORMAT format;
 };
 
-struct DirectXUniformBuffer
+struct DirectXUniformBuffer : UniformBuffer
 {
      ID3D11Buffer *buffer;
      u32 slot;
@@ -24,7 +24,7 @@ struct DirectXUniformBuffer
      u32 dataSize;
 };
 
-struct DirectXFrameBuffer
+struct DirectXFrameBuffer : FrameBuffer
 {
      u32 x, y, w, h;
      u32 msaa = 1;
@@ -39,14 +39,14 @@ struct DirectXFrameBuffer
      ID3D11ShaderResourceView *shaderResourceView;
 };
 
-struct DirectXShader
+struct DirectXShader : Shader
 {
      ID3D11InputLayout *layout;
      ID3D11VertexShader *vertexShader;
      ID3D11PixelShader *pixelShader;
 };
 
-struct DirectXTexture
+struct DirectXTexture : Texture
 {
      i32 w, h;
      ID3D11Texture2D *texture;
@@ -83,12 +83,12 @@ struct GraphicsManagerState
      ID3D11BlendState *alphaBlendOff;
      ID3D11BlendState *additiveBlending;
      
-     Slotmap<DirectXVertexBuffer> vertexBuffers;
-     Slotmap<DirectXIndexBuffer> indexBuffers;
-     Slotmap<DirectXUniformBuffer> uniformBuffers;
-     Slotmap<DirectXFrameBuffer> frameBuffers;
-     Slotmap<DirectXShader> shaders;
-     Slotmap<DirectXTexture> textures;
+     ObjectAllocator<DirectXVertexBuffer> vertexBufferAllocator;
+     ObjectAllocator<DirectXIndexBuffer> indexBufferAllocator;
+     ObjectAllocator<DirectXUniformBuffer> uniformBufferAllocator;
+     ObjectAllocator<DirectXFrameBuffer> frameBufferAllocator;
+     ObjectAllocator<DirectXShader> shaderAllocator;
+     ObjectAllocator<DirectXTexture> textureAllocator;
      
 };
 
@@ -224,10 +224,10 @@ static HRESULT DirectXCreateInputLayoutDescFromVertexShaderSignature(ID3DBlob* p
      pVertexShaderReflection->GetDesc( &shaderDesc );
  
      // Read input layout description from shader info
-     Frame frame = MemoryManager::Get()->GetFrame(STACK_LOW);
+     Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
 
      Array<D3D11_INPUT_ELEMENT_DESC> inputLayoutDesc;
-     inputLayoutDesc.Init(shaderDesc.InputParameters, STACK_LOW);
+     inputLayoutDesc.Init(shaderDesc.InputParameters, FRAME_MEMORY);
      
      for ( uint32 i=0; i< shaderDesc.InputParameters; i++ )
      {
@@ -380,12 +380,12 @@ void GraphicsManager::Init(void *osWindow, i32 width, i32 height, i32 stackNum)
      viewport.MaxDepth = 1.0f;
      state->deviceContext->RSSetViewports(1, &viewport);
         
-     state->vertexBuffers.Init(MAX_VERTEX_BUFFER_COUNT, stackNum);
-     state->indexBuffers.Init(MAX_INDEX_BUFFER_COUNT, stackNum);
-     state->uniformBuffers.Init(MAX_UNIFORM_BUFFER_COUNT, stackNum);
-     state->frameBuffers.Init(MAX_FRAME_BUFFER_COUNT, stackNum);
-     state->shaders.Init(MAX_SHADER_COUNT, stackNum);
-     state->textures.Init(MAX_TEXTURE_COUNT, stackNum);
+     state->vertexBufferAllocator.Init(stackNum);
+     state->indexBufferAllocator.Init(stackNum);
+     state->uniformBufferAllocator.Init(stackNum);
+     state->frameBufferAllocator.Init(stackNum);
+     state->shaderAllocator.Init(stackNum);
+     state->textureAllocator.Init(stackNum);
 
      initialize = true;
      printf("DirectX11 Initialized!\n");
@@ -483,13 +483,13 @@ void GraphicsManager::SetRasterizerStateWireframe()
      state->deviceContext->RSSetState(state->wireFrameRasterizer);
 }
 
-VertexBuffer GraphicsManager::VertexBufferAlloc(void *vertices, u32 count, u32 stride)
+VertexBuffer *GraphicsManager::VertexBufferAlloc(void *vertices, u32 count, u32 stride)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXVertexBuffer vb;
-     vb.verticesCount = count;
-     vb.stride = stride;
-     vb.offset = 0;
+     DirectXVertexBuffer *vb = state->vertexBufferAllocator.Alloc();
+     vb->verticesCount = count;
+     vb->stride = stride;
+     vb->offset = 0;
  
      D3D11_BUFFER_DESC vertexDesc;
      ZeroMemory(&vertexDesc, sizeof(vertexDesc));
@@ -500,34 +500,34 @@ VertexBuffer GraphicsManager::VertexBufferAlloc(void *vertices, u32 count, u32 s
      D3D11_SUBRESOURCE_DATA subresourceData;
      ZeroMemory(&subresourceData, sizeof(subresourceData));
      subresourceData.pSysMem = vertices;
-     if (FAILED(state->device->CreateBuffer(&vertexDesc, &subresourceData, &vb.buffer)))
+     if (FAILED(state->device->CreateBuffer(&vertexDesc, &subresourceData, &vb->buffer)))
      {
           ASSERT(!"Error creating vertex buffer");
      }
-     return state->vertexBuffers.Add(vb);
+     return (VertexBuffer *)vb;
 }
 
-void GraphicsManager::VertexBufferFree(VertexBuffer vertexBuffer)
+void GraphicsManager::VertexBufferFree(VertexBuffer *vertexBuffer)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXVertexBuffer *vb = state->vertexBuffers.Get(vertexBuffer);
+     DirectXVertexBuffer *vb = (DirectXVertexBuffer *)vertexBuffer;
      vb->buffer->Release();
-     state->vertexBuffers.Remove(vertexBuffer);
+     state->vertexBufferAllocator.Free(vb);
 }
 
-void GraphicsManager::VertexBufferBind(VertexBuffer vertexBuffer)
+void GraphicsManager::VertexBufferBind(VertexBuffer *vertexBuffer)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXVertexBuffer *vb = state->vertexBuffers.Get(vertexBuffer);
+     DirectXVertexBuffer *vb = (DirectXVertexBuffer *)vertexBuffer;
      state->deviceContext->IASetVertexBuffers(0, 1, &vb->buffer, &vb->stride, &vb->offset);
 }
 
-IndexBuffer GraphicsManager::IndexBufferAlloc(u32 *indices, u32 count)
+IndexBuffer *GraphicsManager::IndexBufferAlloc(u32 *indices, u32 count)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXIndexBuffer ib;
-     ib.indicesCount = count;
-     ib.format = DXGI_FORMAT_R32_UINT;
+     DirectXIndexBuffer *ib = state->indexBufferAllocator.Alloc();
+     ib->indicesCount = count;
+     ib->format = DXGI_FORMAT_R32_UINT;
 
      D3D11_BUFFER_DESC indexDesc;
      ZeroMemory(&indexDesc, sizeof(indexDesc));
@@ -538,64 +538,64 @@ IndexBuffer GraphicsManager::IndexBufferAlloc(u32 *indices, u32 count)
      D3D11_SUBRESOURCE_DATA subresourceData;
      ZeroMemory(&subresourceData, sizeof(subresourceData));
      subresourceData.pSysMem = indices;
-     if (FAILED(state->device->CreateBuffer(&indexDesc, &subresourceData, &ib.buffer)))
+     if (FAILED(state->device->CreateBuffer(&indexDesc, &subresourceData, &ib->buffer)))
      {
           ASSERT(!"Error creating vertex buffer");
      }
      
-     return state->indexBuffers.Add(ib);
+     return (IndexBuffer *)ib;
 }
 
-void GraphicsManager::IndexBufferFree(IndexBuffer indexBuffer)
+void GraphicsManager::IndexBufferFree(IndexBuffer *indexBuffer)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXIndexBuffer *ib = state->indexBuffers.Get(indexBuffer);
+     DirectXIndexBuffer *ib = (DirectXIndexBuffer *)indexBuffer;
      ib->buffer->Release();
-     state->indexBuffers.Remove(indexBuffer);
+     state->indexBufferAllocator.Free(ib);
 }
 
-void GraphicsManager::IndexBufferBind(IndexBuffer indexBuffer)
+void GraphicsManager::IndexBufferBind(IndexBuffer *indexBuffer)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXIndexBuffer *ib = state->indexBuffers.Get(indexBuffer);
+     DirectXIndexBuffer *ib = (DirectXIndexBuffer *)indexBuffer;
      state->deviceContext->IASetIndexBuffer(ib->buffer, ib->format, 0);
 }
 
-UniformBuffer GraphicsManager::UniformBufferAlloc(u32 bindTo, void *data, u32 dataSize, u32 slot)
+UniformBuffer *GraphicsManager::UniformBufferAlloc(u32 bindTo, void *data, u32 dataSize, u32 slot)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXUniformBuffer ub;
-     ub.slot = slot;
-     ub.bindTo = bindTo;
-     ub.dataSize = dataSize;
+     DirectXUniformBuffer *ub = state->uniformBufferAllocator.Alloc();
+     ub->slot = slot;
+     ub->bindTo = bindTo;
+     ub->dataSize = dataSize;
 
      D3D11_BUFFER_DESC bufferDesc;
      ZeroMemory(&bufferDesc, sizeof(bufferDesc));
      bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
      bufferDesc.ByteWidth = dataSize;
      bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-     if (FAILED(state->device->CreateBuffer(&bufferDesc, 0, &ub.buffer)))
+     if (FAILED(state->device->CreateBuffer(&bufferDesc, 0, &ub->buffer)))
      {
           ASSERT(!"Error creating const buffer");
      }
 
-     state->deviceContext->UpdateSubresource(ub.buffer, 0, 0, data, 0, 0);
+     state->deviceContext->UpdateSubresource(ub->buffer, 0, 0, data, 0, 0);
 
-     return state->uniformBuffers.Add(ub);
+     return (UniformBuffer *)ub;
 }
 
-void GraphicsManager::UniformBufferFree(UniformBuffer uniformBuffer)
+void GraphicsManager::UniformBufferFree(UniformBuffer *uniformBuffer)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXUniformBuffer *ub = state->uniformBuffers.Get(uniformBuffer);
+     DirectXUniformBuffer *ub = (DirectXUniformBuffer *)uniformBuffer;
      ub->buffer->Release();
-     state->uniformBuffers.Remove(uniformBuffer);
+     state->uniformBufferAllocator.Free(ub);
 }
 
-void GraphicsManager::UniformBufferBind(UniformBuffer uniformBuffer)
+void GraphicsManager::UniformBufferBind(UniformBuffer *uniformBuffer)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXUniformBuffer *ub = state->uniformBuffers.Get(uniformBuffer);
+     DirectXUniformBuffer *ub = (DirectXUniformBuffer *)uniformBuffer;
      
      if (ub->bindTo & BIND_TO_VS)
      {
@@ -611,18 +611,18 @@ void GraphicsManager::UniformBufferBind(UniformBuffer uniformBuffer)
      }
 }
 
-void GraphicsManager::UniformBufferUpdate(UniformBuffer uniformBuffer, void *data)
+void GraphicsManager::UniformBufferUpdate(UniformBuffer *uniformBuffer, void *data)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXUniformBuffer *ub = state->uniformBuffers.Get(uniformBuffer);
+     DirectXUniformBuffer *ub = (DirectXUniformBuffer *)uniformBuffer;
      state->deviceContext->UpdateSubresource(ub->buffer, 0, 0, data, 0, 0);
 }
 
 
-Shader GraphicsManager::ShaderAlloc(File vertFile, File fragFile)
+Shader *GraphicsManager::ShaderAlloc(File vertFile, File fragFile)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXShader sh;
+     DirectXShader *sh = state->shaderAllocator.Alloc();
 
      ID3DBlob *errorShader;
      ID3DBlob *vertShaderCompiled;
@@ -644,10 +644,10 @@ Shader GraphicsManager::ShaderAlloc(File vertFile, File fragFile)
           state->device->CreateVertexShader(
                vertShaderCompiled->GetBufferPointer(),
                vertShaderCompiled->GetBufferSize(), 0,
-               &sh.vertexShader);
+               &sh->vertexShader);
      }
      // Create the input layout for this shader
-     if(FAILED(DirectXCreateInputLayoutDescFromVertexShaderSignature(vertShaderCompiled, state->device, &sh.layout)))
+     if(FAILED(DirectXCreateInputLayoutDescFromVertexShaderSignature(vertShaderCompiled, state->device, &sh->layout)))
      {
           ASSERT(!"Error creating input layout for this shader");
      }
@@ -668,44 +668,44 @@ Shader GraphicsManager::ShaderAlloc(File vertFile, File fragFile)
           state->device->CreatePixelShader(
                fragShaderCompiled->GetBufferPointer(),
                fragShaderCompiled->GetBufferSize(), 0,
-               &sh.pixelShader);
+               &sh->pixelShader);
      }
 
      vertShaderCompiled->Release();
      fragShaderCompiled->Release();
 
-     return state->shaders.Add(sh);
+     return (Shader *)sh;
 }
 
-void GraphicsManager::ShaderFree(Shader shader)
+void GraphicsManager::ShaderFree(Shader *shader)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXShader *sh = state->shaders.Get(shader);
+     DirectXShader *sh = (DirectXShader *)shader;
      sh->layout->Release();
      sh->vertexShader->Release();
      sh->pixelShader->Release();
-     state->shaders.Remove(shader);
+     state->shaderAllocator.Free(sh);
 
 }
 
-void GraphicsManager::ShaderBind(Shader shader)
+void GraphicsManager::ShaderBind(Shader *shader)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXShader *sh = state->shaders.Get(shader);     
+     DirectXShader *sh = (DirectXShader *)shader;
      state->deviceContext->IASetInputLayout(sh->layout);
      state->deviceContext->VSSetShader(sh->vertexShader, 0, 0);
      state->deviceContext->PSSetShader(sh->pixelShader, 0, 0);
 }
 
-Texture GraphicsManager::TextureAlloc(const char *filepath)
+Texture *GraphicsManager::TextureAlloc(const char *filepath)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXTexture tx;
+     DirectXTexture *tx = state->textureAllocator.Alloc();
 
      stbi_set_flip_vertically_on_load(true);
 
      int channels;
-     void* data = (void*)stbi_load(filepath, &tx.w, &tx.h, &channels, 0);
+     void* data = (void*)stbi_load(filepath, &tx->w, &tx->h, &channels, 0);
      if (!data)
      {
           ASSERT(!"Error reading texture file");
@@ -713,11 +713,11 @@ Texture GraphicsManager::TextureAlloc(const char *filepath)
 
      D3D11_SUBRESOURCE_DATA subresourceData = {};
      subresourceData.pSysMem = data;
-     subresourceData.SysMemPitch = tx.w * channels;
+     subresourceData.SysMemPitch = tx->w * channels;
 
      D3D11_TEXTURE2D_DESC texDesc = {};
-     texDesc.Width = tx.w;
-     texDesc.Height = tx.h;
+     texDesc.Width = tx->w;
+     texDesc.Height = tx->h;
      texDesc.MipLevels = 0;
      texDesc.ArraySize = 1;
      texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -728,57 +728,57 @@ Texture GraphicsManager::TextureAlloc(const char *filepath)
      texDesc.CPUAccessFlags = 0;
      texDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
-     if (FAILED(state->device->CreateTexture2D(&texDesc, 0, &tx.texture)))
+     if (FAILED(state->device->CreateTexture2D(&texDesc, 0, &tx->texture)))
      {
           ASSERT(!"Error creating texture");
      }
 
-     state->deviceContext->UpdateSubresource(tx.texture, 0, 0, subresourceData.pSysMem, subresourceData.SysMemPitch, 0);
+     state->deviceContext->UpdateSubresource(tx->texture, 0, 0, subresourceData.pSysMem, subresourceData.SysMemPitch, 0);
 
      D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
      srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
      srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
      srvDesc.Texture2D.MipLevels = -1;
      srvDesc.Texture2D.MostDetailedMip = 0;
-     if (FAILED(state->device->CreateShaderResourceView(tx.texture, &srvDesc, &tx.shaderResourceView)))
+     if (FAILED(state->device->CreateShaderResourceView(tx->texture, &srvDesc, &tx->shaderResourceView)))
      {
           ASSERT(!"Error creating texture shader resource view");
      }
 
-     state->deviceContext->GenerateMips(tx.shaderResourceView);
+     state->deviceContext->GenerateMips(tx->shaderResourceView);
 
      stbi_image_free(data);
 
-     return state->textures.Add(tx);
+     return (Texture *)tx;
 }
 
-void GraphicsManager::TextureFree(Texture texture)
+void GraphicsManager::TextureFree(Texture *texture)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXTexture *tx = state->textures.Get(texture);
+     DirectXTexture *tx = (DirectXTexture *)texture;
      tx->texture->Release();
      tx->shaderResourceView->Release();
-     state->textures.Remove(texture);
+     state->textureAllocator.Free(tx);
 }
 
-void GraphicsManager::TextureBind(Texture texture, i32 slot)
+void GraphicsManager::TextureBind(Texture *texture, i32 slot)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXTexture *tx = state->textures.Get(texture);
+     DirectXTexture *tx = (DirectXTexture *)texture;
      state->deviceContext->PSSetShaderResources(slot, 1, &tx->shaderResourceView);
 }
 
-i32 GraphicsManager::TextureWidth(Texture texture)
+i32 GraphicsManager::TextureWidth(Texture *texture)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXTexture *tx = state->textures.Get(texture);
+     DirectXTexture *tx = (DirectXTexture *)texture;
      return tx->w;
 }
 
-i32 GraphicsManager::TextureHeight(Texture texture)
+i32 GraphicsManager::TextureHeight(Texture *texture)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
-     DirectXTexture *tx = state->textures.Get(texture);
+     DirectXTexture *tx = (DirectXTexture *)texture;
      return tx->h;
 }
 

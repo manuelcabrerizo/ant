@@ -181,8 +181,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                                       0, 0, hInstance, 0);
           if(window)
           {
-               GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT, STACK_UP);
-               NotificationManager::Init(STACK_UP);
+               GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT, STATIC_MEMORY);
+               NotificationManager::Init(STATIC_MEMORY);
 
                Game game;
                game.Init();
