@@ -124,6 +124,25 @@ void Game::Init()
      SlotmapKey<Actor> floor = am.CreateActor();
      am.AddTransformComponent(floor, vec3(0.0f), vec3(1.0f), vec3(0.0f, 0.0f, 1.0f));
      am.AddRenderComponent(floor, plane, texture);
+
+
+     // Hashmap Test
+
+     HashMap<i32> actorsMap;
+
+     actorsMap.Init(128, STATIC_MEMORY);
+
+     actorsMap.Add("manu", 27);
+     actorsMap.Add("tomi", 24);
+     actorsMap.Add("mona", 123);
+     actorsMap.Add("pepa pig se la come", 69);
+     actorsMap.Add("xxx_manu", 27);
+     actorsMap.Add("xxx_tomi", 24);
+
+     actorsMap.Remove("mona");
+     actorsMap.Remove("manu");
+
+     actorsMap.PrintHashMap();
 }
 
 void Game::Update(f32 dt)

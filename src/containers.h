@@ -71,3 +71,31 @@ public:
      void Free(Type *object);
      
 };
+
+#define INVALID_MAP_ID 0xFFFFFFFF
+#define DELETED_MAP_ID (0xFFFFFFFF - 1)
+
+template<typename Type>
+class HashMap
+{
+public:
+     struct HashElement
+     {
+          u32 id;
+          Type value;
+     };
+     
+     void Init(u64 size, i32 stackNum);
+     
+     void Add(const char *name, Type value);
+     void Remove(const char *name);
+     Type *Get(const char *name);
+
+     void PrintHashMap();
+     
+private:
+     HashElement *elements = 0;
+     u32 mask = 0;
+     u32 capacity = 0;
+     u32 occupied = 0;
+};

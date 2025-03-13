@@ -154,3 +154,148 @@ void ObjectAllocator<Type>::Free(Type *object)
      free->next = firstFree;
      firstFree = free;
 }
+
+// TODO: mabye use 64 bits hash
+static u32 djb2(const char *str) {
+    u32 hash = 5381;
+    int c;
+    while ((c = *str++))
+    {
+        hash = ((hash << 5) + hash) + c;
+    }
+    return hash;
+}
+
+
+template<typename Type>
+void HashMap<Type>::Init(u64 size, i32 stackNum)
+{
+     ASSERT((size & (size - 1)) == 0); // size should be power of two
+     elements = (HashElement *)MemoryManager::Get()->Alloc(size, stackNum);
+     memset(elements, 0, size);
+     
+     capacity = size / sizeof(HashElement);
+     mask = capacity - 1;
+     occupied = 0;
+
+     for(i32 i = 0; i < capacity; ++i)
+     {
+          elements[i].id = INVALID_MAP_ID;
+     }
+
+}
+
+template<typename Type>
+void HashMap<Type>::Add(const char *name, Type value)
+{
+     ASSERT(occupied + 1 <= capacity);
+     
+     u32 id = djb2(name);
+     u32 index = id % mask;
+
+     if(elements[index].id == INVALID_MAP_ID ||
+        elements[index].id == DELETED_MAP_ID)
+     {
+          elements[index].id = id;
+          elements[index].value = value;
+          occupied++;
+     }
+     else
+     {
+          if(elements[index].id == id)
+          {
+               ASSERT(!"Element is already on the map!");
+          }
+
+          u32 nextIndex = (index + 1) % capacity;
+          while(elements[nextIndex].id != INVALID_MAP_ID &&
+                elements[nextIndex].id != DELETED_MAP_ID)
+          {
+               nextIndex = (nextIndex + 1) % capacity;
+          }
+          elements[nextIndex].id = id;
+          elements[nextIndex].value = value;
+          occupied++;
+     }
+}
+
+template<typename Type>
+void HashMap<Type>::Remove(const char *name)
+{
+     u32 id = djb2(name);
+     u32 index = id % mask;
+
+     if(elements[index].id == INVALID_MAP_ID)
+     {
+          ASSERT(!"Error: trying to delete an invalid element!");
+     }
+
+     i32 checkCount = 0;
+     while(elements[index].id != id)
+     {
+          index = (index + 1) % capacity;
+          if(checkCount >= capacity)
+          {
+               ASSERT(!"Error: element not found!");
+          }
+          checkCount++;
+     }
+     elements[index].id = DELETED_MAP_ID;
+     elements[index].value = {};
+     occupied--;
+}
+
+template<typename Type>
+Type *HashMap<Type>::Get(const char *name)
+{
+
+     u32 id = djb2(name);
+     u32 index = id % mask;
+
+     if(elements[index].id == INVALID_MAP_ID)
+     {
+          ASSERT(!"Error: trying to get an invalid element!");
+     }
+
+     i32 checkCount = 0;
+     while(elements[index].id != id &&
+           elements[index].id != INVALID_MAP_ID)
+     {
+          index = (index + 1) % capacity;
+          if(checkCount >= capacity)
+          {
+               ASSERT(!"Error: element not found!");
+          }
+          checkCount++;
+     }
+     
+     if(elements[index].id == INVALID_MAP_ID)
+     {
+          ASSERT(!"Error: element not found!");
+     }
+     
+     return &elements[index].value;
+}
+
+template<typename Type>
+void HashMap<Type>::PrintHashMap()
+{
+     for(i32 i = 0; i < capacity; ++i)
+     {
+          switch(elements[i].id)
+          {
+          case INVALID_MAP_ID:
+          {
+               printf("INVALID_MAP_ID\n");
+          } break;
+          case DELETED_MAP_ID:
+          {
+               printf("DELETED_MAP_ID\n");
+          } break;
+          default:
+          {
+               printf("OCCUPIED\n");
+          } break;
+          }
+     }
+}
