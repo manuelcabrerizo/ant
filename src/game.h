@@ -3,6 +3,9 @@
 class Game
 {
 private:
+     TextureManager tm;
+     ModelManager mm;
+
      ActorManager am;
 
      InputSystem inputSystem;
@@ -10,18 +13,8 @@ private:
      RenderSystem renderSystem;
      WeaponSystem weaponSystem;
 
-     Model cube;
-     Model plane;
-     Model pistol;
-     Model sniper;
-     Model warrior;
-     Model wall;
-
      Shader *shader;
-     
-     Texture *texture;
-     Texture *warriorTexture;
-
+         
      SlotmapKey<Actor> player;
      SlotmapKey<Actor> firstWeapon;
      SlotmapKey<Actor> secondWeapon;

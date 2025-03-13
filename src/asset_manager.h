@@ -1,3 +1,49 @@
 #pragma once
 
+template <typename Type>
+class AssetManager
+{
+protected:
+     Slotmap<Type> assets;
+     HashMap<SlotmapKey<Type>> nameIndex;
+public:
+     virtual ~AssetManager() {}
+     
+     void Init(u32 assetsCapacity);
+     void Terminate();
 
+     virtual void Load(const char *name) = 0;
+     virtual void Unload(const char *name) = 0;
+     
+     Type *Get(const char *name);
+     Type *Get(SlotmapKey<Type> handle);
+     SlotmapKey<Type> GetHandle(const char *name);
+};
+
+
+struct TextureHandle
+{
+     const  char *name;
+     Texture *texture;
+};
+
+class TextureManager : public AssetManager<TextureHandle>
+{
+public:
+     void Load(const char *name) override;
+     void Unload(const char *name) override;
+};
+
+struct ModelHandle
+{
+     const char *name;
+     Model model;
+};
+
+
+class ModelManager : public AssetManager<ModelHandle>
+{
+public:
+     void Load(const char *name) override;
+     void Unload(const char *name) override;
+};

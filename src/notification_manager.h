@@ -19,6 +19,7 @@ struct Notification
 class INotificable
 {
 public:
+     virtual ~INotificable() {}
      virtual void OnNotify(NotificationType type, Notification notification, void *sender) = 0;
 };
 

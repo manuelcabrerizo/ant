@@ -37,6 +37,7 @@ struct File
 #include "input_manager.h"
 #include "notification_manager.h"
 #include "model.h"
+#include "asset_manager.h"
 
 #include "camera_component.h"
 
@@ -58,6 +59,7 @@ File PlatformReadFile(const char *filepath, i32 stackNum);
 #include "input_manager.cpp"
 #include "notification_manager.cpp"
 #include "model.cpp"
+#include "asset_manager.cpp"
 
 #include "camera_component.cpp"
 

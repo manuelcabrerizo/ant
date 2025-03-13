@@ -70,16 +70,28 @@ void Game::Init()
      MemoryManager::Get()->ReleaseFrame(frame);
      
      // Load the models
-     cube.Init("../data/models/cube.obj");
-     plane.Init("../data/models/plane.obj");
-     pistol.Init("../data/models/pistol.obj");
-     sniper.Init("../data/models/sniper.obj");
-     warrior.Init("../data/models/warrior.dae");
-     wall.Init("../data/models/wall.obj");
+     mm.Init(32);
+     mm.Load("../data/models/cube.obj");
+     mm.Load("../data/models/plane.obj");
+     mm.Load("../data/models/pistol.obj");
+     mm.Load("../data/models/sniper.obj");
+     mm.Load("../data/models/warrior.dae");
+     mm.Load("../data/models/wall.obj");
+
+     ModelHandle *cube = mm.Get("../data/models/cube.obj");
+     ModelHandle *plane = mm.Get("../data/models/plane.obj");
+     ModelHandle *pistol = mm.Get("../data/models/pistol.obj");
+     ModelHandle *sniper = mm.Get("../data/models/sniper.obj");
+     ModelHandle *warrior = mm.Get("../data/models/warrior.dae");
+     ModelHandle *wall = mm.Get("../data/models/wall.obj");
 
      // Load a texture
-     texture = GraphicsManager::Get()->TextureAlloc("../data/textures/texture_13.png");
-     warriorTexture = GraphicsManager::Get()->TextureAlloc("../data/textures/warrior.png");
+     tm.Init(128);
+     tm.Load("../data/textures/texture_13.png");
+     tm.Load("../data/textures/warrior.png");
+
+     Texture *texture = tm.Get("../data/textures/texture_13.png")->texture;
+     Texture *warriorTexture = tm.Get("../data/textures/warrior.png")->texture;
      
      // Initialize the Actor Manager
      am.Init(STATIC_MEMORY);
@@ -96,7 +108,7 @@ void Game::Init()
      // Create sniper
      firstWeapon = am.CreateActor();
      am.AddTransformComponent(firstWeapon, vec3(2.0f, -0.1f, 0.0f), vec3(0.25f, 0.25f, 0.25f), vec3(0.0f, 0.0f, 1.0f));
-     am.AddRenderComponent(firstWeapon, sniper, texture);
+     am.AddRenderComponent(firstWeapon, sniper->model, texture);
 
      // Create pistol
      secondWeapon = am.CreateActor();
@@ -109,40 +121,21 @@ void Game::Init()
      // Create wallRH
      SlotmapKey<Actor> rh = am.CreateActor();
      am.AddTransformComponent(rh, vec3(1.0f, 0.5f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 1.0f));
-     am.AddRenderComponent(rh, wall, texture);
+     am.AddRenderComponent(rh, wall->model, texture);
      
      // Create box
      SlotmapKey<Actor> box = am.CreateActor();
      am.AddTransformComponent(box, vec3(1.0f, 0.0f, -4.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 1.0f));
-     am.AddRenderComponent(box, cube, texture);
+     am.AddRenderComponent(box, cube->model, texture);
      
      SlotmapKey<Actor> guy = am.CreateActor();
      am.AddTransformComponent(guy, vec3(-1.0f, -0.5f, -1.0f), vec3(0.005f, 0.005f, 0.005f), vec3(0.0f, 0.0f, 1.0f));
-     am.AddRenderComponent(guy, warrior, warriorTexture);
+     am.AddRenderComponent(guy, warrior->model, warriorTexture);
 
      // Create floor
      SlotmapKey<Actor> floor = am.CreateActor();
      am.AddTransformComponent(floor, vec3(0.0f), vec3(1.0f), vec3(0.0f, 0.0f, 1.0f));
-     am.AddRenderComponent(floor, plane, texture);
-
-
-     // Hashmap Test
-
-     HashMap<i32> actorsMap;
-
-     actorsMap.Init(128, STATIC_MEMORY);
-
-     actorsMap.Add("manu", 27);
-     actorsMap.Add("tomi", 24);
-     actorsMap.Add("mona", 123);
-     actorsMap.Add("pepa pig se la come", 69);
-     actorsMap.Add("xxx_manu", 27);
-     actorsMap.Add("xxx_tomi", 24);
-
-     actorsMap.Remove("mona");
-     actorsMap.Remove("manu");
-
-     actorsMap.PrintHashMap();
+     am.AddRenderComponent(floor, plane->model, texture);
 }
 
 void Game::Update(f32 dt)
@@ -151,10 +144,16 @@ void Game::Update(f32 dt)
      cameraSystem.Update(&am, dt);
      weaponSystem.Update(&am, dt);
 
+     ModelHandle *pistol = mm.Get("../data/models/pistol.obj");
+     ModelHandle *sniper = mm.Get("../data/models/sniper.obj");
+
+     Texture *texture = tm.Get("../data/textures/texture_13.png")->texture;
+     Texture *warriorTexture = tm.Get("../data/textures/warrior.png")->texture;
+     
      if(InputManager::Get()->KeyJustDown(KEY_1) && !usingFirstWeapon)
      {
           am.RemoveRenderComponent(secondWeapon);
-          am.AddRenderComponent(firstWeapon, sniper, texture);
+          am.AddRenderComponent(firstWeapon, sniper->model, texture);
           
           am.RemoveWeaponComponent(player);
           am.AddWeaponComponent(player, firstWeapon);
@@ -166,7 +165,7 @@ void Game::Update(f32 dt)
      if(InputManager::Get()->KeyJustDown(KEY_2) && usingFirstWeapon)
      {
           am.RemoveRenderComponent(firstWeapon);
-          am.AddRenderComponent(secondWeapon, pistol, texture);
+          am.AddRenderComponent(secondWeapon, pistol->model, texture);
           
           am.RemoveWeaponComponent(player);
           am.AddWeaponComponent(player, secondWeapon);
@@ -196,16 +195,20 @@ void Game::Terminate()
      weaponSystem.Terminate();
      
      am.Terminate();
+     tm.Terminate();
+     mm.Terminate();
 
-     GraphicsManager::Get()->TextureFree(warriorTexture);
-     GraphicsManager::Get()->TextureFree(texture);
+     //GraphicsManager::Get()->TextureFree(warriorTexture);
+     //GraphicsManager::Get()->TextureFree(texture);
+
      GraphicsManager::Get()->ShaderFree(shader);
-     cube.Terminate();
-     plane.Terminate();
-     pistol.Terminate();
-     sniper.Terminate();
-     warrior.Terminate();
-     wall.Terminate();
+
+     //cube.Terminate();
+     //plane.Terminate();
+     //pistol.Terminate();
+     //sniper.Terminate();
+     //warrior.Terminate();
+     //wall.Terminate();
      
      printf("Game Terminate!\n");
 }
