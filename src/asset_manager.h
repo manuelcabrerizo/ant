@@ -20,7 +20,7 @@ public:
      SlotmapKey<Type> GetHandle(const char *name);
 };
 
-
+// Texture Manager
 struct TextureHandle
 {
      const  char *name;
@@ -34,6 +34,7 @@ public:
      void Unload(const char *name) override;
 };
 
+// Model Manager
 struct ModelHandle
 {
      const char *name;

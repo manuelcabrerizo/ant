@@ -402,6 +402,9 @@ void GraphicsManager::Terminate()
      
      GraphicsManagerState *state = &gGraphicsManagerState;
      
+     //Sleep(1000);
+     state->deviceContext->Flush();
+          
      state->wireFrameRasterizer->Release();
      state->fillRasterizerCullBack->Release();
      state->fillRasterizerCullFront->Release();
@@ -613,6 +616,7 @@ void GraphicsManager::UniformBufferBind(UniformBuffer *uniformBuffer)
 
 void GraphicsManager::UniformBufferUpdate(UniformBuffer *uniformBuffer, void *data)
 {
+     // TODO: mabye use Map and Unmap instead of UpdateSubresource
      GraphicsManagerState *state = &gGraphicsManagerState;
      DirectXUniformBuffer *ub = (DirectXUniformBuffer *)uniformBuffer;
      state->deviceContext->UpdateSubresource(ub->buffer, 0, 0, data, 0, 0);

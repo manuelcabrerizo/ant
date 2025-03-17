@@ -5,7 +5,7 @@ class InputSystem
 public:
      void Init();
      void Terminate();
-     void Update(ActorManager *am, f32 dt);
+     void Update(ActorManager *am, CollisionWorld *cw, f32 dt);
 };
 
 

@@ -8,7 +8,7 @@ void InputSystem::Terminate()
 
 }
 
-void InputSystem::Update(ActorManager *am, float dt)
+void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
 {
      Array<InputComponent> *inputs = am->GetInputComponents();
      for(u32 i = 0; i < inputs->size; ++i)
@@ -18,6 +18,7 @@ void InputSystem::Update(ActorManager *am, float dt)
           TransformComponent *transform = am->GetTransformComponent(actor);
           CameraComponent *camera = am->GetCameraComponent(actor);
 
+          // TODO: implement some collision test
           vec3 playerVel = vec3(0.0f);
           if(InputManager::Get()->KeyDown(KEY_A))
           {
@@ -29,18 +30,40 @@ void InputSystem::Update(ActorManager *am, float dt)
           }
           if(InputManager::Get()->KeyDown(KEY_W))
           {
-               playerVel += camera->GetWorldFront();
+               playerVel += camera->GetFront();
           }
           if(InputManager::Get()->KeyDown(KEY_S))
           {
-               playerVel -= camera->GetWorldFront();
+               playerVel -= camera->GetFront();
           }
           if(dot(playerVel, playerVel) > 0.0f)
           {
                playerVel = normalize(playerVel);
           }
-          transform->position += playerVel * dt;
 
+          // Collision detection, this should be done in its own system
+          vec3 playerNewPosition = transform->position;
+          playerNewPosition += (playerVel * 2.0f) * dt;
+
+          Segment playerMovement;
+          playerMovement.Init(transform->position, playerNewPosition);
+
+          f32 t;
+          vec3 n;
+          if(cw->Intersect(playerMovement, t, n))
+          {
+               vec3 movement = playerNewPosition - transform->position;
+               transform->position += (movement * t) + (n * 0.001f);
+               f32 projection = dot(movement, n);
+               vec3 newVelocity = (movement - (n * projection)) * (1.0f - t);
+               transform->position += newVelocity;
+          }
+          else
+          {
+               transform->position = playerNewPosition;
+          }
+
+          
           if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_RIGHT))
           {
                PlatformShowMouse(false);
