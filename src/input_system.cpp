@@ -30,11 +30,11 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           }
           if(InputManager::Get()->KeyDown(KEY_W))
           {
-               playerVel += camera->GetFront();
+               playerVel += camera->GetWorldFront();
           }
           if(InputManager::Get()->KeyDown(KEY_S))
           {
-               playerVel -= camera->GetFront();
+               playerVel -= camera->GetWorldFront();
           }
 
           if(InputManager::Get()->KeyDown(KEY_R))
@@ -54,10 +54,6 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           // Collision detection, this should be done in its own system
 
           vec3 movement = (playerVel * 2.0f) * dt;
-          
-          //bool collisionFound = false;
-          //for(i32 j = 0; j < 4; ++j)
-          //{
                
           Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
 
@@ -83,8 +79,6 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
 
           MemoryManager::Get()->ReleaseFrame(frame);
 
-          
-          
           if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_RIGHT))
           {
                PlatformShowMouse(false);
