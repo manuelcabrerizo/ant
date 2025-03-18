@@ -103,6 +103,8 @@ bool Segment::Intersect(Sphere& sphere, f32& t)
      return true;
 }
 
+#define EPSILON 0.001f
+
 bool Segment::Intersect(Cylinder& cylinder, f32& t)
 {
      vec3 d = cylinder.q - cylinder.p, m = a - cylinder.p, n = b - a;
@@ -125,7 +127,7 @@ bool Segment::Intersect(Cylinder& cylinder, f32& t)
      f32 k = dot(m, m) - cylinder.r * cylinder.r;
      f32 c = dd * k - md * md;
 
-     if(fabsf(a_) < FLT_EPSILON)
+     if(fabsf(a_) < EPSILON)
      {
           if(c > 0.0f)
           {
@@ -181,6 +183,18 @@ bool Segment::Intersect(Cylinder& cylinder, f32& t)
      }
      
      return true;
+}
+
+
+vec3 Segment::ClosestPoint(vec3 point, f32& t)
+{
+     vec3 ab = b - a;
+     t = dot(point - a, ab) / dot(ab, ab);
+
+     if(t < 0.0f) t = 0.0f;
+     if(t > 1.0f) t = 1.0f;
+
+     return a + t * ab;
 }
 
 void Plane::Init(vec3 n_, f32 d_)
@@ -277,7 +291,7 @@ bool Sphere::DynamicIntersect(Plane& plane, vec3 movement, f32& t)
 
 bool Sphere::DynamicIntersect(Triangle& triangle, vec3 movement, f32& u, f32& v, f32& w,
                               f32& t, vec3& n)
-{
+{         
      Plane plane;
      plane.Init(triangle);
 
@@ -309,11 +323,16 @@ bool Sphere::DynamicIntersect(Triangle& triangle, vec3 movement, f32& u, f32& v,
                     {
                          if(currentT < t)
                          {
-                              vec3 axis = normalize(cylinders[i].q - cylinders[i].p);
-                              vec3 toSphere = c - cylinders[i].p;
-                              
+                              Segment segment;
+                              segment.Init(cylinders[i].p, cylinders[i].q);
+
                               t = currentT;
-                              n = normalize(toSphere - axis * dot(toSphere, axis));
+                              vec3 hitPos = c + movement * t;
+
+                              f32 t0;
+                              vec3 closest = segment.ClosestPoint(hitPos, t0);
+
+                              n = normalize(hitPos - closest);                    
                          }
                     }
                }

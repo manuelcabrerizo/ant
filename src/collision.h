@@ -22,7 +22,8 @@ public:
      bool Intersect(Triangle& triangle, f32& u, f32& v, f32& w, f32& t);
      bool Intersect(Sphere& sphere, f32& t);
      bool Intersect(Cylinder& cylinder, f32& t);
-
+     vec3 ClosestPoint(vec3 point, f32& t);
+     
      vec3 a;
      vec3 b;
 };

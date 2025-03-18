@@ -30,11 +30,11 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           }
           if(InputManager::Get()->KeyDown(KEY_W))
           {
-               playerVel += camera->GetWorldFront();
+               playerVel += camera->GetFront();
           }
           if(InputManager::Get()->KeyDown(KEY_S))
           {
-               playerVel -= camera->GetWorldFront();
+               playerVel -= camera->GetFront();
           }
 
           if(InputManager::Get()->KeyDown(KEY_R))
@@ -65,7 +65,7 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           collisionData.Init(MAX_COLLISION_COUNT, FRAME_MEMORY);
                
           Sphere sphere;
-          sphere.Init(transform->position + vec3(0.0f, -0.5f, 0.0f), 0.2f);
+          sphere.Init(transform->position + vec3(0.0f, 0.0f, 0.0f), 0.2f);
           if(cw->DynamicIntersect(sphere, movement, collisionData))
           {
                for(i32 i = 0; i < collisionData.size; ++i)
@@ -83,16 +83,7 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
 
           MemoryManager::Get()->ReleaseFrame(frame);
 
-          //}
-
-
-          //if(!collisionFound)
-          //{
-          //     transform->position += movement;
-          //}
           
-
-
           
           if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_RIGHT))
           {
