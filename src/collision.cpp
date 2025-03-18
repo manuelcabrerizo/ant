@@ -536,6 +536,36 @@ bool CollisionWorld::DynamicIntersect(Sphere& sphere, vec3 movement, Array<Colli
                }
           }
      }
+
+     if(collisionData.size > 1)
+     {
+          for(i32 i = 0; i < collisionData.size; ++i)
+          {
+               bool collisionAdded = false;
+               for(i32 j = 0; j < collisionData.size; ++j)
+               {
+                    if(i != j)
+                    {
+                         vec3 n0 = collisionData[i].n;
+                         vec3 n1 = collisionData[j].n;
+                         f32 proj = dot(n0, n1); 
+                         if(proj < 0.0f && proj > -0.999f)
+                         {
+                              CollisionData collision = {};
+                              collision.n = normalize(n0 + n1);
+                              collisionData.Push(collision);
+                              collisionAdded = true;
+                              break;
+                         }     
+                    }
+               }
+               if(collisionAdded)
+               {
+                    break;
+               }
+          }
+     }
+          
      SortCollisionRersult(collisionData);
      return collisionData.size > 0;
 }
