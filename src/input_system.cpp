@@ -30,38 +30,68 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           }
           if(InputManager::Get()->KeyDown(KEY_W))
           {
-               playerVel += camera->GetFront();
+               playerVel += camera->GetWorldFront();
           }
           if(InputManager::Get()->KeyDown(KEY_S))
           {
-               playerVel -= camera->GetFront();
+               playerVel -= camera->GetWorldFront();
           }
+
+          if(InputManager::Get()->KeyDown(KEY_R))
+          {
+               playerVel += camera->GetWorldUp();
+          }
+          if(InputManager::Get()->KeyDown(KEY_F))
+          {
+               playerVel -= camera->GetWorldUp();
+          }
+          
           if(dot(playerVel, playerVel) > 0.0f)
           {
                playerVel = normalize(playerVel);
           }
 
           // Collision detection, this should be done in its own system
-          vec3 playerNewPosition = transform->position;
-          playerNewPosition += (playerVel * 2.0f) * dt;
 
-          Segment playerMovement;
-          playerMovement.Init(transform->position, playerNewPosition);
+          vec3 movement = (playerVel * 2.0f) * dt;
+          
+          //bool collisionFound = false;
+          //for(i32 j = 0; j < 4; ++j)
+          //{
+               
+          Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
 
-          f32 t;
-          vec3 n;
-          if(cw->Intersect(playerMovement, t, n))
+          Array<CollisionData> collisionData;
+          collisionData.Init(MAX_COLLISION_COUNT, FRAME_MEMORY);
+               
+          Sphere sphere;
+          sphere.Init(transform->position + vec3(0.0f, -0.5f, 0.0f), 0.2f);
+          if(cw->DynamicIntersect(sphere, movement, collisionData))
           {
-               vec3 movement = playerNewPosition - transform->position;
-               transform->position += (movement * t) + (n * 0.001f);
-               f32 projection = dot(movement, n);
-               vec3 newVelocity = (movement - (n * projection)) * (1.0f - t);
-               transform->position += newVelocity;
+               for(i32 i = 0; i < collisionData.size; ++i)
+               {
+                    vec3 n = collisionData[i].n;
+                    f32 t = collisionData[i].t;
+                    
+                    transform->position = transform->position + movement * t;
+                    transform->position += n * 0.001f; 
+                    f32 projection = dot(movement, n);
+                    movement = (movement - (n * projection)) * (1.0f - t);
+               }
           }
-          else
-          {
-               transform->position = playerNewPosition;
-          }
+          transform->position += movement;
+
+          MemoryManager::Get()->ReleaseFrame(frame);
+
+          //}
+
+
+          //if(!collisionFound)
+          //{
+          //     transform->position += movement;
+          //}
+          
+
 
           
           if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_RIGHT))

@@ -105,7 +105,7 @@ void Game::Init()
      ModelHandle *pistol = mm.Get("../data/models/pistol.obj");
      ModelHandle *sniper = mm.Get("../data/models/sniper.obj");
      ModelHandle *warrior = mm.Get("../data/models/warrior.dae");
-     ModelHandle *wall = mm.Get("../data/models/test-level.obj");
+     ModelHandle *walls = mm.Get("../data/models/test-level.obj");
 
      // Load a texture
      tm.Init(128);
@@ -138,10 +138,10 @@ void Game::Init()
      player = CreateActorFromFile("../data/xml/player.xml", &am, &tm, &mm);
      am.AddWeaponComponent(player, firstWeapon);
 
-     // Create wallRH
-     SlotmapKey<Actor> rh = am.CreateActor();
-     am.AddTransformComponent(rh, vec3(0.0f, -0.5f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 1.0f));
-     am.AddRenderComponent(rh, wall->model, texture);
+     // Create Level
+     SlotmapKey<Actor> level = am.CreateActor();
+     am.AddTransformComponent(level, vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 1.0f));
+     am.AddRenderComponent(level, walls->model, texture);
      
      // Create box
      //SlotmapKey<Actor> box = am.CreateActor();

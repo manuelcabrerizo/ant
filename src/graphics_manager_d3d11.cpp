@@ -390,7 +390,7 @@ void GraphicsManager::Init(void *osWindow, i32 width, i32 height, i32 stackNum)
      initialize = true;
      printf("DirectX11 Initialized!\n");
 
-     GraphicsManager::Get()->SetRasterizerStateCullBack();
+     GraphicsManager::Get()->SetRasterizerStateCullNone();
 }
 
 void GraphicsManager::Terminate()
