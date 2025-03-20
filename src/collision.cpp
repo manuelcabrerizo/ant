@@ -70,7 +70,7 @@ bool Segment::Intersect(Sphere& sphere, f32& t)
 {
      vec3 ab = b - a;
      vec3 o = a;
-     vec3 d = normalize(ab);
+     vec3 d = ab;
 
      vec3 m = o - sphere.c;
      f32 b = dot(m, d);
@@ -90,10 +90,10 @@ bool Segment::Intersect(Sphere& sphere, f32& t)
 
      t = -b - sqrtf(discr);
 
-     if(t*t > dot(ab, ab))
-     {
-          return false;
-     }
+     //if(t*t > dot(ab, ab))
+     //{
+     //     return false;
+     //}
 
      if(t < 0.0f)
      {
@@ -101,6 +101,7 @@ bool Segment::Intersect(Sphere& sphere, f32& t)
      }
      
      return true;
+     
 }
 
 #define EPSILON 0.001f
@@ -307,7 +308,7 @@ bool Sphere::DynamicIntersect(Triangle& triangle, vec3 movement, f32& u, f32& v,
           else
           {
                Segment segment;
-               segment.Init(c, c + t*movement);
+               segment.Init(c, c + movement);
                
                Cylinder cylinders[3];
                cylinders[0].Init(triangle.a, triangle.b, r);
@@ -358,12 +359,75 @@ bool Sphere::DynamicIntersect(Triangle& triangle, vec3 movement, f32& u, f32& v,
                               if(currentT < t)
                               {
                                    t = currentT;
-                                   n = normalize(c - spheres[i].c);
+                                   vec3 hitPos = c + movement * t;
+                                   n = normalize(hitPos - spheres[i].c);
                               }
                          }
                     }
                     return t != FLT_MAX;
+               }               
+          }
+     }
+     else
+     {
+          Segment segment;
+          segment.Init(c, c + movement);
+               
+          Cylinder cylinders[3];
+          cylinders[0].Init(triangle.a, triangle.b, r);
+          cylinders[1].Init(triangle.b, triangle.c, r);
+          cylinders[2].Init(triangle.c, triangle.a, r);
+
+               
+          t = FLT_MAX;
+          for(i32 i = 0; i < 3; i++)
+          {
+               f32 currentT;
+               if(segment.Intersect(cylinders[i], currentT))
+               {
+                    if(currentT < t)
+                    {
+                         Segment segment;
+                         segment.Init(cylinders[i].p, cylinders[i].q);
+
+                         t = currentT;
+                         vec3 hitPos = c + movement * t;
+
+                         f32 t0;
+                         vec3 closest = segment.ClosestPoint(hitPos, t0);
+
+                         n = normalize(hitPos - closest);                    
+                    }
                }
+          }
+
+          if(t != FLT_MAX)
+          {
+               // TODO: calculate barycentric
+               return true;
+          }
+          else
+          {
+               Sphere spheres[3];
+               spheres[0].Init(triangle.a, r);
+               spheres[1].Init(triangle.b, r);
+               spheres[2].Init(triangle.c, r);
+
+               t = FLT_MAX;
+               for(i32 i = 0; i < 3; i++)
+               {
+                    f32 currentT;
+                    if(segment.Intersect(spheres[i], currentT))
+                    {
+                         if(currentT < t)
+                         {
+                              t = currentT;
+                              vec3 hitPos = c + movement * t;
+                              n = normalize(hitPos - spheres[i].c);
+                         }
+                    }
+               }
+               return t != FLT_MAX;
           }
      }
      
@@ -516,7 +580,8 @@ static void SortCollisionRersult(Array<CollisionData>& arr)
      }
 }
 
-bool CollisionWorld::DynamicIntersect(Sphere& sphere, vec3 movement, Array<CollisionData>& collisionData)
+bool CollisionWorld::DynamicIntersect(Sphere& sphere, vec3 movement,
+                                      Array<CollisionData>& collisionData)
 {    
      for(i32 i = 0; i < triangles.size; ++i)
      {

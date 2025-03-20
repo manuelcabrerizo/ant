@@ -9,10 +9,17 @@ template <typename Type>
 void AssetManager<Type>::Terminate()
 {
      // TODO: test this and think other ways ...
+#if 1
+     for(i32 i = assets.GetArray()->size - 1; i >= 0; --i)
+     {
+          Type *asset = &assets.GetArray()->data[i];
+          Unload(asset->name);
+     }
+#else
      Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
      
      Array<Type> assetsArray;
-     u32 size = assets.GetArray()->size;
+     u32 size = assets.GetArray()->size;    
      assetsArray.Init(size, FRAME_MEMORY);
      memcpy(assetsArray.data, assets.GetArray()->data, sizeof(Type) * size);
      
@@ -23,6 +30,7 @@ void AssetManager<Type>::Terminate()
      }
 
      MemoryManager::Get()->ReleaseFrame(frame);
+#endif
 }
      
 template <typename Type>
