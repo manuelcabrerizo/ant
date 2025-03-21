@@ -30,11 +30,11 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           }
           if(InputManager::Get()->KeyDown(KEY_W))
           {
-               playerVel += camera->GetFront();
+               playerVel += camera->GetWorldFront();
           }
           if(InputManager::Get()->KeyDown(KEY_S))
           {
-               playerVel -= camera->GetFront();
+               playerVel -= camera->GetWorldFront();
           }
 
           if(InputManager::Get()->KeyDown(KEY_R))
@@ -52,32 +52,38 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           }
 
           // Collision detection, this should be done in its own system
-          vec3 movement = (playerVel * 0.25f) * dt;
-               
-          Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
-
-          Array<CollisionData> collisionData;
-          collisionData.Init(MAX_COLLISION_COUNT, FRAME_MEMORY);
-               
-          Sphere sphere;
-          sphere.Init(transform->position - vec3(0.0f, 0.0f, 0.0f), 0.2f);
-          if(cw->DynamicIntersect(sphere, movement, collisionData))
+          vec3 movement = (playerVel * 2.0f) * dt;
+          
+          if(dot(movement, movement) > 0.0f)
           {
-               for(i32 i = 0; i < collisionData.size; ++i)
+               Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
+
+               Array<CollisionData> collisionData;
+               collisionData.Init(MAX_COLLISION_COUNT, FRAME_MEMORY);
+               
+               Sphere sphere;
+               sphere.Init(transform->position - vec3(0.0f, 0.4f, 0.0f), 0.2f);
+               if(cw->DynamicIntersect(sphere, movement, collisionData))
                {
-                    vec3 n = collisionData[i].n;
-                    f32 t = collisionData[i].t;
+                    for(i32 i = 0; i < collisionData.size; ++i)
+                    {
+                         vec3 n = collisionData[i].n;
+                         f32 t = collisionData[i].t;
+
+                         vec3 hitPos = transform->position + movement * t;
+
                     
-                    transform->position = transform->position + movement * t;
-                    transform->position += n * 0.0001f; 
-                    f32 projection = dot(movement, n);
-                    movement = (movement - (n * projection)) * (1.0f - t);
+                         transform->position = hitPos +  n * 0.0005f;
+                         //transform->position += n * 0.001f; 
+                         f32 projection = dot(movement, n);
+                         movement = (movement - (n * projection)) * (1.0f - t);
+                    }
                }
+               transform->position += movement;
+
+               MemoryManager::Get()->ReleaseFrame(frame);
           }
-          transform->position += movement;
-
-          MemoryManager::Get()->ReleaseFrame(frame);
-
+       
           if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_RIGHT))
           {
                PlatformShowMouse(false);

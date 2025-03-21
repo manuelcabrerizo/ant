@@ -70,30 +70,30 @@ bool Segment::Intersect(Sphere& sphere, f32& t)
 {
      vec3 ab = b - a;
      vec3 o = a;
-     vec3 d = ab;
+     vec3 d = normalize(ab);
 
      vec3 m = o - sphere.c;
-     f32 b = dot(m, d);
+     f32 b_ = dot(m, d);
      f32 c = dot(m, m) - sphere.r * sphere.r;
 
-     if(c > 0.0f && b > 0.0f)
+     if(c > 0.0f && b_ > 0.0f)
      {
           return false;
      }
 
-     f32 discr = b*b - c;
+     f32 discr = b_*b_ - c;
 
      if(discr < 0.0f)
      {
           return false;
      }
 
-     t = -b - sqrtf(discr);
+     t = -b_ - sqrtf(discr);
 
-     //if(t*t > dot(ab, ab))
-     //{
-     //     return false;
-     //}
+     if(t*t > dot(ab, ab))
+     {
+          return false;
+     }
 
      if(t < 0.0f)
      {
