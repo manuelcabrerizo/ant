@@ -30,11 +30,11 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           }
           if(InputManager::Get()->KeyDown(KEY_W))
           {
-               playerVel += camera->GetWorldFront();
+               playerVel += camera->GetFront();
           }
           if(InputManager::Get()->KeyDown(KEY_S))
           {
-               playerVel -= camera->GetWorldFront();
+               playerVel -= camera->GetFront();
           }
 
           if(InputManager::Get()->KeyDown(KEY_R))
@@ -53,7 +53,36 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
 
           // Collision detection, this should be done in its own system
           vec3 movement = (playerVel * 2.0f) * dt;
+
+
           
+          Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
+
+          Array<CollisionData> collisionData;
+          collisionData.Init(MAX_COLLISION_COUNT, FRAME_MEMORY);
+          
+          transform->position += movement;
+          
+          Sphere sphere;
+          sphere.Init(transform->position, 0.2f);
+          if(cw->Intersect(sphere, collisionData))
+          {
+               for(i32 i = 0; i < collisionData.size; ++i)
+               {
+                    vec3 n = collisionData[i].n;
+                    f32 penetration = collisionData[i].penetration;
+                    printf("penetration: %f\n", penetration);
+                    transform->position += penetration * n;
+                    transform->position += 0.001f * n;
+               }
+          }
+
+          MemoryManager::Get()->ReleaseFrame(frame);
+          
+          GraphicsManager::Get()->DebugDrawSphere(transform->position, 0.2f, 20, 10);
+
+          
+          /*
           if(dot(movement, movement) > 0.0f)
           {
                Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
@@ -83,6 +112,7 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
 
                MemoryManager::Get()->ReleaseFrame(frame);
           }
+          */
        
           if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_RIGHT))
           {

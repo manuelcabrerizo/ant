@@ -62,4 +62,11 @@ public:
      void TextureBind(Texture *texture, i32 slot);
      i32 TextureWidth(Texture *texture);
      i32 TextureHeight(Texture *texture);
+
+     void DebugInit();
+     void DebugTerminate();
+     void DebugPresent();
+     void DebugDrawLine(vec3& a, vec3& b);
+     void DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlice);
+     void DebugDrawCube(vec3& c, vec3& hExtend);
 };

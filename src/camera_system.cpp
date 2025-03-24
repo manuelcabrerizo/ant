@@ -20,7 +20,7 @@ void CameraSystem::Update(ActorManager *am, f32 dt)
           CameraComponent *camera = &(*cameras)[i];
           TransformComponent *transform = am->GetTransformComponent(actor);
 
-          camera->SetPosition(transform->position);
+          camera->SetPosition(transform->position/* + camera->GetWorldUp() * 2.0f - camera->GetWorldFront() * 2.0f*/);
           camera->SetDirection(transform->direction);
           ubo.view = camera->GetView();
           GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);

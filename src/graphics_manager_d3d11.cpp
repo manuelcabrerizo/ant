@@ -53,6 +53,8 @@ struct DirectXTexture : Texture
      ID3D11ShaderResourceView *shaderResourceView;
 };
 
+#include "debug_renderer_d3d11.h"
+
 struct GraphicsManagerState
 {
      HWND *window;
@@ -66,7 +68,6 @@ struct GraphicsManagerState
      ID3D11RenderTargetView *renderTargetView;
      ID3D11DepthStencilView *depthStencilView;
      
-     // TODO: ...
      ID3D11SamplerState *samplerStateLinearClamp;
      ID3D11SamplerState *samplerStateLinearWrap;
 
@@ -75,6 +76,7 @@ struct GraphicsManagerState
      ID3D11RasterizerState *fillRasterizerCullFront;
      ID3D11RasterizerState *fillRasterizerCullNone;
 
+     // TODO: ...
      ID3D11DepthStencilState *depthStencilOn;
      ID3D11DepthStencilState *depthStencilOff;
      ID3D11DepthStencilState *depthStencilOnWriteMaskZero;
@@ -89,7 +91,10 @@ struct GraphicsManagerState
      ObjectAllocator<DirectXFrameBuffer> frameBufferAllocator;
      ObjectAllocator<DirectXShader> shaderAllocator;
      ObjectAllocator<DirectXTexture> textureAllocator;
-     
+
+#ifdef ANT_DEBUG
+     DebugRenderer debugRenderer;
+#endif
 };
 
 // State of the graphics manager
@@ -97,6 +102,9 @@ static GraphicsManagerState gGraphicsManagerState;
 // Behavior of the graphics manager
 GraphicsManager GraphicsManager::instance;
 bool GraphicsManager::initialize = false;
+
+// TODO: find a better way that using gGraphicsManagerState
+#include "debug_renderer_d3d11.cpp"
 
 static void DirectXCreateDeviceAndSwapChain(GraphicsManagerState *state)
 {
@@ -444,6 +452,11 @@ void GraphicsManager::BeginFrame(f32 r, f32 g, f32 b)
 void GraphicsManager::EndFrame(i32 vsync)
 {
      GraphicsManagerState *state = &gGraphicsManagerState;
+
+#ifdef ANT_DEBUG
+     state->debugRenderer.Present();
+#endif
+     
      state->swapChain->Present(vsync, 0);
 }
 
@@ -786,3 +799,83 @@ i32 GraphicsManager::TextureHeight(Texture *texture)
      return tx->h;
 }
 
+void GraphicsManager::DebugInit()
+{
+#ifdef ANT_DEBUG
+     GraphicsManagerState *state = &gGraphicsManagerState;
+     state->debugRenderer.Init();
+#endif
+}
+
+void GraphicsManager::DebugTerminate()
+{
+#ifdef ANT_DEBUG
+     GraphicsManagerState *state = &gGraphicsManagerState;
+     state->debugRenderer.Terminate();
+#endif
+}
+
+void GraphicsManager::DebugPresent()
+{
+#ifdef ANT_DEBUG
+     GraphicsManagerState *state = &gGraphicsManagerState;
+     state->debugRenderer.Present();
+#endif
+}
+     
+void GraphicsManager::DebugDrawLine(vec3& a, vec3& b)
+{
+#ifdef ANT_DEBUG
+     GraphicsManagerState *state = &gGraphicsManagerState;
+     state->debugRenderer.DrawLine(a, b);
+#endif
+}
+
+
+void GraphicsManager::DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlice)
+{
+#ifdef ANT_DEBUG
+     vec3 up = vec3(0.0f, 1.0f, 0.0f);
+     vec3 right = vec3(1.0f, 0.0f, 0.0f);
+     // TODO: try to make it fit perfectly
+
+     // Draw the vertical Lines
+     f32 hInc = ANT_PI / (f32)hSlice;
+     f32 vInc = (2.0f * ANT_PI) / (f32)vSlice;
+     for(i32 j = 0; j < hSlice; ++j)
+     {
+          vec3 dir = up;
+          for(i32 i = 0; i < vSlice; ++i)
+          {
+               vec3 a = dir * r;
+               dir = mat3(rotate(mat4(1.0f), vInc, right)) * dir;
+               vec3 b = dir * r;
+               GraphicsManager::Get()->DebugDrawLine(c + a, c + b);
+          }
+          right = mat3(rotate(mat4(1.0f), hInc, up)) * right;
+     }
+
+     // Draw the horizontal lines
+     hInc = (2.0f * ANT_PI) / (f32)hSlice;
+     vInc = ANT_PI / (f32)vSlice;
+     right = vec3(1.0f, 0.0f, 0.0f);
+     vec3 dir = up;
+     for(i32 j = 0; j < vSlice - 2; ++j)
+     {
+          dir = mat3(rotate(mat4(1.0f), vInc, right)) * dir;
+          for(i32 i = 0; i < hSlice; ++i)
+          {
+               vec3 a = dir * r;
+               dir = mat3(rotate(mat4(1.0f), hInc, up)) * dir;
+               vec3 b = dir * r;
+               GraphicsManager::Get()->DebugDrawLine(c + a, c + b);
+          }
+     }
+#endif
+}
+
+void GraphicsManager::DebugDrawCube(vec3& c, vec3& hExtend)
+{
+#ifdef ANT_DEBUG
+#endif
+}

@@ -238,12 +238,18 @@ bool Plane::Intersect(Segment& segment, f32& t)
      return false;
 }
 
+
+vec3 Plane::ClosestPoint(vec3 q)
+{
+     f32 t = (dot(n, q) - d) / dot(n, n);
+     return q - t * n;
+}
+
 void Sphere::Init(vec3 c_, f32 r_)
 {
      c = c_;
      r = r_;
 }
-
 
 bool Sphere::Intersect(Ray& ray, f32& t)
 {
@@ -253,6 +259,25 @@ bool Sphere::Intersect(Ray& ray, f32& t)
 bool Sphere::Intersect(Segment& segment, f32& t)
 {
      return segment.Intersect(*this, t);
+}
+
+bool Sphere::Intersect(Triangle& triangle, vec3& n, f32& penetration)
+{
+     vec3 closest = triangle.ClosestPoint(c);
+
+     vec3 toSphere = c - closest;
+     
+     f32 lenSq = dot(toSphere, toSphere);
+
+     n = normalize(toSphere);
+     
+     penetration = r - sqrtf(lenSq);
+     if(lenSq <= r*r)
+     {
+          i32 StopHere = 0;
+     }
+     
+     return lenSq <= r*r;
 }
 
 bool Sphere::DynamicIntersect(Plane& plane, vec3 movement, f32& t)
@@ -489,6 +514,42 @@ bool Triangle::PointInside(vec3 q, f32& u, f32& v, f32& w)
           z >= 0.0f && z <= 1.0f;
 }
 
+vec3 Triangle::ClosestPoint(vec3 q)
+{
+     Plane plane;
+     plane.Init(*this);
+
+     vec3 pointInPlane = plane.ClosestPoint(q);
+     f32 u, v, w;
+     if(PointInside(pointInPlane, u, v, w))
+     {
+          return pointInPlane;
+     }
+
+     Segment edges[3];
+     edges[0].Init(a, b);
+     edges[1].Init(b, c);
+     edges[2].Init(c, a);
+
+     vec3 result;
+     
+     f32 lenSq = FLT_MAX;
+     for(i32 i = 0; i < 3; ++i)
+     {
+          f32 currentT;
+          vec3 closest = edges[i].ClosestPoint(q, currentT);
+
+          f32 currentLenSq = dot(closest - q, closest - q); 
+          if(currentLenSq < lenSq)
+          {
+               lenSq = currentLenSq;
+               result = closest;
+          }
+     }
+     
+     return result;
+}
+
 
 void CollisionWorld::LoadFromFile(const char *filepath)
 {
@@ -578,6 +639,26 @@ static void SortCollisionRersult(Array<CollisionData>& arr)
           }
           arr[j + 1] = key;
      }
+}
+
+bool CollisionWorld::Intersect(Sphere& sphere, Array<CollisionData>& collisionData)
+{
+     for(i32 i = 0; i < triangles.size; ++i)
+     {
+          f32 penetration;
+          vec3 n;
+          if(sphere.Intersect(triangles[i], n, penetration))
+          {
+               if(collisionData.size < MAX_COLLISION_COUNT)
+               {
+                    CollisionData cd;
+                    cd.n = n;
+                    cd.penetration = penetration;
+                    collisionData.Push(cd);
+               }
+          }
+     }
+     return collisionData.size > 0;
 }
 
 bool CollisionWorld::DynamicIntersect(Sphere& sphere, vec3 movement,

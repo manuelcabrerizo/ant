@@ -83,6 +83,8 @@ void Game::Init()
 {
      printf("Game Init!\n");
 
+     GraphicsManager::Get()->DebugInit();
+     
      Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
      // Load the shader
      File vertFile = PlatformReadFile("../data/shaders/vert.hlsl", FRAME_MEMORY);
@@ -216,6 +218,8 @@ void Game::Terminate()
      mm.Terminate();
 
      GraphicsManager::Get()->ShaderFree(shader);
+
+     GraphicsManager::Get()->DebugTerminate();
      
      printf("Game Terminate!\n");
 }

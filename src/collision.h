@@ -37,6 +37,8 @@ public:
 
      bool Intersect(Ray& ray, f32& t);
      bool Intersect(Segment& segment, f32& t);
+
+     vec3 ClosestPoint(vec3 q);
      
      vec3 n;
      f32 d;
@@ -49,6 +51,8 @@ public:
 
      bool Intersect(Ray& ray, f32& t);
      bool Intersect(Segment& segment, f32& t);
+     bool Intersect(Triangle& triangle, vec3& n, f32& penetration);
+     
      bool DynamicIntersect(Plane& plane, vec3 movement, f32& t);
      bool DynamicIntersect(Triangle& triangle, vec3 movement, f32& u, f32& v, f32& w,
                            f32& t, vec3& n);
@@ -102,6 +106,7 @@ public:
      bool Intersect(Segment& segment, f32& u, f32& v, f32& w, f32& t);
 
      bool PointInside(vec3 q, f32& u, f32& v, f32& w);
+     vec3 ClosestPoint(vec3 q);
 
      vec3 a, b, c;
      vec3  n;
@@ -112,6 +117,7 @@ public:
 struct CollisionData
 {
      vec3 n;
+     f32 penetration;
      f32 t;
      f32 u, v, w;
 };
@@ -123,6 +129,9 @@ public:
 
      bool Intersect(Segment& segment, f32& t, vec3& n);
      bool Intersect(Ray& ray, f32& t, vec3& n);
+
+     bool Intersect(Sphere& sphere, Array<CollisionData>& collisionData);
+     
      bool DynamicIntersect(Sphere& sphere, vec3 movement, Array<CollisionData>& collisionData);
 
 private:
