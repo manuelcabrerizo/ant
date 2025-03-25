@@ -265,11 +265,15 @@ bool Sphere::Intersect(Triangle& triangle, vec3& n, f32& penetration)
 {
      vec3 closest = triangle.ClosestPoint(c);
 
+     //GraphicsManager::Get()->DebugDrawSphere(closest, 0.02f, 4, 6);
+
      vec3 toSphere = c - closest;
      
      f32 lenSq = dot(toSphere, toSphere);
 
      n = normalize(toSphere);
+
+     //GraphicsManager::Get()->DebugDrawLine(closest, closest + n);
      
      penetration = r - sqrtf(lenSq);
      if(lenSq <= r*r)

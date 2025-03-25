@@ -159,6 +159,8 @@ void Game::Init()
 
 void Game::Update(f32 dt)
 {
+     GraphicsManager::Get()->BeginFrame(1.0f, 0.0f, 1.0f);
+     
      inputSystem.Update(&am, &cw, dt);
      cameraSystem.Update(&am, dt);
      weaponSystem.Update(&am, dt);
@@ -197,7 +199,6 @@ void Game::Update(f32 dt)
 
 void Game::Render()
 {    
-     GraphicsManager::Get()->BeginFrame(1.0f, 0.0f, 1.0f);
 
      GraphicsManager::Get()->ShaderBind(shader);
 
