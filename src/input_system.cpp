@@ -30,11 +30,11 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           }
           if(InputManager::Get()->KeyDown(KEY_W))
           {
-               playerVel += camera->GetFront();
+               playerVel += camera->GetWorldFront();
           }
           if(InputManager::Get()->KeyDown(KEY_S))
           {
-               playerVel -= camera->GetFront();
+               playerVel -= camera->GetWorldFront();
           }
 
           if(InputManager::Get()->KeyDown(KEY_R))
@@ -54,8 +54,6 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           // Collision detection, this should be done in its own system
           vec3 movement = (playerVel * 2.0f) * dt;
 
-
-          
           Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
 
           Array<CollisionData> collisionData;
@@ -67,53 +65,23 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           sphere.Init(transform->position, 0.2f);
           if(cw->Intersect(sphere, collisionData))
           {
-               for(i32 i = 0; i < collisionData.size; ++i)
+               while(collisionData.size > 0)
                {
                     vec3 n = collisionData[i].n;
                     f32 penetration = collisionData[i].penetration;
-                    printf("penetration: %f\n", penetration);
                     transform->position += penetration * n;
                     transform->position += 0.001f * n;
+
+                    collisionData.Clear();
+
+                    sphere.Init(transform->position, 0.2f);
+                    cw->Intersect(sphere, collisionData);                    
                }
+               
           }
 
           MemoryManager::Get()->ReleaseFrame(frame);
           
-          GraphicsManager::Get()->DebugDrawSphere(transform->position, 0.2f, 20, 10);
-
-          
-          /*
-          if(dot(movement, movement) > 0.0f)
-          {
-               Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
-
-               Array<CollisionData> collisionData;
-               collisionData.Init(MAX_COLLISION_COUNT, FRAME_MEMORY);
-               
-               Sphere sphere;
-               sphere.Init(transform->position - vec3(0.0f, 0.4f, 0.0f), 0.2f);
-               if(cw->DynamicIntersect(sphere, movement, collisionData))
-               {
-                    for(i32 i = 0; i < collisionData.size; ++i)
-                    {
-                         vec3 n = collisionData[i].n;
-                         f32 t = collisionData[i].t;
-
-                         vec3 hitPos = transform->position + movement * t;
-
-                    
-                         transform->position = hitPos +  n * 0.0005f;
-                         //transform->position += n * 0.001f; 
-                         f32 projection = dot(movement, n);
-                         movement = (movement - (n * projection)) * (1.0f - t);
-                    }
-               }
-               transform->position += movement;
-
-               MemoryManager::Get()->ReleaseFrame(frame);
-          }
-          */
-       
           if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_RIGHT))
           {
                PlatformShowMouse(false);

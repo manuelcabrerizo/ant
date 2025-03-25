@@ -629,7 +629,7 @@ bool CollisionWorld::Intersect(Ray& ray, f32& t, vec3& n)
      return t != FLT_MAX;
 }
 
-static void SortCollisionRersult(Array<CollisionData>& arr)
+static void SortCollisionByTime(Array<CollisionData>& arr)
 {
      for(i32 i = 1; i < arr.size; ++i)
      {
@@ -637,6 +637,22 @@ static void SortCollisionRersult(Array<CollisionData>& arr)
           i32 j = i - 1;
 
           while(j >= 0 && arr[j].t > key.t)
+          {
+               arr[j + 1] = arr[j];
+               j = j - 1;
+          }
+          arr[j + 1] = key;
+     }
+}
+
+static void SortCollisionByPenetration(Array<CollisionData>& arr)
+{
+     for(i32 i = 1; i < arr.size; ++i)
+     {
+          auto key = arr[i];
+          i32 j = i - 1;
+
+          while(j >= 0 && arr[j].penetration < key.penetration)
           {
                arr[j + 1] = arr[j];
                j = j - 1;
@@ -662,6 +678,7 @@ bool CollisionWorld::Intersect(Sphere& sphere, Array<CollisionData>& collisionDa
                }
           }
      }
+     SortCollisionByPenetration(collisionData);
      return collisionData.size > 0;
 }
 
@@ -716,6 +733,6 @@ bool CollisionWorld::DynamicIntersect(Sphere& sphere, vec3 movement,
           }
      }
           
-     SortCollisionRersult(collisionData);
+     SortCollisionByTime(collisionData);
      return collisionData.size > 0;
 }
