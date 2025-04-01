@@ -35,6 +35,10 @@ private:
      bool mouseButtons[2][MOUSE_BUTTON_COUNT];
      i32 mousePosX[2];
      i32 mousePosY[2];
+     
+     IDirectInput8 *directInput;
+     IDirectInputDevice8* mouse;
+     DIMOUSESTATE2 mouseState;
 };
 
 constexpr u32 KEY_ESCAPE = 0x1B;

@@ -8,6 +8,16 @@ void InputManager::Init()
           ASSERT(!"Error: input manager already initialize");
      }
      memset(&instance, 0, sizeof(InputManager));
+
+     DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (VOID**)&instance.directInput, NULL);
+
+
+     instance.directInput->CreateDevice(GUID_SysMouse, &instance.mouse, NULL);
+     instance.mouse->SetDataFormat(&c_dfDIMouse2);
+     instance.mouse->SetCooperativeLevel(*(HWND*)PlatformGetOsWindow(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+     instance.mouse->Acquire();
+
+     
      initialize = true;
 }
 
@@ -17,6 +27,10 @@ void InputManager::Terminate()
      {
           ASSERT(!"Error: input manager has not been initialize");
      }
+
+     if(instance.mouse) instance.mouse->Release();
+     if(instance.directInput) instance.directInput->Release();
+     
      initialize = false;
 }
 
@@ -27,6 +41,24 @@ InputManager *InputManager::Get()
           ASSERT(!"Error: input manager has not been initialize");
      }
      return &instance;
+}
+
+void InputManager::Process()
+{
+     memcpy(keys[1], keys[0], KEY_COUNT * sizeof(bool));
+     memcpy(mouseButtons[1], mouseButtons[0], MOUSE_BUTTON_COUNT * sizeof(bool));
+     mousePosX[1] = mousePosX[0];
+     mousePosY[1] = mousePosY[0];
+
+     ZeroMemory(&mouseState, sizeof(mouseState));
+
+     HRESULT hr = mouse->GetDeviceState(sizeof(DIMOUSESTATE2), &mouseState);
+     if(FAILED(hr)) 
+     {
+          hr = mouse->Acquire();
+          while(hr == DIERR_INPUTLOST) 
+               hr = mouse->Acquire(); 
+     } 
 }
 
 bool InputManager::KeyDown(u32 key)
@@ -58,15 +90,6 @@ bool InputManager::MouseButtonJustUp(u32 button)
 {
      return !mouseButtons[0][button] && mouseButtons[1][button];
 }
-
-void InputManager::Process()
-{
-     memcpy(keys[1], keys[0], KEY_COUNT * sizeof(bool));
-     memcpy(mouseButtons[1], mouseButtons[0], MOUSE_BUTTON_COUNT * sizeof(bool));
-     mousePosX[1] = mousePosX[0];
-     mousePosY[1] = mousePosY[0];
-}
-
 
 void InputManager::SetKey(u32 key, bool value)
 {
@@ -102,11 +125,11 @@ i32 InputManager::MouseY()
 
 i32 InputManager::MouseXMovement()
 {
-     return mousePosX[0] - mousePosX[1];
+     return mouseState.lX;
 }
 
 i32 InputManager::MouseYMovement()
 {
      
-     return mousePosY[0] - mousePosY[1];
+     return mouseState.lY;
 }

@@ -5,6 +5,10 @@
 #include <Windows.h>
 #include <Windowsx.h>
 
+#define DIRECTINPUT_VERSION 0x0800
+
+#include <dinput.h>
+
 // glm
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -46,6 +50,7 @@ struct File
 #include "systems.h"
 #include "game.h"
 
+void *PlatformGetOsWindow();
 void PlaformGetWindowPos(i32 *x, i32 *y);
 void PlaformSetCursorPos(i32 x, i32 y);
 void PlatformShowMouse(bool show);
@@ -77,6 +82,7 @@ File PlatformReadFile(const char *filepath, i32 stackNum);
 static bool running;
 static bool pause;
 
+static HWND gWindow;
 static i32 gWindowX;
 static i32 gWindowY;
 static i32 gWindowWidth;
@@ -139,7 +145,7 @@ LRESULT Wndproc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
           i32 mouseX = (i32)GET_X_LPARAM(lParam);
           i32 mouseY = (i32)GET_Y_LPARAM(lParam);
           im->SetMousePosition(mouseX, mouseY);
-     } break;
+     } break;     
      default:
      {
           result = DefWindowProc(window, message, wParam, lParam);
@@ -185,6 +191,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                                       0, 0, hInstance, 0);
           if(window)
           {
+               gWindow = window;
+               
                GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT, STATIC_MEMORY);
                NotificationManager::Init(STATIC_MEMORY);
 
@@ -244,6 +252,11 @@ int CALLBACK WinMain(HINSTANCE hInstance,
      MemoryManager::Terminate();
 
      return 0;
+}
+
+void *PlatformGetOsWindow()
+{
+     return &gWindow;
 }
 
 void PlaformGetWindowPos(i32 *x, i32 *y)
