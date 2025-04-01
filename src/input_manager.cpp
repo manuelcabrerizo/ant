@@ -10,13 +10,11 @@ void InputManager::Init()
      memset(&instance, 0, sizeof(InputManager));
 
      DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (VOID**)&instance.directInput, NULL);
-
-
      instance.directInput->CreateDevice(GUID_SysMouse, &instance.mouse, NULL);
      instance.mouse->SetDataFormat(&c_dfDIMouse2);
      instance.mouse->SetCooperativeLevel(*(HWND*)PlatformGetOsWindow(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
      instance.mouse->Acquire();
-
+     printf("DirectInput8 Initialized!\n");
      
      initialize = true;
 }
@@ -30,6 +28,7 @@ void InputManager::Terminate()
 
      if(instance.mouse) instance.mouse->Release();
      if(instance.directInput) instance.directInput->Release();
+     printf("DirectInput8 Terminate!\n");
      
      initialize = false;
 }
@@ -56,8 +55,11 @@ void InputManager::Process()
      if(FAILED(hr)) 
      {
           hr = mouse->Acquire();
-          while(hr == DIERR_INPUTLOST) 
-               hr = mouse->Acquire(); 
+          while(hr == DIERR_INPUTLOST)
+          {
+               printf("Mouse Device Lost!!!\n");
+               hr = mouse->Acquire();
+          }
      } 
 }
 

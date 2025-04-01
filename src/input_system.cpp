@@ -80,12 +80,22 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           }
 
           MemoryManager::Get()->ReleaseFrame(frame);
+
+
+          if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_RIGHT))
+          {
+               PlatformShowMouse(false);
+          }
+          if(InputManager::Get()->MouseButtonJustUp(MOUSE_BUTTON_RIGHT))
+          {
+               PlatformShowMouse(true);
+          }
           
           if(InputManager::Get()->MouseButtonDown(MOUSE_BUTTON_RIGHT))
           {
                // TODO: see if the dt in the input position integration is correct
-               input->yaw += InputManager::Get()->MouseXMovement() * dt * 0.1f;
-               input->pitch += InputManager::Get()->MouseYMovement() * dt * 0.1f;
+               input->yaw += InputManager::Get()->MouseXMovement() * 0.001f;
+               input->pitch += InputManager::Get()->MouseYMovement() * 0.001f;
                if(input->pitch > radians(89.0f))
                {
                     input->pitch = radians(89.0f);
@@ -99,23 +109,14 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
                // TODO: this can be optimice by not using the generic angle axis rotation function
                transform->direction = rotate(mat4(1.0f), input->pitch, vec3(1, 0, 0)) * vec4(dir, 0.0f);
                transform->direction = rotate(mat4(1.0f), input->yaw, vec3(0, 1, 0)) * vec4(transform->direction, 0.0f);
-
-              
                
                i32 windowX, windowY, windowW, windowH;
                PlaformGetWindowPos(&windowX, &windowY);
                PlatformClientDimensions(&windowW, &windowH);
 
-               i32 mouseX = InputManager::Get()->MouseX();
-               i32 mouseY = InputManager::Get()->MouseY();
-
-               mouseX = max(min(mouseX, windowW - 1), 0);
-               mouseY = max(min(mouseY, windowH - 1), 0);
-
-               PlaformSetCursorPos(windowX + mouseX, windowY + mouseY); 
-               InputManager::Get()->SetMousePosition(mouseX, mouseY);
-               InputManager::Get()->SetMouseLastPosition(mouseX, mouseY);
-               
+               PlaformSetCursorPos(windowX + windowW/2, windowY + windowH/2); 
+               InputManager::Get()->SetMousePosition(windowW/2, windowH/2);
+               InputManager::Get()->SetMouseLastPosition(windowW/2, windowH/2);
           }
           
           if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
