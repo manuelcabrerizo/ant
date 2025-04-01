@@ -6,7 +6,7 @@
         <vec3 x="0" y="0" z="1"/>
     </TransformComponent>
     <RenderComponent>
-        <model path="../data/models/sniper.obj"/>
-        <texture path="../data/textures/texture_01.png"/>
+        <model name="sniper"/>
+        <texture name="default"/>
     </RenderComponent>
 </Actor>

@@ -589,13 +589,17 @@ UniformBuffer *GraphicsManager::UniformBufferAlloc(u32 bindTo, void *data, u32 d
      ZeroMemory(&bufferDesc, sizeof(bufferDesc));
      bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
      bufferDesc.ByteWidth = dataSize;
-     bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-     if (FAILED(state->device->CreateBuffer(&bufferDesc, 0, &ub->buffer)))
+     bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+     bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+
+     D3D11_SUBRESOURCE_DATA subresourceData;
+     ZeroMemory(&subresourceData, sizeof(subresourceData));
+     subresourceData.pSysMem = data;
+
+     if (FAILED(state->device->CreateBuffer(&bufferDesc, &subresourceData, &ub->buffer)))
      {
           ASSERT(!"Error creating const buffer");
      }
-
-     state->deviceContext->UpdateSubresource(ub->buffer, 0, 0, data, 0, 0);
 
      return (UniformBuffer *)ub;
 }
@@ -629,10 +633,15 @@ void GraphicsManager::UniformBufferBind(UniformBuffer *uniformBuffer)
 
 void GraphicsManager::UniformBufferUpdate(UniformBuffer *uniformBuffer, void *data)
 {
-     // TODO: mabye use Map and Unmap instead of UpdateSubresource
      GraphicsManagerState *state = &gGraphicsManagerState;
      DirectXUniformBuffer *ub = (DirectXUniformBuffer *)uniformBuffer;
-     state->deviceContext->UpdateSubresource(ub->buffer, 0, 0, data, 0, 0);
+     D3D11_MAPPED_SUBRESOURCE mappedSubresourece;
+     if(FAILED(state->deviceContext->Map(ub->buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresourece)))
+     {
+          ASSERT(!"Error mapping const buffer");
+     }
+     memcpy(mappedSubresourece.pData, data, ub->dataSize);
+     state->deviceContext->Unmap(ub->buffer, 0);
 }
 
 

@@ -53,11 +53,11 @@ SlotmapKey<Type> AssetManager<Type>::GetHandle(const char *name)
 
 
 // Texture Manager
-void TextureManager::Load(const char *name)
+void TextureManager::Load(const char *name, const char *path)
 {
      TextureHandle textureHandle;
      textureHandle.name = name;
-     textureHandle.texture = GraphicsManager::Get()->TextureAlloc(name);
+     textureHandle.texture = GraphicsManager::Get()->TextureAlloc(path);
      nameIndex.Add(name, assets.Add(textureHandle));
 }
 
@@ -70,11 +70,11 @@ void TextureManager::Unload(const char *name)
 }
 
 // Model Manager
-void ModelManager::Load(const char *name)
+void ModelManager::Load(const char *name, const char *path)
 {
      ModelHandle modelHandle;
      modelHandle.name = name;
-     modelHandle.model.Init(name);
+     modelHandle.model.Init(path);
      nameIndex.Add(name, assets.Add(modelHandle));
 }
 

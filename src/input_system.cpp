@@ -62,7 +62,7 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           transform->position += movement;
           
           Sphere sphere;
-          sphere.Init(transform->position, 0.2f);
+          sphere.Init(transform->position + vec3(0.0f, -0.3f, 0.0f), 0.2f);
           if(cw->Intersect(sphere, collisionData))
           {
                while(collisionData.size > 0)
@@ -74,10 +74,9 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
 
                     collisionData.Clear();
 
-                    sphere.Init(transform->position, 0.2f);
+                    sphere.Init(transform->position + vec3(0.0f, -0.3f, 0.0f), 0.2f);
                     cw->Intersect(sphere, collisionData);                    
-               }
-               
+               }    
           }
 
           MemoryManager::Get()->ReleaseFrame(frame);
@@ -93,8 +92,8 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           
           if(InputManager::Get()->MouseButtonDown(MOUSE_BUTTON_RIGHT))
           {
-               input->yaw += InputManager::Get()->MouseXMovement() * 0.0016f;
-               input->pitch += InputManager::Get()->MouseYMovement() * 0.0016f;
+               input->yaw += InputManager::Get()->MouseXMovement() * 0.0005f;
+               input->pitch += InputManager::Get()->MouseYMovement() * 0.0005f;
                if(input->pitch > radians(89.0f))
                {
                     input->pitch = radians(89.0f);
@@ -105,6 +104,7 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
                }
 
                vec3 dir = vec3(0.0f, 0.0f, 1.0f);
+               // TODO: this can be optimice by not using the generic angle axis rotation function
                transform->direction = rotate(mat4(1.0f), input->pitch, vec3(1, 0, 0)) * vec4(dir, 0.0f);
                transform->direction = rotate(mat4(1.0f), input->yaw, vec3(0, 1, 0)) * vec4(transform->direction, 0.0f);
 

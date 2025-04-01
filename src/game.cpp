@@ -54,12 +54,12 @@ SlotmapKey<Actor> CreateActorFromFile(const char *filepath, ActorManager *am, Te
                tinyxml2::XMLElement *attributes = component->FirstChildElement();
 
                const char *modelPath = 0;
-               attributes->QueryStringAttribute("path", &modelPath);
+               attributes->QueryStringAttribute("name", &modelPath);
 
                attributes = attributes->NextSiblingElement();
 
                const char *texturePath = 0;
-               attributes->QueryStringAttribute("path", &texturePath);
+               attributes->QueryStringAttribute("name", &texturePath);
 
                ASSERT(modelPath && texturePath);
 
@@ -95,27 +95,23 @@ void Game::Init()
      
      // Load the models
      mm.Init(32);
-     mm.Load("../data/models/cube.obj");
-     mm.Load("../data/models/plane.obj");
-     mm.Load("../data/models/pistol.obj");
-     mm.Load("../data/models/sniper.obj");
-     mm.Load("../data/models/warrior.dae");
-     mm.Load("../data/models/test-level.obj");
+     mm.Load("cube", "../data/models/cube.obj");
+     mm.Load("plane", "../data/models/plane.obj");
+     mm.Load("pistol", "../data/models/pistol.obj");
+     mm.Load("sniper", "../data/models/sniper.obj");
+     mm.Load("test-level", "../data/models/test-level.obj");
 
-     ModelHandle *cube = mm.Get("../data/models/cube.obj");
-     ModelHandle *plane = mm.Get("../data/models/plane.obj");
-     ModelHandle *pistol = mm.Get("../data/models/pistol.obj");
-     ModelHandle *sniper = mm.Get("../data/models/sniper.obj");
-     ModelHandle *warrior = mm.Get("../data/models/warrior.dae");
-     ModelHandle *walls = mm.Get("../data/models/test-level.obj");
+     ModelHandle *cube = mm.Get("cube");
+     ModelHandle *plane = mm.Get("plane");
+     ModelHandle *pistol = mm.Get("pistol");
+     ModelHandle *sniper = mm.Get("sniper");
+     ModelHandle *walls = mm.Get("test-level");
 
      // Load a texture
      tm.Init(128);
-     tm.Load("../data/textures/texture_01.png");
-     tm.Load("../data/textures/warrior.png");
+     tm.Load("default", "../data/textures/texture_01.png");
 
-     Texture *texture = tm.Get("../data/textures/texture_01.png")->texture;
-     Texture *warriorTexture = tm.Get("../data/textures/warrior.png")->texture;
+     Texture *texture = tm.Get("default")->texture;
      
      // Initialize the Actor Manager
      am.Init(STATIC_MEMORY);
@@ -158,18 +154,17 @@ void Game::Init()
 }
 
 void Game::Update(f32 dt)
-{
+{     
      GraphicsManager::Get()->BeginFrame(1.0f, 0.0f, 1.0f);
      
      inputSystem.Update(&am, &cw, dt);
      cameraSystem.Update(&am, dt);
      weaponSystem.Update(&am, dt);
 
-     ModelHandle *pistol = mm.Get("../data/models/pistol.obj");
-     ModelHandle *sniper = mm.Get("../data/models/sniper.obj");
+     ModelHandle *pistol = mm.Get("pistol");
+     ModelHandle *sniper = mm.Get("sniper");
 
-     Texture *texture = tm.Get("../data/textures/texture_01.png")->texture;
-     Texture *warriorTexture = tm.Get("../data/textures/warrior.png")->texture;
+     Texture *texture = tm.Get("default")->texture;
      
      if(InputManager::Get()->KeyJustDown(KEY_1) && !usingFirstWeapon)
      {
