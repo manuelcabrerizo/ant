@@ -18,7 +18,6 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           TransformComponent *transform = am->GetTransformComponent(actor);
           CameraComponent *camera = am->GetCameraComponent(actor);
 
-          // TODO: implement some collision test
           vec3 playerVel = vec3(0.0f);
           if(InputManager::Get()->KeyDown(KEY_A))
           {
@@ -93,7 +92,6 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           
           if(InputManager::Get()->MouseButtonDown(MOUSE_BUTTON_RIGHT))
           {
-               // TODO: see if the dt in the input position integration is correct
                input->yaw += InputManager::Get()->MouseXMovement() * 0.001f;
                input->pitch += InputManager::Get()->MouseYMovement() * 0.001f;
                if(input->pitch > radians(89.0f))
@@ -113,7 +111,6 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
                i32 windowX, windowY, windowW, windowH;
                PlaformGetWindowPos(&windowX, &windowY);
                PlatformClientDimensions(&windowW, &windowH);
-
                PlaformSetCursorPos(windowX + windowW/2, windowY + windowH/2); 
                InputManager::Get()->SetMousePosition(windowW/2, windowH/2);
                InputManager::Get()->SetMouseLastPosition(windowW/2, windowH/2);

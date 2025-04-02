@@ -38,6 +38,7 @@ struct File
 #include "memory_manager.h"
 #include "containers.h"
 #include "graphics_manager.h"
+#include "graphics_manager_d3d11.h"
 #include "input_manager.h"
 #include "notification_manager.h"
 #include "model.h"
@@ -61,6 +62,7 @@ File PlatformReadFile(const char *filepath, i32 stackNum);
 #include "memory.cpp"
 #include "memory_manager.cpp"
 #include "containers.cpp"
+#include "graphics_manager.cpp"
 #include "graphics_manager_d3d11.cpp"
 #include "input_manager.cpp"
 #include "notification_manager.cpp"
@@ -193,7 +195,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
           {
                gWindow = window;
                
-               GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT, STATIC_MEMORY);
+               GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT, GraphicsManagerType::D3D11, STATIC_MEMORY);
                NotificationManager::Init(STATIC_MEMORY);
 
                Game game;

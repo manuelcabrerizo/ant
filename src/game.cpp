@@ -83,7 +83,7 @@ void Game::Init()
 {
      printf("Game Init!\n");
 
-     GraphicsManager::Get()->DebugInit();
+     //GraphicsManager::Get()->DebugInit();
      
      Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
      // Load the shader
@@ -215,7 +215,7 @@ void Game::Terminate()
 
      GraphicsManager::Get()->ShaderFree(shader);
 
-     GraphicsManager::Get()->DebugTerminate();
+     //GraphicsManager::Get()->DebugTerminate();
      
      printf("Game Terminate!\n");
 }
