@@ -2,6 +2,8 @@
 
 class InputSystem
 {
+private:
+     bool showMouse;
 public:
      void Init();
      void Terminate();

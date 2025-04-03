@@ -95,15 +95,7 @@ private:
 #ifdef ANT_DEBUG
      DebugRenderer debugRenderer;
 #endif
-*/
-     void CreateDeviceAndSwapChain();
-     void CreateRenderTargetView();
-     void CreateDepthStencilView();
-     HRESULT CreateInputLayoutDescFromVertexShaderSignature(ID3DBlob* pShaderBlob, ID3D11Device* pD3DDevice,
-                                                            ID3D11InputLayout** pInputLayout);
-     void CreateSamplerStates();
-     void CreateRasterizerStates();
-     
+*/   
 public:
      void Initialize(void *osWindow, i32 width, i32 height, i32 stackNum) override;
      void Shutdown() override;
@@ -149,4 +141,13 @@ public:
      void DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlice) override;
      void DebugDrawCube(vec3& c, vec3& hExtend) override;
 */
+
+private:
+     void CreateDeviceAndSwapChain();
+     void CreateRenderTargetView();
+     void CreateDepthStencilView();
+     HRESULT CreateInputLayoutDescFromVertexShaderSignature(ID3DBlob* pShaderBlob, ID3D11Device* pD3DDevice,
+                                                            ID3D11InputLayout** pInputLayout);
+     void CreateSamplerStates();
+     void CreateRasterizerStates();
 };

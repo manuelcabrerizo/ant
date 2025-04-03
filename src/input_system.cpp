@@ -1,11 +1,13 @@
 void InputSystem::Init()
 {
-
+     showMouse = false;
+     PlatformShowMouse(showMouse);
 }
 
 void InputSystem::Terminate()
 {
-
+     showMouse = true;
+     PlatformShowMouse(showMouse);
 }
 
 void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
@@ -81,16 +83,13 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           MemoryManager::Get()->ReleaseFrame(frame);
 
 
-          if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_RIGHT))
+          if(InputManager::Get()->KeyJustDown(KEY_ESCAPE))
           {
-               PlatformShowMouse(false);
-          }
-          if(InputManager::Get()->MouseButtonJustUp(MOUSE_BUTTON_RIGHT))
-          {
-               PlatformShowMouse(true);
+               showMouse = !showMouse;
+               PlatformShowMouse(showMouse);
           }
           
-          if(InputManager::Get()->MouseButtonDown(MOUSE_BUTTON_RIGHT))
+          if(showMouse == false)
           {
                input->yaw += InputManager::Get()->MouseXMovement() * 0.001f;
                input->pitch += InputManager::Get()->MouseYMovement() * 0.001f;
@@ -114,14 +113,16 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
                PlaformSetCursorPos(windowX + windowW/2, windowY + windowH/2); 
                InputManager::Get()->SetMousePosition(windowW/2, windowH/2);
                InputManager::Get()->SetMouseLastPosition(windowW/2, windowH/2);
+
+               if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
+               {
+                    Notification notification = {};
+                    const char *message = "te dispare gato\n";
+                    memcpy(notification.data, message, strlen(message));
+                    NotificationManager::Get()->SendNotification(notification, NOTIFICATION_SHOOT, (void *)this);
+               }  
           }
           
-          if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
-          {
-               Notification notification = {};
-               const char *message = "te dispare gato\n";
-               memcpy(notification.data, message, strlen(message));
-               NotificationManager::Get()->SendNotification(notification, NOTIFICATION_SHOOT, (void *)this);
-          }  
+
      }
 }
