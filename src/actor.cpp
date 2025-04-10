@@ -144,3 +144,83 @@ void ActorManager::PrintActorAndCompoenentState()
      printf("weaponComponents count: %d\n", weaponComponents.Size());
 }
 
+// TODO: Integrate this function int the engine
+SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
+     ActorManager *actorManager, TextureManager *textureManager, ModelManager *modelManager)
+{
+    tinyxml2::XMLDocument doc;
+    doc.LoadFile(filepath);
+
+    SlotmapKey<Actor> actor = actorManager->CreateActor();
+
+    tinyxml2::XMLElement *root = doc.FirstChildElement("Actor");
+    tinyxml2::XMLElement *component = root->FirstChildElement();
+    while(component)
+    {
+         const char *componentType = component->Value();
+
+         if(strcmp("TransformComponent", componentType) == 0)
+         {
+              tinyxml2::XMLElement *attributes = component->FirstChildElement();
+              vec3 position;
+              attributes->QueryFloatAttribute("x", &position.x);
+              attributes->QueryFloatAttribute("y", &position.y);
+              attributes->QueryFloatAttribute("z", &position.z);
+              attributes = attributes->NextSiblingElement();
+              vec3 scale;
+              attributes->QueryFloatAttribute("x", &scale.x);
+              attributes->QueryFloatAttribute("y", &scale.y);
+              attributes->QueryFloatAttribute("z", &scale.z);
+              attributes = attributes->NextSiblingElement();
+              vec3 direction;
+              attributes->QueryFloatAttribute("x", &direction.x);
+              attributes->QueryFloatAttribute("y", &direction.y);
+              attributes->QueryFloatAttribute("z", &direction.z);
+              actorManager->AddTransformComponent(actor, position, scale, direction);
+         }
+         else if(strcmp("CameraComponent", componentType) == 0)
+         {
+              tinyxml2::XMLElement *attributes = component->FirstChildElement();
+              vec3 position;
+              attributes->QueryFloatAttribute("x", &position.x);
+              attributes->QueryFloatAttribute("y", &position.y);
+              attributes->QueryFloatAttribute("z", &position.z);
+              attributes = attributes->NextSiblingElement();
+              vec3 direction;
+              attributes->QueryFloatAttribute("x", &direction.x);
+              attributes->QueryFloatAttribute("y", &direction.y);
+              attributes->QueryFloatAttribute("z", &direction.z);
+              actorManager->AddCameraComponent(actor, position, direction);
+         }
+         else if(strcmp("InputComponent", componentType) == 0)
+         {
+              actorManager->AddInputComponent(actor);
+         }
+         else if(strcmp("RenderComponent", componentType) == 0)
+         {
+              tinyxml2::XMLElement *attributes = component->FirstChildElement();
+
+              const char *modelPath = 0;
+              attributes->QueryStringAttribute("name", &modelPath);
+
+              attributes = attributes->NextSiblingElement();
+
+              const char *texturePath = 0;
+              attributes->QueryStringAttribute("name", &texturePath);
+
+              ASSERT(modelPath && texturePath);
+
+              ModelHandle *modelHandle = modelManager->Get(modelPath);
+              TextureHandle *textureHandle = textureManager->Get(texturePath);
+              actorManager->AddRenderComponent(actor, modelHandle->model, textureHandle->texture);
+         }
+         else
+         {
+              ASSERT(!"Component not Supported!");
+         }
+         
+         component = component->NextSiblingElement();
+    }
+    return actor;
+}
+

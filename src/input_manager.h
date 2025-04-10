@@ -3,6 +3,8 @@
 constexpr u32 KEY_COUNT = 256;
 constexpr u32 MOUSE_BUTTON_COUNT = 3;
 
+// TODO: factor out DirectInput
+//       refactor singleton code
 class InputManager
 {
 private:

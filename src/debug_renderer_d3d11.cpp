@@ -7,7 +7,6 @@ void DebugRenderer::Init()
 
      cpuBuffer = (VertexLine *)MemoryManager::Get()->Alloc(sizeof(VertexLine) * bufferSize, STATIC_MEMORY);
 
-     // TODO: alloc the gpu buffer
      D3D11_BUFFER_DESC vertexDesc;
      ZeroMemory(&vertexDesc, sizeof(vertexDesc));
      vertexDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -19,7 +18,7 @@ void DebugRenderer::Init()
           ASSERT(!"Error create line renderer GPU buffer.");
      }
      
-     Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
+     Frame frame = MemoryManager::Get()->GetFrame();
      // Load the shader
      File vertFile = PlatformReadFile("../data/shaders/line_vert.hlsl", FRAME_MEMORY);
      File fragFile = PlatformReadFile("../data/shaders/line_frag.hlsl", FRAME_MEMORY);

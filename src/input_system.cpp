@@ -55,7 +55,7 @@ void InputSystem::Update(ActorManager *am, CollisionWorld *cw, float dt)
           // Collision detection, this should be done in its own system
           vec3 movement = (playerVel * 2.0f) * dt;
 
-          Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
+          Frame frame = MemoryManager::Get()->GetFrame();
 
           Array<CollisionData> collisionData;
           collisionData.Init(MAX_COLLISION_COUNT, FRAME_MEMORY);

@@ -1,5 +1,6 @@
 #pragma once
 
+
 template <typename Type>
 class AssetManager
 {
@@ -40,7 +41,6 @@ struct ModelHandle
      const char *name;
      Model model;
 };
-
 
 class ModelManager : public AssetManager<ModelHandle>
 {

@@ -14,7 +14,7 @@ public:
      static MemoryManager *Get();
 
      void *Alloc(u64 size, i32 stackNum);
-     Frame GetFrame(i32 stackNum);
+     Frame GetFrame();
 
      void ReleaseFrame(Frame frame);
 };

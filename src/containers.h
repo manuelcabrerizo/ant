@@ -17,8 +17,7 @@ public:
 
      Type& operator[](u32 index) {
           return data[index];
-     }
-     
+     }   
 };
 
 template <typename Type>

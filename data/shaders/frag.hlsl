@@ -13,21 +13,21 @@ float4 fs_main(PS_Input i) : SV_TARGET
 {
     float3 ambient = float3(0.2f, 0.2f, 0.2f);
 
-    float3 ligthPos0 = float3(3.0f, 0.0f, 2.0f);
+    float3 ligthPos0 = float3(30.0f, 20.0f, 20.0f);
     float3 ligthDir0 = normalize(ligthPos0 - i.fragPos);
-    float3 lightColor0 = float3(2.0f, 0.2f, 0.2f);
+    float3 lightColor0 = float3(0.2f, 0.2f, 0.6f);
 
-    float3 ligthPos1 = float3(0.0f, 0.0f, -2.0f);
+    float3 ligthPos1 = float3(0.0f, 20.0f, -20.0f);
     float3 ligthDir1 = normalize(ligthPos1 - i.fragPos);
-    float3 lightColor1 = float3(0.2f, 0.2f, 2.0f);
+    float3 lightColor1 = float3(0.2f, 0.2f, 0.6f);
     
-    float3 ligthPos2 = float3(0.0f, 0.0f, 4.0f);
+    float3 ligthPos2 = float3(0.0f, 20.0f, 40.0f);
     float3 ligthDir2 = normalize(ligthPos2 - i.fragPos);
-    float3 lightColor2 = float3(0.2f, 2.0f, 0.2f);
+    float3 lightColor2 = float3(0.2f, 0.6f, 0.2f);
 
-    float3 ligthPos3 = float3(-3.0f, 0.0f, 2.0f);
+    float3 ligthPos3 = float3(-30.0f, 20.0f, 20.0f);
     float3 ligthDir3 = normalize(ligthPos3 - i.fragPos);
-    float3 lightColor3 = float3(2.0f, 2.0f, 0.2f);
+    float3 lightColor3 = float3(0.6f, 0.2f, 0.2f);
 
     float3 color = srv.Sample(samplerState, i.uv).rgb;
 

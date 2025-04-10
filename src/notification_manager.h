@@ -16,13 +16,14 @@ struct Notification
      u8 data[256];
 };
 
+// TODO: find a way to note use and interface for this.
+// try to use function pointers intead
 class INotificable
 {
 public:
      virtual ~INotificable() {}
      virtual void OnNotify(NotificationType type, Notification notification, void *sender) = 0;
 };
-
 
 
 struct NotificationRegistry

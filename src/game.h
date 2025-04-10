@@ -1,23 +1,11 @@
 #pragma once
 
-/*
-=#=#=#=#=#=#=#=#=#=#
-= TODO:
-=#=#=#=#=#=#=#=#=#=#
-= Run around on a level
-= Multiple weapos and the avility to shoot them
-= Collision detection with the scene
-= Very simple AI for enemies
-=#=#=#=#=#=#=#=#=#=#
-*/
-
 class Game
 {
 private:
-     TextureManager tm;
-     ModelManager mm;
-
-     ActorManager am;
+     TextureManager textureManager;
+     ModelManager modelManager;
+     ActorManager actorManager;
 
      InputSystem inputSystem;
      CameraSystem cameraSystem;
@@ -31,7 +19,7 @@ private:
      SlotmapKey<Actor> secondWeapon;
      bool usingFirstWeapon = true;
 
-     CollisionWorld cw;
+     CollisionWorld collisionWorld;
      
 public:     
      void Init();

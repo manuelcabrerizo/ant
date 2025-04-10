@@ -610,7 +610,7 @@ HRESULT GraphicsManagerD3D11::CreateInputLayoutDescFromVertexShaderSignature(ID3
      pVertexShaderReflection->GetDesc( &shaderDesc );
  
      // Read input layout description from shader info
-     Frame frame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
+     Frame frame = MemoryManager::Get()->GetFrame();
 
      Array<D3D11_INPUT_ELEMENT_DESC> inputLayoutDesc;
      inputLayoutDesc.Init(shaderDesc.InputParameters, FRAME_MEMORY);

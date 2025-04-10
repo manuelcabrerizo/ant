@@ -36,9 +36,9 @@ void *MemoryManager::Alloc(u64 size, i32 stackNum)
      return allocator.Alloc(size, stackNum);
 }
 
-Frame MemoryManager::GetFrame(i32 stackNum)
+Frame MemoryManager::GetFrame()
 {
-     return allocator.GetFrame(stackNum);
+     return allocator.GetFrame(FRAME_MEMORY);
 }
 
 void MemoryManager::ReleaseFrame(Frame frame)
