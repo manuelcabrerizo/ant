@@ -11,7 +11,7 @@ void PlayerController::Terminate()
      PlatformShowMouse(showMouse);
 }
 
-void PlayerController::Update(ActorManager *am, CollisionWorld *cw, float dt)
+void PlayerController::Update(ActorManager *am, CollisionWorld *cw, f32 dt)
 {
      Array<PlayerControllerComponent>& playerControllers = am->GetPlayerControllerComponents();
      for(u32 i = 0; i < playerControllers.size; ++i)
@@ -23,6 +23,8 @@ void PlayerController::Update(ActorManager *am, CollisionWorld *cw, float dt)
           camera = am->GetCameraComponent(actor);
           physics = am->GetPhysicsComponent(actor);
           moveDirection = vec3(0.0f);
+
+          ChangeWeapon(am);
 
           ProcessMouseMovement();
           ProcessKeyboardMovement();
@@ -161,4 +163,36 @@ void PlayerController::ProcessColisionDetectionAndResolution(CollisionWorld *cw)
           }    
      }
      MemoryManager::Get()->ReleaseFrame(frame);
+}
+
+void PlayerController::ChangeWeapon(ActorManager *actorManager)
+{     
+     RenderComponent *weaponRenderComponents[2];
+     weaponRenderComponents[0] = actorManager->GetRenderComponent(playerController->weapons[0]);
+     weaponRenderComponents[1] = actorManager->GetRenderComponent(playerController->weapons[1]);
+
+     if(InputManager::Get()->KeyJustDown(KEY_1) && !playerController->usingFirstWeapon)
+     {
+          weaponRenderComponents[1]->enable = false;
+          weaponRenderComponents[0]->enable = true;          
+          
+          actorManager->RemoveWeaponComponent(playerController->owner);
+          actorManager->AddWeaponComponent(playerController->owner, playerController->weapons[0]);
+
+          playerController->usingFirstWeapon = true;
+
+          actorManager->PrintActorAndCompoenentState();
+     }
+     if(InputManager::Get()->KeyJustDown(KEY_2) && playerController->usingFirstWeapon)
+     {
+          weaponRenderComponents[0]->enable = false;   
+          weaponRenderComponents[1]->enable = true;
+           
+          actorManager->RemoveWeaponComponent(playerController->owner);
+          actorManager->AddWeaponComponent(playerController->owner, playerController->weapons[1]);
+
+          playerController->usingFirstWeapon = false;
+
+          actorManager->PrintActorAndCompoenentState();
+     }
 }

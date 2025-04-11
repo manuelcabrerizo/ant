@@ -3,7 +3,14 @@
 struct Actor;
 class ActorManager;
 
-struct TransformComponent
+// TODO: test the bug here
+
+struct Component
+{
+     bool enable = true;
+};
+
+struct TransformComponent : public Component
 {
      vec3 position;
      vec3 scale;
@@ -11,14 +18,15 @@ struct TransformComponent
      SlotmapKey<Actor> owner;
 };
 
-struct RenderComponent
+struct RenderComponent : public Component
 {
      Texture *texture;
      Model model;
+     //bool enable = true;
      SlotmapKey<Actor> owner;
 };
 
-struct PhysicsComponent
+struct PhysicsComponent : public Component
 {
      vec3 acceleration;
      vec3 velocity;
@@ -27,14 +35,18 @@ struct PhysicsComponent
      SlotmapKey<Actor> owner;
 };
 
-struct PlayerControllerComponent
+struct PlayerControllerComponent : public Component
 {
-     f32 yaw, pitch;
+     f32 yaw = 0;
+     f32 pitch = 0;
      bool grounded = false;
+     SlotmapKey<Actor> weapons[2];
+     i32 weaponCount = 0;
+     bool usingFirstWeapon = true;
      SlotmapKey<Actor> owner;
 };
 
-struct WeaponComponent
+struct WeaponComponent : public Component
 {
      SlotmapKey<Actor> owner;
      SlotmapKey<Actor> weapon;

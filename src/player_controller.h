@@ -16,6 +16,8 @@ private:
      void ProcessKeyboardMovement();
      void ProcessPhysics(float dt);
      void ProcessColisionDetectionAndResolution(CollisionWorld *cw);
+     void ChangeWeapon(ActorManager *actorManager);
+
 public:
      void Init();
      void Terminate();

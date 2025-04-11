@@ -17,6 +17,12 @@ void RenderSystem::Render(ActorManager *am, f32 dt)
      {
           SlotmapKey<Actor> actor = renders[i].owner;
           RenderComponent *render = &renders[i];
+
+          if(!render->enable)
+          {
+               continue;
+          }
+
           TransformComponent *transform = am->GetTransformComponent(actor);
 
           mat4 tra = translate(mat4(1.0f), transform->position); 

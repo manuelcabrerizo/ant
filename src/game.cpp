@@ -49,19 +49,9 @@ void Game::Init()
      // Register system to be notify
      NotificationManager::Get()->RegisterListener(&weaponSystem, NOTIFICATION_SHOOT);
 
-     // Create sniper
-     firstWeapon = CreateActorFromFile("../data/xml/sniper.xml", 
-          &actorManager, &textureManager, &modelManager);
-
-     // Create pistol
-     secondWeapon = CreateActorFromFile("../data/xml/pistol.xml",
-          &actorManager, &textureManager, &modelManager);
-     actorManager.RemoveRenderComponent(secondWeapon);
-
      // Create Player
-     player = CreateActorFromFile("../data/xml/player.xml",
+     SlotmapKey<Actor> player = CreateActorFromFile("../data/xml/player.xml",
           &actorManager, &textureManager, &modelManager);
-     actorManager.AddWeaponComponent(player, firstWeapon);
      actorManager.AddPhysicsComponent(player, vec3(0.0), vec3(0.0f));
 
      // Create Level
@@ -69,6 +59,7 @@ void Game::Init()
      actorManager.AddTransformComponent(level, vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 1.0f));
      actorManager.AddRenderComponent(level, walls->model, textureManager.Get("default")->texture);
      
+     // Create collision world
      collisionWorld.LoadFromFile("../data/collision/level-collision.obj");
 }
 
@@ -80,36 +71,6 @@ void Game::Update(f32 dt)
      playerController.Update(&actorManager, &collisionWorld, dt);
      cameraSystem.Update(&actorManager, dt);
      weaponSystem.Update(&actorManager, dt);
-
-     ModelHandle *pistol = modelManager.Get("pistol");
-     ModelHandle *sniper = modelManager.Get("sniper");
-
-     Texture *texture = textureManager.Get("default")->texture;
-     
-     if(InputManager::Get()->KeyJustDown(KEY_1) && !usingFirstWeapon)
-     {
-          actorManager.RemoveRenderComponent(secondWeapon);
-          actorManager.AddRenderComponent(firstWeapon, sniper->model, texture);
-          
-          actorManager.RemoveWeaponComponent(player);
-          actorManager.AddWeaponComponent(player, firstWeapon);
-
-          usingFirstWeapon = true;
-
-          actorManager.PrintActorAndCompoenentState();
-     }
-     if(InputManager::Get()->KeyJustDown(KEY_2) && usingFirstWeapon)
-     {
-          actorManager.RemoveRenderComponent(firstWeapon);
-          actorManager.AddRenderComponent(secondWeapon, pistol->model, texture);
-          
-          actorManager.RemoveWeaponComponent(player);
-          actorManager.AddWeaponComponent(player, secondWeapon);
-
-          usingFirstWeapon = false;
-
-          actorManager.PrintActorAndCompoenentState();
-     }
 }
 
 void Game::Render()

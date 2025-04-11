@@ -215,6 +215,24 @@ SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
          else if(strcmp("PlayerControllerComponent", componentType) == 0)
          {
               actorManager->AddPlayerControllerComponent(actor);
+              PlayerControllerComponent *playerController = actorManager->GetPlayerControllerComponent(actor);
+
+              // TODO: make this work for variable amount of weapons
+              tinyxml2::XMLElement *attributes = component->FirstChildElement();
+              if(attributes)
+              {
+                    const char *weaponPath[2];
+                    attributes->QueryStringAttribute("path", &weaponPath[0]);
+                    attributes = attributes->NextSiblingElement();
+                    attributes->QueryStringAttribute("path", &weaponPath[1]);
+
+                    playerController->weapons[0] = CreateActorFromFile(weaponPath[0], actorManager, textureManager, modelManager); 
+                    playerController->weapons[1] = CreateActorFromFile(weaponPath[1], actorManager, textureManager, modelManager);
+                    RenderComponent *render = actorManager->GetRenderComponent(playerController->weapons[1]);
+                    render->enable = false;
+
+                    actorManager->AddWeaponComponent(actor, playerController->weapons[0]);
+              }
          }
          else if(strcmp("RenderComponent", componentType) == 0)
          {

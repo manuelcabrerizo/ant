@@ -13,12 +13,6 @@ private:
      WeaponSystem weaponSystem;
 
      Shader *shader;
-         
-     SlotmapKey<Actor> player;
-     SlotmapKey<Actor> firstWeapon;
-     SlotmapKey<Actor> secondWeapon;
-     bool usingFirstWeapon = true;
-
      CollisionWorld collisionWorld;
      
 public:     

@@ -9,5 +9,8 @@
         <vec3 x="0" y="0" z="-4"/>
         <vec3 x="0" y="0" z="1"/>
     </CameraComponent>
-    <PlayerControllerComponent/>
+    <PlayerControllerComponent>
+        <weapon path="../data/xml/pistol.xml"/>
+        <weapon path="../data/xml/sniper.xml"/>
+    </PlayerControllerComponent>
 </Actor>
