@@ -5,7 +5,7 @@ void ActorManager::Init(i32 stackNum)
      transformComponents.Init(100, stackNum);
      renderComponents.Init(100, stackNum);
      physicsComponents.Init(100, stackNum);
-     inputComponents.Init(1, stackNum);
+     playerControllerComponents.Init(1, stackNum);
      cameraComponents.Init(1, stackNum);
      weaponComponents.Init(100, stackNum);
 }
@@ -16,7 +16,7 @@ void ActorManager::Terminate()
      transformComponents.Clear();
      renderComponents.Clear();
      physicsComponents.Clear();
-     inputComponents.Clear();
+     playerControllerComponents.Clear();
      cameraComponents.Clear();
      weaponComponents.Clear();
 }
@@ -32,7 +32,8 @@ void ActorManager::DestroyActor(SlotmapKey<Actor> actorKey)
      Actor *actor = actors.Get(actorKey);
      if(actor->transform.gen != INVALID_KEY) transformComponents.Remove(actor->transform);
      if(actor->render.gen != INVALID_KEY) renderComponents.Remove(actor->render);
-     if(actor->input.gen != INVALID_KEY) inputComponents.Remove(actor->input);
+     if(actor->physics.gen != INVALID_KEY) physicsComponents.Remove(actor->physics);
+     if(actor->playerController.gen != INVALID_KEY) playerControllerComponents.Remove(actor->playerController);
      if(actor->camera.gen != INVALID_KEY) cameraComponents.Remove(actor->camera);
      if(actor->weapon.gen != INVALID_KEY) weaponComponents.Remove(actor->weapon);
      actors.Remove(actorKey);
@@ -81,13 +82,13 @@ void ActorManager::AddPhysicsComponent(SlotmapKey<Actor> actorKey, vec3 accelera
 }
 
 
-void ActorManager::AddInputComponent(SlotmapKey<Actor> actorKey)
+void ActorManager::AddPlayerControllerComponent(SlotmapKey<Actor> actorKey)
 {
-     InputComponent input;
-     input.owner = actorKey;
-     SlotmapKey<InputComponent> key = inputComponents.Add(input);
+     PlayerControllerComponent playerController;
+     playerController.owner = actorKey;
+     SlotmapKey<PlayerControllerComponent> key = playerControllerComponents.Add(playerController);
      Actor *actor = GetActor(actorKey);
-     actor->input = key;
+     actor->playerController = key;
 }
 
 void ActorManager::AddCameraComponent(SlotmapKey<Actor> actorKey, vec3 pos, vec3 dir)
@@ -119,7 +120,7 @@ Array<type>& ActorManager::Get##type##s() \
 GetComponentsImp(TransformComponent, transformComponents);
 GetComponentsImp(RenderComponent, renderComponents);
 GetComponentsImp(PhysicsComponent, physicsComponents);
-GetComponentsImp(InputComponent, inputComponents);
+GetComponentsImp(PlayerControllerComponent, playerControllerComponents);
 GetComponentsImp(CameraComponent, cameraComponents);
 GetComponentsImp(WeaponComponent, weaponComponents);
 
@@ -134,7 +135,7 @@ void ActorManager::Remove##type(SlotmapKey<Actor> actorKey) \
 RemoveComponentImp(TransformComponent, transform, transformComponents);
 RemoveComponentImp(RenderComponent, render, renderComponents);
 RemoveComponentImp(PhysicsComponent, physics, physicsComponents);
-RemoveComponentImp(InputComponent, input, inputComponents);
+RemoveComponentImp(PlayerControllerComponent, playerController, playerControllerComponents);
 RemoveComponentImp(CameraComponent, camera, cameraComponents);
 RemoveComponentImp(WeaponComponent, weapon, weaponComponents);
 
@@ -149,7 +150,7 @@ type *ActorManager::Get##type(SlotmapKey<Actor> actorKey) \
 GetComponentImp(TransformComponent, transform, transformComponents);
 GetComponentImp(RenderComponent, render, renderComponents);
 GetComponentImp(PhysicsComponent, physics, physicsComponents);
-GetComponentImp(InputComponent, input, inputComponents);
+GetComponentImp(PlayerControllerComponent, playerController, playerControllerComponents);
 GetComponentImp(CameraComponent, camera, cameraComponents);
 GetComponentImp(WeaponComponent, weapon, weaponComponents);
 
@@ -158,7 +159,7 @@ void ActorManager::PrintActorAndCompoenentState()
      printf("Actors count: %d\n", actors.Size());
      printf("transformComponents count: %d\n", transformComponents.Size());
      printf("renderComponents count: %d\n", renderComponents.Size());
-     printf("inputComponents count: %d\n", inputComponents.Size());
+     printf("playerComponents count: %d\n", playerControllerComponents.Size());
      printf("cameraComponents count: %d\n", cameraComponents.Size());
      printf("weaponComponents count: %d\n", weaponComponents.Size());
 }
@@ -211,9 +212,9 @@ SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
               attributes->QueryFloatAttribute("z", &direction.z);
               actorManager->AddCameraComponent(actor, position, direction);
          }
-         else if(strcmp("InputComponent", componentType) == 0)
+         else if(strcmp("PlayerControllerComponent", componentType) == 0)
          {
-              actorManager->AddInputComponent(actor);
+              actorManager->AddPlayerControllerComponent(actor);
          }
          else if(strcmp("RenderComponent", componentType) == 0)
          {

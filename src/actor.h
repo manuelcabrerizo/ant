@@ -27,8 +27,7 @@ struct PhysicsComponent
      SlotmapKey<Actor> owner;
 };
 
-// TODO: change the name to PlayerControllerComponent
-struct InputComponent
+struct PlayerControllerComponent
 {
      f32 yaw, pitch;
      SlotmapKey<Actor> owner;
@@ -45,7 +44,7 @@ struct Actor
      SlotmapKey<TransformComponent> transform;
      SlotmapKey<RenderComponent> render;
      SlotmapKey<PhysicsComponent> physics;
-     SlotmapKey<InputComponent> input;
+     SlotmapKey<PlayerControllerComponent> playerController;
      SlotmapKey<CameraComponent> camera;
      SlotmapKey<WeaponComponent> weapon;
 };
@@ -57,7 +56,7 @@ private:
      Slotmap<TransformComponent> transformComponents;
      Slotmap<RenderComponent> renderComponents;
      Slotmap<PhysicsComponent> physicsComponents;
-     Slotmap<InputComponent> inputComponents;
+     Slotmap<PlayerControllerComponent> playerControllerComponents;
      Slotmap<CameraComponent> cameraComponents;
      Slotmap<WeaponComponent> weaponComponents;
      
@@ -73,7 +72,7 @@ public:
      Array<TransformComponent>& GetTransformComponents();
      Array<RenderComponent>& GetRenderComponents();
      Array<PhysicsComponent>& GetPhysicsComponents();
-     Array<InputComponent>& GetInputComponents();
+     Array<PlayerControllerComponent>& GetPlayerControllerComponents();
      Array<CameraComponent>& GetCameraComponents();
      Array<WeaponComponent>& GetWeaponComponents();
      
@@ -81,21 +80,21 @@ public:
                                 vec3 position, vec3 scale, vec3 direction);
      void AddRenderComponent(SlotmapKey<Actor> actorKey, Model model, Texture *texture);
      void AddPhysicsComponent(SlotmapKey<Actor> actorKey, vec3 acceleration, vec3 velocity);
-     void AddInputComponent(SlotmapKey<Actor> actorKey);
+     void AddPlayerControllerComponent(SlotmapKey<Actor> actorKey);
      void AddCameraComponent(SlotmapKey<Actor> actorKey, vec3 pos, vec3 dir);
      void AddWeaponComponent(SlotmapKey<Actor> actorKey, SlotmapKey<Actor> weaponKey);
 
      void RemoveTransformComponent(SlotmapKey<Actor> actorKey);
      void RemoveRenderComponent(SlotmapKey<Actor> actorKey);
      void RemovePhysicsComponent(SlotmapKey<Actor> actorKey);
-     void RemoveInputComponent(SlotmapKey<Actor> actorKey);
+     void RemovePlayerControllerComponent(SlotmapKey<Actor> actorKey);
      void RemoveCameraComponent(SlotmapKey<Actor> actorKey);
      void RemoveWeaponComponent(SlotmapKey<Actor> actorKey);
      
      TransformComponent *GetTransformComponent(SlotmapKey<Actor> actorKey);
      RenderComponent *GetRenderComponent(SlotmapKey<Actor> actorKey);
      PhysicsComponent *GetPhysicsComponent(SlotmapKey<Actor> actorKey);
-     InputComponent *GetInputComponent(SlotmapKey<Actor> actorKey);
+     PlayerControllerComponent *GetPlayerControllerComponent(SlotmapKey<Actor> actorKey);
      CameraComponent *GetCameraComponent(SlotmapKey<Actor> actorKey);
      WeaponComponent *GetWeaponComponent(SlotmapKey<Actor> actorKey);
 

@@ -7,7 +7,7 @@ private:
      bool showMouse;
      vec3 moveDirection;
 
-     InputComponent *input;
+     PlayerControllerComponent *playerController;
      TransformComponent *transform;
      CameraComponent *camera;
      PhysicsComponent *physics;

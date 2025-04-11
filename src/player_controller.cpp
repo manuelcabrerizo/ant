@@ -13,12 +13,12 @@ void PlayerController::Terminate()
 
 void PlayerController::Update(ActorManager *am, CollisionWorld *cw, float dt)
 {
-     Array<InputComponent>& inputs = am->GetInputComponents();
-     for(u32 i = 0; i < inputs.size; ++i)
+     Array<PlayerControllerComponent>& playerControllers = am->GetPlayerControllerComponents();
+     for(u32 i = 0; i < playerControllers.size; ++i)
      {
-          SlotmapKey<Actor> actor = inputs[i].owner;
+          SlotmapKey<Actor> actor = playerControllers[i].owner;
 
-          input = &inputs[i];
+          playerController = &playerControllers[i];
           transform = am->GetTransformComponent(actor);
           camera = am->GetCameraComponent(actor);
           physics = am->GetPhysicsComponent(actor);
@@ -40,21 +40,21 @@ void PlayerController::ProcessMouseMovement()
      }
      if(showMouse == false)
      {
-          input->yaw += InputManager::Get()->MouseXMovement() * 0.001f;
-          input->pitch += InputManager::Get()->MouseYMovement() * 0.001f;
-          if(input->pitch > radians(89.0f))
+          playerController->yaw += InputManager::Get()->MouseXMovement() * 0.001f;
+          playerController->pitch += InputManager::Get()->MouseYMovement() * 0.001f;
+          if(playerController->pitch > radians(89.0f))
           {
-               input->pitch = radians(89.0f);
+               playerController->pitch = radians(89.0f);
           }
-          if(input->pitch < -radians(89.0f))
+          if(playerController->pitch < -radians(89.0f))
           {
-               input->pitch = -radians(89.0f);
+               playerController->pitch = -radians(89.0f);
           }
 
           vec3 dir = vec3(0.0f, 0.0f, 1.0f);
           // TODO: this can be optimice by not using the generic angle axis rotation function
-          transform->direction = rotate(mat4(1.0f), input->pitch, vec3(1, 0, 0)) * vec4(dir, 0.0f);
-          transform->direction = rotate(mat4(1.0f), input->yaw, vec3(0, 1, 0)) * vec4(transform->direction, 0.0f);
+          transform->direction = rotate(mat4(1.0f), playerController->pitch, vec3(1, 0, 0)) * vec4(dir, 0.0f);
+          transform->direction = rotate(mat4(1.0f), playerController->yaw, vec3(0, 1, 0)) * vec4(transform->direction, 0.0f);
           
           i32 windowX, windowY, windowW, windowH;
           PlaformGetWindowPos(&windowX, &windowY);
