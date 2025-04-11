@@ -30,6 +30,7 @@ struct PhysicsComponent
 struct PlayerControllerComponent
 {
      f32 yaw, pitch;
+     bool grounded = false;
      SlotmapKey<Actor> owner;
 };
 
