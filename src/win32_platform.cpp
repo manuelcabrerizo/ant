@@ -49,6 +49,7 @@ struct File
 
 #include "actor.h"
 #include "systems.h"
+#include "player_controller.h"
 #include "game.h"
 
 void *PlatformGetOsWindow();
