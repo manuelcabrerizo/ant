@@ -1,3 +1,11 @@
+// TODO:
+// - More colliders and Raycast test
+// - Implement a small demo with a full loop
+// the player has to have life and be able to shoot at least two weapons
+// the enemies have to move arrown the map and shoot the player
+// when the player kills all enemies the game restart
+// when the player gets kill the game restart
+
 void Game::Init()
 {
      printf("Game Init!\n");
@@ -33,7 +41,7 @@ void Game::Init()
      actorManager.Init(STATIC_MEMORY);
 
      // Initialize gameplay systems
-     inputSystem.Init();
+     playerController.Init();
      cameraSystem.Init();
      renderSystem.Init();
      weaponSystem.Init();
@@ -54,6 +62,7 @@ void Game::Init()
      player = CreateActorFromFile("../data/xml/player.xml",
           &actorManager, &textureManager, &modelManager);
      actorManager.AddWeaponComponent(player, firstWeapon);
+     actorManager.AddPhysicsComponent(player, vec3(0.0), vec3(0.0f));
 
      // Create Level
      SlotmapKey<Actor> level = actorManager.CreateActor();
@@ -64,10 +73,11 @@ void Game::Init()
 }
 
 void Game::Update(f32 dt)
-{     
+{    
+     // NOTE: this is in the update for the debug renderer to work properly 
      GraphicsManager::Get()->BeginFrame(1.0f, 0.0f, 1.0f);
      
-     inputSystem.Update(&actorManager, &collisionWorld, dt);
+     playerController.Update(&actorManager, &collisionWorld, dt);
      cameraSystem.Update(&actorManager, dt);
      weaponSystem.Update(&actorManager, dt);
 
@@ -113,7 +123,7 @@ void Game::Render()
 
 void Game::Terminate()
 {
-     inputSystem.Terminate();
+     playerController.Terminate();
      cameraSystem.Terminate();
      renderSystem.Terminate();
      weaponSystem.Terminate();

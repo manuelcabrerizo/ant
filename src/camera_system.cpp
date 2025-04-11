@@ -13,11 +13,11 @@ void CameraSystem::Terminate()
 
 void CameraSystem::Update(ActorManager *am, f32 dt)
 {
-     Array<CameraComponent> *cameras = am->GetCameraComponents();
-     for(u32 i = 0; i < cameras->size; ++i)
+     Array<CameraComponent>& cameras = am->GetCameraComponents();
+     for(u32 i = 0; i < cameras.size; ++i)
      {
-          SlotmapKey<Actor> actor = (*cameras)[i].owner;
-          CameraComponent *camera = &(*cameras)[i];
+          SlotmapKey<Actor> actor = cameras[i].owner;
+          CameraComponent *camera = &cameras[i];
           TransformComponent *transform = am->GetTransformComponent(actor);
 
           camera->SetPosition(transform->position/* + camera->GetWorldUp() * 2.0f - camera->GetWorldFront() * 2.0f*/);

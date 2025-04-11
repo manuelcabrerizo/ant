@@ -2,11 +2,7 @@ static Assimp::Importer gImporter;
 
 void Model::Init(const char *filepath)
 {
-/*
-     aiProcess_MakeLeftHanded |
-     aiProcess_FlipUVs | 
-     aiProcess_FlipWindingOrder*/
-     const aiScene *scene = gImporter.ReadFile(filepath, /*aiProcess_ConvertToLeftHanded*/0);
+     const aiScene *scene = gImporter.ReadFile(filepath, 0);
      i32 totalVerticesCount = 0;
      i32 totalIndicesCount = 0;
      for(i32 i = 0; i < scene->mNumMeshes; i++)

@@ -82,6 +82,8 @@ SlotmapKey<Type> Slotmap<Type>::Add(Type value)
 template <typename Type>
 Type *Slotmap<Type>::Get(SlotmapKey<Type> key)
 {
+     ASSERT(key.gen != INVALID_KEY);
+
      ASSERT(key.id < indices.capacity);
      SlotmapKey<Type> checkKey =  indices.data[key.id];
      ASSERT(checkKey.gen == key.gen);

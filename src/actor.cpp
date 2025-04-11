@@ -4,6 +4,7 @@ void ActorManager::Init(i32 stackNum)
      actors.Init(100, stackNum);
      transformComponents.Init(100, stackNum);
      renderComponents.Init(100, stackNum);
+     physicsComponents.Init(100, stackNum);
      inputComponents.Init(1, stackNum);
      cameraComponents.Init(1, stackNum);
      weaponComponents.Init(100, stackNum);
@@ -14,6 +15,7 @@ void ActorManager::Terminate()
      actors.Clear();
      transformComponents.Clear();
      renderComponents.Clear();
+     physicsComponents.Clear();
      inputComponents.Clear();
      cameraComponents.Clear();
      weaponComponents.Clear();
@@ -65,6 +67,20 @@ void ActorManager::AddRenderComponent(SlotmapKey<Actor> actorKey, Model model, T
      actor->render = key;
 }
 
+void ActorManager::AddPhysicsComponent(SlotmapKey<Actor> actorKey, vec3 acceleration, vec3 velocity)
+{
+     PhysicsComponent physics;
+     physics.acceleration = acceleration;
+     physics.velocity = velocity;
+     physics.forceAccumulator = vec3(0.0f, 0.0f, 0.0f);
+     physics.lastFrameAcceleration = vec3(0.0f, 0.0f, 0.0f);
+     physics.owner = actorKey;
+     SlotmapKey<PhysicsComponent> key = physicsComponents.Add(physics);
+     Actor *actor = GetActor(actorKey);
+     actor->physics = key;
+}
+
+
 void ActorManager::AddInputComponent(SlotmapKey<Actor> actorKey)
 {
      InputComponent input;
@@ -95,13 +111,14 @@ void ActorManager::AddWeaponComponent(SlotmapKey<Actor> actorKey, SlotmapKey<Act
 }
 
 #define GetComponentsImp(type, slotmap) \
-Array<type> *ActorManager::Get##type##s() \
+Array<type>& ActorManager::Get##type##s() \
 { \
-     return slotmap.GetArray(); \
+     return *slotmap.GetArray(); \
 }
 
 GetComponentsImp(TransformComponent, transformComponents);
 GetComponentsImp(RenderComponent, renderComponents);
+GetComponentsImp(PhysicsComponent, physicsComponents);
 GetComponentsImp(InputComponent, inputComponents);
 GetComponentsImp(CameraComponent, cameraComponents);
 GetComponentsImp(WeaponComponent, weaponComponents);
@@ -116,6 +133,7 @@ void ActorManager::Remove##type(SlotmapKey<Actor> actorKey) \
 
 RemoveComponentImp(TransformComponent, transform, transformComponents);
 RemoveComponentImp(RenderComponent, render, renderComponents);
+RemoveComponentImp(PhysicsComponent, physics, physicsComponents);
 RemoveComponentImp(InputComponent, input, inputComponents);
 RemoveComponentImp(CameraComponent, camera, cameraComponents);
 RemoveComponentImp(WeaponComponent, weapon, weaponComponents);
@@ -130,6 +148,7 @@ type *ActorManager::Get##type(SlotmapKey<Actor> actorKey) \
 
 GetComponentImp(TransformComponent, transform, transformComponents);
 GetComponentImp(RenderComponent, render, renderComponents);
+GetComponentImp(PhysicsComponent, physics, physicsComponents);
 GetComponentImp(InputComponent, input, inputComponents);
 GetComponentImp(CameraComponent, camera, cameraComponents);
 GetComponentImp(WeaponComponent, weapon, weaponComponents);

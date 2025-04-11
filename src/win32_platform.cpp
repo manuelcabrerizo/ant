@@ -74,7 +74,7 @@ File PlatformReadFile(const char *filepath, i32 stackNum);
 
 #include "actor.cpp"
 
-#include "input_system.cpp"
+#include "player_controller.cpp"
 #include "camera_system.cpp"
 #include "render_system.cpp"
 #include "weapon_system.cpp"

@@ -7,7 +7,7 @@ private:
      ModelManager modelManager;
      ActorManager actorManager;
 
-     InputSystem inputSystem;
+     PlayerController playerController;
      CameraSystem cameraSystem;
      RenderSystem renderSystem;
      WeaponSystem weaponSystem;

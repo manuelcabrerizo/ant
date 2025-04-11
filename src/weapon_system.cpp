@@ -10,10 +10,10 @@ void WeaponSystem::Terminate()
 
 void WeaponSystem::Update(ActorManager *am, f32 dt)
 {
-     Array<WeaponComponent> *weapons = am->GetWeaponComponents();
-     for(u32 i = 0; i < weapons->size; ++i)
+     Array<WeaponComponent>& weapons = am->GetWeaponComponents();
+     for(u32 i = 0; i < weapons.size; ++i)
      {
-          WeaponComponent *weapon = &(*weapons)[i];
+          WeaponComponent *weapon = &weapons[i];
           TransformComponent *transform = am->GetTransformComponent(weapon->owner);
           
           // TODO: make this more clear!
