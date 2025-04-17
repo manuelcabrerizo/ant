@@ -38,10 +38,18 @@ void Game::Init()
      textureManager.Load("default", "../data/textures/GridBox_Default.png");
      
      // Initialize the Actor Manager
-     actorManager.Init(STATIC_MEMORY);
+     actorManager.Init(100, 64, STATIC_MEMORY);
+     actorManager.AddComponentType<TransformComponent, 100>();
+     actorManager.AddComponentType<RenderComponent, 100>();
+     actorManager.AddComponentType<PhysicsComponent, 100>();
+     actorManager.AddComponentType<PlayerControllerComponent, 1>();
+     actorManager.AddComponentType<WeaponComponent, 100>();
+     actorManager.AddComponentType<CameraComponent, 1>();
+     actorManager.AddComponentType<EnemyComponent, 10>();
 
      // Initialize gameplay systems
      playerController.Init();
+     physicsSystem.Init();
      cameraSystem.Init();
      renderSystem.Init();
      weaponSystem.Init();
@@ -49,18 +57,30 @@ void Game::Init()
      // Register system to be notify
      NotificationManager::Get()->RegisterListener(&weaponSystem, NOTIFICATION_SHOOT);
 
+
      // Create Player
      SlotmapKey<Actor> player = CreateActorFromFile("../data/xml/player.xml",
           &actorManager, &textureManager, &modelManager);
-     actorManager.AddPhysicsComponent(player, vec3(0.0), vec3(0.0f));
+
+     // Create Enemy
+     SlotmapKey<Actor> enemy = CreateActorFromFile("../data/xml/enemy.xml",
+          &actorManager, &textureManager, &modelManager);
 
      // Create Level
-     SlotmapKey<Actor> level = actorManager.CreateActor();
-     actorManager.AddTransformComponent(level, vec3(0.0f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f), vec3(0.0f, 0.0f, 1.0f));
-     actorManager.AddRenderComponent(level, walls->model, textureManager.Get("default")->texture);
+     SlotmapKey<Actor> level = actorManager.CreateActor(2);
+     TransformComponent transform;
+     transform.position = vec3(0.0f);
+     transform.scale = vec3(1.0f);
+     transform.direction = vec3(0.0f, 0.0f, 1.0f);
+     actorManager.AddComponent<TransformComponent>(level, transform);
+     RenderComponent render;
+     render.model = walls->model;
+     render.texture = textureManager.Get("default")->texture;
+     actorManager.AddComponent<RenderComponent>(level, render);
      
      // Create collision world
      collisionWorld.LoadFromFile("../data/collision/level-collision.obj");
+     
 }
 
 void Game::Update(f32 dt)
@@ -68,7 +88,8 @@ void Game::Update(f32 dt)
      // NOTE: this is in the update for the debug renderer to work properly 
      GraphicsManager::Get()->BeginFrame(1.0f, 0.0f, 1.0f);
      
-     playerController.Update(&actorManager, &collisionWorld, dt);
+     playerController.Update(&actorManager, dt);
+     physicsSystem.Update(&actorManager, &collisionWorld, dt);
      cameraSystem.Update(&actorManager, dt);
      weaponSystem.Update(&actorManager, dt);
 }
@@ -85,6 +106,7 @@ void Game::Render()
 void Game::Terminate()
 {
      playerController.Terminate();
+     physicsSystem.Terminate();
      cameraSystem.Terminate();
      renderSystem.Terminate();
      weaponSystem.Terminate();

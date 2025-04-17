@@ -14,12 +14,10 @@ private:
 
      void ProcessMouseMovement();
      void ProcessKeyboardMovement();
-     void ProcessPhysics(float dt);
-     void ProcessColisionDetectionAndResolution(CollisionWorld *cw);
      void ChangeWeapon(ActorManager *actorManager);
 
 public:
      void Init();
      void Terminate();
-     void Update(ActorManager *am, CollisionWorld *cw, f32 dt);
+     void Update(ActorManager *am, f32 dt);
 };

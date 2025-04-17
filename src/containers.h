@@ -14,18 +14,40 @@ public:
      void Clear();
 
      Type *Push(Type value);
-
+     
      Type& operator[](u32 index) {
           return data[index];
      }   
 };
 
-template <typename Type>
-struct SlotmapKey
+struct SlotmapKeyBase
 {
      u32 id = 0;
      u64 gen = INVALID_KEY;
 };
+
+template <typename Type>
+struct SlotmapKey : public SlotmapKeyBase
+{
+};
+
+template <typename Type>
+SlotmapKey<Type> FromKeyBase(SlotmapKeyBase keyBase)
+{
+     SlotmapKey<Type> key;
+     key.id = keyBase.id;
+     key.gen = keyBase.gen;
+     return key;
+}
+
+template <typename Type>
+SlotmapKeyBase FromKey(SlotmapKey<Type> key)
+{
+     SlotmapKeyBase keyBase;
+     keyBase.id = key.id;
+     keyBase.gen = key.gen;
+     return key;
+}
 
 template <typename Type>
 class Slotmap
@@ -87,8 +109,11 @@ public:
      void Init(u64 size, i32 stackNum);
      
      void Add(const char *name, Type value);
+     void Add(i32 key, Type value);
      void Remove(const char *name);
+     void Remove(i32 key);
      Type *Get(const char *name);
+     Type *Get(i32 key);
 
      void PrintHashMap();
      

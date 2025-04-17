@@ -524,23 +524,55 @@ void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
      swapChainDesc.SampleDesc.Quality = 0;
      swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
+     // Select the best gpu   
+     IDXGIFactory1 * pFactory;
+     HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&pFactory));
+          
+     UINT i = 0; 
+     IDXGIAdapter *pSelectedAdapter = nullptr;
+     IDXGIAdapter * pAdapter = nullptr; 
+     while(pFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND) 
+     { 
+          DXGI_ADAPTER_DESC desc;
+          pAdapter->GetDesc(&desc);
+          if (desc.DedicatedVideoMemory > 0)
+          {
+               printf("Dedicated adapter found: %ls\n", desc.Description);
+               pSelectedAdapter = pAdapter;
+               break;
+          }
+          ++i;
+     }
+
      D3D_FEATURE_LEVEL featureLevel;
      D3D_DRIVER_TYPE driverType;
-     for(u32 driver = 0; driver < driverTypesCount; ++driver)
+     if(pSelectedAdapter)
      {
-          
-          HRESULT result = D3D11CreateDeviceAndSwapChain(0, driverTypes[driver], 0, deviceFlags,
-                                                           featureLevels, featureLevelsCount,
-                                                           D3D11_SDK_VERSION, &swapChainDesc,
-                                                           &swapChain,
-                                                           &device,
-                                                           &featureLevel,
-                                                           &deviceContext);
-          if(SUCCEEDED(result))
+          HRESULT result = D3D11CreateDeviceAndSwapChain(pSelectedAdapter, D3D_DRIVER_TYPE_UNKNOWN, 0, deviceFlags,
+               featureLevels, featureLevelsCount,
+               D3D11_SDK_VERSION, &swapChainDesc,
+               &swapChain,
+               &device,
+               &featureLevel,
+               &deviceContext);
+     }
+     else
+     {
+          for(u32 driver = 0; driver < driverTypesCount; ++driver)
           {
-               driverType = driverTypes[driver];
-               printf("Driver selected %d\n", driver);
-               break;
+               HRESULT result = D3D11CreateDeviceAndSwapChain(0, driverTypes[driver], 0, deviceFlags,
+                    featureLevels, featureLevelsCount,
+                    D3D11_SDK_VERSION, &swapChainDesc,
+                    &swapChain,
+                    &device,
+                    &featureLevel,
+                    &deviceContext);
+               if(SUCCEEDED(result))
+               {
+                    driverType = driverTypes[driver];
+                    printf("Driver selected %d\n", driver);
+                    break;
+               }
           }
      }
 }

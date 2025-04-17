@@ -45,10 +45,11 @@ struct File
 #include "asset_manager.h"
 #include "collision.h"
 
+#include "component.h"
 #include "camera_component.h"
-
 #include "actor.h"
 #include "systems.h"
+#include "physics_system.h"
 #include "player_controller.h"
 #include "game.h"
 
@@ -75,6 +76,7 @@ File PlatformReadFile(const char *filepath, i32 stackNum);
 
 #include "actor.cpp"
 
+#include "physics_system.cpp"
 #include "player_controller.cpp"
 #include "camera_system.cpp"
 #include "render_system.cpp"
@@ -221,6 +223,12 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                     double currentTime = (double)currentCounter.QuadPart / frequency.QuadPart;
                     lastCounter = currentCounter;
                     float dt = (float)(currentTime - lastTime);
+                    if(dt > 0.033f)
+                    {
+                         dt = 0.033f;
+                    }
+
+                    //printf("dt: %f\n", dt);
 
                     //printf("FPS: %d\n", (i32)(1.0f/dt));
                     

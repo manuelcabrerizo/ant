@@ -1,7 +1,7 @@
 template <typename Type>
 void AssetManager<Type>::Init(u32 assetsCapacity)
 {
-     nameIndex.Init(assetsCapacity * sizeof(Type), STATIC_MEMORY);
+     nameIndex.Init(assetsCapacity, STATIC_MEMORY);
      assets.Init(assetsCapacity, STATIC_MEMORY);
 }
 

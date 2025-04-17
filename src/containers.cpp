@@ -11,6 +11,7 @@ template <typename Type>
 void Array<Type>::Clear()
 {
      size = 0;
+     memset(data, 0, capacity * sizeof(Type));
 }
 
 template <typename Type>
@@ -158,6 +159,7 @@ void ObjectAllocator<Type>::Free(Type *object)
 }
 
 // TODO: mabye use 64 bits hash
+/*
 static u32 djb2(const char *str) {
     u32 hash = 5381;
     int c;
@@ -167,24 +169,53 @@ static u32 djb2(const char *str) {
     }
     return hash;
 }
+*/
+static u32 MurMur2(const void *key, i32 len, u32 seed) {
+     const u32 m = 0x5bd1e995;
+     const i32 r = 24;
+     u32 h = seed ^ len;
+     const u8 *data = (const u8 *)key;
+     while(len >= 4) {
+         u32 k = *(u32 *)data;
+         k *= m;
+         k ^= k >> r;
+         k *= m;
+         h *= m;
+         h ^= k;
+         data += 4;
+         len -= 4;
+     }
+     switch(len) {
+         case 3: h ^= data[2] << 16;
+         case 2: h ^= data[1] << 8;
+         case 1: h ^= data[0];
+                 h *= m;
+     }
+     h ^= h >> 13;
+     h *= m;
+     h ^= h >> 15;
+     return h;
+ }
 
 
 template<typename Type>
-void HashMap<Type>::Init(u64 size, i32 stackNum)
+void HashMap<Type>::Init(u64 capacity_, i32 stackNum)
 {
-     ASSERT((size & (size - 1)) == 0); // size should be power of two
+     ASSERT(capacity_ > 1);
+     ASSERT((capacity_ & (capacity_ - 1)) == 0); // capacity_ should be power of two
+     capacity = capacity_;
+     mask = capacity - 1;
+
+     u64 size = capacity * sizeof(HashElement);
      elements = (HashElement *)MemoryManager::Get()->Alloc(size, stackNum);
      memset(elements, 0, size);
      
-     capacity = size / sizeof(HashElement);
-     mask = capacity - 1;
      occupied = 0;
 
      for(i32 i = 0; i < capacity; ++i)
      {
           elements[i].id = INVALID_MAP_ID;
      }
-
 }
 
 // TODO: Test this to make shoure if we need to use placement new
@@ -193,7 +224,41 @@ void HashMap<Type>::Add(const char *name, Type value)
 {
      ASSERT(occupied + 1 <= capacity);
      
-     u32 id = djb2(name);
+     u32 id = MurMur2(name, strlen(name), 123);
+     u32 index = id % mask;
+
+     if(elements[index].id == INVALID_MAP_ID ||
+        elements[index].id == DELETED_MAP_ID)
+     {
+          elements[index].id = id;
+          elements[index].value = value;
+          occupied++;
+     }
+     else
+     {
+          if(elements[index].id == id)
+          {
+               ASSERT(!"Element is already on the map!");
+          }
+
+          u32 nextIndex = (index + 1) % capacity;
+          while(elements[nextIndex].id != INVALID_MAP_ID &&
+                elements[nextIndex].id != DELETED_MAP_ID)
+          {
+               nextIndex = (nextIndex + 1) % capacity;
+          }
+          elements[nextIndex].id = id;
+          elements[nextIndex].value = value;
+          occupied++;
+     }
+}
+
+template<typename Type>
+void HashMap<Type>::Add(i32 key, Type value)
+{
+     ASSERT(occupied + 1 <= capacity);
+     
+     u32 id = MurMur2(&key, sizeof(key), 123);
      u32 index = id % mask;
 
      if(elements[index].id == INVALID_MAP_ID ||
@@ -225,7 +290,33 @@ void HashMap<Type>::Add(const char *name, Type value)
 template<typename Type>
 void HashMap<Type>::Remove(const char *name)
 {
-     u32 id = djb2(name);
+     u32 id = MurMur2(name, strlen(name), 123);
+     u32 index = id % mask;
+
+     if(elements[index].id == INVALID_MAP_ID)
+     {
+          ASSERT(!"Error: trying to delete an invalid element!");
+     }
+
+     i32 checkCount = 0;
+     while(elements[index].id != id)
+     {
+          index = (index + 1) % capacity;
+          if(checkCount >= capacity)
+          {
+               ASSERT(!"Error: element not found!");
+          }
+          checkCount++;
+     }
+     elements[index].id = DELETED_MAP_ID;
+     elements[index].value = {};
+     occupied--;
+}
+
+template<typename Type>
+void HashMap<Type>::Remove(i32 key)
+{
+     u32 id = MurMur2(&key, sizeof(key), 123);
      u32 index = id % mask;
 
      if(elements[index].id == INVALID_MAP_ID)
@@ -252,7 +343,39 @@ template<typename Type>
 Type *HashMap<Type>::Get(const char *name)
 {
 
-     u32 id = djb2(name);
+     u32 id = MurMur2(name, strlen(name), 123);
+     u32 index = id % mask;
+
+     if(elements[index].id == INVALID_MAP_ID)
+     {
+          ASSERT(!"Error: trying to get an invalid element!");
+     }
+
+     i32 checkCount = 0;
+     while(elements[index].id != id &&
+           elements[index].id != INVALID_MAP_ID)
+     {
+          index = (index + 1) % capacity;
+          if(checkCount >= capacity)
+          {
+               ASSERT(!"Error: element not found!");
+          }
+          checkCount++;
+     }
+     
+     if(elements[index].id == INVALID_MAP_ID)
+     {
+          ASSERT(!"Error: element not found!");
+     }
+     
+     return &elements[index].value;
+}
+
+template<typename Type>
+Type *HashMap<Type>::Get(i32 key)
+{
+
+     u32 id = MurMur2(&key, sizeof(key), 123);
      u32 index = id % mask;
 
      if(elements[index].id == INVALID_MAP_ID)

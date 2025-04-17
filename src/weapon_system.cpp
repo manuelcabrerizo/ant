@@ -10,14 +10,14 @@ void WeaponSystem::Terminate()
 
 void WeaponSystem::Update(ActorManager *am, f32 dt)
 {
-     Array<WeaponComponent>& weapons = am->GetWeaponComponents();
+     Array<WeaponComponent>& weapons = am->GetComponents<WeaponComponent>();
      for(u32 i = 0; i < weapons.size; ++i)
      {
           WeaponComponent *weapon = &weapons[i];
-          TransformComponent *transform = am->GetTransformComponent(weapon->owner);
+          TransformComponent *transform = am->GetComponent<TransformComponent>(weapon->owner);
           
           // TODO: make this more clear!
-          TransformComponent *weaponTransform = am->GetTransformComponent(weapon->weapon);
+          TransformComponent *weaponTransform = am->GetComponent<TransformComponent>(weapon->weapon);
 
           vec3 front = normalize(transform->direction);
           vec3 right = normalize(cross(vec3(0.0f, 1.0f, 0.0f), front));

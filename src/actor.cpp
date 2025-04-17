@@ -1,41 +1,63 @@
+// TODO: find the correct place for this
+i32 ComponentBase::counter = 0;
 
-void ActorManager::Init(i32 stackNum)
+template <typename ComponentType>
+void ComponentStorage<ComponentType>::RemoveComponent(SlotmapKeyBase keyBase)
 {
-     actors.Init(100, stackNum);
-     transformComponents.Init(100, stackNum);
-     renderComponents.Init(100, stackNum);
-     physicsComponents.Init(100, stackNum);
-     playerControllerComponents.Init(1, stackNum);
-     cameraComponents.Init(1, stackNum);
-     weaponComponents.Init(100, stackNum);
+     SlotmapKey<ComponentType> key = FromKeyBase<ComponentType>(keyBase);
+     components.Remove(key);
+}
+
+void ActorManager::Init(i32 actorCount, i32 componentCount_, i32 memoryType_)
+{
+     memoryType = memoryType_;
+     componentCount = componentCount_;
+     maxActorCount = actorCount;
+
+     actors.Init(maxActorCount, memoryType);
+     componentStorageMap.Init(componentCount, memoryType);
 }
 
 void ActorManager::Terminate()
 {
      actors.Clear();
-     transformComponents.Clear();
-     renderComponents.Clear();
-     physicsComponents.Clear();
-     playerControllerComponents.Clear();
-     cameraComponents.Clear();
-     weaponComponents.Clear();
 }
 
-SlotmapKey<Actor> ActorManager::CreateActor()
+template <typename ComponentType, i32 Count>
+void ActorManager::AddComponentType()
+{
+     void *buffer = MemoryManager::Get()->Alloc(sizeof(ComponentStorage<ComponentType>), memoryType);
+     ComponentStorage<ComponentType> *componentStorage = new (buffer) ComponentStorage<ComponentType>();
+     componentStorage->components.Init(Count, memoryType);
+     componentStorageMap.Add(ComponentType::GetID(), (ComponentStorageBase *)componentStorage);
+}
+
+template <typename ComponentType>
+Array<ComponentType>& ActorManager::GetComponents()
+{
+     ComponentStorage<ComponentType>* compoentStorage = 
+          (ComponentStorage<ComponentType> *)(*componentStorageMap.Get(ComponentType::GetID()));
+     return *compoentStorage->components.GetArray();
+}
+
+
+SlotmapKey<Actor> ActorManager::CreateActor(i32 componentCount_)
 {
      Actor actor;
-     return actors.Add(actor);
+     actor.componentsMap.Init(componentCount_, memoryType);
+     actor.componentsIds.Init(componentCount_, memoryType);
+     SlotmapKey<Actor> actorKey = actors.Add(actor); 
+     return actorKey;
 }
 
 void ActorManager::DestroyActor(SlotmapKey<Actor> actorKey)
 {
      Actor *actor = actors.Get(actorKey);
-     if(actor->transform.gen != INVALID_KEY) transformComponents.Remove(actor->transform);
-     if(actor->render.gen != INVALID_KEY) renderComponents.Remove(actor->render);
-     if(actor->physics.gen != INVALID_KEY) physicsComponents.Remove(actor->physics);
-     if(actor->playerController.gen != INVALID_KEY) playerControllerComponents.Remove(actor->playerController);
-     if(actor->camera.gen != INVALID_KEY) cameraComponents.Remove(actor->camera);
-     if(actor->weapon.gen != INVALID_KEY) weaponComponents.Remove(actor->weapon);
+     for(i32 i = actor->componentsIds.size - 1; i >= 0; --i)
+     {
+          RemoveComponentById(actorKey, actor->componentsIds[i]);  
+     }
+     actor->componentsIds.Clear();
      actors.Remove(actorKey);
 }
 
@@ -44,125 +66,111 @@ Actor *ActorManager::GetActor(SlotmapKey<Actor> actorKey)
      return actors.Get(actorKey);
 }
 
-void ActorManager::AddTransformComponent(SlotmapKey<Actor> actorKey,
-                                         vec3 position, vec3 scale, vec3 direction)
-{    
-     TransformComponent transform;
-     transform.position = position;
-     transform.scale = scale;
-     transform.direction = direction;
-     transform.owner = actorKey;
-     SlotmapKey<TransformComponent> key = transformComponents.Add(transform);
-     Actor *actor = GetActor(actorKey);
-     actor->transform = key;
-}
-
-void ActorManager::AddRenderComponent(SlotmapKey<Actor> actorKey, Model model, Texture *texture)
+template <typename ComponentType>
+void ActorManager::AddComponent(SlotmapKey<Actor> actorKey, ComponentType component)
 {
-     RenderComponent render;
-     render.model = model;
-     render.texture = texture;
-     render.owner = actorKey;
-     SlotmapKey<RenderComponent> key = renderComponents.Add(render);
+     component.owner = actorKey;
+
+     ComponentStorage<ComponentType>* compoentStorage = 
+          (ComponentStorage<ComponentType> *)(*componentStorageMap.Get(ComponentType::GetID()));
+
+     SlotmapKey<ComponentType> key = compoentStorage->components.Add(component);
+
      Actor *actor = GetActor(actorKey);
-     actor->render = key;
-}
+     SlotmapKeyBase keyBase = FromKey<ComponentType>(key);
+     actor->componentsMap.Add(ComponentType::GetID(), keyBase);
+     actor->componentsIds.Push(ComponentType::GetID());
+} 
 
-void ActorManager::AddPhysicsComponent(SlotmapKey<Actor> actorKey, vec3 acceleration, vec3 velocity)
+template <typename ComponentType>
+void ActorManager::RemoveComponent(SlotmapKey<Actor> actorKey)
 {
-     PhysicsComponent physics;
-     physics.acceleration = acceleration;
-     physics.velocity = velocity;
-     physics.forceAccumulator = vec3(0.0f, 0.0f, 0.0f);
-     physics.lastFrameAcceleration = vec3(0.0f, 0.0f, 0.0f);
-     physics.owner = actorKey;
-     SlotmapKey<PhysicsComponent> key = physicsComponents.Add(physics);
+     ComponentStorage<ComponentType>* compoentStorage = 
+          (ComponentStorage<ComponentType> *)(*componentStorageMap.Get(ComponentType::GetID()));
+
      Actor *actor = GetActor(actorKey);
-     actor->physics = key;
+     SlotmapKeyBase keyBase = *actor->componentsMap.Get(ComponentType::GetID());
+     SlotmapKey<ComponentType> key = FromKeyBase<ComponentType>(keyBase);
+     ASSERT(key.gen != INVALID_KEY);
+     compoentStorage->components.Remove(key);
+     actor->componentsMap.Remove(ComponentType::GetID());
+
+     // TODO: try to find a way of not having this linear search
+     i32 foundIndex = -1;
+     for(i32 i = 0; i < actor->componentsIds.size; ++i)
+     {
+          if(actor->componentsIds[i] == ComponentType::GetID())
+          {
+               foundIndex = i;
+          }
+     }
+     if(foundIndex >= 0)
+     {
+          actor->componentsIds[foundIndex] = actor->componentsIds[actor->componentsIds.size - 1];
+          actor->componentsIds[actor->componentsIds.size - 1] = 0;
+          actor->componentsIds.size--;
+     }
 }
 
-
-void ActorManager::AddPlayerControllerComponent(SlotmapKey<Actor> actorKey)
+void ActorManager::RemoveComponentById(SlotmapKey<Actor> actorKey, i32 id)
 {
-     PlayerControllerComponent playerController;
-     playerController.owner = actorKey;
-     SlotmapKey<PlayerControllerComponent> key = playerControllerComponents.Add(playerController);
+     ComponentStorageBase* compoentStorage = *componentStorageMap.Get(id);
      Actor *actor = GetActor(actorKey);
-     actor->playerController = key;
+     SlotmapKeyBase keyBase = *actor->componentsMap.Get(id);
+     ASSERT(keyBase.gen != INVALID_KEY);
+     compoentStorage->RemoveComponent(keyBase);
+     actor->componentsMap.Remove(id);
+
+     // TODO: try to find a way of not having this linear search
+     i32 foundIndex = -1;
+     for(i32 i = 0; i < actor->componentsIds.size; ++i)
+     {
+          if(actor->componentsIds[i] == id)
+          {
+               foundIndex = i;
+          }
+     }
+     if(foundIndex >= 0)
+     {
+          actor->componentsIds[foundIndex] = actor->componentsIds[actor->componentsIds.size - 1];
+          actor->componentsIds[actor->componentsIds.size - 1] = 0;
+          actor->componentsIds.size--;
+     }
 }
 
-void ActorManager::AddCameraComponent(SlotmapKey<Actor> actorKey, vec3 pos, vec3 dir)
+template <typename ComponentType>
+ComponentType *ActorManager::GetComponent(SlotmapKey<Actor> actorKey)
 {
-     CameraComponent camera;
-     camera.Init(pos, dir);
-     camera.owner = actorKey;
-     SlotmapKey<CameraComponent> key = cameraComponents.Add(camera);
+     ComponentStorage<ComponentType>* compoentStorage = 
+          (ComponentStorage<ComponentType> *)(*componentStorageMap.Get(ComponentType::GetID()));
+
      Actor *actor = GetActor(actorKey);
-     actor->camera = key;
+     SlotmapKeyBase keyBase = *actor->componentsMap.Get(ComponentType::GetID());
+     SlotmapKey<ComponentType> key = FromKeyBase<ComponentType>(keyBase);
+     ASSERT(key.gen != INVALID_KEY);
+     return compoentStorage->components.Get(key);
 }
 
-void ActorManager::AddWeaponComponent(SlotmapKey<Actor> actorKey, SlotmapKey<Actor> weaponKey)
+i32 NextPower2(u32  x)
 {
-     WeaponComponent weapon;
-     weapon.weapon = weaponKey;
-     weapon.owner = actorKey;
-     SlotmapKey<WeaponComponent> key = weaponComponents.Add(weapon);
-     Actor *actor = GetActor(actorKey);
-     actor->weapon = key;
+     int  value  =  1 ;
+     while  ( value  <=  x)
+     {
+          value  =  value  <<  1 ;
+     }
+     return  value;
 }
 
-#define GetComponentsImp(type, slotmap) \
-Array<type>& ActorManager::Get##type##s() \
-{ \
-     return *slotmap.GetArray(); \
-}
-
-GetComponentsImp(TransformComponent, transformComponents);
-GetComponentsImp(RenderComponent, renderComponents);
-GetComponentsImp(PhysicsComponent, physicsComponents);
-GetComponentsImp(PlayerControllerComponent, playerControllerComponents);
-GetComponentsImp(CameraComponent, cameraComponents);
-GetComponentsImp(WeaponComponent, weaponComponents);
-
-
-#define RemoveComponentImp(type, slotmapKey, slotmap) \
-void ActorManager::Remove##type(SlotmapKey<Actor> actorKey) \
-{ \
-     Actor *actor = GetActor(actorKey); \
-     if(actor->slotmapKey.gen != INVALID_KEY) slotmap.Remove(actor->slotmapKey); \
-}
-
-RemoveComponentImp(TransformComponent, transform, transformComponents);
-RemoveComponentImp(RenderComponent, render, renderComponents);
-RemoveComponentImp(PhysicsComponent, physics, physicsComponents);
-RemoveComponentImp(PlayerControllerComponent, playerController, playerControllerComponents);
-RemoveComponentImp(CameraComponent, camera, cameraComponents);
-RemoveComponentImp(WeaponComponent, weapon, weaponComponents);
-
-
-#define GetComponentImp(type, slotmapKey, slotmap) \
-type *ActorManager::Get##type(SlotmapKey<Actor> actorKey) \
-{ \
-     Actor *actor = GetActor(actorKey); \
-     return slotmap.Get(actor->slotmapKey); \
-}
-
-GetComponentImp(TransformComponent, transform, transformComponents);
-GetComponentImp(RenderComponent, render, renderComponents);
-GetComponentImp(PhysicsComponent, physics, physicsComponents);
-GetComponentImp(PlayerControllerComponent, playerController, playerControllerComponents);
-GetComponentImp(CameraComponent, camera, cameraComponents);
-GetComponentImp(WeaponComponent, weapon, weaponComponents);
-
-void ActorManager::PrintActorAndCompoenentState()
-{
-     printf("Actors count: %d\n", actors.Size());
-     printf("transformComponents count: %d\n", transformComponents.Size());
-     printf("renderComponents count: %d\n", renderComponents.Size());
-     printf("playerComponents count: %d\n", playerControllerComponents.Size());
-     printf("cameraComponents count: %d\n", cameraComponents.Size());
-     printf("weaponComponents count: %d\n", weaponComponents.Size());
-}
+i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
+     int count = 0;
+     for (tinyxml2::XMLElement* child = parent->FirstChildElement();
+          child != nullptr;
+          child = child->NextSiblingElement())
+     {
+         ++count;
+     }
+     return count;
+ }
 
 // TODO: Integrate this function int the engine
 SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
@@ -171,9 +179,15 @@ SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
     tinyxml2::XMLDocument doc;
     doc.LoadFile(filepath);
 
-    SlotmapKey<Actor> actor = actorManager->CreateActor();
-
     tinyxml2::XMLElement *root = doc.FirstChildElement("Actor");
+    
+     i32 componentCount = GetChildElementCount(root);
+     if((componentCount & (componentCount - 1)) != 0)
+     {
+          componentCount = NextPower2(componentCount);
+     }
+
+    SlotmapKey<Actor> actor = actorManager->CreateActor(componentCount);
     tinyxml2::XMLElement *component = root->FirstChildElement();
     while(component)
     {
@@ -196,7 +210,11 @@ SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
               attributes->QueryFloatAttribute("x", &direction.x);
               attributes->QueryFloatAttribute("y", &direction.y);
               attributes->QueryFloatAttribute("z", &direction.z);
-              actorManager->AddTransformComponent(actor, position, scale, direction);
+              TransformComponent transform;
+              transform.position = position;
+              transform.scale = scale;
+              transform.direction = direction;
+              actorManager->AddComponent<TransformComponent>(actor, transform);
          }
          else if(strcmp("CameraComponent", componentType) == 0)
          {
@@ -210,13 +228,13 @@ SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
               attributes->QueryFloatAttribute("x", &direction.x);
               attributes->QueryFloatAttribute("y", &direction.y);
               attributes->QueryFloatAttribute("z", &direction.z);
-              actorManager->AddCameraComponent(actor, position, direction);
+              CameraComponent camera;
+              camera.Init(position, direction);
+              actorManager->AddComponent<CameraComponent>(actor, camera);
          }
          else if(strcmp("PlayerControllerComponent", componentType) == 0)
          {
-              actorManager->AddPlayerControllerComponent(actor);
-              PlayerControllerComponent *playerController = actorManager->GetPlayerControllerComponent(actor);
-
+               PlayerControllerComponent playerController;
               // TODO: make this work for variable amount of weapons
               tinyxml2::XMLElement *attributes = component->FirstChildElement();
               if(attributes)
@@ -226,13 +244,15 @@ SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
                     attributes = attributes->NextSiblingElement();
                     attributes->QueryStringAttribute("path", &weaponPath[1]);
 
-                    playerController->weapons[0] = CreateActorFromFile(weaponPath[0], actorManager, textureManager, modelManager); 
-                    playerController->weapons[1] = CreateActorFromFile(weaponPath[1], actorManager, textureManager, modelManager);
-                    RenderComponent *render = actorManager->GetRenderComponent(playerController->weapons[1]);
+                    playerController.weapons[0] = CreateActorFromFile(weaponPath[0], actorManager, textureManager, modelManager); 
+                    playerController.weapons[1] = CreateActorFromFile(weaponPath[1], actorManager, textureManager, modelManager);
+                    RenderComponent *render = actorManager->GetComponent<RenderComponent>(playerController.weapons[1]);
                     render->enable = false;
-
-                    actorManager->AddWeaponComponent(actor, playerController->weapons[0]);
+                    WeaponComponent *weapon = actorManager->GetComponent<WeaponComponent>(actor);
+                    weapon->weapon = playerController.weapons[0];
               }
+              actorManager->AddComponent<PlayerControllerComponent>(actor, playerController);
+
          }
          else if(strcmp("RenderComponent", componentType) == 0)
          {
@@ -250,7 +270,41 @@ SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
 
               ModelHandle *modelHandle = modelManager->Get(modelPath);
               TextureHandle *textureHandle = textureManager->Get(texturePath);
-              actorManager->AddRenderComponent(actor, modelHandle->model, textureHandle->texture);
+
+              RenderComponent render;
+              render.model = modelHandle->model;
+              render.texture = textureHandle->texture;
+              actorManager->AddComponent<RenderComponent>(actor, render);
+         }
+         else if(strcmp("PhysicsComponent", componentType) == 0)
+         {
+               tinyxml2::XMLElement *attributes = component->FirstChildElement();
+               vec3 acceleration;
+               attributes->QueryFloatAttribute("x", &acceleration.x);
+               attributes->QueryFloatAttribute("y", &acceleration.y);
+               attributes->QueryFloatAttribute("z", &acceleration.z);
+               attributes = attributes->NextSiblingElement();
+               vec3 velocity;
+               attributes->QueryFloatAttribute("x", &velocity.x);
+               attributes->QueryFloatAttribute("y", &velocity.y);
+               attributes->QueryFloatAttribute("z", &velocity.z);
+
+               PhysicsComponent physics;
+               physics.acceleration = acceleration;
+               physics.velocity = velocity;
+               physics.forceAccumulator = vec3(0.0f);
+               physics.lastFrameAcceleration = vec3(0.0f);
+               actorManager->AddComponent(actor, physics);
+         }
+         else if(strcmp("WeaponComponent", componentType) == 0)
+         {
+               WeaponComponent weapon;
+               actorManager->AddComponent<WeaponComponent>(actor, weapon);
+         }
+         else if(strcmp("EnemyComponent", componentType) == 0)
+         {
+               EnemyComponent enemy;
+               actorManager->AddComponent<EnemyComponent>(actor, enemy);
          }
          else
          {
@@ -261,4 +315,3 @@ SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
     }
     return actor;
 }
-

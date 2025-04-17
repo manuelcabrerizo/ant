@@ -11,25 +11,29 @@ void PlayerController::Terminate()
      PlatformShowMouse(showMouse);
 }
 
-void PlayerController::Update(ActorManager *am, CollisionWorld *cw, f32 dt)
+void PlayerController::Update(ActorManager *am, f32 dt)
 {
-     Array<PlayerControllerComponent>& playerControllers = am->GetPlayerControllerComponents();
+     Array<PlayerControllerComponent>& playerControllers = am->GetComponents<PlayerControllerComponent>();
      for(u32 i = 0; i < playerControllers.size; ++i)
      {
           SlotmapKey<Actor> actor = playerControllers[i].owner;
 
           playerController = &playerControllers[i];
-          transform = am->GetTransformComponent(actor);
-          camera = am->GetCameraComponent(actor);
-          physics = am->GetPhysicsComponent(actor);
+
+          if(!playerController->enable)
+          {
+               continue;
+          }
+
+          transform = am->GetComponent<TransformComponent>(actor);
+          camera = am->GetComponent<CameraComponent>(actor);
+          physics = am->GetComponent<PhysicsComponent>(actor);
           moveDirection = vec3(0.0f);
 
           ChangeWeapon(am);
 
           ProcessMouseMovement();
           ProcessKeyboardMovement();
-          ProcessPhysics(dt);
-          ProcessColisionDetectionAndResolution(cw);
      }
 }
 
@@ -44,13 +48,14 @@ void PlayerController::ProcessMouseMovement()
      {
           playerController->yaw += InputManager::Get()->MouseXMovement() * 0.001f;
           playerController->pitch += InputManager::Get()->MouseYMovement() * 0.001f;
-          if(playerController->pitch > radians(89.0f))
+          f32 limit = radians(89.0f);
+          if(playerController->pitch > limit)
           {
-               playerController->pitch = radians(89.0f);
+               playerController->pitch = limit;
           }
-          if(playerController->pitch < -radians(89.0f))
+          if(playerController->pitch < -limit)
           {
-               playerController->pitch = -radians(89.0f);
+               playerController->pitch = -limit;
           }
 
           vec3 dir = vec3(0.0f, 0.0f, 1.0f);
@@ -100,99 +105,44 @@ void PlayerController::ProcessKeyboardMovement()
      }
 
      // Jump code
-     if(playerController->grounded && InputManager::Get()->KeyJustDown(KEY_SPACE))
+     if(physics->grounded && InputManager::Get()->KeyJustDown(KEY_SPACE))
      {
           physics->velocity.y = 0.0f;
           physics->velocity += vec3(0.0f, 9.8f*1.5f, 0.0f);                    
      }
-}
-
-void PlayerController::ProcessPhysics(float dt)
-{
-     physics->forceAccumulator += vec3(0.0f, -9.8f*3.0f, 0.0f);
 
      vec3 movement = (moveDirection * speed);
      physics->acceleration = movement;
-
-     physics->lastFrameAcceleration = physics->acceleration;
-     physics->lastFrameAcceleration += physics->forceAccumulator;
-
-     physics->velocity += physics->lastFrameAcceleration * dt;
-
-     physics->velocity *= powf(0.01f, dt);
-
-     transform->position += physics->velocity * dt;
-
-     physics->forceAccumulator = vec3(0.0f);
-}
-
-void PlayerController::ProcessColisionDetectionAndResolution(CollisionWorld *cw)
-{
-     f32 colliderRadius = 0.2f;
-
-     // Grounded test
-     Segment groundSegment;
-     vec3 colliderPos = transform->position + vec3(0.0f, -0.3f, 0.0f);
-     groundSegment.Init(colliderPos,
-          colliderPos - vec3(0.0f, colliderRadius + 0.05f, 0.0f));
-     float tOut; vec3 nOut;
-     playerController->grounded = cw->Intersect(groundSegment, tOut, nOut);
-
-     // Colission detection and resolution
-     Frame frame = MemoryManager::Get()->GetFrame();
-     Array<CollisionData> collisionData;
-     collisionData.Init(MAX_COLLISION_COUNT, FRAME_MEMORY);
-
-     Sphere sphere;
-     sphere.Init(transform->position + vec3(0.0f, -0.3f, 0.0f), colliderRadius);
-     if(cw->Intersect(sphere, collisionData))
-     {
-          while(collisionData.size > 0)
-          {
-               vec3 n = collisionData[0].n;
-               f32 penetration = collisionData[0].penetration;
-               transform->position += penetration * n;
-               transform->position += 0.001f * n;
-               physics->acceleration = vec3(0.0f);
-               physics->velocity -= dot(physics->velocity, n) * n;
-
-               collisionData.Clear();
-
-               sphere.Init(transform->position + vec3(0.0f, -0.3f, 0.0f), colliderRadius);
-               cw->Intersect(sphere, collisionData);                    
-          }    
-     }
-     MemoryManager::Get()->ReleaseFrame(frame);
 }
 
 void PlayerController::ChangeWeapon(ActorManager *actorManager)
 {     
      RenderComponent *weaponRenderComponents[2];
-     weaponRenderComponents[0] = actorManager->GetRenderComponent(playerController->weapons[0]);
-     weaponRenderComponents[1] = actorManager->GetRenderComponent(playerController->weapons[1]);
+     weaponRenderComponents[0] = actorManager->GetComponent<RenderComponent>(playerController->weapons[0]);
+     weaponRenderComponents[1] = actorManager->GetComponent<RenderComponent>(playerController->weapons[1]);
 
      if(InputManager::Get()->KeyJustDown(KEY_1) && !playerController->usingFirstWeapon)
      {
           weaponRenderComponents[1]->enable = false;
           weaponRenderComponents[0]->enable = true;          
           
-          actorManager->RemoveWeaponComponent(playerController->owner);
-          actorManager->AddWeaponComponent(playerController->owner, playerController->weapons[0]);
+          actorManager->RemoveComponent<WeaponComponent>(playerController->owner);
+          WeaponComponent weapon;
+          weapon.weapon = playerController->weapons[0];
+          actorManager->AddComponent<WeaponComponent>(playerController->owner, weapon);
 
           playerController->usingFirstWeapon = true;
-
-          actorManager->PrintActorAndCompoenentState();
      }
      if(InputManager::Get()->KeyJustDown(KEY_2) && playerController->usingFirstWeapon)
      {
           weaponRenderComponents[0]->enable = false;   
           weaponRenderComponents[1]->enable = true;
            
-          actorManager->RemoveWeaponComponent(playerController->owner);
-          actorManager->AddWeaponComponent(playerController->owner, playerController->weapons[1]);
+          actorManager->RemoveComponent<WeaponComponent>(playerController->owner);
+          WeaponComponent weapon;
+          weapon.weapon = playerController->weapons[1];
+          actorManager->AddComponent<WeaponComponent>(playerController->owner, weapon);
 
           playerController->usingFirstWeapon = false;
-
-          actorManager->PrintActorAndCompoenentState();
      }
 }

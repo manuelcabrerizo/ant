@@ -1,8 +1,6 @@
 #pragma once
 
-struct Actor;
-
-class CameraComponent
+class CameraComponent : public Component<CameraComponent>
 {
 private:
      vec3 position;
@@ -13,9 +11,7 @@ private:
      vec3 worldUp;
      vec3 worldFront;
 
-public:
-     SlotmapKey<Actor> owner;
-     
+public:     
      void Init(vec3 pos, vec3 dir);
 
      void SetPosition(vec3 pos);

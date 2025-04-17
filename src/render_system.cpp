@@ -12,7 +12,7 @@ void RenderSystem::Terminate()
 
 void RenderSystem::Render(ActorManager *am, f32 dt)
 {     
-     Array<RenderComponent>& renders = am->GetRenderComponents();
+     Array<RenderComponent>& renders = am->GetComponents<RenderComponent>();
      for(u32 i = 0; i < renders.size; ++i)
      {
           SlotmapKey<Actor> actor = renders[i].owner;
@@ -23,7 +23,7 @@ void RenderSystem::Render(ActorManager *am, f32 dt)
                continue;
           }
 
-          TransformComponent *transform = am->GetTransformComponent(actor);
+          TransformComponent *transform = am->GetComponent<TransformComponent>(actor);
 
           mat4 tra = translate(mat4(1.0f), transform->position); 
           mat4 sca = scale(mat4(1.0f), transform->scale);
