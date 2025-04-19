@@ -11,13 +11,14 @@ void Game::Init()
      printf("Game Init!\n");
 
      //GraphicsManager::Get()->DebugInit();
-     
      // Load the shader
      Frame frame = MemoryManager::Get()->GetFrame();
      File vertFile = PlatformReadFile("../data/shaders/vert.hlsl", FRAME_MEMORY);
      File fragFile = PlatformReadFile("../data/shaders/frag.hlsl", FRAME_MEMORY);
      shader = GraphicsManager::Get()->ShaderAlloc(vertFile, fragFile);
      MemoryManager::Get()->ReleaseFrame(frame);
+
+     GraphicsManager::Get()->ShaderBind(shader);
      
      // Load the models
      modelManager.Init(32);
@@ -26,12 +27,6 @@ void Game::Init()
      modelManager.Load("pistol", "../data/models/pistol.obj");
      modelManager.Load("sniper", "../data/models/sniper.obj");
      modelManager.Load("test-level", "../data/models/level-rendering.obj");
-
-     ModelHandle *cube = modelManager.Get("cube");
-     ModelHandle *plane = modelManager.Get("plane");
-     ModelHandle *pistol = modelManager.Get("pistol");
-     ModelHandle *sniper = modelManager.Get("sniper");
-     ModelHandle *walls = modelManager.Get("test-level");
 
      // Load a texture
      textureManager.Init(128);
@@ -57,49 +52,27 @@ void Game::Init()
      // Register system to be notify
      NotificationManager::Get()->RegisterListener(&weaponSystem, NOTIFICATION_SHOOT);
 
-
-     // Create Player
-     SlotmapKey<Actor> player = CreateActorFromFile("../data/xml/player.xml",
-          &actorManager, &textureManager, &modelManager);
-
-     // Create Enemy
-     SlotmapKey<Actor> enemy = CreateActorFromFile("../data/xml/enemy.xml",
-          &actorManager, &textureManager, &modelManager);
-
-     // Create Level
-     SlotmapKey<Actor> level = actorManager.CreateActor(2);
-     TransformComponent transform;
-     transform.position = vec3(0.0f);
-     transform.scale = vec3(1.0f);
-     transform.direction = vec3(0.0f, 0.0f, 1.0f);
-     actorManager.AddComponent<TransformComponent>(level, transform);
-     RenderComponent render;
-     render.model = walls->model;
-     render.texture = textureManager.Get("default")->texture;
-     actorManager.AddComponent<RenderComponent>(level, render);
+     // Create Entities
+     CreateActorFromFile("../data/xml/player.xml", &actorManager, &textureManager, &modelManager);
+     CreateActorFromFile("../data/xml/enemy.xml", &actorManager, &textureManager, &modelManager);
+     CreateActorFromFile("../data/xml/test-level.xml", &actorManager, &textureManager, &modelManager);
      
      // Create collision world
      collisionWorld.LoadFromFile("../data/collision/level-collision.obj");
-     
 }
 
 void Game::Update(f32 dt)
 {    
-     // NOTE: this is in the update for the debug renderer to work properly 
-     GraphicsManager::Get()->BeginFrame(1.0f, 0.0f, 1.0f);
-     
      playerController.Update(&actorManager, dt);
-     physicsSystem.Update(&actorManager, &collisionWorld, dt);
      cameraSystem.Update(&actorManager, dt);
      weaponSystem.Update(&actorManager, dt);
+     physicsSystem.Update(&actorManager, &collisionWorld, dt);
 }
 
 void Game::Render()
 {    
-     GraphicsManager::Get()->ShaderBind(shader);
-
+     GraphicsManager::Get()->BeginFrame(1.0f, 0.0f, 1.0f);
      renderSystem.Render(&actorManager, 0.0f);
-     
      GraphicsManager::Get()->EndFrame(1);
 }
 

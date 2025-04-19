@@ -1,4 +1,3 @@
-// TODO: find the correct place for this
 i32 ComponentBase::counter = 0;
 
 template <typename ComponentType>

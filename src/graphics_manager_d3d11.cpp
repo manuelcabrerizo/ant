@@ -52,6 +52,7 @@ void GraphicsManagerD3D11::Shutdown()
      
      depthStencilView->Release();
      renderTargetView->Release();
+     swapChain2->Release();
      swapChain->Release();
      deviceContext->Release();
      device->Release();
@@ -69,11 +70,17 @@ void GraphicsManagerD3D11::BeginFrame(f32 r, f32 g, f32 b)
 void GraphicsManagerD3D11::EndFrame(i32 vsync)
 {
      /*
-#ifdef ANT_DEBUG
+#if ANT_DEBUG
      debugRenderer.Present();
 #endif
      */
+     if(vsync > 0)
+     {
+          WaitForSingleObject(waitHandle, INFINITE); // blocks until frame is ready
+     }
      swapChain->Present(vsync, 0);
+     deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+
 }
 
 
@@ -403,7 +410,7 @@ i32 GraphicsManagerD3D11::TextureHeight(Texture *texture)
 /*
 void GraphicsManager::DebugInit()
 {
-#ifdef ANT_DEBUG
+#if ANT_DEBUG
      GraphicsManagerState *state = &gGraphicsManagerState;
      state->debugRenderer.Init();
 #endif
@@ -411,7 +418,7 @@ void GraphicsManager::DebugInit()
 
 void GraphicsManager::DebugTerminate()
 {
-#ifdef ANT_DEBUG
+#if ANT_DEBUG
      GraphicsManagerState *state = &gGraphicsManagerState;
      state->debugRenderer.Terminate();
 #endif
@@ -419,7 +426,7 @@ void GraphicsManager::DebugTerminate()
 
 void GraphicsManager::DebugPresent()
 {
-#ifdef ANT_DEBUG
+#if ANT_DEBUG
      GraphicsManagerState *state = &gGraphicsManagerState;
      state->debugRenderer.Present();
 #endif
@@ -427,7 +434,7 @@ void GraphicsManager::DebugPresent()
      
 void GraphicsManager::DebugDrawLine(vec3& a, vec3& b)
 {
-#ifdef ANT_DEBUG
+#if ANT_DEBUG
      GraphicsManagerState *state = &gGraphicsManagerState;
      state->debugRenderer.DrawLine(a, b);
 #endif
@@ -436,7 +443,7 @@ void GraphicsManager::DebugDrawLine(vec3& a, vec3& b)
 
 void GraphicsManager::DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlice)
 {
-#ifdef ANT_DEBUG
+#if ANT_DEBUG
      vec3 up = vec3(0.0f, 1.0f, 0.0f);
      vec3 right = vec3(1.0f, 0.0f, 0.0f);
      // TODO: try to make it fit perfectly
@@ -478,7 +485,7 @@ void GraphicsManager::DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlice)
 
 void GraphicsManager::DebugDrawCube(vec3& c, vec3& hExtend)
 {
-#ifdef ANT_DEBUG
+#if ANT_DEBUG
 #endif
 }
 */
@@ -488,7 +495,7 @@ void GraphicsManager::DebugDrawCube(vec3& c, vec3& hExtend)
 void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
 {
      i32 deviceFlags = 0;
-#ifdef ANT_DEBUG
+#if ANT_DEBUG
      printf("Directx11 debug mode set\n");
      deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
@@ -506,23 +513,6 @@ void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
      
      i32 driverTypesCount = ARRAY_LENGTH(driverTypes);
      i32 featureLevelsCount = ARRAY_LENGTH(featureLevels);
-
-     DXGI_SWAP_CHAIN_DESC swapChainDesc;
-     ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
-     swapChainDesc.BufferCount = 2;
-     swapChainDesc.BufferDesc.Width = windowWidth;
-     swapChainDesc.BufferDesc.Height = windowHeight;
-     swapChainDesc.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-     swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
-     swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
-     swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-     swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-     swapChainDesc.OutputWindow = *window;
-     swapChainDesc.Windowed = true;
-     swapChainDesc.SampleDesc.Count = 1;
-     swapChainDesc.SampleDesc.Quality = 0;
-     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
      // Select the best gpu   
      IDXGIFactory1 * pFactory;
@@ -548,33 +538,63 @@ void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
      D3D_DRIVER_TYPE driverType;
      if(pSelectedAdapter)
      {
-          HRESULT result = D3D11CreateDeviceAndSwapChain(pSelectedAdapter, D3D_DRIVER_TYPE_UNKNOWN, 0, deviceFlags,
+          if (FAILED(D3D11CreateDevice(pSelectedAdapter, D3D_DRIVER_TYPE_UNKNOWN, 0, deviceFlags,
                featureLevels, featureLevelsCount,
-               D3D11_SDK_VERSION, &swapChainDesc,
-               &swapChain,
-               &device,
-               &featureLevel,
-               &deviceContext);
+               D3D11_SDK_VERSION, &device, &featureLevel, &deviceContext)))
+          {
+              ASSERT("Error Creating Directx11 device");
+          }
      }
      else
      {
+          bool driverSelected = false;
           for(u32 driver = 0; driver < driverTypesCount; ++driver)
           {
-               HRESULT result = D3D11CreateDeviceAndSwapChain(0, driverTypes[driver], 0, deviceFlags,
+               HRESULT result = D3D11CreateDevice(0, driverTypes[driver], 0, deviceFlags,
                     featureLevels, featureLevelsCount,
-                    D3D11_SDK_VERSION, &swapChainDesc,
-                    &swapChain,
-                    &device,
-                    &featureLevel,
-                    &deviceContext);
+                    D3D11_SDK_VERSION, &device, &featureLevel, &deviceContext);
                if(SUCCEEDED(result))
                {
                     driverType = driverTypes[driver];
                     printf("Driver selected %d\n", driver);
+                    driverSelected = true;
                     break;
                }
           }
+          ASSERT(driverSelected);
      }
+
+     Microsoft::WRL::ComPtr<IDXGIDevice> dxgiDevice;
+     Microsoft::WRL::ComPtr<IDXGIAdapter> dxgiAdapter;
+     Microsoft::WRL::ComPtr<IDXGIFactory2> dxgiFactory;
+     device->QueryInterface(__uuidof(IDXGIDevice), &dxgiDevice);
+     dxgiDevice->GetParent(__uuidof(IDXGIAdapter), &dxgiAdapter);
+     dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), &dxgiFactory);
+
+     // DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL and DXGI_SWAP_EFFECT_FLIP_DISCARD
+     // TODO: this is for windows 11 and wwe need to fix fullscreen
+     // TODO: After calling SetFullscreenState, the app must call ResizeBuffers before Present.
+     DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
+     ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
+     swapChainDesc.Width = windowWidth;
+     swapChainDesc.Height = windowHeight;
+     swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+     swapChainDesc.BufferCount = 2;
+     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+     swapChainDesc.SampleDesc.Count = 1;
+     swapChainDesc.SampleDesc.Quality = 0;
+     swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+     swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
+     swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
+     if (FAILED(dxgiFactory->CreateSwapChainForHwnd(device, *window, &swapChainDesc, nullptr, nullptr, &swapChain)))
+     {
+         ASSERT(!"Error creating swap chain.");
+     }
+
+     swapChain->QueryInterface(__uuidof(IDXGISwapChain2), (void**)&swapChain2);
+     waitHandle = swapChain2->GetFrameLatencyWaitableObject();
+     swapChain2->SetMaximumFrameLatency(1);
 }
 
 

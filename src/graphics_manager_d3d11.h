@@ -1,6 +1,8 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
-#include <dxgi.h>
+//#include <dxgi.h>
+#include <dxgi1_3.h>
+#include <wrl.h>
 
 struct VertexBufferD3D11 : public VertexBuffer
 {
@@ -63,7 +65,9 @@ private:
      
      ID3D11Device *device;
      ID3D11DeviceContext *deviceContext;
-     IDXGISwapChain *swapChain;
+     IDXGISwapChain1 *swapChain;
+     IDXGISwapChain2* swapChain2;
+     HANDLE waitHandle;
 
      ID3D11RenderTargetView *renderTargetView;
      ID3D11DepthStencilView *depthStencilView;
@@ -93,7 +97,7 @@ private:
      ObjectAllocator<TextureD3D11> textureAllocator;
 
 /*
-#ifdef ANT_DEBUG
+#if ANT_DEBUG
      DebugRenderer debugRenderer;
 #endif
 */   

@@ -160,16 +160,16 @@ LRESULT Wndproc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
      return result;
 }
 
-#ifdef ANT_CONSOLE
+#if ANT_CONSOLE
 int main(int argc, char *argv[])
-#elif
+#else
 int CALLBACK WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
                      LPSTR lpCmdLine,
                      int nShowCmd)
 #endif
 {
-#ifdef ANT_CONSOLE
+#if ANT_CONSOLE
      HINSTANCE hInstance = GetModuleHandle(0);
 #endif
      WNDCLASS wndClass = {};
