@@ -150,7 +150,7 @@ ComponentType *ActorManager::GetComponent(SlotmapKey<Actor> actorKey)
      return compoentStorage->components.Get(key);
 }
 
-i32 NextPower2(u32  x)
+static i32 NextPower2(u32  x)
 {
      int  value  =  1 ;
      while  ( value  <=  x)
@@ -160,7 +160,7 @@ i32 NextPower2(u32  x)
      return  value;
 }
 
-i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
+static i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
      int count = 0;
      for (tinyxml2::XMLElement* child = parent->FirstChildElement();
           child != nullptr;
@@ -172,7 +172,7 @@ i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
  }
 
 SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
-     ActorManager *actorManager, TextureManager *textureManager, ModelManager *modelManager)
+     TextureManager *textureManager, ModelManager *modelManager)
 {
     tinyxml2::XMLDocument doc;
     doc.LoadFile(filepath);
@@ -185,7 +185,7 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
           componentCount = NextPower2(componentCount);
      }
 
-    SlotmapKey<Actor> actor = actorManager->CreateActor(componentCount);
+    SlotmapKey<Actor> actor = CreateActor(componentCount);
     tinyxml2::XMLElement *component = root->FirstChildElement();
     while(component)
     {
@@ -212,7 +212,7 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
               transform.position = position;
               transform.scale = scale;
               transform.direction = direction;
-              actorManager->AddComponent<TransformComponent>(actor, transform);
+              AddComponent<TransformComponent>(actor, transform);
          }
          else if(strcmp("CameraComponent", componentType) == 0)
          {
@@ -228,7 +228,7 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
               attributes->QueryFloatAttribute("z", &direction.z);
               CameraComponent camera;
               camera.Init(position, direction);
-              actorManager->AddComponent<CameraComponent>(actor, camera);
+              AddComponent<CameraComponent>(actor, camera);
          }
          else if(strcmp("PlayerControllerComponent", componentType) == 0)
          {
@@ -242,14 +242,14 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
                     attributes = attributes->NextSiblingElement();
                     attributes->QueryStringAttribute("path", &weaponPath[1]);
 
-                    playerController.weapons[0] = CreateActorFromFile(weaponPath[0], actorManager, textureManager, modelManager); 
-                    playerController.weapons[1] = CreateActorFromFile(weaponPath[1], actorManager, textureManager, modelManager);
-                    RenderComponent *render = actorManager->GetComponent<RenderComponent>(playerController.weapons[1]);
+                    playerController.weapons[0] = CreateActorFromFile(weaponPath[0], textureManager, modelManager); 
+                    playerController.weapons[1] = CreateActorFromFile(weaponPath[1], textureManager, modelManager);
+                    RenderComponent *render = GetComponent<RenderComponent>(playerController.weapons[1]);
                     render->enable = false;
-                    WeaponComponent *weapon = actorManager->GetComponent<WeaponComponent>(actor);
+                    WeaponComponent *weapon = GetComponent<WeaponComponent>(actor);
                     weapon->weapon = playerController.weapons[0];
               }
-              actorManager->AddComponent<PlayerControllerComponent>(actor, playerController);
+              AddComponent<PlayerControllerComponent>(actor, playerController);
 
          }
          else if(strcmp("RenderComponent", componentType) == 0)
@@ -269,7 +269,7 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
               RenderComponent render;
               render.model = modelManager->Get(modelPath);
               render.texture = textureManager->Get(texturePath);
-              actorManager->AddComponent<RenderComponent>(actor, render);
+              AddComponent<RenderComponent>(actor, render);
          }
          else if(strcmp("PhysicsComponent", componentType) == 0)
          {
@@ -289,17 +289,17 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
                physics.velocity = velocity;
                physics.forceAccumulator = vec3(0.0f);
                physics.lastFrameAcceleration = vec3(0.0f);
-               actorManager->AddComponent(actor, physics);
+               AddComponent(actor, physics);
          }
          else if(strcmp("WeaponComponent", componentType) == 0)
          {
                WeaponComponent weapon;
-               actorManager->AddComponent<WeaponComponent>(actor, weapon);
+               AddComponent<WeaponComponent>(actor, weapon);
          }
          else if(strcmp("EnemyComponent", componentType) == 0)
          {
                EnemyComponent enemy;
-               actorManager->AddComponent<EnemyComponent>(actor, enemy);
+               AddComponent<EnemyComponent>(actor, enemy);
          }
          else
          {

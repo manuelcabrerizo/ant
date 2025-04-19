@@ -13,7 +13,6 @@ public:
      void Init(u32 assetsCapacity);
      void Terminate();
 
-     virtual void Load(const char *name, const char *path) = 0;
      virtual void Unload(const char *name) = 0;
 protected:
      Type *Get(const char *name);
@@ -31,7 +30,7 @@ struct TextureHandle
 class TextureManager : public AssetManager<TextureHandle>
 {
 public:
-     void Load(const char *name, const char *path) override;
+     void Load(const char *name, const char *path);
      void Unload(const char *name) override;
      Texture *Get(const char *name);
 };
@@ -46,7 +45,7 @@ struct ModelHandle
 class ModelManager : public AssetManager<ModelHandle>
 {
 public:
-     void Load(const char *name, const char *path) override;
+     void Load(const char *name, const char *path);
      void Unload(const char *name) override;
      Model *Get(const char *name);
 };
@@ -59,8 +58,6 @@ struct ShaderHandle
 
 class ShaderManager : public AssetManager<ShaderHandle>
 {
-private:
-     void Load(const char *name, const char *path) override {};
 public:
      void Load(const char *name, const char *vertPath, const char *fragPath);
      void Unload(const char *name) override;

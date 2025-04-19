@@ -38,8 +38,7 @@ public:
      Array<ComponentType>& GetComponents();
 
      SlotmapKey<Actor> CreateActor(i32 componentCount);
-     SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
-          ActorManager *actorManager, TextureManager *textureManager, ModelManager *modelManager);
+     SlotmapKey<Actor> CreateActorFromFile(const char *filepath, TextureManager *textureManager, ModelManager *modelManager);
      void DestroyActor(SlotmapKey<Actor> actorKey);
      Actor *GetActor(SlotmapKey<Actor> actorKey);
     

@@ -15,6 +15,5 @@ public:
 
      void *Alloc(u64 size, i32 stackNum);
      Frame GetFrame();
-
      void ReleaseFrame(Frame frame);
 };

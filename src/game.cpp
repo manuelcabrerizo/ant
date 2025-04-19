@@ -39,9 +39,9 @@ void Game::Init()
      actorManager.AddComponentType<EnemyComponent, 10>();
 
      // Create Entities
-     actorManager.CreateActorFromFile("../data/xml/player.xml", &actorManager, &textureManager, &modelManager);
-     actorManager.CreateActorFromFile("../data/xml/enemy.xml", &actorManager, &textureManager, &modelManager);
-     actorManager.CreateActorFromFile("../data/xml/test-level.xml", &actorManager, &textureManager, &modelManager);
+     actorManager.CreateActorFromFile("../data/xml/player.xml", &textureManager, &modelManager);
+     actorManager.CreateActorFromFile("../data/xml/enemy.xml", &textureManager, &modelManager);
+     actorManager.CreateActorFromFile("../data/xml/test-level.xml", &textureManager, &modelManager);
 
      // Initialize gameplay systems
      playerController.Init();
