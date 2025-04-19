@@ -1,5 +1,4 @@
 struct Actor;
-class ActorManager;
 
 struct ComponentBase
 {
@@ -28,7 +27,7 @@ struct TransformComponent : public Component<TransformComponent>
 struct RenderComponent : public Component<RenderComponent>
 {
     Texture *texture;
-    Model model;
+    Model *model;
 };
 
 struct PhysicsComponent : public Component<PhysicsComponent>

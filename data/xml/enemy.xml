@@ -2,12 +2,12 @@
 <Actor>
     <TransformComponent>
         <vec3 x="0" y="3" z="10"/>
-        <vec3 x="1" y="1" z="1"/>
+        <vec3 x="0.005" y="0.005" z="0.005"/>
         <vec3 x="0" y="0" z="1"/>
     </TransformComponent>
     <RenderComponent>
-        <model name="cube"/>
-        <texture name="default"/>
+        <model name="warrior"/>
+        <texture name="warrior"/>
     </RenderComponent>
     <PhysicsComponent>
         <vec3 x="0" y="0" z="0"/>

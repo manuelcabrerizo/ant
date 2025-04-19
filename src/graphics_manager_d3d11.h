@@ -1,8 +1,6 @@
 #include <d3d11.h>
 #include <d3dcompiler.h>
-//#include <dxgi.h>
 #include <dxgi1_3.h>
-#include <wrl.h>
 
 struct VertexBufferD3D11 : public VertexBuffer
 {

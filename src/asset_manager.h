@@ -15,7 +15,7 @@ public:
 
      virtual void Load(const char *name, const char *path) = 0;
      virtual void Unload(const char *name) = 0;
-     
+protected:
      Type *Get(const char *name);
      Type *Get(SlotmapKey<Type> handle);
      SlotmapKey<Type> GetHandle(const char *name);
@@ -33,6 +33,7 @@ class TextureManager : public AssetManager<TextureHandle>
 public:
      void Load(const char *name, const char *path) override;
      void Unload(const char *name) override;
+     Texture *Get(const char *name);
 };
 
 // Model Manager
@@ -47,4 +48,22 @@ class ModelManager : public AssetManager<ModelHandle>
 public:
      void Load(const char *name, const char *path) override;
      void Unload(const char *name) override;
+     Model *Get(const char *name);
+};
+
+struct ShaderHandle
+{
+     const char *name;
+     Shader *shader;
+};
+
+class ShaderManager : public AssetManager<ShaderHandle>
+{
+private:
+     void Load(const char *name, const char *path) override {};
+public:
+     void Load(const char *name, const char *vertPath, const char *fragPath);
+     void Unload(const char *name) override;
+     void Bind(const char *name);
+     Shader *Get(const char *name);
 };

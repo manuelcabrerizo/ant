@@ -37,7 +37,7 @@ void RenderSystem::Render(ActorManager *am, f32 dt)
           ubo.model =  tra * ori * sca;
           GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
           GraphicsManager::Get()->TextureBind(render->texture, 0);
-          render->model.Draw();
+          render->model->Draw();
      }
 }
 

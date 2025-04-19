@@ -8,29 +8,25 @@
 
 void Game::Init()
 {
-     printf("Game Init!\n");
-
-     //GraphicsManager::Get()->DebugInit();
-     // Load the shader
-     Frame frame = MemoryManager::Get()->GetFrame();
-     File vertFile = PlatformReadFile("../data/shaders/vert.hlsl", FRAME_MEMORY);
-     File fragFile = PlatformReadFile("../data/shaders/frag.hlsl", FRAME_MEMORY);
-     shader = GraphicsManager::Get()->ShaderAlloc(vertFile, fragFile);
-     MemoryManager::Get()->ReleaseFrame(frame);
-
-     GraphicsManager::Get()->ShaderBind(shader);
+     // Load the shaders
+     shaderManager.Init(4);
+     shaderManager.Load("default", "../data/shaders/vert.hlsl", "../data/shaders/frag.hlsl");
+     shaderManager.Bind("default");
      
      // Load the models
      modelManager.Init(32);
      modelManager.Load("cube", "../data/models/cube.obj");
+     modelManager.Load("sphere", "../data/models/sphere.obj");
      modelManager.Load("plane", "../data/models/plane.obj");
      modelManager.Load("pistol", "../data/models/pistol.obj");
      modelManager.Load("sniper", "../data/models/sniper.obj");
+     modelManager.Load("warrior", "../data/models/warrior.dae");
      modelManager.Load("test-level", "../data/models/level-rendering.obj");
 
      // Load a texture
      textureManager.Init(128);
      textureManager.Load("default", "../data/textures/GridBox_Default.png");
+     textureManager.Load("warrior", "../data/textures/warrior.png");
      
      // Initialize the Actor Manager
      actorManager.Init(100, 64, STATIC_MEMORY);
@@ -59,6 +55,9 @@ void Game::Init()
      
      // Create collision world
      collisionWorld.LoadFromFile("../data/collision/level-collision.obj");
+     
+     // TODO: GraphicsManager::Get()->DebugInit();
+     printf("Game Init!\n");
 }
 
 void Game::Update(f32 dt)
@@ -78,6 +77,8 @@ void Game::Render()
 
 void Game::Terminate()
 {
+     // TODO: GraphicsManager::Get()->DebugTerminate();
+
      playerController.Terminate();
      physicsSystem.Terminate();
      cameraSystem.Terminate();
@@ -87,10 +88,7 @@ void Game::Terminate()
      actorManager.Terminate();
      textureManager.Terminate();
      modelManager.Terminate();
+     shaderManager.Terminate();
 
-     GraphicsManager::Get()->ShaderFree(shader);
-
-     //GraphicsManager::Get()->DebugTerminate();
-     
      printf("Game Terminate!\n");
 }

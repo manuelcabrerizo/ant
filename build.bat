@@ -9,7 +9,7 @@ set SOURCES=.\src\win32_platform.cpp
 set OUT_DIR=/Fo.\build\ /Fe.\build\%TARGET% /Fm.\build\
 set INC_DIR=/Ilibs\glm /Ilibs\stb /Ilibs\assimp\include
 set LNK_DIR=/LIBPATH:libs\assimp\lib\Release
-set DEFINES=-DANT_DEBUG=0 -DANT_CONSOLE=1
+set DEFINES=-DANT_DEBUG=1 -DANT_CONSOLE=1
 
 echo on
 

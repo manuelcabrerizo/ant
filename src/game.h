@@ -5,6 +5,7 @@ class Game
 private:
      TextureManager textureManager;
      ModelManager modelManager;
+     ShaderManager shaderManager;
      ActorManager actorManager;
 
      PlayerController playerController;
@@ -13,7 +14,6 @@ private:
      RenderSystem renderSystem;
      WeaponSystem weaponSystem;
 
-     Shader *shader;
      CollisionWorld collisionWorld;
      
 public:     

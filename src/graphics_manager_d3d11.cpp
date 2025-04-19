@@ -564,12 +564,12 @@ void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
           ASSERT(driverSelected);
      }
 
-     Microsoft::WRL::ComPtr<IDXGIDevice> dxgiDevice;
-     Microsoft::WRL::ComPtr<IDXGIAdapter> dxgiAdapter;
-     Microsoft::WRL::ComPtr<IDXGIFactory2> dxgiFactory;
-     device->QueryInterface(__uuidof(IDXGIDevice), &dxgiDevice);
-     dxgiDevice->GetParent(__uuidof(IDXGIAdapter), &dxgiAdapter);
-     dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), &dxgiFactory);
+     IDXGIDevice *dxgiDevice;
+     IDXGIAdapter *dxgiAdapter;
+     IDXGIFactory2 *dxgiFactory;
+     device->QueryInterface(__uuidof(IDXGIDevice), (void **)&dxgiDevice);
+     dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void **)&dxgiAdapter);
+     dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void **)&dxgiFactory);
 
      // DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL and DXGI_SWAP_EFFECT_FLIP_DISCARD
      // TODO: this is for windows 11 and wwe need to fix fullscreen
@@ -592,9 +592,13 @@ void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
          ASSERT(!"Error creating swap chain.");
      }
 
-     swapChain->QueryInterface(__uuidof(IDXGISwapChain2), (void**)&swapChain2);
+     swapChain->QueryInterface(__uuidof(IDXGISwapChain2), (void **)&swapChain2);
      waitHandle = swapChain2->GetFrameLatencyWaitableObject();
      swapChain2->SetMaximumFrameLatency(1);
+
+     dxgiDevice->Release();
+     dxgiAdapter->Release();
+     dxgiFactory->Release();
 }
 
 

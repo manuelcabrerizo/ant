@@ -267,12 +267,9 @@ SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
 
               ASSERT(modelPath && texturePath);
 
-              ModelHandle *modelHandle = modelManager->Get(modelPath);
-              TextureHandle *textureHandle = textureManager->Get(texturePath);
-
               RenderComponent render;
-              render.model = modelHandle->model;
-              render.texture = textureHandle->texture;
+              render.model = modelManager->Get(modelPath);
+              render.texture = textureManager->Get(texturePath);
               actorManager->AddComponent<RenderComponent>(actor, render);
          }
          else if(strcmp("PhysicsComponent", componentType) == 0)

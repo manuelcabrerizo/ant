@@ -199,12 +199,12 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                gWindow = window;
                
                GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT, GraphicsManagerType::D3D11, STATIC_MEMORY);
+               ShowWindow(window, SW_SHOW);
                NotificationManager::Init(STATIC_MEMORY);
-
+               
                Game game;
                game.Init();
                
-               ShowWindow(window, SW_SHOW);
                running = true;
 
                LARGE_INTEGER lastCounter, frequency;

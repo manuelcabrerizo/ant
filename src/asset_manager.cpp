@@ -51,6 +51,12 @@ void TextureManager::Unload(const char *name)
      nameIndex.Remove(name);
 }
 
+Texture *TextureManager::Get(const char *name)
+{
+     return AssetManager::Get(name)->texture;
+}
+
+
 // Model Manager
 void ModelManager::Load(const char *name, const char *path)
 {
@@ -67,3 +73,40 @@ void ModelManager::Unload(const char *name)
      assets.Remove(handle);
      nameIndex.Remove(name);
 }
+
+Model *ModelManager::Get(const char *name)
+{
+     return &AssetManager::Get(name)->model;
+}
+
+
+void ShaderManager::Load(const char *name, const char *vertPath, const char *fragPath)
+{
+     Frame frame = MemoryManager::Get()->GetFrame();
+     File vertFile = PlatformReadFile(vertPath, FRAME_MEMORY);
+     File fragFile = PlatformReadFile(fragPath, FRAME_MEMORY);
+     ShaderHandle shaderHandle;
+     shaderHandle.name = name;
+     shaderHandle.shader =  GraphicsManager::Get()->ShaderAlloc(vertFile, fragFile);
+     MemoryManager::Get()->ReleaseFrame(frame);
+     nameIndex.Add(name, assets.Add(shaderHandle));
+}
+
+void ShaderManager::Unload(const char *name)
+{
+     auto handle = *nameIndex.Get(name);
+     GraphicsManager::Get()->ShaderFree(assets.Get(handle)->shader);
+     assets.Remove(handle);
+     nameIndex.Remove(name);
+}
+
+void ShaderManager::Bind(const char *name)
+{
+     GraphicsManager::Get()->ShaderBind(AssetManager::Get(name)->shader);
+}
+
+Shader *ShaderManager::Get(const char *name)
+{
+     return AssetManager::Get(name)->shader;
+}
+
