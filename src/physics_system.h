@@ -5,11 +5,12 @@ class PhysicsSystem
 private:
     TransformComponent *transform;
     PhysicsComponent *physics;
+    CollisionWorld collisionWorld;
 
     void ProcessPhysics(float dt);
-    void ProcessColisionDetectionAndResolution(CollisionWorld *cw);
+    void ProcessColisionDetectionAndResolution();
 public:
     void Init();
     void Terminate();
-    void Update(ActorManager *actorManager, CollisionWorld *collisionWorld, f32 dt);
+    void Update(ActorManager *actorManager, f32 dt);
 };

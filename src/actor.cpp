@@ -171,8 +171,7 @@ i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
      return count;
  }
 
-// TODO: Integrate this function int the engine
-SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
+SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
      ActorManager *actorManager, TextureManager *textureManager, ModelManager *modelManager)
 {
     tinyxml2::XMLDocument doc;

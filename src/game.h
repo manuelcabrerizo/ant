@@ -12,10 +12,7 @@ private:
      PhysicsSystem physicsSystem;
      CameraSystem cameraSystem;
      RenderSystem renderSystem;
-     WeaponSystem weaponSystem;
-
-     CollisionWorld collisionWorld;
-     
+     WeaponSystem weaponSystem;     
 public:     
      void Init();
      void Terminate();

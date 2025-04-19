@@ -38,6 +38,11 @@ void Game::Init()
      actorManager.AddComponentType<CameraComponent, 1>();
      actorManager.AddComponentType<EnemyComponent, 10>();
 
+     // Create Entities
+     actorManager.CreateActorFromFile("../data/xml/player.xml", &actorManager, &textureManager, &modelManager);
+     actorManager.CreateActorFromFile("../data/xml/enemy.xml", &actorManager, &textureManager, &modelManager);
+     actorManager.CreateActorFromFile("../data/xml/test-level.xml", &actorManager, &textureManager, &modelManager);
+
      // Initialize gameplay systems
      playerController.Init();
      physicsSystem.Init();
@@ -47,15 +52,7 @@ void Game::Init()
 
      // Register system to be notify
      NotificationManager::Get()->RegisterListener(&weaponSystem, NOTIFICATION_SHOOT);
-
-     // Create Entities
-     CreateActorFromFile("../data/xml/player.xml", &actorManager, &textureManager, &modelManager);
-     CreateActorFromFile("../data/xml/enemy.xml", &actorManager, &textureManager, &modelManager);
-     CreateActorFromFile("../data/xml/test-level.xml", &actorManager, &textureManager, &modelManager);
-     
-     // Create collision world
-     collisionWorld.LoadFromFile("../data/collision/level-collision.obj");
-     
+          
      // TODO: GraphicsManager::Get()->DebugInit();
      printf("Game Init!\n");
 }
@@ -65,12 +62,12 @@ void Game::Update(f32 dt)
      playerController.Update(&actorManager, dt);
      cameraSystem.Update(&actorManager, dt);
      weaponSystem.Update(&actorManager, dt);
-     physicsSystem.Update(&actorManager, &collisionWorld, dt);
+     physicsSystem.Update(&actorManager, dt);
 }
 
 void Game::Render()
 {    
-     GraphicsManager::Get()->BeginFrame(1.0f, 0.0f, 1.0f);
+     GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
      renderSystem.Render(&actorManager, 0.0f);
      GraphicsManager::Get()->EndFrame(1);
 }

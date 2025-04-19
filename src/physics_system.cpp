@@ -1,6 +1,6 @@
 void PhysicsSystem::Init()
 {
-
+    collisionWorld.LoadFromFile("../data/collision/level-collision.obj");
 }
 
 void PhysicsSystem::Terminate()
@@ -8,7 +8,7 @@ void PhysicsSystem::Terminate()
 
 }
 
-void PhysicsSystem::Update(ActorManager *actorManager, CollisionWorld *collisionWorld, f32 dt)
+void PhysicsSystem::Update(ActorManager *actorManager, f32 dt)
 {
     Array<PhysicsComponent>& physicsComponents = actorManager->GetComponents<PhysicsComponent>();
     for(u32 i = 0; i < physicsComponents.size; ++i)
@@ -17,7 +17,7 @@ void PhysicsSystem::Update(ActorManager *actorManager, CollisionWorld *collision
         transform = actorManager->GetComponent<TransformComponent>(actor);
         physics = actorManager->GetComponent<PhysicsComponent>(actor);
         ProcessPhysics(dt);
-        ProcessColisionDetectionAndResolution(collisionWorld);
+        ProcessColisionDetectionAndResolution();
     }
 }
 
@@ -34,7 +34,7 @@ void PhysicsSystem::ProcessPhysics(float dt)
     physics->forceAccumulator = vec3(0.0f);
 }
 
-void PhysicsSystem::ProcessColisionDetectionAndResolution(CollisionWorld *collisionWorld)
+void PhysicsSystem::ProcessColisionDetectionAndResolution()
 {
     f32 colliderRadius = 0.5f;
 
@@ -44,7 +44,7 @@ void PhysicsSystem::ProcessColisionDetectionAndResolution(CollisionWorld *collis
     groundSegment.Init(colliderPos,
          colliderPos - vec3(0.0f, colliderRadius + 0.05f, 0.0f));
     float tOut; vec3 nOut;
-    physics->grounded = collisionWorld->Intersect(groundSegment, tOut, nOut);
+    physics->grounded = collisionWorld.Intersect(groundSegment, tOut, nOut);
 
     // Colission detection and resolution
     Frame frame = MemoryManager::Get()->GetFrame();
@@ -53,7 +53,7 @@ void PhysicsSystem::ProcessColisionDetectionAndResolution(CollisionWorld *collis
 
     Sphere sphere;
     sphere.Init(transform->position + vec3(0.0f, -0.0f, 0.0f), colliderRadius);
-    if(collisionWorld->Intersect(sphere, collisionData))
+    if(collisionWorld.Intersect(sphere, collisionData))
     {
          while(collisionData.size > 0)
          {
@@ -67,7 +67,7 @@ void PhysicsSystem::ProcessColisionDetectionAndResolution(CollisionWorld *collis
               collisionData.Clear();
 
               sphere.Init(transform->position + vec3(0.0f, -0.0f, 0.0f), colliderRadius);
-              collisionWorld->Intersect(sphere, collisionData);                    
+              collisionWorld.Intersect(sphere, collisionData);                    
          }    
     }
     MemoryManager::Get()->ReleaseFrame(frame);
