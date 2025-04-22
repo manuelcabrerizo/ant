@@ -11,18 +11,13 @@ enum NotificationType
      NOTIFICATION_TYPE_COUNT
 };
 
-struct Notification
-{
-     u8 data[256];
-};
-
 // TODO: find a way to note use and interface for this.
 // try to use function pointers intead
 class INotificable
 {
 public:
      virtual ~INotificable() {}
-     virtual void OnNotify(NotificationType type, Notification notification, void *sender) = 0;
+     virtual void OnNotify(NotificationType type, void *data, size_t size, void *sender) = 0;
 };
 
 
@@ -48,5 +43,5 @@ public:
 
      void RegisterListener(INotificable *listener, NotificationType type);
      
-     void SendNotification(Notification notification, NotificationType type, void *sender);
+     void SendNotification(NotificationType type, void *data, size_t size, void *sender);
 };

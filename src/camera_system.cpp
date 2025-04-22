@@ -27,8 +27,8 @@ void CameraSystem::Update(ActorManager *am, f32 dt)
      }
 }
 
-void CameraSystem::OnNotify(NotificationType type, Notification notification, void *sender)
+void CameraSystem::OnNotify(NotificationType type, void *data, size_t size, void *sender)
 {
-     i32 *size = (i32 *)notification.data;
-     ubo.proj = perspective(radians(60.0f), (float)size[0]/size[1], 0.01f, 100.0f);
+     vec2 *extend = (vec2 *)data;
+     ubo.proj = perspective(radians(60.0f), extend->x/extend->y, 0.01f, 100.0f);
 }

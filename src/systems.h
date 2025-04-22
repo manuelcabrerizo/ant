@@ -12,7 +12,7 @@ private:
      UniformBuffer *uniformBuffer;
      CameraUbo ubo;
 
-     void OnNotify(NotificationType type, Notification notification, void *sender) override;
+     void OnNotify(NotificationType type, void *data, size_t size, void *sender) override;
 public:
      void Init();
      void Terminate();
@@ -42,5 +42,5 @@ public:
      void Terminate();
      void Update(ActorManager *am, f32 dt);
 
-     void OnNotify(NotificationType type, Notification notification, void *sender) override;
+     void OnNotify(NotificationType type, void *data, size_t size, void *sender) override;
 };

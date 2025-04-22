@@ -43,11 +43,11 @@ void NotificationManager::RegisterListener(INotificable *listener, NotificationT
      registries[type].listeners.Push(listener);
 }
      
-void NotificationManager::SendNotification(Notification notification, NotificationType type, void *sender)
+void NotificationManager::SendNotification(NotificationType type, void *data, size_t size, void *sender)
 {
      Array<INotificable *>& listeners = registries[type].listeners;
      for(i32 i = 0; i < listeners.size; ++i)
      {
-          listeners[i]->OnNotify(type, notification, sender);
+          listeners[i]->OnNotify(type, data, size, sender);
      }
 }

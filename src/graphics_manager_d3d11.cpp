@@ -53,11 +53,11 @@ void GraphicsManagerD3D11::Shutdown()
      depthStencilView->Release();
      renderTargetView->Release();
 
-     swapChain1->Release();
+     if(swapChain1) swapChain1->Release();
      swapChain->Release();
-     deviceContext1->Release();
+     if(deviceContext1) deviceContext1->Release();
      deviceContext->Release();
-     device1->Release();
+     if(device1) device1->Release();
      device->Release();
 
      printf("DirectX11 Terminated!\n");

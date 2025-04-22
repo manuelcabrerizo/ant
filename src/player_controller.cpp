@@ -72,10 +72,8 @@ void PlayerController::ProcessMouseMovement()
 
           if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
           {
-               Notification notification = {};
                const char *message = "te dispare gato\n";
-               memcpy(notification.data, message, strlen(message));
-               NotificationManager::Get()->SendNotification(notification, NOTIFICATION_SHOOT, (void *)this);
+               NotificationManager::Get()->SendNotification(NOTIFICATION_SHOOT, (void *)message, strlen(message), (void *)this);
           }  
      }
 }
@@ -115,10 +113,7 @@ void PlayerController::ProcessKeyboardMovement()
 
      if(dot(movement, movement) > 0.0f)
      {
-          Notification notification;
-          vec3 *position = (vec3 *)notification.data;
-          *position = transform->position;
-          NotificationManager::Get()->SendNotification(notification, NOTIFICATION_PLAYER_MOVE, (void *)this);
+          NotificationManager::Get()->SendNotification(NOTIFICATION_PLAYER_MOVE, (void *)&transform->position, sizeof(transform->position), (void *)this);
      }
 
      physics->acceleration = movement;

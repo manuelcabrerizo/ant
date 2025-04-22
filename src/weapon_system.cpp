@@ -27,13 +27,13 @@ void WeaponSystem::Update(ActorManager *am, f32 dt)
      }
 }
 
-void WeaponSystem::OnNotify(NotificationType type, Notification notification, void *sender)
+void WeaponSystem::OnNotify(NotificationType type, void *data, size_t size, void *sender)
 {
      switch(type)
      {
      case NOTIFICATION_SHOOT:
      {
-          printf((const char *)notification.data);
+          printf((const char *)data);
      } break;
      }
 }

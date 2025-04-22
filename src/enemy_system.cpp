@@ -28,8 +28,8 @@ void EnemySystem::Terminate()
 
 }
 
-void EnemySystem::OnNotify(NotificationType type, Notification notification, void *sender)
+void EnemySystem::OnNotify(NotificationType type, void *data, size_t size, void *sender)
 {
-       vec3 *position = (vec3 *)notification.data;
+       vec3 *position = (vec3 *)data;
        playerPosition = *position;  
 }
