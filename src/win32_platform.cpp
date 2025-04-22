@@ -118,6 +118,15 @@ LRESULT Wndproc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
           }
           gWindowWidth = LOWORD(lParam);
           gWindowHeight = HIWORD(lParam);
+          if(GraphicsManager::Get())
+          {
+               GraphicsManager::Get()->OnResize(gWindowWidth, gWindowHeight);
+          }
+          Notification notification = {};
+          i32 *size = (i32 *)notification.data;
+          size[0] = gWindowWidth;
+          size[1] = gWindowHeight;
+          NotificationManager::Get()->SendNotification(notification, NOTIFICATION_ON_RESIZE, nullptr);   
      } break;
      
      case WM_MOVE: {
@@ -174,7 +183,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
      HINSTANCE hInstance = GetModuleHandle(0);
 #endif
      MemoryManager::Init(MB(100), 4);
-     InputManager::Init();               
+     InputManager::Init();
+     NotificationManager::Init(STATIC_MEMORY);           
 
      WNDCLASS wndClass = {};
      wndClass.style = CS_HREDRAW|CS_VREDRAW|CS_OWNDC;
@@ -200,7 +210,6 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                
                GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT, GraphicsManagerType::D3D11, STATIC_MEMORY);
                ShowWindow(window, SW_SHOW);
-               NotificationManager::Init(STATIC_MEMORY);
                
                Game game;
                game.Init();
@@ -241,8 +250,6 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                     }    
                }
                game.Terminate();
-
-               NotificationManager::Terminate();
                GraphicsManager::Terminate();
           }
           else
@@ -255,6 +262,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
           // TODO: Logging!
      }
 
+     NotificationManager::Terminate();
      InputManager::Terminate();
      MemoryManager::Terminate();
 

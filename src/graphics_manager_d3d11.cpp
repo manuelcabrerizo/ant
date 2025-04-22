@@ -9,7 +9,7 @@ void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32
      
      CreateDeviceAndSwapChain();
      CreateRenderTargetView();
-     CreateDepthStencilView();
+     CreateDepthStencilView(windowWidth, windowHeight);
      CreateSamplerStates();
      CreateRasterizerStates();
 
@@ -52,12 +52,44 @@ void GraphicsManagerD3D11::Shutdown()
      
      depthStencilView->Release();
      renderTargetView->Release();
-     swapChain2->Release();
+
+     swapChain1->Release();
      swapChain->Release();
+     deviceContext1->Release();
      deviceContext->Release();
+     device1->Release();
      device->Release();
 
      printf("DirectX11 Terminated!\n");
+}
+
+void GraphicsManagerD3D11::OnResize(i32 width, i32 height)
+{
+     windowWidth = width;
+     windowHeight = height;
+
+     // Release the render target view
+     deviceContext->OMSetRenderTargets(0, 0, 0);
+     renderTargetView->Release();
+     depthStencilView->Release();
+
+     swapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+
+     // create render target view
+     CreateRenderTargetView();
+     CreateDepthStencilView(width, height);
+
+     deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+
+     // Set up the viewport.
+     D3D11_VIEWPORT vp;
+     vp.Width = (f32)width;
+     vp.Height = (f32)height;
+     vp.MinDepth = 0.0f;
+     vp.MaxDepth = 1.0f;
+     vp.TopLeftX = 0;
+     vp.TopLeftY = 0;
+     deviceContext->RSSetViewports( 1, &vp );
 }
 
 void GraphicsManagerD3D11::BeginFrame(f32 r, f32 g, f32 b)
@@ -69,18 +101,7 @@ void GraphicsManagerD3D11::BeginFrame(f32 r, f32 g, f32 b)
 
 void GraphicsManagerD3D11::EndFrame(i32 vsync)
 {
-     /*
-#if ANT_DEBUG
-     debugRenderer.Present();
-#endif
-     */
-     if(vsync > 0)
-     {
-          WaitForSingleObject(waitHandle, INFINITE); // blocks until frame is ready
-     }
      swapChain->Present(vsync, 0);
-     deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
-
 }
 
 
@@ -491,7 +512,6 @@ void GraphicsManager::DebugDrawCube(vec3& c, vec3& hExtend)
 */
 
 // Private member functions
-
 void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
 {
      i32 deviceFlags = 0;
@@ -506,6 +526,7 @@ void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
           D3D_DRIVER_TYPE_SOFTWARE
      };
      D3D_FEATURE_LEVEL featureLevels[] = {
+          D3D_FEATURE_LEVEL_11_1,
           D3D_FEATURE_LEVEL_11_0,
           D3D_FEATURE_LEVEL_10_1,
           D3D_FEATURE_LEVEL_10_0
@@ -514,91 +535,110 @@ void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
      i32 driverTypesCount = ARRAY_LENGTH(driverTypes);
      i32 featureLevelsCount = ARRAY_LENGTH(featureLevels);
 
-     // Select the best gpu   
-     IDXGIFactory1 * pFactory;
-     HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), (void**)(&pFactory));
-          
-     UINT i = 0; 
-     IDXGIAdapter *pSelectedAdapter = nullptr;
-     IDXGIAdapter * pAdapter = nullptr; 
-     while(pFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND) 
-     { 
-          DXGI_ADAPTER_DESC desc;
-          pAdapter->GetDesc(&desc);
-          if (desc.DedicatedVideoMemory > 0)
-          {
-               printf("Dedicated adapter found: %ls\n", desc.Description);
-               pSelectedAdapter = pAdapter;
-               break;
-          }
-          ++i;
-     }
-
+     HRESULT hr = S_OK;
      D3D_FEATURE_LEVEL featureLevel;
      D3D_DRIVER_TYPE driverType;
-     if(pSelectedAdapter)
+     for(u32 driver = 0; driver < driverTypesCount; ++driver)
      {
-          if (FAILED(D3D11CreateDevice(pSelectedAdapter, D3D_DRIVER_TYPE_UNKNOWN, 0, deviceFlags,
-               featureLevels, featureLevelsCount,
-               D3D11_SDK_VERSION, &device, &featureLevel, &deviceContext)))
-          {
-              ASSERT("Error Creating Directx11 device");
-          }
-     }
-     else
-     {
-          bool driverSelected = false;
-          for(u32 driver = 0; driver < driverTypesCount; ++driver)
-          {
-               HRESULT result = D3D11CreateDevice(0, driverTypes[driver], 0, deviceFlags,
+               hr = D3D11CreateDevice(0, driverTypes[driver], 0, deviceFlags,
                     featureLevels, featureLevelsCount,
                     D3D11_SDK_VERSION, &device, &featureLevel, &deviceContext);
-               if(SUCCEEDED(result))
+               if (hr == E_INVALIDARG)
                {
-                    driverType = driverTypes[driver];
-                    printf("Driver selected %d\n", driver);
-                    driverSelected = true;
-                    break;
+                   // DirectX 11.0 platforms will not recognize D3D_FEATURE_LEVEL_11_1 so we need to retry without it
+                    hr = D3D11CreateDevice(0, driverTypes[driver], 0, deviceFlags,
+                         &featureLevels[1], featureLevelsCount - 1,
+                         D3D11_SDK_VERSION, &device, &featureLevel, &deviceContext);
                }
+
+          if(SUCCEEDED(hr))
+          {
+               break;
           }
-          ASSERT(driverSelected);
      }
-
-     IDXGIDevice *dxgiDevice;
-     IDXGIAdapter *dxgiAdapter;
-     IDXGIFactory2 *dxgiFactory;
-     device->QueryInterface(__uuidof(IDXGIDevice), (void **)&dxgiDevice);
-     dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void **)&dxgiAdapter);
-     dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void **)&dxgiFactory);
-
-     // DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL and DXGI_SWAP_EFFECT_FLIP_DISCARD
-     // TODO: this is for windows 11 and fullscreen needs to be fix
-     // TODO: After calling SetFullscreenState, the app must call ResizeBuffers before Present.
-     DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
-     ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
-     swapChainDesc.Width = windowWidth;
-     swapChainDesc.Height = windowHeight;
-     swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-     swapChainDesc.BufferCount = 2;
-     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-     swapChainDesc.SampleDesc.Count = 1;
-     swapChainDesc.SampleDesc.Quality = 0;
-     swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
-     swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
-     swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
-     if (FAILED(dxgiFactory->CreateSwapChainForHwnd(device, *window, &swapChainDesc, nullptr, nullptr, &swapChain)))
+     if(FAILED(hr))
      {
-         ASSERT(!"Error creating swap chain.");
+          ASSERT(!"Error creating D3D11 Device!");
      }
 
-     swapChain->QueryInterface(__uuidof(IDXGISwapChain2), (void **)&swapChain2);
-     waitHandle = swapChain2->GetFrameLatencyWaitableObject();
-     swapChain2->SetMaximumFrameLatency(1);
+     // check for msaa
+     u32 msaaQuality4x;
+     device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &msaaQuality4x);
+     if (msaaQuality4x <= 0)
+     {
+          ASSERT(!"Error msaa 4x not supported.");
+     }
 
-     dxgiDevice->Release();
-     dxgiAdapter->Release();
-     dxgiFactory->Release();
+    // Obtain DXGI factory from device (since we used nullptr for pAdapter above)
+     IDXGIFactory1* dxgiFactory = nullptr;
+     {
+          IDXGIDevice* dxgiDevice = nullptr;
+          hr = device->QueryInterface( __uuidof(IDXGIDevice), reinterpret_cast<void**>(&dxgiDevice) );
+          if (SUCCEEDED(hr))
+          {
+               IDXGIAdapter* adapter = nullptr;
+               hr = dxgiDevice->GetAdapter(&adapter);
+               if (SUCCEEDED(hr))
+               {
+                    hr = adapter->GetParent( __uuidof(IDXGIFactory1), reinterpret_cast<void**>(&dxgiFactory) );
+                    adapter->Release();
+               }
+               dxgiDevice->Release();
+          }
+     }
+     if (FAILED(hr))
+     {
+          ASSERT(!"Error getting DXGIFactory");
+     }    
+
+    // Create swap chain
+    IDXGIFactory2* dxgiFactory2 = nullptr;
+    hr = dxgiFactory->QueryInterface( __uuidof(IDXGIFactory2), reinterpret_cast<void**>(&dxgiFactory2) );
+    if (dxgiFactory2)
+    {
+        // DirectX 11.1 or later
+        hr = device->QueryInterface( __uuidof(ID3D11Device1), reinterpret_cast<void**>(&device1) );
+        if (SUCCEEDED(hr))
+        {
+            (void) deviceContext->QueryInterface( __uuidof(ID3D11DeviceContext1), reinterpret_cast<void**>(&deviceContext1) );
+        }
+
+        DXGI_SWAP_CHAIN_DESC1 sd = {};
+        sd.Width = windowWidth;
+        sd.Height = windowHeight;
+        sd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        sd.SampleDesc.Count = 1;
+        sd.SampleDesc.Quality = 0;
+        sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        sd.BufferCount = 2;
+
+        hr = dxgiFactory2->CreateSwapChainForHwnd( device, *window, &sd, nullptr, nullptr, &swapChain1 );
+        if (SUCCEEDED(hr))
+        {
+            hr = swapChain1->QueryInterface( __uuidof(IDXGISwapChain), reinterpret_cast<void**>(&swapChain) );
+        }
+        dxgiFactory2->Release();
+    }
+    else
+    {
+        // DirectX 11.0 systems
+        DXGI_SWAP_CHAIN_DESC sd = {};
+        sd.BufferCount = 2;
+        sd.BufferDesc.Width = windowWidth;
+        sd.BufferDesc.Height = windowHeight;
+        sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        sd.BufferDesc.RefreshRate.Numerator = 60;
+        sd.BufferDesc.RefreshRate.Denominator = 1;
+        sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        sd.OutputWindow = *window;
+        sd.SampleDesc.Count = 1;
+        sd.SampleDesc.Quality = 0;
+        sd.Windowed = TRUE;
+
+        hr = dxgiFactory->CreateSwapChain( device, &sd, &swapChain );
+    }
+     
+    dxgiFactory->Release();
 }
 
 
@@ -614,22 +654,13 @@ void GraphicsManagerD3D11::CreateRenderTargetView()
      backBufferTexture->Release();
 }
 
-void GraphicsManagerD3D11::CreateDepthStencilView()
-{
-     // TODO: remove this check, it does not belong to this function
-     // check for msaa
-     u32 msaaQuality4x;
-     device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &msaaQuality4x);
-     if (msaaQuality4x <= 0)
-     {
-          ASSERT(!"Error msaa 4x not supported.");
-     }
-     
+void GraphicsManagerD3D11::CreateDepthStencilView(i32 width, i32 height)
+{     
      // create the depth stencil texture
      ID3D11Texture2D *depthStencilTexture;
      D3D11_TEXTURE2D_DESC depthStencilTextureDesc;
-     depthStencilTextureDesc.Width = windowWidth;
-     depthStencilTextureDesc.Height = windowHeight;
+     depthStencilTextureDesc.Width = width;
+     depthStencilTextureDesc.Height = height;
      depthStencilTextureDesc.MipLevels = 1;
      depthStencilTextureDesc.ArraySize = 1;
      depthStencilTextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;

@@ -69,6 +69,8 @@ void Game::Init()
      // Register system to be notify
      NotificationManager::Get()->RegisterListener(&weaponSystem, NOTIFICATION_SHOOT);
      NotificationManager::Get()->RegisterListener(&enemySystem, NOTIFICATION_PLAYER_MOVE);
+     NotificationManager::Get()->RegisterListener(&cameraSystem, NOTIFICATION_ON_RESIZE);
+
           
      // TODO: GraphicsManager::Get()->DebugInit();
      printf("Game Init!\n");

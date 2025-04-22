@@ -6,6 +6,7 @@ enum NotificationType
 {
      NOTIFICATION_PLAYER_MOVE = 0,
      NOTIFICATION_SHOOT,
+     NOTIFICATION_ON_RESIZE,
      
      NOTIFICATION_TYPE_COUNT
 };

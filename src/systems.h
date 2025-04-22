@@ -6,11 +6,13 @@ struct CameraUbo
      mat4 proj;
 };
 
-class CameraSystem
+class CameraSystem : public INotificable
 {
 private:
      UniformBuffer *uniformBuffer;
      CameraUbo ubo;
+
+     void OnNotify(NotificationType type, Notification notification, void *sender) override;
 public:
      void Init();
      void Terminate();

@@ -1,6 +1,5 @@
-#include <d3d11.h>
+#include <d3d11_1.h>
 #include <d3dcompiler.h>
-#include <dxgi1_3.h>
 
 struct VertexBufferD3D11 : public VertexBuffer
 {
@@ -60,12 +59,14 @@ private:
      HWND *window;
      i32 windowWidth;
      i32 windowHeight;
+     DXGI_SWAP_CHAIN_DESC sd;
      
      ID3D11Device *device;
+     ID3D11Device1 *device1;
      ID3D11DeviceContext *deviceContext;
-     IDXGISwapChain1 *swapChain;
-     IDXGISwapChain2* swapChain2;
-     HANDLE waitHandle;
+     ID3D11DeviceContext1 *deviceContext1;
+     IDXGISwapChain *swapChain;
+     IDXGISwapChain1 *swapChain1;
 
      ID3D11RenderTargetView *renderTargetView;
      ID3D11DepthStencilView *depthStencilView;
@@ -102,6 +103,8 @@ private:
 public:
      void Initialize(void *osWindow, i32 width, i32 height, i32 stackNum) override;
      void Shutdown() override;
+
+     void OnResize(i32 width, i32 height) override;
      
      void BeginFrame(f32 r, f32 g, f32 b) override;
      void EndFrame(i32 vsync) override;
@@ -148,7 +151,7 @@ public:
 private:
      void CreateDeviceAndSwapChain();
      void CreateRenderTargetView();
-     void CreateDepthStencilView();
+     void CreateDepthStencilView(i32 width, i32 height);
      HRESULT CreateInputLayoutDescFromVertexShaderSignature(ID3DBlob* pShaderBlob, ID3D11Device* pD3DDevice,
                                                             ID3D11InputLayout** pInputLayout);
      void CreateSamplerStates();

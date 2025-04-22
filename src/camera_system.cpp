@@ -20,9 +20,15 @@ void CameraSystem::Update(ActorManager *am, f32 dt)
           CameraComponent *camera = &cameras[i];
           TransformComponent *transform = am->GetComponent<TransformComponent>(actor);
 
-          camera->SetPosition(transform->position/* + camera->GetWorldUp() * 2.0f - camera->GetWorldFront() * 2.0f*/);
+          camera->SetPosition(transform->position);
           camera->SetDirection(transform->direction);
           ubo.view = camera->GetView();
           GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
      }
+}
+
+void CameraSystem::OnNotify(NotificationType type, Notification notification, void *sender)
+{
+     i32 *size = (i32 *)notification.data;
+     ubo.proj = perspective(radians(60.0f), (float)size[0]/size[1], 0.01f, 100.0f);
 }

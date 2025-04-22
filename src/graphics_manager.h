@@ -1,7 +1,7 @@
 #pragma once
 
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
 
 enum class GraphicsManagerType
 {
@@ -38,6 +38,8 @@ public:
 
      virtual void Initialize(void *osWindow, i32 width, i32 height, i32 stackNum) = 0;
      virtual void Shutdown() = 0;
+
+     virtual void OnResize(i32 width, i32 height) = 0;
      
      virtual void BeginFrame(f32 r, f32 g, f32 b) = 0;
      virtual void EndFrame(i32 vsync) = 0;
