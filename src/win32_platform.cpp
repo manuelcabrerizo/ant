@@ -6,7 +6,6 @@
 #include <Windowsx.h>
 
 #define DIRECTINPUT_VERSION 0x0800
-
 #include <dinput.h>
 
 // glm
@@ -51,6 +50,7 @@ struct File
 #include "systems.h"
 #include "physics_system.h"
 #include "player_controller.h"
+#include "enemy_system.h"
 #include "game.h"
 
 void *PlatformGetOsWindow();
@@ -78,6 +78,7 @@ File PlatformReadFile(const char *filepath, i32 stackNum);
 
 #include "physics_system.cpp"
 #include "player_controller.cpp"
+#include "enemy_system.cpp"
 #include "camera_system.cpp"
 #include "render_system.cpp"
 #include "weapon_system.cpp"
@@ -172,6 +173,9 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 #if ANT_CONSOLE
      HINSTANCE hInstance = GetModuleHandle(0);
 #endif
+     MemoryManager::Init(MB(100), 4);
+     InputManager::Init();               
+
      WNDCLASS wndClass = {};
      wndClass.style = CS_HREDRAW|CS_VREDRAW|CS_OWNDC;
      wndClass.lpfnWndProc = Wndproc;
@@ -183,10 +187,6 @@ int CALLBACK WinMain(HINSTANCE hInstance,
      wndClass.hbrBackground = 0;
      wndClass.lpszMenuName = 0;
      wndClass.lpszClassName = "AntWindowClass";
-
-     MemoryManager::Init(MB(100), 4);
-     InputManager::Init();               
-     
      if(RegisterClassA(&wndClass))
      {
           HWND window = CreateWindowA(wndClass.lpszClassName,
@@ -227,10 +227,6 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                     {
                          dt = 0.033f;
                     }
-
-                    //printf("dt: %f\n", dt);
-
-                    //printf("FPS: %d\n", (i32)(1.0f/dt));
                     
                     InputManager::Get()->Process();  
                     while(PeekMessageA(&message, window, 0, 0, PM_REMOVE))

@@ -8,6 +8,12 @@ void AssetManager<Type>::Init(u32 assetsCapacity)
 template <typename Type>
 void AssetManager<Type>::Terminate()
 {
+     Clear();
+}
+
+template <typename Type>
+void AssetManager<Type>::Clear()
+{
      for(i32 i = assets.GetArray()->size - 1; i >= 0; --i)
      {
           Type *asset = &assets.GetArray()->data[i];

@@ -112,6 +112,15 @@ void PlayerController::ProcessKeyboardMovement()
      }
 
      vec3 movement = (moveDirection * speed);
+
+     if(dot(movement, movement) > 0.0f)
+     {
+          Notification notification;
+          vec3 *position = (vec3 *)notification.data;
+          *position = transform->position;
+          NotificationManager::Get()->SendNotification(notification, NOTIFICATION_PLAYER_MOVE, (void *)this);
+     }
+
      physics->acceleration = movement;
 }
 

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Actor>
     <TransformComponent>
-        <vec3 x="0" y="2.0" z="3"/>
-        <vec3 x="1" y="1" z="1"/>
-        <vec3 x="0" y="0" z="1"/>
+        <position x="0" y="2.0" z="3"/>
+        <scale x="1" y="1" z="1"/>
+        <direction x="0" y="0" z="1"/>
     </TransformComponent>
     <CameraComponent>
-        <vec3 x="0" y="0" z="-4"/>
-        <vec3 x="0" y="0" z="1"/>
+        <position x="0" y="0" z="-4"/>
+        <direction x="0" y="0" z="1"/>
     </CameraComponent>
     <WeaponComponent>
     </WeaponComponent>
@@ -16,7 +16,8 @@
         <weapon path="../data/xml/pistol.xml"/>
     </PlayerControllerComponent>
     <PhysicsComponent>
-        <vec3 x="0" y="0" z="0"/>
-        <vec3 x="0" y="0" z="0"/>
+        <acceleration x="0" y="0" z="0"/>
+        <velocity x="0" y="0" z="0"/>
+        <offset x="0" y="-0.5" z="0"/>
     </PhysicsComponent>
 </Actor>

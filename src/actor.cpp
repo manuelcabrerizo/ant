@@ -93,8 +93,6 @@ void ActorManager::RemoveComponent(SlotmapKey<Actor> actorKey)
      ASSERT(key.gen != INVALID_KEY);
      compoentStorage->components.Remove(key);
      actor->componentsMap.Remove(ComponentType::GetID());
-
-     // TODO: try to find a way of not having this linear search
      i32 foundIndex = -1;
      for(i32 i = 0; i < actor->componentsIds.size; ++i)
      {
@@ -119,8 +117,6 @@ void ActorManager::RemoveComponentById(SlotmapKey<Actor> actorKey, i32 id)
      ASSERT(keyBase.gen != INVALID_KEY);
      compoentStorage->RemoveComponent(keyBase);
      actor->componentsMap.Remove(id);
-
-     // TODO: try to find a way of not having this linear search
      i32 foundIndex = -1;
      for(i32 i = 0; i < actor->componentsIds.size; ++i)
      {
@@ -250,7 +246,6 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
                     weapon->weapon = playerController.weapons[0];
               }
               AddComponent<PlayerControllerComponent>(actor, playerController);
-
          }
          else if(strcmp("RenderComponent", componentType) == 0)
          {
@@ -283,12 +278,18 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
                attributes->QueryFloatAttribute("x", &velocity.x);
                attributes->QueryFloatAttribute("y", &velocity.y);
                attributes->QueryFloatAttribute("z", &velocity.z);
+               attributes = attributes->NextSiblingElement();
+               vec3 offset;
+               attributes->QueryFloatAttribute("x", &offset.x);
+               attributes->QueryFloatAttribute("y", &offset.y);
+               attributes->QueryFloatAttribute("z", &offset.z);
 
                PhysicsComponent physics;
                physics.acceleration = acceleration;
                physics.velocity = velocity;
                physics.forceAccumulator = vec3(0.0f);
                physics.lastFrameAcceleration = vec3(0.0f);
+               physics.offset = offset;
                AddComponent(actor, physics);
          }
          else if(strcmp("WeaponComponent", componentType) == 0)

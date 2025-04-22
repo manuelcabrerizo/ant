@@ -12,6 +12,7 @@ public:
      
      void Init(u32 assetsCapacity);
      void Terminate();
+     void Clear();
 
      virtual void Unload(const char *name) = 0;
 protected:

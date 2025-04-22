@@ -40,8 +40,23 @@ void Game::Init()
 
      // Create Entities
      actorManager.CreateActorFromFile("../data/xml/player.xml", &textureManager, &modelManager);
-     actorManager.CreateActorFromFile("../data/xml/enemy.xml", &textureManager, &modelManager);
      actorManager.CreateActorFromFile("../data/xml/test-level.xml", &textureManager, &modelManager);
+
+     SlotmapKey<Actor> enemy[3] =
+     {
+          actorManager.CreateActorFromFile("../data/xml/enemy.xml", &textureManager, &modelManager),
+          actorManager.CreateActorFromFile("../data/xml/enemy.xml", &textureManager, &modelManager),
+          actorManager.CreateActorFromFile("../data/xml/enemy.xml", &textureManager, &modelManager)
+     };
+     TransformComponent *transforms[3] =
+     {
+          actorManager.GetComponent<TransformComponent>(enemy[0]),
+          actorManager.GetComponent<TransformComponent>(enemy[1]),
+          actorManager.GetComponent<TransformComponent>(enemy[2])
+     };
+     transforms[0]->position.x = 0.0f;
+     transforms[1]->position.x = 3.0f;
+     transforms[2]->position.x = 6.0f;
 
      // Initialize gameplay systems
      playerController.Init();
@@ -49,9 +64,11 @@ void Game::Init()
      cameraSystem.Init();
      renderSystem.Init();
      weaponSystem.Init();
+     enemySystem.Init();
 
      // Register system to be notify
      NotificationManager::Get()->RegisterListener(&weaponSystem, NOTIFICATION_SHOOT);
+     NotificationManager::Get()->RegisterListener(&enemySystem, NOTIFICATION_PLAYER_MOVE);
           
      // TODO: GraphicsManager::Get()->DebugInit();
      printf("Game Init!\n");
@@ -62,6 +79,9 @@ void Game::Update(f32 dt)
      playerController.Update(&actorManager, dt);
      cameraSystem.Update(&actorManager, dt);
      weaponSystem.Update(&actorManager, dt);
+     enemySystem.Update(&actorManager, dt);
+
+     // TODO: Create a FixedUpdate
      physicsSystem.Update(&actorManager, dt);
 }
 
@@ -77,6 +97,7 @@ void Game::Terminate()
      // TODO: GraphicsManager::Get()->DebugTerminate();
 
      playerController.Terminate();
+     enemySystem.Terminate();
      physicsSystem.Terminate();
      cameraSystem.Terminate();
      renderSystem.Terminate();

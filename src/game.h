@@ -12,7 +12,8 @@ private:
      PhysicsSystem physicsSystem;
      CameraSystem cameraSystem;
      RenderSystem renderSystem;
-     WeaponSystem weaponSystem;     
+     WeaponSystem weaponSystem;
+     EnemySystem enemySystem;    
 public:     
      void Init();
      void Terminate();

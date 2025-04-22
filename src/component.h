@@ -36,6 +36,7 @@ struct PhysicsComponent : public Component<PhysicsComponent>
     vec3 velocity;
     vec3 forceAccumulator;
     vec3 lastFrameAcceleration;
+    vec3 offset;
     bool grounded = false;
 };
 

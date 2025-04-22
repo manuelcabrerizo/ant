@@ -40,9 +40,8 @@ void PhysicsSystem::ProcessColisionDetectionAndResolution()
 
     // Grounded test
     Segment groundSegment;
-    vec3 colliderPos = transform->position + vec3(0.0f, -0.3f, 0.0f);
-    groundSegment.Init(colliderPos,
-         colliderPos - vec3(0.0f, colliderRadius + 0.05f, 0.0f));
+    vec3 colliderPos = transform->position + physics->offset;
+    groundSegment.Init(colliderPos, colliderPos - vec3(0.0f, colliderRadius + 0.05f, 0.0f));
     float tOut; vec3 nOut;
     physics->grounded = collisionWorld.Intersect(groundSegment, tOut, nOut);
 
@@ -52,7 +51,7 @@ void PhysicsSystem::ProcessColisionDetectionAndResolution()
     collisionData.Init(MAX_COLLISION_COUNT, FRAME_MEMORY);
 
     Sphere sphere;
-    sphere.Init(transform->position + vec3(0.0f, -0.0f, 0.0f), colliderRadius);
+    sphere.Init(transform->position + physics->offset, colliderRadius);
     if(collisionWorld.Intersect(sphere, collisionData))
     {
          while(collisionData.size > 0)
@@ -66,7 +65,7 @@ void PhysicsSystem::ProcessColisionDetectionAndResolution()
 
               collisionData.Clear();
 
-              sphere.Init(transform->position + vec3(0.0f, -0.0f, 0.0f), colliderRadius);
+              sphere.Init(transform->position + physics->offset, colliderRadius);
               collisionWorld.Intersect(sphere, collisionData);                    
          }    
     }

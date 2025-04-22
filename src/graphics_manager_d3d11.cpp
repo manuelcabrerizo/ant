@@ -572,7 +572,7 @@ void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
      dxgiAdapter->GetParent(__uuidof(IDXGIFactory2), (void **)&dxgiFactory);
 
      // DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL and DXGI_SWAP_EFFECT_FLIP_DISCARD
-     // TODO: this is for windows 11 and wwe need to fix fullscreen
+     // TODO: this is for windows 11 and fullscreen needs to be fix
      // TODO: After calling SetFullscreenState, the app must call ResizeBuffers before Present.
      DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
      ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
@@ -617,7 +617,6 @@ void GraphicsManagerD3D11::CreateRenderTargetView()
 void GraphicsManagerD3D11::CreateDepthStencilView()
 {
      // TODO: remove this check, it does not belong to this function
-     
      // check for msaa
      u32 msaaQuality4x;
      device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &msaaQuality4x);
