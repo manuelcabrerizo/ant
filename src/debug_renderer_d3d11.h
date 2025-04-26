@@ -4,7 +4,7 @@ struct VertexLine
      vec3 col;
 };
 
-class DebugRenderer
+class DebugRendererD3D11
 {
 private:
      ID3D11Buffer *gpuBuffer;
@@ -14,9 +14,9 @@ private:
 
      Shader *shader;
 public:
-     void Init();
+     void Init(ID3D11Device *device);
      void Terminate();
-     void Present();
+     void Present(ID3D11DeviceContext *deviceContext);
 
-     void DrawLine(vec3& a, vec3 &b);
+     void DrawLine(ID3D11DeviceContext *deviceContext, vec3& a, vec3 &b);
 };

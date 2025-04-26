@@ -44,11 +44,10 @@ struct File
 #include "asset_manager.h"
 #include "collision.h"
 
-#include "component.h"
-#include "camera_component.h"
 #include "actor.h"
+#include "components/component.h"
+
 #include "systems.h"
-#include "physics_system.h"
 #include "player_controller.h"
 #include "enemy_system.h"
 #include "game.h"
@@ -72,15 +71,12 @@ File PlatformReadFile(const char *filepath, i32 stackNum);
 #include "asset_manager.cpp"
 #include "collision.cpp"
 
-#include "camera_component.cpp"
-
 #include "actor.cpp"
 
-#include "physics_system.cpp"
 #include "player_controller.cpp"
 #include "enemy_system.cpp"
-#include "camera_system.cpp"
-#include "render_system.cpp"
+//#include "camera_system.cpp"
+//#include "render_system.cpp"
 #include "weapon_system.cpp"
 
 #include "game.cpp"

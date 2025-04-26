@@ -9,4 +9,7 @@
         <model name="sniper"/>
         <texture name="default"/>
     </RenderComponent>
+    <AnchorComponent>
+        <offset x="0" y="0.035" z="0"/>
+    </AnchorComponent>
 </Actor>

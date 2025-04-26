@@ -37,6 +37,37 @@ void PlayerController::Update(ActorManager *am, f32 dt)
      }
 }
 
+void PlayerController::LateUpdate(ActorManager *actorManager, f32 dt)
+{
+     Array<PlayerControllerComponent>& playerControllers = actorManager->GetComponents<PlayerControllerComponent>();
+     for(u32 i = 0; i < playerControllers.size; ++i)
+     {
+          SlotmapKey<Actor> actor = playerControllers[i].owner;
+          playerController = &playerControllers[i];
+          if(!playerController->enable)
+          {
+               continue;
+          }
+
+          transform = actorManager->GetComponent<TransformComponent>(actor);
+          camera = actorManager->GetComponent<CameraComponent>(actor);
+
+          if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
+          {
+               const char *message = "te dispare gato\n";
+               NotificationManager::Get()->SendNotification(NOTIFICATION_SHOOT, (void *)message, strlen(message), (void *)this);
+          }  
+
+          if(InputManager::Get()->MouseButtonDown(MOUSE_BUTTON_LEFT))
+          {
+               int currentWeapon = playerController->usingFirstWeapon ? 0 : 1;
+               AnchorComponent *weaponAnchor = actorManager->GetComponent<AnchorComponent>(playerController->weapons[currentWeapon]);
+               vec3 targetPosition = camera->GetPosition() + camera->GetFront() * 100.0f;
+               GraphicsManager::Get()->DebugDrawLine(weaponAnchor->position, targetPosition);
+          }
+     } 
+}
+
 void PlayerController::ProcessMouseMovement()
 {
      if(InputManager::Get()->KeyJustDown(KEY_ESCAPE))
@@ -69,12 +100,6 @@ void PlayerController::ProcessMouseMovement()
           PlaformSetCursorPos(windowX + windowW/2, windowY + windowH/2); 
           InputManager::Get()->SetMousePosition(windowW/2, windowH/2);
           InputManager::Get()->SetMouseLastPosition(windowW/2, windowH/2);
-
-          if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
-          {
-               const char *message = "te dispare gato\n";
-               NotificationManager::Get()->SendNotification(NOTIFICATION_SHOOT, (void *)message, strlen(message), (void *)this);
-          }  
      }
 }
 
@@ -134,7 +159,6 @@ void PlayerController::ChangeWeapon(ActorManager *actorManager)
           WeaponComponent weapon;
           weapon.weapon = playerController->weapons[0];
           actorManager->AddComponent<WeaponComponent>(playerController->owner, weapon);
-
           playerController->usingFirstWeapon = true;
      }
      if(InputManager::Get()->KeyJustDown(KEY_2) && playerController->usingFirstWeapon)
@@ -146,7 +170,6 @@ void PlayerController::ChangeWeapon(ActorManager *actorManager)
           WeaponComponent weapon;
           weapon.weapon = playerController->weapons[1];
           actorManager->AddComponent<WeaponComponent>(playerController->owner, weapon);
-
           playerController->usingFirstWeapon = false;
      }
 }

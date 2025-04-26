@@ -153,6 +153,7 @@ Type *ObjectAllocator<Type>::Alloc()
 template<typename Type>
 void ObjectAllocator<Type>::Free(Type *object)
 {
+     object->~Type();
      FreeNode *free = (FreeNode *)object;
      free->next = firstFree;
      firstFree = free;

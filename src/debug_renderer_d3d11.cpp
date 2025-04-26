@@ -1,7 +1,5 @@
-void DebugRenderer::Init()
+void DebugRendererD3D11::Init(ID3D11Device *device)
 {
-     GraphicsManagerState *state = &gGraphicsManagerState;
-
      bufferUsed = 0;
      bufferSize = 10000;
 
@@ -13,7 +11,7 @@ void DebugRenderer::Init()
      vertexDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
      vertexDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
      vertexDesc.ByteWidth = sizeof(VertexLine) * bufferSize;
-     if(FAILED(state->device->CreateBuffer(&vertexDesc, 0, &gpuBuffer)))
+     if(FAILED(device->CreateBuffer(&vertexDesc, 0, &gpuBuffer)))
      {
           ASSERT(!"Error create line renderer GPU buffer.");
      }
@@ -30,7 +28,7 @@ void DebugRenderer::Init()
      
 }
 
-void DebugRenderer::Terminate()
+void DebugRendererD3D11::Terminate()
 {
      gpuBuffer->Release();
      GraphicsManager::Get()->ShaderFree(shader);
@@ -38,30 +36,27 @@ void DebugRenderer::Terminate()
      printf("Debug Renderer Terminate!\n");
 }
 
-void DebugRenderer::Present()
+void DebugRendererD3D11::Present(ID3D11DeviceContext *deviceContext)
 {
-     GraphicsManagerState *state = &gGraphicsManagerState;
-
      D3D11_MAPPED_SUBRESOURCE bufferData;
      ZeroMemory(&bufferData, sizeof(bufferData));
-     state->deviceContext->Map(gpuBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
+     deviceContext->Map(gpuBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
      memcpy(bufferData.pData, cpuBuffer, sizeof(VertexLine)*bufferUsed);
-     state->deviceContext->Unmap(gpuBuffer, 0);
+     deviceContext->Unmap(gpuBuffer, 0);
 
      GraphicsManager::Get()->ShaderBind(shader);
      
      u32 stride = sizeof(VertexLine);
      u32 offset = 0;
-     state->deviceContext->IASetVertexBuffers(0, 1, &gpuBuffer, &stride, &offset);
-     state->deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
-     state->deviceContext->Draw(bufferUsed, 0);
+     deviceContext->IASetVertexBuffers(0, 1, &gpuBuffer, &stride, &offset);
+     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+     deviceContext->Draw(bufferUsed, 0);
      bufferUsed = 0;
 }
 
 
-void DebugRenderer::DrawLine(vec3& a, vec3 &b)
+void DebugRendererD3D11::DrawLine(ID3D11DeviceContext *deviceContext, vec3& a, vec3 &b)
 {
-     GraphicsManagerState *state = &gGraphicsManagerState;
      VertexLine line[2] = {};
      line[0].pos = a;
      line[0].col = vec3(0.0f, 1.0f, 0.0f);
@@ -70,7 +65,7 @@ void DebugRenderer::DrawLine(vec3& a, vec3 &b)
 
      if(bufferUsed + 2 > bufferSize)
      {
-          Present();
+          Present(deviceContext);
      }
      
      ASSERT(bufferUsed + 2 <= bufferSize);

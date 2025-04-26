@@ -20,4 +20,5 @@ public:
      void Init();
      void Terminate();
      void Update(ActorManager *am, f32 dt);
+     void LateUpdate(ActorManager *actorManager, f32 dt);
 };

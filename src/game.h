@@ -9,9 +9,6 @@ private:
      ActorManager actorManager;
 
      PlayerController playerController;
-     PhysicsSystem physicsSystem;
-     CameraSystem cameraSystem;
-     RenderSystem renderSystem;
      WeaponSystem weaponSystem;
      EnemySystem enemySystem;    
 public:     

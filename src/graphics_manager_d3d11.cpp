@@ -1,5 +1,6 @@
-
 // Public Interface
+
+#include "debug_renderer_d3d11.cpp"
 
 void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32 stackNum)
 {    
@@ -428,41 +429,37 @@ i32 GraphicsManagerD3D11::TextureHeight(Texture *texture)
      return tx->h;
 }
 
-/*
-void GraphicsManager::DebugInit()
+
+void GraphicsManagerD3D11::DebugInit()
 {
 #if ANT_DEBUG
-     GraphicsManagerState *state = &gGraphicsManagerState;
-     state->debugRenderer.Init();
+     debugRenderer.Init(device);
 #endif
 }
 
-void GraphicsManager::DebugTerminate()
+void GraphicsManagerD3D11::DebugTerminate()
 {
 #if ANT_DEBUG
-     GraphicsManagerState *state = &gGraphicsManagerState;
-     state->debugRenderer.Terminate();
+     debugRenderer.Terminate();
 #endif
 }
 
-void GraphicsManager::DebugPresent()
+void GraphicsManagerD3D11::DebugPresent()
 {
 #if ANT_DEBUG
-     GraphicsManagerState *state = &gGraphicsManagerState;
-     state->debugRenderer.Present();
+     debugRenderer.Present(deviceContext);
 #endif
 }
      
-void GraphicsManager::DebugDrawLine(vec3& a, vec3& b)
+void GraphicsManagerD3D11::DebugDrawLine(vec3& a, vec3& b)
 {
 #if ANT_DEBUG
-     GraphicsManagerState *state = &gGraphicsManagerState;
-     state->debugRenderer.DrawLine(a, b);
+     debugRenderer.DrawLine(deviceContext, a, b);
 #endif
 }
 
 
-void GraphicsManager::DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlice)
+void GraphicsManagerD3D11::DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlice)
 {
 #if ANT_DEBUG
      vec3 up = vec3(0.0f, 1.0f, 0.0f);
@@ -504,12 +501,13 @@ void GraphicsManager::DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlice)
 #endif
 }
 
-void GraphicsManager::DebugDrawCube(vec3& c, vec3& hExtend)
+void GraphicsManagerD3D11::DebugDrawCube(vec3& c, vec3& hExtend)
 {
 #if ANT_DEBUG
+     // TODO: ...
 #endif
 }
-*/
+
 
 // Private member functions
 void GraphicsManagerD3D11::CreateDeviceAndSwapChain()

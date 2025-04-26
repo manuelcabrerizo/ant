@@ -74,12 +74,12 @@ public:
      virtual void TextureBind(Texture *texture, i32 slot) = 0;
      virtual i32 TextureWidth(Texture *texture) = 0;
      virtual i32 TextureHeight(Texture *texture) = 0;
-/*
+
      virtual void DebugInit() = 0;
      virtual void DebugTerminate() = 0;
      virtual void DebugPresent() = 0;
      virtual void DebugDrawLine(vec3& a, vec3& b) = 0;
      virtual void DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlice) = 0;
      virtual void DebugDrawCube(vec3& c, vec3& hExtend) = 0;
-*/
+
 };

@@ -10,8 +10,10 @@ void RenderSystem::Terminate()
      GraphicsManager::Get()->UniformBufferFree(uniformBuffer);
 }
 
-void RenderSystem::Render(ActorManager *am, f32 dt)
-{     
+void RenderSystem::Render(ShaderManager *shaderManager, ActorManager *am, f32 dt)
+{    
+     shaderManager->Bind("default"); 
+
      Array<RenderComponent>& renders = am->GetComponents<RenderComponent>();
      for(u32 i = 0; i < renders.size; ++i)
      {

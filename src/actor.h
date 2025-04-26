@@ -51,4 +51,21 @@ public:
      
      template <typename ComponentType>
      ComponentType *GetComponent(SlotmapKey<Actor> actorKey);
+
+     // TODO: test for implementing the game logic in the component
+     // trying to make a unity like framework
+     template<typename ComponentType>
+     void InitComponents();
+
+     template<typename ComponentType>
+     void TerminateComponents();
+
+     template<typename ComponentType>
+     void UpdateComponents(f32 dt);
+
+     template<typename ComponentType>
+     void LateUpdateComponents(f32 dt);
+
+     template<typename ComponentType>
+     void RenderComponents(ShaderManager *shaderManager);
 };

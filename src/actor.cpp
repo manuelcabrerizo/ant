@@ -302,6 +302,18 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
                EnemyComponent enemy;
                AddComponent<EnemyComponent>(actor, enemy);
          }
+         else if(strcmp("AnchorComponent", componentType) == 0)
+         {
+               tinyxml2::XMLElement *attributes = component->FirstChildElement();
+               vec3 offset;
+               attributes->QueryFloatAttribute("x", &offset.x);
+               attributes->QueryFloatAttribute("y", &offset.y);
+               attributes->QueryFloatAttribute("z", &offset.z);
+
+               AnchorComponent anchor;
+               anchor.offset = offset;
+               AddComponent<AnchorComponent>(actor, anchor);
+         }
          else
          {
               ASSERT(!"Component not Supported!");
@@ -310,4 +322,65 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
          component = component->NextSiblingElement();
     }
     return actor;
+}
+
+// TODO: test
+template<typename ComponentType>
+void ActorManager::InitComponents()
+{
+     Array<ComponentType>& components = GetComponents<ComponentType>();
+     for(u32 i = 0; i < components.size; ++i)
+     {
+          components[i].OnInit(this);
+     }
+}
+
+template<typename ComponentType>
+void ActorManager::TerminateComponents()
+{
+     Array<ComponentType>& components = GetComponents<ComponentType>();
+     for(u32 i = 0; i < components.size; ++i)
+     {
+          components[i].OnTerminate(this);
+     }
+}
+
+template<typename ComponentType>
+void ActorManager::UpdateComponents(f32 dt)
+{
+     Array<ComponentType>& components = GetComponents<ComponentType>();
+     for(u32 i = 0; i < components.size; ++i)
+     {
+          if(components[i].enable)
+          {
+               components[i].OnUpdate(this, dt);
+          }
+     }
+}
+
+template<typename ComponentType>
+void ActorManager::LateUpdateComponents(f32 dt)
+{
+     Array<ComponentType>& components = GetComponents<ComponentType>();
+     for(u32 i = 0; i < components.size; ++i)
+     {
+          if(components[i].enable)
+          {
+               components[i].OnLateUpdate(this, dt);
+          }
+     }
+}
+
+
+template<typename ComponentType>
+void ActorManager::RenderComponents(ShaderManager *shaderManager)
+{
+     Array<ComponentType>& components = GetComponents<ComponentType>();
+     for(u32 i = 0; i < components.size; ++i)
+     {
+          if(components[i].enable)
+          {
+               components[i].OnRender(shaderManager, this);
+          }
+     }
 }

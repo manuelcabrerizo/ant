@@ -1,11 +1,6 @@
 #pragma once
 
-struct CameraUbo
-{
-     mat4 view;
-     mat4 proj;
-};
-
+/*
 class CameraSystem : public INotificable
 {
 private:
@@ -18,6 +13,7 @@ public:
      void Terminate();
      void Update(ActorManager *am, f32 dt);
 };
+
 
 struct PerDrawUbo
 {
@@ -32,8 +28,9 @@ private:
 public:
      void Init();
      void Terminate();
-     void Render(ActorManager *am, f32 dt);
+     void Render(ShaderManager *shaderManager, ActorManager *am, f32 dt);
 };
+*/
 
 class WeaponSystem : public INotificable
 {

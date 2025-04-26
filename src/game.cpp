@@ -1,5 +1,8 @@
 // TODO:
+// - Try to implement the gameplay login on the component itself
+// - Get the components array on the init of the systems
 // - More colliders and Raycast test
+// - Basic steering behaviors
 // - Implement a small demo with a full loop
 // the player has to have life and be able to shoot at least two weapons
 // the enemies have to move arrown the map and shoot the player
@@ -37,11 +40,11 @@ void Game::Init()
      actorManager.AddComponentType<WeaponComponent, 100>();
      actorManager.AddComponentType<CameraComponent, 1>();
      actorManager.AddComponentType<EnemyComponent, 10>();
+     actorManager.AddComponentType<AnchorComponent, 10>();
 
      // Create Entities
      actorManager.CreateActorFromFile("../data/xml/player.xml", &textureManager, &modelManager);
      actorManager.CreateActorFromFile("../data/xml/test-level.xml", &textureManager, &modelManager);
-
      SlotmapKey<Actor> enemy[3] =
      {
           actorManager.CreateActorFromFile("../data/xml/enemy.xml", &textureManager, &modelManager),
@@ -58,52 +61,64 @@ void Game::Init()
      transforms[1]->position.x = 3.0f;
      transforms[2]->position.x = 6.0f;
 
+     CameraComponent::Initialize();
+     RenderComponent::Initialize();
+     PhysicsComponent::Initialize();
+
+     actorManager.InitComponents<CameraComponent>();
+     actorManager.InitComponents<RenderComponent>();
+     actorManager.InitComponents<PhysicsComponent>();
+
      // Initialize gameplay systems
      playerController.Init();
-     physicsSystem.Init();
-     cameraSystem.Init();
-     renderSystem.Init();
      weaponSystem.Init();
      enemySystem.Init();
 
      // Register system to be notify
      NotificationManager::Get()->RegisterListener(&weaponSystem, NOTIFICATION_SHOOT);
      NotificationManager::Get()->RegisterListener(&enemySystem, NOTIFICATION_PLAYER_MOVE);
-     NotificationManager::Get()->RegisterListener(&cameraSystem, NOTIFICATION_ON_RESIZE);
 
-          
-     // TODO: GraphicsManager::Get()->DebugInit();
+     GraphicsManager::Get()->DebugInit();
      printf("Game Init!\n");
 }
 
 void Game::Update(f32 dt)
 {    
      playerController.Update(&actorManager, dt);
-     cameraSystem.Update(&actorManager, dt);
+     actorManager.UpdateComponents<CameraComponent>(dt);
      weaponSystem.Update(&actorManager, dt);
      enemySystem.Update(&actorManager, dt);
+     actorManager.UpdateComponents<PhysicsComponent>(dt);
 
-     // TODO: Create a FixedUpdate
-     physicsSystem.Update(&actorManager, dt);
+     playerController.LateUpdate(&actorManager, dt);
 }
 
 void Game::Render()
-{    
-     GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
-     renderSystem.Render(&actorManager, 0.0f);
+{
+     actorManager.RenderComponents<RenderComponent>(&shaderManager);
+     GraphicsManager::Get()->DebugPresent();
      GraphicsManager::Get()->EndFrame(1);
+
+     GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
 }
 
 void Game::Terminate()
 {
-     // TODO: GraphicsManager::Get()->DebugTerminate();
+     GraphicsManager::Get()->DebugTerminate();
+
+     actorManager.TerminateComponents<CameraComponent>();
+     actorManager.TerminateComponents<RenderComponent>();
+     actorManager.TerminateComponents<PhysicsComponent>();
+
 
      playerController.Terminate();
      enemySystem.Terminate();
-     physicsSystem.Terminate();
-     cameraSystem.Terminate();
-     renderSystem.Terminate();
+
      weaponSystem.Terminate();
+
+     CameraComponent::Terminate();
+     RenderComponent::Terminate();
+     PhysicsComponent::Terminate();
      
      actorManager.Terminate();
      textureManager.Terminate();

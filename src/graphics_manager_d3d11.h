@@ -1,6 +1,8 @@
 #include <d3d11_1.h>
 #include <d3dcompiler.h>
 
+#include "debug_renderer_d3d11.h"
+
 struct VertexBufferD3D11 : public VertexBuffer
 {
      ID3D11Buffer *buffer;
@@ -95,11 +97,10 @@ private:
      ObjectAllocator<ShaderD3D11> shaderAllocator;
      ObjectAllocator<TextureD3D11> textureAllocator;
 
-/*
 #if ANT_DEBUG
-     DebugRenderer debugRenderer;
+     DebugRendererD3D11 debugRenderer;
 #endif
-*/   
+   
 public:
      void Initialize(void *osWindow, i32 width, i32 height, i32 stackNum) override;
      void Shutdown() override;
@@ -139,14 +140,13 @@ public:
      void TextureBind(Texture *texture, i32 slot) override;
      i32 TextureWidth(Texture *texture) override;
      i32 TextureHeight(Texture *texture) override;
-/*
+
      void DebugInit() override;
      void DebugTerminate() override;
      void DebugPresent() override;
      void DebugDrawLine(vec3& a, vec3& b) override;
      void DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlice) override;
      void DebugDrawCube(vec3& c, vec3& hExtend) override;
-*/
 
 private:
      void CreateDeviceAndSwapChain();
