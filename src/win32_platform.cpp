@@ -31,6 +31,13 @@ struct File
      u64 size;
 };
 
+void *PlatformGetOsWindow();
+void PlaformGetWindowPos(i32 *x, i32 *y);
+void PlaformSetCursorPos(i32 x, i32 y);
+void PlatformShowMouse(bool show);
+void PlatformClientDimensions(i32 *width, i32 *height);
+File PlatformReadFile(const char *filepath, i32 stackNum);
+
 // engine
 #include "common.h"
 #include "memory.h"
@@ -47,17 +54,7 @@ struct File
 #include "actor.h"
 #include "components/component.h"
 
-#include "systems.h"
-#include "player_controller.h"
-#include "enemy_system.h"
 #include "game.h"
-
-void *PlatformGetOsWindow();
-void PlaformGetWindowPos(i32 *x, i32 *y);
-void PlaformSetCursorPos(i32 x, i32 y);
-void PlatformShowMouse(bool show);
-void PlatformClientDimensions(i32 *width, i32 *height);
-File PlatformReadFile(const char *filepath, i32 stackNum);
 
 // unity build
 #include "memory.cpp"
@@ -72,13 +69,6 @@ File PlatformReadFile(const char *filepath, i32 stackNum);
 #include "collision.cpp"
 
 #include "actor.cpp"
-
-#include "player_controller.cpp"
-#include "enemy_system.cpp"
-//#include "camera_system.cpp"
-//#include "render_system.cpp"
-#include "weapon_system.cpp"
-
 #include "game.cpp"
 
 static bool running;

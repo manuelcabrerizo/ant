@@ -23,6 +23,6 @@ public:
 
      // Component logic interface, this are call form the ActorManager automaticaly
      void OnInit(ActorManager *actorManager);
-     void OnTerminate(ActorManager *actorManager);
+     void OnTerminate(ActorManager *actorManager) override;
      void OnRender(ShaderManager *shaderManager, ActorManager *actorManager);
 };

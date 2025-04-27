@@ -1,6 +1,14 @@
 #pragma once
 
-struct WeaponComponent : public Component<WeaponComponent>
+class WeaponComponent : public Component<WeaponComponent>, INotificable
 {
+private:
+    TransformComponent *transform;
+public:
     SlotmapKey<Actor> weapon;
+
+    void OnInit(ActorManager *actorManager);
+    void OnTerminate(ActorManager *actorManager) override;
+    void OnUpdate(ActorManager *actorManager, f32 dt);
+    void OnNotify(NotificationType type, void *data, size_t size, void *sender) override;
 };

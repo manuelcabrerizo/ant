@@ -6,11 +6,7 @@ private:
      TextureManager textureManager;
      ModelManager modelManager;
      ShaderManager shaderManager;
-     ActorManager actorManager;
-
-     PlayerController playerController;
-     WeaponSystem weaponSystem;
-     EnemySystem enemySystem;    
+     ActorManager actorManager; 
 public:     
      void Init();
      void Terminate();

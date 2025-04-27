@@ -1,5 +1,7 @@
 #pragma once
 
+class ActorManager;
+
 struct Actor
 {
      HashMap<SlotmapKeyBase> componentsMap;
@@ -8,14 +10,14 @@ struct Actor
 
 struct ComponentStorageBase
 {
-     virtual void RemoveComponent(SlotmapKeyBase keyBase) = 0;
+     virtual void RemoveComponent(ActorManager *actorManager, SlotmapKeyBase keyBase) = 0;
 };
 
 template <typename ComponentType>
 struct ComponentStorage : ComponentStorageBase
 {
      Slotmap<ComponentType> components;
-     void RemoveComponent(SlotmapKeyBase keyBase) override;
+     void RemoveComponent(ActorManager *actorManager, SlotmapKeyBase keyBase) override;
 };
 
 class ActorManager
@@ -48,17 +50,10 @@ public:
      template <typename ComponentType>
      void RemoveComponent(SlotmapKey<Actor> actorKey);
      void RemoveComponentById(SlotmapKey<Actor> actorKey, i32 id);
+     void RemoveComponentById(Actor *actor, i32 id);
      
      template <typename ComponentType>
      ComponentType *GetComponent(SlotmapKey<Actor> actorKey);
-
-     // TODO: test for implementing the game logic in the component
-     // trying to make a unity like framework
-     template<typename ComponentType>
-     void InitComponents();
-
-     template<typename ComponentType>
-     void TerminateComponents();
 
      template<typename ComponentType>
      void UpdateComponents(f32 dt);

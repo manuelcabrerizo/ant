@@ -1,6 +1,5 @@
 // TODO:
-// - Try to implement the gameplay login on the component itself
-// - Get the components array on the init of the systems
+// - the ability to remove class from notification useing a slotmap
 // - More colliders and Raycast test
 // - Basic steering behaviors
 // - Implement a small demo with a full loop
@@ -65,32 +64,21 @@ void Game::Init()
      RenderComponent::Initialize();
      PhysicsComponent::Initialize();
 
-     actorManager.InitComponents<CameraComponent>();
-     actorManager.InitComponents<RenderComponent>();
-     actorManager.InitComponents<PhysicsComponent>();
-
-     // Initialize gameplay systems
-     playerController.Init();
-     weaponSystem.Init();
-     enemySystem.Init();
-
-     // Register system to be notify
-     NotificationManager::Get()->RegisterListener(&weaponSystem, NOTIFICATION_SHOOT);
-     NotificationManager::Get()->RegisterListener(&enemySystem, NOTIFICATION_PLAYER_MOVE);
-
      GraphicsManager::Get()->DebugInit();
      printf("Game Init!\n");
 }
 
 void Game::Update(f32 dt)
 {    
-     playerController.Update(&actorManager, dt);
+     // Update
+     actorManager.UpdateComponents<PlayerControllerComponent>(dt);
      actorManager.UpdateComponents<CameraComponent>(dt);
-     weaponSystem.Update(&actorManager, dt);
-     enemySystem.Update(&actorManager, dt);
+     actorManager.UpdateComponents<WeaponComponent>(dt);
+     actorManager.UpdateComponents<EnemyComponent>(dt);
      actorManager.UpdateComponents<PhysicsComponent>(dt);
 
-     playerController.LateUpdate(&actorManager, dt);
+     // Late Update
+     actorManager.LateUpdateComponents<PlayerControllerComponent>(dt);
 }
 
 void Game::Render()
@@ -105,16 +93,6 @@ void Game::Render()
 void Game::Terminate()
 {
      GraphicsManager::Get()->DebugTerminate();
-
-     actorManager.TerminateComponents<CameraComponent>();
-     actorManager.TerminateComponents<RenderComponent>();
-     actorManager.TerminateComponents<PhysicsComponent>();
-
-
-     playerController.Terminate();
-     enemySystem.Terminate();
-
-     weaponSystem.Terminate();
 
      CameraComponent::Terminate();
      RenderComponent::Terminate();

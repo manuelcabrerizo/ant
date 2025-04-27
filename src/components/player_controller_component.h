@@ -1,10 +1,29 @@
 #pragma once
 
-struct PlayerControllerComponent : public Component<PlayerControllerComponent>
+class PlayerControllerComponent : public Component<PlayerControllerComponent>
 {
+private:
     f32 yaw = 0;
     f32 pitch = 0;
-    SlotmapKey<Actor> weapons[2];
+    float speed;
+    bool showMouse;
+
     i32 weaponCount = 0;
     bool usingFirstWeapon = true;
+
+    TransformComponent *transform;
+    CameraComponent *camera;
+    PhysicsComponent *physics;
+    WeaponComponent *weapon;
+
+    void ProcessMouseMovement();
+    void ProcessKeyboardMovement();
+    void ChangeWeapon(ActorManager *actorManager);
+public:
+    SlotmapKey<Actor> weapons[2];
+
+    void OnInit(ActorManager *actorManager);
+    void OnTerminate(ActorManager *actorManager) override;
+    void OnUpdate(ActorManager *actorManager, f32 dt);
+    void OnLateUpdate(ActorManager *actorManager, f32 dt);
 };

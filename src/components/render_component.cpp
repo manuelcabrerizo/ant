@@ -20,7 +20,6 @@ void RenderComponent::OnInit(ActorManager *actorManager)
 
 void RenderComponent::OnTerminate(ActorManager *actorManager)
 {
-
 }
 
 void RenderComponent::OnRender(ShaderManager *shaderManager, ActorManager *actorManager)

@@ -22,6 +22,6 @@ public:
     static void Terminate();
 
     void OnInit(ActorManager *actorManager);
-    void OnTerminate(ActorManager *actorManager);
+    void OnTerminate(ActorManager *actorManager) override;
     void OnUpdate(ActorManager *actorManager, f32 dt);
 };

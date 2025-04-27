@@ -3,8 +3,14 @@
 struct ComponentBase
 {
     static i32 counter;
-    bool enable = true;
+
     SlotmapKey<Actor> owner;
+    bool initialized = false;
+    bool enable = true;
+
+    virtual ~ComponentBase() {}
+    virtual void OnInit(ActorManager *actorManager) {}
+    virtual void OnTerminate(ActorManager *actorManager) {}
 };
 
 template <typename>

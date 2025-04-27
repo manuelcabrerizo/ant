@@ -1,9 +1,11 @@
 i32 ComponentBase::counter = 0;
 
 template <typename ComponentType>
-void ComponentStorage<ComponentType>::RemoveComponent(SlotmapKeyBase keyBase)
+void ComponentStorage<ComponentType>::RemoveComponent(ActorManager *actorManager, SlotmapKeyBase keyBase)
 {
      SlotmapKey<ComponentType> key = FromKeyBase<ComponentType>(keyBase);
+     ComponentType *component = components.Get(key);
+     component->OnTerminate(actorManager);
      components.Remove(key);
 }
 
@@ -19,6 +21,16 @@ void ActorManager::Init(i32 actorCount, i32 componentCount_, i32 memoryType_)
 
 void ActorManager::Terminate()
 {
+     
+     Array<Actor> *actorsArray = actors.GetArray();
+     for(i32 i = 0; i < actorsArray->size; ++i)
+     {
+          Actor *actor = &(*actorsArray)[i];
+          for(i32 j = actor->componentsIds.size - 1; j >= 0; --j)
+          {
+               RemoveComponentById(actor, actor->componentsIds[j]);  
+          }
+     }
      actors.Clear();
 }
 
@@ -84,6 +96,9 @@ void ActorManager::AddComponent(SlotmapKey<Actor> actorKey, ComponentType compon
 template <typename ComponentType>
 void ActorManager::RemoveComponent(SlotmapKey<Actor> actorKey)
 {
+     ComponentType *component = GetComponent<ComponentType>(actorKey);
+     component->OnTerminate(this);
+
      ComponentStorage<ComponentType>* compoentStorage = 
           (ComponentStorage<ComponentType> *)(*componentStorageMap.Get(ComponentType::GetID()));
 
@@ -115,7 +130,30 @@ void ActorManager::RemoveComponentById(SlotmapKey<Actor> actorKey, i32 id)
      Actor *actor = GetActor(actorKey);
      SlotmapKeyBase keyBase = *actor->componentsMap.Get(id);
      ASSERT(keyBase.gen != INVALID_KEY);
-     compoentStorage->RemoveComponent(keyBase);
+     compoentStorage->RemoveComponent(this, keyBase);
+     actor->componentsMap.Remove(id);
+     i32 foundIndex = -1;
+     for(i32 i = 0; i < actor->componentsIds.size; ++i)
+     {
+          if(actor->componentsIds[i] == id)
+          {
+               foundIndex = i;
+          }
+     }
+     if(foundIndex >= 0)
+     {
+          actor->componentsIds[foundIndex] = actor->componentsIds[actor->componentsIds.size - 1];
+          actor->componentsIds[actor->componentsIds.size - 1] = 0;
+          actor->componentsIds.size--;
+     }
+}
+
+void ActorManager::RemoveComponentById(Actor *actor, i32 id)
+{
+     ComponentStorageBase* compoentStorage = *componentStorageMap.Get(id);
+     SlotmapKeyBase keyBase = *actor->componentsMap.Get(id);
+     ASSERT(keyBase.gen != INVALID_KEY);
+     compoentStorage->RemoveComponent(this, keyBase);
      actor->componentsMap.Remove(id);
      i32 foundIndex = -1;
      for(i32 i = 0; i < actor->componentsIds.size; ++i)
@@ -324,33 +362,18 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
     return actor;
 }
 
-// TODO: test
-template<typename ComponentType>
-void ActorManager::InitComponents()
-{
-     Array<ComponentType>& components = GetComponents<ComponentType>();
-     for(u32 i = 0; i < components.size; ++i)
-     {
-          components[i].OnInit(this);
-     }
-}
-
-template<typename ComponentType>
-void ActorManager::TerminateComponents()
-{
-     Array<ComponentType>& components = GetComponents<ComponentType>();
-     for(u32 i = 0; i < components.size; ++i)
-     {
-          components[i].OnTerminate(this);
-     }
-}
-
 template<typename ComponentType>
 void ActorManager::UpdateComponents(f32 dt)
 {
      Array<ComponentType>& components = GetComponents<ComponentType>();
      for(u32 i = 0; i < components.size; ++i)
      {
+          if(!components[i].initialized)
+          {
+               components[i].OnInit(this);
+               components[i].initialized = true;
+          }
+
           if(components[i].enable)
           {
                components[i].OnUpdate(this, dt);
@@ -364,6 +387,12 @@ void ActorManager::LateUpdateComponents(f32 dt)
      Array<ComponentType>& components = GetComponents<ComponentType>();
      for(u32 i = 0; i < components.size; ++i)
      {
+          if(!components[i].initialized)
+          {
+               components[i].OnInit(this);
+               components[i].initialized = true;
+          }
+
           if(components[i].enable)
           {
                components[i].OnLateUpdate(this, dt);
@@ -371,13 +400,18 @@ void ActorManager::LateUpdateComponents(f32 dt)
      }
 }
 
-
 template<typename ComponentType>
 void ActorManager::RenderComponents(ShaderManager *shaderManager)
 {
      Array<ComponentType>& components = GetComponents<ComponentType>();
      for(u32 i = 0; i < components.size; ++i)
      {
+          if(!components[i].initialized)
+          {
+               components[i].OnInit(this);
+               components[i].initialized = true;
+          }
+
           if(components[i].enable)
           {
                components[i].OnRender(shaderManager, this);

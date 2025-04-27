@@ -28,7 +28,7 @@ public:
 
      // Component logic interface, this are call form the ActorManager automaticaly
      void OnInit(ActorManager *actorManager);
-     void OnTerminate(ActorManager *actorManager);
+     void OnTerminate(ActorManager *actorManager) override;
      void OnUpdate(ActorManager *actorManager, f32 dt);
      void OnNotify(NotificationType type, void *data, size_t size, void *sender) override;
 
