@@ -25,7 +25,7 @@ struct NotificationRegistry
 {
      // TODO: see if its no to hard to use slotmaps here
      // so we can remover listeners if we want
-     Array<INotificable *> listeners;
+     Slotmap<INotificable *> listeners;
 };
 
 class NotificationManager
@@ -41,7 +41,7 @@ public:
      static void Terminate();
      static NotificationManager *Get();
 
-     void RegisterListener(INotificable *listener, NotificationType type);
-     
+     SlotmapKey<INotificable *> AddListener(INotificable *listener, NotificationType type);
+     void RemoveListener(SlotmapKey<INotificable *> listenerKey, NotificationType type);
      void SendNotification(NotificationType type, void *data, size_t size, void *sender);
 };

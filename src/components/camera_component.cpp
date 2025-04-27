@@ -16,12 +16,13 @@ void CameraComponent::Terminate()
 
 void CameraComponent::OnInit(ActorManager *actorManager)
 {
-     NotificationManager::Get()->RegisterListener(this, NOTIFICATION_ON_RESIZE);
+     resizeNotification = NotificationManager::Get()->AddListener(this, NOTIFICATION_ON_RESIZE);
      transform = actorManager->GetComponent<TransformComponent>(owner);
 }
 
 void CameraComponent::OnTerminate(ActorManager *actorManager)
 {
+     NotificationManager::Get()->RemoveListener(resizeNotification, NOTIFICATION_ON_RESIZE);
 }
 
 void CameraComponent::OnUpdate(ActorManager *actorManager, f32 dt)

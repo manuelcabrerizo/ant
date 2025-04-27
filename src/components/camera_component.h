@@ -14,6 +14,7 @@ private:
      static CameraUbo ubo;
 
      TransformComponent *transform;
+     SlotmapKey<INotificable *> resizeNotification;
 
      vec3 position;
      vec3 front;

@@ -94,6 +94,7 @@ Type *Slotmap<Type>::Get(SlotmapKey<Type> key)
 template <typename Type>
 void Slotmap<Type>::Remove(SlotmapKey<Type> key)
 {
+     ASSERT(key.gen != INVALID_KEY);
      ASSERT(key.id < indices.capacity);
      SlotmapKey<Type> *removeKey =  &indices.data[key.id];
      if(removeKey->gen != key.gen)

@@ -1,6 +1,7 @@
 #pragma once
 
 class ActorManager;
+struct ComponentBase;
 
 struct Actor
 {
@@ -26,15 +27,19 @@ private:
      i32 memoryType = STATIC_MEMORY;
      i32 componentCount = 0;
      i32 maxActorCount = 0;
+     i32 maxComponentCount = 0;
 
      Slotmap<Actor> actors;
-     HashMap<ComponentStorageBase *> componentStorageMap;     
+     HashMap<ComponentStorageBase *> componentStorageMap;
+     Array<ComponentBase *> componentsToInit;
 public:
      void Init(i32 actorCount, i32 componentCount, i32 memoryType);
      void Terminate();
 
      template <typename ComponentType, i32 Count>
      void AddComponentType();
+
+     void AllocInternalMemory();
 
      template <typename ComponentType>
      Array<ComponentType>& GetComponents();
@@ -54,6 +59,8 @@ public:
      
      template <typename ComponentType>
      ComponentType *GetComponent(SlotmapKey<Actor> actorKey);
+
+     void InitializeNewComponents();
 
      template<typename ComponentType>
      void UpdateComponents(f32 dt);

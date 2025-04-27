@@ -38,16 +38,21 @@ NotificationManager *NotificationManager::Get()
      return &instance;
 }
 
-void NotificationManager::RegisterListener(INotificable *listener, NotificationType type)
+SlotmapKey<INotificable *> NotificationManager::AddListener(INotificable *listener, NotificationType type)
 {
-     registries[type].listeners.Push(listener);
+     return registries[type].listeners.Add(listener);
+}
+
+void NotificationManager::RemoveListener(SlotmapKey<INotificable *> listenerKey, NotificationType type)
+{
+     return registries[type].listeners.Remove(listenerKey);
 }
      
 void NotificationManager::SendNotification(NotificationType type, void *data, size_t size, void *sender)
 {
-     Array<INotificable *>& listeners = registries[type].listeners;
-     for(i32 i = 0; i < listeners.size; ++i)
+     Array<INotificable *> *listeners = registries[type].listeners.GetArray();;
+     for(i32 i = 0; i < listeners->size; ++i)
      {
-          listeners[i]->OnNotify(type, data, size, sender);
+          (*listeners)[i]->OnNotify(type, data, size, sender);
      }
 }

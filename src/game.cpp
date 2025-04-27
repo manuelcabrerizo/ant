@@ -1,5 +1,4 @@
 // TODO:
-// - the ability to remove class from notification useing a slotmap
 // - More colliders and Raycast test
 // - Basic steering behaviors
 // - Implement a small demo with a full loop
@@ -40,6 +39,7 @@ void Game::Init()
      actorManager.AddComponentType<CameraComponent, 1>();
      actorManager.AddComponentType<EnemyComponent, 10>();
      actorManager.AddComponentType<AnchorComponent, 10>();
+     actorManager.AllocInternalMemory();
 
      // Create Entities
      actorManager.CreateActorFromFile("../data/xml/player.xml", &textureManager, &modelManager);
@@ -70,13 +70,14 @@ void Game::Init()
 
 void Game::Update(f32 dt)
 {    
+     // Initialize new components
+     actorManager.InitializeNewComponents();
      // Update
      actorManager.UpdateComponents<PlayerControllerComponent>(dt);
      actorManager.UpdateComponents<CameraComponent>(dt);
      actorManager.UpdateComponents<WeaponComponent>(dt);
      actorManager.UpdateComponents<EnemyComponent>(dt);
      actorManager.UpdateComponents<PhysicsComponent>(dt);
-
      // Late Update
      actorManager.LateUpdateComponents<PlayerControllerComponent>(dt);
 }

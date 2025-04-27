@@ -4,6 +4,7 @@ class EnemyComponent : public Component<EnemyComponent>, INotificable
 {
 private:
     TransformComponent *transform;
+    SlotmapKey<INotificable *> playerMoveNotification;
     vec3 playerPosition;
 public:
     void OnInit(ActorManager *actorManager);

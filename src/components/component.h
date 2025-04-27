@@ -5,7 +5,6 @@ struct ComponentBase
     static i32 counter;
 
     SlotmapKey<Actor> owner;
-    bool initialized = false;
     bool enable = true;
 
     virtual ~ComponentBase() {}

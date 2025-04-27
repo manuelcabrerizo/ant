@@ -3,12 +3,12 @@ void EnemyComponent::OnInit(ActorManager *actorManager)
     transform = actorManager->GetComponent<TransformComponent>(owner);
     playerPosition = vec3(0.0f);
 
-    NotificationManager::Get()->RegisterListener(this, NOTIFICATION_PLAYER_MOVE);
+    playerMoveNotification = NotificationManager::Get()->AddListener(this, NOTIFICATION_PLAYER_MOVE);
 }
 
 void EnemyComponent::OnTerminate(ActorManager *actorManager)
 {
-
+    NotificationManager::Get()->RemoveListener(playerMoveNotification, NOTIFICATION_PLAYER_MOVE);
 }
 
 void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)

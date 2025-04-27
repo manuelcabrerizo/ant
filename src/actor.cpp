@@ -41,6 +41,12 @@ void ActorManager::AddComponentType()
      ComponentStorage<ComponentType> *componentStorage = new (buffer) ComponentStorage<ComponentType>();
      componentStorage->components.Init(Count, memoryType);
      componentStorageMap.Add(ComponentType::GetID(), (ComponentStorageBase *)componentStorage);
+     maxComponentCount += Count;
+}
+
+void ActorManager::AllocInternalMemory()
+{
+     componentsToInit.Init(maxComponentCount, STATIC_MEMORY);
 }
 
 template <typename ComponentType>
@@ -91,6 +97,9 @@ void ActorManager::AddComponent(SlotmapKey<Actor> actorKey, ComponentType compon
      SlotmapKeyBase keyBase = FromKey<ComponentType>(key);
      actor->componentsMap.Add(ComponentType::GetID(), keyBase);
      actor->componentsIds.Push(ComponentType::GetID());
+
+     ComponentBase *componentBase = (ComponentBase *)GetComponent<ComponentType>(actorKey);
+     componentsToInit.Push(componentBase);
 } 
 
 template <typename ComponentType>
@@ -362,18 +371,21 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
     return actor;
 }
 
+void ActorManager::InitializeNewComponents()
+{
+     for(i32 i = 0; i < componentsToInit.size; ++i)
+     {
+          componentsToInit[i]->OnInit(this);
+     }
+     componentsToInit.Clear();
+}
+
 template<typename ComponentType>
 void ActorManager::UpdateComponents(f32 dt)
 {
      Array<ComponentType>& components = GetComponents<ComponentType>();
      for(u32 i = 0; i < components.size; ++i)
      {
-          if(!components[i].initialized)
-          {
-               components[i].OnInit(this);
-               components[i].initialized = true;
-          }
-
           if(components[i].enable)
           {
                components[i].OnUpdate(this, dt);
@@ -387,12 +399,6 @@ void ActorManager::LateUpdateComponents(f32 dt)
      Array<ComponentType>& components = GetComponents<ComponentType>();
      for(u32 i = 0; i < components.size; ++i)
      {
-          if(!components[i].initialized)
-          {
-               components[i].OnInit(this);
-               components[i].initialized = true;
-          }
-
           if(components[i].enable)
           {
                components[i].OnLateUpdate(this, dt);
@@ -406,12 +412,6 @@ void ActorManager::RenderComponents(ShaderManager *shaderManager)
      Array<ComponentType>& components = GetComponents<ComponentType>();
      for(u32 i = 0; i < components.size; ++i)
      {
-          if(!components[i].initialized)
-          {
-               components[i].OnInit(this);
-               components[i].initialized = true;
-          }
-
           if(components[i].enable)
           {
                components[i].OnRender(shaderManager, this);
