@@ -335,7 +335,7 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
                physics.acceleration = acceleration;
                physics.velocity = velocity;
                physics.forceAccumulator = vec3(0.0f);
-               physics.lastFrameAcceleration = vec3(0.0f);
+               //physics.lastFrameAcceleration = vec3(0.0f);
                physics.offset = offset;
                AddComponent(actor, physics);
          }
@@ -376,6 +376,7 @@ void ActorManager::InitializeNewComponents()
      for(i32 i = 0; i < componentsToInit.size; ++i)
      {
           componentsToInit[i]->OnInit(this);
+          componentsToInit[i]->initialized = true;
      }
      componentsToInit.Clear();
 }
@@ -386,7 +387,7 @@ void ActorManager::UpdateComponents(f32 dt)
      Array<ComponentType>& components = GetComponents<ComponentType>();
      for(u32 i = 0; i < components.size; ++i)
      {
-          if(components[i].enable)
+          if(components[i].initialized && components[i].enable)
           {
                components[i].OnUpdate(this, dt);
           }
@@ -399,7 +400,7 @@ void ActorManager::LateUpdateComponents(f32 dt)
      Array<ComponentType>& components = GetComponents<ComponentType>();
      for(u32 i = 0; i < components.size; ++i)
      {
-          if(components[i].enable)
+          if(components[i].initialized && components[i].enable)
           {
                components[i].OnLateUpdate(this, dt);
           }
@@ -412,7 +413,7 @@ void ActorManager::RenderComponents(ShaderManager *shaderManager)
      Array<ComponentType>& components = GetComponents<ComponentType>();
      for(u32 i = 0; i < components.size; ++i)
      {
-          if(components[i].enable)
+          if(components[i].initialized && components[i].enable)
           {
                components[i].OnRender(shaderManager, this);
           }

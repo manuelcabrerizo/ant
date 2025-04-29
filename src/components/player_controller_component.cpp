@@ -10,7 +10,6 @@ void PlayerControllerComponent::OnInit(ActorManager *actorManager)
     weapon = actorManager->GetComponent<WeaponComponent>(owner);
 }
 
-
 void PlayerControllerComponent::OnTerminate(ActorManager *actorManager)
 {
     showMouse = true;
@@ -66,7 +65,7 @@ void PlayerControllerComponent::ProcessMouseMovement()
          // TODO: this can be optimice by not using the generic angle axis rotation function
          transform->direction = rotate(mat4(1.0f), pitch, vec3(1, 0, 0)) * vec4(dir, 0.0f);
          transform->direction = rotate(mat4(1.0f), yaw, vec3(0, 1, 0)) * vec4(transform->direction, 0.0f);
-         
+         transform->direction = normalize(transform->direction);
          i32 windowX, windowY, windowW, windowH;
          PlaformGetWindowPos(&windowX, &windowY);
          PlatformClientDimensions(&windowW, &windowH);

@@ -6,6 +6,7 @@ struct ComponentBase
 
     SlotmapKey<Actor> owner;
     bool enable = true;
+    bool initialized = false;
 
     virtual ~ComponentBase() {}
     virtual void OnInit(ActorManager *actorManager) {}

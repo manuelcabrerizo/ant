@@ -31,7 +31,7 @@ void PhysicsComponent::ProcessPhysics(float dt)
     // Add the force of gravity
     forceAccumulator += vec3(0.0f, -9.8f*3.0f, 0.0f);
     // Equations of motion
-    lastFrameAcceleration = acceleration;
+    vec3 lastFrameAcceleration = acceleration;
     lastFrameAcceleration += forceAccumulator;
     velocity += lastFrameAcceleration * dt;
     velocity *= powf(0.01f, dt);

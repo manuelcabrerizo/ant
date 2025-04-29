@@ -38,6 +38,8 @@ void PlatformShowMouse(bool show);
 void PlatformClientDimensions(i32 *width, i32 *height);
 File PlatformReadFile(const char *filepath, i32 stackNum);
 
+// TODO: try to make the unity build work with vc code c++ extension
+//       by moving the header file to their corresponding cpp files
 // engine
 #include "common.h"
 #include "memory.h"
@@ -50,6 +52,7 @@ File PlatformReadFile(const char *filepath, i32 stackNum);
 #include "model.h"
 #include "asset_manager.h"
 #include "collision.h"
+
 
 #include "actor.h"
 #include "components/component.h"
@@ -67,6 +70,9 @@ File PlatformReadFile(const char *filepath, i32 stackNum);
 #include "model.cpp"
 #include "asset_manager.cpp"
 #include "collision.cpp"
+#include "artificial_intelligence/kinematic_behaviors.cpp"
+#include "artificial_intelligence/steering_behaviors.cpp"
+
 
 #include "actor.cpp"
 #include "game.cpp"
