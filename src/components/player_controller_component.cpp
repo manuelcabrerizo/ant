@@ -25,6 +25,11 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 
 void PlayerControllerComponent::OnLateUpdate(ActorManager *actorManager, f32 dt)
 {
+     void *data[2];
+     data[0] = transform;
+     data[1] = physics;
+     NotificationManager::Get()->SendNotification(NOTIFICATION_PLAYER_MOVE, (void *)data, sizeof(void *)*2, (void *)this);
+
     if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
     {
          const char *message = "te dispare gato\n";
@@ -108,12 +113,6 @@ void PlayerControllerComponent::ProcessKeyboardMovement()
     }
 
     vec3 movement = (moveDirection * speed);
-
-    if(dot(movement, movement) > 0.0f)
-    {
-         NotificationManager::Get()->SendNotification(NOTIFICATION_PLAYER_MOVE, (void *)&transform->position, sizeof(transform->position), (void *)this);
-    }
-
     physics->acceleration = movement;
 }
 

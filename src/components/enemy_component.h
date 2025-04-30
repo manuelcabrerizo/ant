@@ -1,6 +1,8 @@
 #pragma once
 
 #include "artificial_intelligence/kinematic_behaviors.h"
+#include "artificial_intelligence/steering_behaviors.h"
+
 
 class EnemyComponent : public Component<EnemyComponent>, INotificable
 {
@@ -10,7 +12,9 @@ private:
 
     Kinematic character;
     Kinematic target;
-    KinematicWander movement;
+    //SteeringPursue movement;
+    //SteeringLookWhereYoureGoing turn;
+    SteeringWander wander;
 
     SlotmapKey<INotificable *> playerMoveNotification;
 public:

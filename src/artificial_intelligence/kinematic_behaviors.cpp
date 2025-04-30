@@ -15,14 +15,25 @@ f32 RandomBinomial()
     return RandomFloat() - RandomFloat();
 }
 
+void AdjustAngle(f32& angle)
+{
+    f32 PI = pi<f32>();
+    while(angle >  (f32)PI) angle -= (f32)(2*PI);
+    while(angle < -(f32)PI) angle += (f32)(2*PI);
+}
+
 f32 Kinematic::GetNewOrientation(f32 currentOrientation, vec3 velocity)
 {
+    f32 PI = pi<f32>();
+    velocity.y = 0.0f;
     if(length(velocity) > 0.0f)
     {
-        velocity.y = 0.0f;
         velocity = normalize(velocity);
-        f32 angle = atan2(velocity.z, velocity.x) + pi<float>()*0.5f;
-        if(angle < 0) angle += (2.0f*pi<float>());
+        f32 angle = atan2(-velocity.x, velocity.z);
+        if(angle < 0.0f)
+        {
+            angle += 2*PI;
+        }
         return angle;
     }
     else
@@ -174,6 +185,7 @@ KinematicSteeringOutput KinematicWander::GetSteering()
     ASSERT(character != nullptr);
     KinematicSteeringOutput steering;
     steering.velocity = maxSpeed * normalize(vec3(-sinf(character->orientation), 0.0f, cosf(character->orientation)));
+    steering.velocity.y = 0.0f;
     steering.rotation = RandomBinomial() * maxRotation;
     return steering;
 }
