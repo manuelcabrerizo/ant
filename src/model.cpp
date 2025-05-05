@@ -1,3 +1,4 @@
+// TODO: fix gImporter architecture
 static Assimp::Importer gImporter;
 
 void Model::Init(const char *filepath)
@@ -22,14 +23,42 @@ void Model::Init(const char *filepath)
      for(i32 k = 0; k < scene->mNumMeshes; k++)
      {
           aiMesh *mesh = scene->mMeshes[k];
+
           for(i32 i = 0; i < mesh->mNumVertices; i++)
           {
                Vertex *vertex = vertices + verticesCount++;
                vertex->pos = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z*-1.0f };
                vertex->nor = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z*-1.0f };
                vertex->uvs = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+
+               for(u32 j = 0; j < MAX_BONE_INFLUENCE; j++)
+               {
+                    vertex->boneId[j] = -1;
+                    vertex->weights[j] = 0.0f;
+               }
           }
-     
+
+          for(i32 boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) 
+          {
+               auto weights = mesh->mBones[boneIndex]->mWeights;
+               i32 weightsCount = mesh->mBones[boneIndex]->mNumWeights;
+               for(i32 weightIndex = 0; weightIndex < weightsCount; ++weightIndex)
+               {
+                    i32 vertexId = weights[weightIndex].mVertexId;
+                    f32 weight = weights[weightIndex].mWeight;
+                    ASSERT(vertexId < mesh->mNumVertices);
+                    for(i32 i = 0; i < 4; ++i) 
+                    {
+                         if(vertices[vertexId].boneId[i] < 0)
+                         {
+                              vertices[vertexId].weights[i] = weight;
+                              vertices[vertexId].boneId[i] = boneIndex;
+                              break;
+                         }
+                    }
+               }
+          }
+
           for(i32 i = 0; i < mesh->mNumFaces; i++)
           {
                aiFace *face = mesh->mFaces + i;
@@ -69,5 +98,5 @@ void Model::Draw()
 {
      GraphicsManager::Get()->VertexBufferBind(vertexBuffer);
      GraphicsManager::Get()->IndexBufferBind(indexBuffer);
-     GraphicsManager::Get()->Draw(verticesCount);
+     GraphicsManager::Get()->DrawIndexed(indicesCount);
 }

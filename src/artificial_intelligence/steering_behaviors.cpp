@@ -293,7 +293,6 @@ SteeringOutput SteeringLookWhereYoureGoing::GetSteering()
     {
         return {};
     }
-
     target->orientation = Kinematic::GetNewOrientation(target->orientation, character->velocity);
     return SteeringAlign::GetSteering();
 }

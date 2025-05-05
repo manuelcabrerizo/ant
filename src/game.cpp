@@ -12,6 +12,7 @@ void Game::Init()
      // Load the shaders
      shaderManager.Init(4);
      shaderManager.Load("default", "../data/shaders/vert.hlsl", "../data/shaders/frag.hlsl");
+     shaderManager.Load("animation", "../data/shaders/animation_vert.hlsl", "../data/shaders/frag.hlsl");
      shaderManager.Bind("default");
      
      // Load the models
@@ -60,6 +61,16 @@ void Game::Init()
      transforms[1]->position.x = 3.0f;
      transforms[2]->position.x = 6.0f;
 
+     RenderComponent *renders[3] =
+     {
+          actorManager.GetComponent<RenderComponent>(enemy[0]),
+          actorManager.GetComponent<RenderComponent>(enemy[1]),
+          actorManager.GetComponent<RenderComponent>(enemy[2])
+     };
+     renders[0]->isAnimated = true;
+     renders[1]->isAnimated = true;
+     renders[2]->isAnimated = true;
+     
      CameraComponent::Initialize();
      RenderComponent::Initialize();
      PhysicsComponent::Initialize();
@@ -78,6 +89,7 @@ void Game::Update(f32 dt)
      actorManager.UpdateComponents<WeaponComponent>(dt);
      actorManager.UpdateComponents<EnemyComponent>(dt);
      actorManager.UpdateComponents<PhysicsComponent>(dt);
+     actorManager.UpdateComponents<RenderComponent>(dt);
      // Late Update
      actorManager.LateUpdateComponents<PlayerControllerComponent>(dt);
 }

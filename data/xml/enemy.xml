@@ -2,7 +2,7 @@
 <Actor>
     <TransformComponent>
         <position x="0" y="3" z="10"/>
-        <scale x="0.0075" y="0.0075" z="0.0075"/>
+        <scale x="1" y="1" z="1"/>
         <direction x="0" y="0" z="1"/>
     </TransformComponent>
     <RenderComponent>

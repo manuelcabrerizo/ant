@@ -14,6 +14,9 @@
 #define GLM_FORCE_LEFT_HANDED
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/compatibility.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 using namespace glm;
 
 // stb
@@ -72,6 +75,10 @@ File PlatformReadFile(const char *filepath, i32 stackNum);
 #include "collision.cpp"
 #include "artificial_intelligence/kinematic_behaviors.cpp"
 #include "artificial_intelligence/steering_behaviors.cpp"
+
+#include "animation/bone.cpp"
+#include "animation/animation.cpp"
+#include "animation/skeleton.cpp"
 
 
 #include "actor.cpp"

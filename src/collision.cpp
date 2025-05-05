@@ -554,7 +554,7 @@ vec3 Triangle::ClosestPoint(vec3 q)
      return result;
 }
 
-
+// TODO: fix gImporter architecture
 void CollisionWorld::LoadFromFile(const char *filepath)
 {
      const aiScene *scene = gImporter.ReadFile(filepath, 0);
