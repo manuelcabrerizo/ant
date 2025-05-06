@@ -36,7 +36,7 @@ void Skeleton::Node::Init(aiNode *node, aiBone **bones, i32 count, i32 memoryTyp
 
 void Skeleton::Init(const char *filepath, i32 memoryType)
 {
-    const aiScene *scene = gImporter.ReadFile(filepath, 0);
+    const aiScene *scene = gImporter.ReadFile(filepath, aiProcess_MakeLeftHanded);
     ASSERT(scene);
     aiMesh *mesh = scene->mMeshes[0];
     root.Init(scene->mRootNode, mesh->mBones, mesh->mNumBones, memoryType);
@@ -64,7 +64,7 @@ void Skeleton::CalculateBoneTransform(Animation *animation, Node *node, mat4 par
         bone->Update(currentTime[0]);
         nodeTransform = bone->GetLocalTransform();
         globalTransform = parentTransform * nodeTransform;
-        finalBoneMatrices[bone->GetId()] = globalTransform * node->inverseBindPose;
+        finalBoneMatrices[bone->GetId()] = (globalTransform * node->inverseBindPose);
     } else
     {
         globalTransform = parentTransform * nodeTransform;

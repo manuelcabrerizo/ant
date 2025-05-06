@@ -9,12 +9,12 @@ inline mat4 ai_mat4_to_sd_mat4(aiMatrix4x4 m)
                     m.a2, m.b2, m.c2, m.d2, 
                     m.a3, m.b3, m.c3, m.d3, 
                     m.a4, m.b4, m.c4, m.d4);                    
-    return mat * scale(mat4(1.0f), vec3(1.0f, 1.0f, -1.0f));
+    return mat;
 }
 
 inline vec3 ai_vec3_to_sd_vec3(aiVector3D m) 
 {
-    return vec3(m.x, m.y, -m.z);
+    return vec3(m.x, m.y, m.z);
 }
 
 inline quat ai_quat_to_sd_quat(aiQuaternion m) 
@@ -79,8 +79,7 @@ i32 Bone::GetIndex(Array<Key<Type>> &array, f32 animationTime)
             return i;
         }
     }
-    ASSERT(!"Error in the animation system!");
-    return 0;
+    return array.size - 1;
 }
 
 template <>
@@ -113,7 +112,7 @@ quat Bone::Interpolate<quat>(Array<Key<quat>> &array, f32 animationTime)
 void Bone::Update(f32 animationTime)
 {
     mat4 translation = translate(mat4(1.0f), Interpolate<vec3>(positions, animationTime));
-    mat4 rotation = toMat4(Interpolate<quat>(rotations, animationTime)) * scale(mat4(1.0f), vec3(1.0f, 1.0f, -1.0f));
+    mat4 rotation = toMat4(Interpolate<quat>(rotations, animationTime));
     mat4 sca = scale(mat4(1.0f), Interpolate<vec3>(scales, animationTime));
     localTransform = translation * rotation * sca;
 }

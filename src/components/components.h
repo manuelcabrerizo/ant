@@ -17,3 +17,4 @@
 #include "weapon_component.cpp"
 #include "player_controller_component.cpp"
 #include "enemy_component.cpp"
+#include "animation_component.cpp"

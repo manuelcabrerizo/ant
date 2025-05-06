@@ -1,6 +1,3 @@
-static const int MAX_BONES = 100;
-static const int MAX_BONE_INFLUENCE = 4;
-
 struct VS_Input
 {
     float3 pos : POSITION;
@@ -29,6 +26,9 @@ cbuffer PerDrawCall : register(b1)
     float4x4 model;
 };
 
+static const int MAX_BONES = 100;
+static const int MAX_BONE_INFLUENCE = 4;
+
 cbuffer Animation : register(b2)
 {
     matrix boneMatrix[MAX_BONES];
@@ -38,14 +38,17 @@ PS_Input vs_main(VS_Input i)
 {
     PS_Input o = (PS_Input)0;
 
-    float4 totalPosition = float4(0, 0, 0, 0);
+    float4 totalPosition = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
-    for(int j = 0; j < MAX_BONE_INFLUENCE; ++j) {
-        if(i.boneIds[j] == -1) {
+    for(int j = 0; j < MAX_BONE_INFLUENCE; ++j) 
+    {
+        if(i.boneIds[j] == -1) 
+        {
             continue;
         }
         
-        if(i.boneIds[j] >= MAX_BONES) {
+        if(i.boneIds[j] >= MAX_BONES)
+        {
             totalPosition = float4(i.pos, 1.0f);
             break;
         }

@@ -222,7 +222,7 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
 
     tinyxml2::XMLElement *root = doc.FirstChildElement("Actor");
     
-     i32 componentCount = GetChildElementCount(root);
+     i32 componentCount = GetChildElementCount(root) + 2; // TODO: handle this better
      if((componentCount & (componentCount - 1)) != 0)
      {
           componentCount = NextPower2(componentCount);

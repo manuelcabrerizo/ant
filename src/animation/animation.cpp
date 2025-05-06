@@ -3,7 +3,7 @@
 // TODO: fix gImporter architecture
 void Animation::Init(const char *filepath, i32 memoryType)
 {
-    const aiScene *scene = gImporter.ReadFile(filepath, 0);
+    const aiScene *scene = gImporter.ReadFile(filepath, aiProcess_MakeLeftHanded);
     ASSERT(scene);
     // Handle only one animation per file
     aiAnimation *animation = scene->mAnimations[0];

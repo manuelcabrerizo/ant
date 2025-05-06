@@ -3,7 +3,7 @@ static Assimp::Importer gImporter;
 
 void Model::Init(const char *filepath)
 {
-     const aiScene *scene = gImporter.ReadFile(filepath, 0);
+     const aiScene *scene = gImporter.ReadFile(filepath, aiProcess_MakeLeftHanded);
      i32 totalVerticesCount = 0;
      i32 totalIndicesCount = 0;
      for(i32 i = 0; i < scene->mNumMeshes; i++)
@@ -27,8 +27,8 @@ void Model::Init(const char *filepath)
           for(i32 i = 0; i < mesh->mNumVertices; i++)
           {
                Vertex *vertex = vertices + verticesCount++;
-               vertex->pos = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z*-1.0f };
-               vertex->nor = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z*-1.0f };
+               vertex->pos = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z};
+               vertex->nor = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
                vertex->uvs = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
 
                for(u32 j = 0; j < MAX_BONE_INFLUENCE; j++)
@@ -98,5 +98,5 @@ void Model::Draw()
 {
      GraphicsManager::Get()->VertexBufferBind(vertexBuffer);
      GraphicsManager::Get()->IndexBufferBind(indexBuffer);
-     GraphicsManager::Get()->DrawIndexed(indicesCount);
+     GraphicsManager::Get()->Draw(verticesCount);
 }

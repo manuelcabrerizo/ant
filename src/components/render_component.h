@@ -1,7 +1,6 @@
 #pragma once
 
-#include "animation/skeleton.h"
-#include "animation/animation.h"
+#include "animation_component.h"
 
 struct PerDrawUbo
 {
@@ -15,11 +14,12 @@ private:
     static PerDrawUbo ubo;
 
     static UniformBuffer *matrixBuffer;
-    static Skeleton skeleton;
-    static Animation animation;
+
+    AnimationComponent *animation = nullptr;
+
 public:
     
-    TransformComponent *transform;
+    TransformComponent *transform = nullptr;
 
     Texture *texture;
     Model *model;

@@ -24,6 +24,7 @@ void Game::Init()
      modelManager.Load("sniper", "../data/models/sniper.obj");
      modelManager.Load("warrior", "../data/models/warrior.dae");
      modelManager.Load("test-level", "../data/models/level-rendering.obj");
+     modelManager.Load("anim-gun", "../data/models/fps-animations-vsk/source/FPS_VSK.fbx");
 
      // Load a texture
      textureManager.Init(128);
@@ -40,10 +41,20 @@ void Game::Init()
      actorManager.AddComponentType<CameraComponent, 1>();
      actorManager.AddComponentType<EnemyComponent, 10>();
      actorManager.AddComponentType<AnchorComponent, 10>();
+     actorManager.AddComponentType<AnimationComponent, 10>();
      actorManager.AllocInternalMemory();
 
      // Create Entities
-     actorManager.CreateActorFromFile("../data/xml/player.xml", &textureManager, &modelManager);
+     SlotmapKey<Actor> player = actorManager.CreateActorFromFile("../data/xml/player.xml", &textureManager, &modelManager);
+     WeaponComponent *weapon = actorManager.GetComponent<WeaponComponent>(player);
+     AnimationComponent animationCmp;
+     animationCmp.skeleton.Init("../data/models/fps-animations-vsk/source/FPS_VSK.fbx", STATIC_MEMORY);
+     animationCmp.animation.Init("../data/models/fps-animations-vsk/source/FPS_VSK.fbx", STATIC_MEMORY);
+     actorManager.AddComponent<AnimationComponent>(weapon->weapon, animationCmp);
+     RenderComponent *render = actorManager.GetComponent<RenderComponent>(weapon->weapon);
+     render->isAnimated = false;
+     
+
      actorManager.CreateActorFromFile("../data/xml/test-level.xml", &textureManager, &modelManager);
      SlotmapKey<Actor> enemy[3] =
      {
@@ -70,6 +81,14 @@ void Game::Init()
      renders[0]->isAnimated = true;
      renders[1]->isAnimated = true;
      renders[2]->isAnimated = true;
+
+     AnimationComponent animation;
+     animation.skeleton.Init("../data/models/warrior.dae", STATIC_MEMORY);
+     animation.animation.Init("../data/animations/walk_front.dae", STATIC_MEMORY);
+     actorManager.AddComponent<AnimationComponent>(enemy[0], animation);
+     actorManager.AddComponent<AnimationComponent>(enemy[1], animation);
+     actorManager.AddComponent<AnimationComponent>(enemy[2], animation);
+
      
      CameraComponent::Initialize();
      RenderComponent::Initialize();
