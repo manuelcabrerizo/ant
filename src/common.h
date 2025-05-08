@@ -22,5 +22,3 @@ typedef float  f32;
 #define MB(value) (KB(value)*1024LL)
 #define GB(value) (MB(value)*1024LL)
 #define TB(value) (GB(value)*1024LL)
-
-#define ANT_PI 3.14159265359f

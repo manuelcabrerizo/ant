@@ -33,6 +33,13 @@ using namespace glm;
 
 #include "common.h"
 
+#include "math/algebra.cpp"
+#include "math/vector2.cpp"
+#include "math/vector3.cpp"
+#include "math/vector4.cpp"
+#include "math/matrix4.cpp"
+#include "math/quaternion.cpp"
+
 struct File
 {
      void *data;
