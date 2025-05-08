@@ -80,8 +80,8 @@ public:
      virtual void DebugInit() = 0;
      virtual void DebugTerminate() = 0;
      virtual void DebugPresent() = 0;
-     virtual void DebugDrawLine(vec3& a, vec3& b) = 0;
-     virtual void DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlice) = 0;
-     virtual void DebugDrawCube(vec3& c, vec3& hExtend) = 0;
+     virtual void DebugDrawLine(Vector3& a, Vector3& b) = 0;
+     virtual void DebugDrawSphere(Vector3& c, f32 r, i32 hSlice, i32 vSlice) = 0;
+     virtual void DebugDrawCube(Vector3& c, Vector3& hExtend) = 0;
 
 };

@@ -1,7 +1,7 @@
 struct VertexLine
 {
-     vec3 pos;
-     vec3 col;
+     Vector3 pos;
+     Vector3 col;
 };
 
 class DebugRendererD3D11
@@ -18,5 +18,5 @@ public:
      void Terminate();
      void Present(ID3D11DeviceContext *deviceContext);
 
-     void DrawLine(ID3D11DeviceContext *deviceContext, vec3& a, vec3 &b);
+     void DrawLine(ID3D11DeviceContext *deviceContext, Vector3& a, Vector3 &b);
 };

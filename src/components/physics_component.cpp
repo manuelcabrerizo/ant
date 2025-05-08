@@ -29,14 +29,14 @@ void PhysicsComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 void PhysicsComponent::ProcessPhysics(float dt)
 {
     // Add the force of gravity
-    forceAccumulator += vec3(0.0f, -9.8f*3.0f, 0.0f);
+    forceAccumulator += Vector3(0.0f, -9.8f*3.0f, 0.0f);
     // Equations of motion
-    vec3 lastFrameAcceleration = acceleration;
+    Vector3 lastFrameAcceleration = acceleration;
     lastFrameAcceleration += forceAccumulator;
     velocity += lastFrameAcceleration * dt;
     velocity *= powf(0.01f, dt);
     transform->position += velocity * dt;
-    forceAccumulator = vec3(0.0f);
+    forceAccumulator = Vector3(0.0f);
 }
 
 void PhysicsComponent::ProcessColisionDetectionAndResolution()
@@ -45,9 +45,9 @@ void PhysicsComponent::ProcessColisionDetectionAndResolution()
 
     // Grounded test
     Segment groundSegment;
-    vec3 colliderPos = transform->position + offset;
-    groundSegment.Init(colliderPos, colliderPos - vec3(0.0f, colliderRadius + 0.05f, 0.0f));
-    float tOut; vec3 nOut;
+    Vector3 colliderPos = transform->position + offset;
+    groundSegment.Init(colliderPos, colliderPos - Vector3(0.0f, colliderRadius + 0.05f, 0.0f));
+    float tOut; Vector3 nOut;
     grounded = collisionWorld.Intersect(groundSegment, tOut, nOut);
 
     // Colission detection and resolution
@@ -61,12 +61,12 @@ void PhysicsComponent::ProcessColisionDetectionAndResolution()
     {
          while(collisionData.size > 0)
          {
-              vec3 n = collisionData[0].n;
+            Vector3 n = collisionData[0].n;
               f32 penetration = collisionData[0].penetration;
-              transform->position += penetration * n;
-              transform->position += 0.001f * n;
-              acceleration = vec3(0.0f);
-              velocity -= dot(velocity, n) * n;
+              transform->position += n * penetration;
+              transform->position += n * 0.001f;
+              acceleration = Vector3(0.0f);
+              velocity -= n * velocity.Dot(n);
 
               collisionData.Clear();
 

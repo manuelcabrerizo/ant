@@ -40,7 +40,7 @@ void PlayerControllerComponent::OnLateUpdate(ActorManager *actorManager, f32 dt)
     {
          int currentWeapon = usingFirstWeapon ? 0 : 1;
          AnchorComponent *weaponAnchor = actorManager->GetComponent<AnchorComponent>(weapons[currentWeapon]);
-         vec3 targetPosition = camera->GetPosition() + camera->GetFront() * 100.0f;
+         Vector3 targetPosition = camera->GetPosition() + camera->GetFront() * 100.0f;
          GraphicsManager::Get()->DebugDrawLine(weaponAnchor->position, targetPosition);
     }
 }
@@ -56,7 +56,7 @@ void PlayerControllerComponent::ProcessMouseMovement()
     {
          yaw += InputManager::Get()->MouseXMovement() * 0.001f;
          pitch += InputManager::Get()->MouseYMovement() * 0.001f;
-         f32 limit = radians(89.0f);
+         f32 limit = Radians(89.0f);
          if(pitch > limit)
          {
               pitch = limit;
@@ -66,11 +66,10 @@ void PlayerControllerComponent::ProcessMouseMovement()
              pitch = -limit;
          }
 
-         vec3 dir = vec3(0.0f, 0.0f, 1.0f);
-         // TODO: this can be optimice by not using the generic angle axis rotation function
-         transform->direction = rotate(mat4(1.0f), pitch, vec3(1, 0, 0)) * vec4(dir, 0.0f);
-         transform->direction = rotate(mat4(1.0f), yaw, vec3(0, 1, 0)) * vec4(transform->direction, 0.0f);
-         transform->direction = normalize(transform->direction);
+         Vector3 dir = Vector3(0.0f, 0.0f, 1.0f);
+         transform->direction = Matrix4::TransformVector(Matrix4::RotateX(pitch), dir);
+         transform->direction = Matrix4::TransformVector(Matrix4::RotateY(yaw), transform->direction);
+         transform->direction.Normalize();
          printf("direction: %f, %f, %f\n", transform->direction.x, transform->direction.y, transform->direction.z);
          i32 windowX, windowY, windowW, windowH;
          PlaformGetWindowPos(&windowX, &windowY);
@@ -83,7 +82,7 @@ void PlayerControllerComponent::ProcessMouseMovement()
 
 void PlayerControllerComponent::ProcessKeyboardMovement()
 {
-    vec3 moveDirection = vec3(0.0f);
+    Vector3 moveDirection = Vector3(0.0f);
     if(InputManager::Get()->KeyDown(KEY_A))
     {
          moveDirection -= camera->GetRight();
@@ -101,19 +100,19 @@ void PlayerControllerComponent::ProcessKeyboardMovement()
          moveDirection -= camera->GetWorldFront();
     }
     
-    if(dot(moveDirection, moveDirection) > 0.0f)
+    if(moveDirection.MagnitudeSq() > 0.0f)
     {
-         moveDirection = normalize(moveDirection);
+         moveDirection.Normalize();
     }
 
     // Jump code
     if(physics->grounded && InputManager::Get()->KeyJustDown(KEY_SPACE))
     {
          physics->velocity.y = 0.0f;
-         physics->velocity += vec3(0.0f, 9.8f*1.5f, 0.0f);                    
+         physics->velocity += Vector3(0.0f, 9.8f*1.5f, 0.0f);                    
     }
 
-    vec3 movement = (moveDirection * speed);
+    Vector3 movement = (moveDirection * speed);
     physics->acceleration = movement;
 }
 

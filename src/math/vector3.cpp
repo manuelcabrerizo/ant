@@ -76,6 +76,22 @@ void Vector3::operator*=(float rhs)
     z *= rhs;
 }
 
+Vector3 Vector3::operator/(float rhs)
+{
+    Vector3 result;
+    result.x = x / rhs;
+    result.y = y / rhs;
+    result.z = z / rhs;
+    return result;
+}
+
+void Vector3::operator/=(float rhs)
+{
+    x /= rhs;
+    y /= rhs;
+    z /= rhs;
+}
+
 float Vector3::Dot(const Vector3& vector)
 {
     return x * vector.x + y * vector.y + z * vector.z;

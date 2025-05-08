@@ -44,9 +44,10 @@ public:
     Matrix4 operator*(Matrix4 &m);
     Vector4 operator*(Vector4 &vec);
 
+
     static Vector3 TransformPoint(Matrix4 mat, Vector3 &vec);
     static Vector3 TransformVector(Matrix4 mat, Vector3 &vec);
-
+    
     static Matrix4 Frustum(float l, float r, float b, float t, float n, float f);
     static Matrix4 Perspective(float fov, float aspect, float znear, float zfar);
     static Matrix4 Ortho(float l, float r, float b, float t, float n, float f);

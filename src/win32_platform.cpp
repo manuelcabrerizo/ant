@@ -10,7 +10,7 @@
 
 // TODO: remove glm to see if fix handednes realed problems
 // glm 
-
+/*
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_LEFT_HANDED
@@ -20,7 +20,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 using namespace glm;
-
+*/
 
 // stb
 #define STB_IMAGE_IMPLEMENTATION
@@ -132,7 +132,7 @@ LRESULT Wndproc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
           {
                GraphicsManager::Get()->OnResize(gWindowWidth, gWindowHeight);
           }
-          vec2 extend = vec2((f32)gWindowWidth, (f32)gWindowHeight);
+          Vector2 extend = Vector2((f32)gWindowWidth, (f32)gWindowHeight);
           NotificationManager::Get()->SendNotification(NOTIFICATION_ON_RESIZE, &extend, sizeof(extend), nullptr);   
      } break;
      

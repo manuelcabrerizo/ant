@@ -24,9 +24,8 @@ void Game::Init()
      modelManager.Load("sniper", "../data/models/sniper.obj");
      modelManager.Load("warrior", "../data/models/warrior.dae");
      modelManager.Load("test-level", "../data/models/level-rendering.obj");
-     //modelManager.Load("anim-gun", "../data/models/bob/bob.md5mesh");
      modelManager.Load("anim-gun", "../data/models/fps-animations-vsk/source/FPS_VSK1.fbx");
-
+     modelManager.Load("house", "../data/models/house.fbx");
 
      // Load a texture
      textureManager.Init(128);
@@ -50,8 +49,6 @@ void Game::Init()
      SlotmapKey<Actor> player = actorManager.CreateActorFromFile("../data/xml/player.xml", &textureManager, &modelManager);
      WeaponComponent *weapon = actorManager.GetComponent<WeaponComponent>(player);
      AnimationComponent animationCmp;
-     //animationCmp.skeleton.Init("../data/models/bob/bob.md5mesh", STATIC_MEMORY);
-     //animationCmp.animation.Init("../data/models/bob/bob.md5mesh", modelManager.Get("anim-gun"), STATIC_MEMORY);
      animationCmp.skeleton.Init("../data/models/fps-animations-vsk/source/FPS_VSK1.fbx", STATIC_MEMORY);
      animationCmp.animation.Init("../data/models/fps-animations-vsk/source/FPS_VSK1.fbx", modelManager.Get("anim-gun"), STATIC_MEMORY);
      actorManager.AddComponent<AnimationComponent>(weapon->weapon, animationCmp);
@@ -60,6 +57,7 @@ void Game::Init()
      
 
      actorManager.CreateActorFromFile("../data/xml/test-level.xml", &textureManager, &modelManager);
+     actorManager.CreateActorFromFile("../data/xml/house.xml", &textureManager, &modelManager);
      SlotmapKey<Actor> enemy[3] =
      {
           actorManager.CreateActorFromFile("../data/xml/enemy.xml", &textureManager, &modelManager),
@@ -73,8 +71,8 @@ void Game::Init()
           actorManager.GetComponent<TransformComponent>(enemy[2])
      };
      transforms[0]->position.x = 0.0f;
-     transforms[1]->position.x = 3.0f;
-     transforms[2]->position.x = 6.0f;
+     transforms[1]->position.x = -2.0f;
+     transforms[2]->position.x = -4.0f;
 
      RenderComponent *renders[3] =
      {

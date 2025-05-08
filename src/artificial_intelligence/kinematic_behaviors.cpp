@@ -17,22 +17,20 @@ f32 RandomBinomial()
 
 void AdjustAngle(f32& angle)
 {
-    f32 PI = pi<f32>();
-    while(angle >  (f32)PI) angle -= (f32)(2*PI);
-    while(angle < -(f32)PI) angle += (f32)(2*PI);
+    while(angle >  ANT_PI) angle -= (f32)(ANT_TAU);
+    while(angle < -ANT_PI) angle += (f32)(ANT_TAU);
 }
 
-f32 Kinematic::GetNewOrientation(f32 currentOrientation, vec3 velocity)
+f32 Kinematic::GetNewOrientation(f32 currentOrientation, Vector3 velocity)
 {
-    f32 PI = pi<f32>();
     velocity.y = 0.0f;
-    if(length(velocity) > 0.0f)
+    if(velocity.Magnitude() > 0.0f)
     {
-        velocity = normalize(velocity);
+        velocity.Normalize();
         f32 angle = atan2(-velocity.x, velocity.z);
         if(angle < 0.0f)
         {
-            angle += 2*PI;
+            angle += ANT_TAU;
         }
         return angle;
     }
@@ -66,7 +64,7 @@ KinematicSteeringOutput KinematicSeek::GetSteering()
     steering.velocity = target->position - character->position;
     steering.velocity.y = 0.0f;
     // The velocity is along this direction, at full speed
-    steering.velocity = normalize(steering.velocity);
+    steering.velocity.Normalize();
     steering.velocity *= maxSpeed;
     character->orientation = Kinematic::GetNewOrientation(character->orientation, steering.velocity);
 
@@ -100,7 +98,7 @@ KinematicSteeringOutput KinematicFlee::GetSteering()
     steering.velocity = character->position - target->position;
     steering.velocity.y = 0.0f;
     // The velocity is along this direction, at full speed
-    steering.velocity = normalize(steering.velocity);
+    steering.velocity.Normalize();
     steering.velocity *= maxSpeed;
     character->orientation = Kinematic::GetNewOrientation(character->orientation, steering.velocity);
 
@@ -143,7 +141,7 @@ KinematicSteeringOutput KinematicArrive::GetSteering()
     // Get the direction to the target
     steering.velocity = target->position - character->position;
     steering.velocity.y = 0.0f;
-    if(length(steering.velocity) < radius)
+    if(steering.velocity.Magnitude() < radius)
     {
         return {};
     }
@@ -152,9 +150,9 @@ KinematicSteeringOutput KinematicArrive::GetSteering()
     steering.velocity /= timeToTarget;
 
     // if its to fast clamp to max speed
-    if(length(steering.velocity) > maxSpeed)
+    if(steering.velocity.Magnitude() > maxSpeed)
     {
-        steering.velocity = normalize(steering.velocity);
+        steering.velocity.Normalize();
         steering.velocity *= maxSpeed;
     }
 
@@ -184,7 +182,7 @@ KinematicSteeringOutput KinematicWander::GetSteering()
 {
     ASSERT(character != nullptr);
     KinematicSteeringOutput steering;
-    steering.velocity = maxSpeed * normalize(vec3(-sinf(character->orientation), 0.0f, cosf(character->orientation)));
+    steering.velocity = Vector3(-sinf(character->orientation), 0.0f, cosf(character->orientation)).Normalized() * maxSpeed;
     steering.velocity.y = 0.0f;
     steering.rotation = RandomBinomial() * maxRotation;
     return steering;

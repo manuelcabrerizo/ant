@@ -4,12 +4,12 @@ UniformBuffer *RenderComponent::matrixBuffer = nullptr;
      
 void RenderComponent::Initialize()
 {
-    ubo.model = mat4(1.0f);
+    ubo.model = Matrix4(1.0f);
     uniformBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_VS, &ubo, sizeof(ubo), 1);
     GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
 
-    mat4 buffer[100] = {};
-    matrixBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_VS, buffer, sizeof(mat4)*100, 2);
+    Matrix4 buffer[100] = {};
+    matrixBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_VS, buffer, sizeof(Matrix4)*100, 2);
     GraphicsManager::Get()->UniformBufferBind(matrixBuffer);
 }
 
@@ -43,18 +43,20 @@ void RenderComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 
 void RenderComponent::OnRender(ShaderManager *shaderManager, ActorManager *actorManager)
 {
-    mat4 tra = translate(mat4(1.0f), transform->position); 
-    mat4 sca = scale(mat4(1.0f), transform->scale);
+    Matrix4 tra = Matrix4::Translate(transform->position); 
+    Matrix4 sca = Matrix4::Scale(transform->scale);
 
-    vec3 front = normalize(transform->direction);
+    Vector3 front = transform->direction.Normalized();
 
-    vec3 worldUp = vec3(0.0f, 1.0f, 0.0f);
-    vec3 right = normalize(cross(worldUp, front));
-    vec3 up = cross(front, right);
-    mat3 rot = mat3(right, up, front);
-    mat4 ori = mat4(rot);
-    ori[3][3] = 1.0f;
-    ubo.model =  tra * ori * sca;
+    Vector3 worldUp = Vector3(0.0f, 1.0f, 0.0f);
+    Vector3 right =  worldUp.Cross(front).Normalized();
+    Vector3 up = front.Cross(right);
+    Matrix4 ori = Matrix4::TransformFromBasis(Vector3(0.0f), right, up, front);
+    ubo.model =  tra * ori * sca; // TODO: chage order of mul
+
+    Matrix4 rotOffset = Matrix4::RotateX(rotationOffset.x) * Matrix4::RotateY(rotationOffset.y) * Matrix4::RotateZ(rotationOffset.z);
+
+    ubo.model = ubo.model * rotOffset;
 
     if(!isAnimated)
     {

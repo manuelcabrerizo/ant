@@ -23,12 +23,12 @@ void Skeleton::Node::Init(aiNode *node, i32 memoryType)
 void Skeleton::Init(const char *filepath, i32 memoryType)
 {
     const aiScene *scene = gImporter.ReadFile(filepath, 
-        /*aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder |*/  aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
+        aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
     ASSERT(scene);
     
     root.Init(scene->mRootNode, memoryType);
     for(i32 i = 0; i < 100; i++) {
-        finalBoneMatrices[i] = mat4(1.0f);
+        finalBoneMatrices[i] = Matrix4(1.0f);
     }
 }
 
@@ -37,12 +37,12 @@ void Skeleton::Animate(Animation *animation, f32 dt)
     deltaTime = dt;
     currentTime[0] += animation->GetTicksPerSeconds() * dt;
     currentTime[0] = fmod(currentTime[0], animation->GetDuration());
-    CalculateBoneTransform(animation, &root, mat4(1.0f));
+    CalculateBoneTransform(animation, &root, Matrix4(1.0f));
 }
 
-void Skeleton::CalculateBoneTransform(Animation *animation, Node *node, mat4 parentTransform)
+void Skeleton::CalculateBoneTransform(Animation *animation, Node *node, Matrix4 parentTransform)
 {
-    mat4 nodeTransform = node->transformation;
+    Matrix4 nodeTransform = node->transformation;
     //Bone *bone = node->boneIndex >= 0 ? &animation->GetBones()[node->boneIndex] : nullptr;
     HashMap<Bone>& bones = animation->GetBones();
     Bone *bone = bones.Contains(node->name) ? bones.Get(node->name) : nullptr;
@@ -51,7 +51,7 @@ void Skeleton::CalculateBoneTransform(Animation *animation, Node *node, mat4 par
         bone->Update(currentTime[0]);
         nodeTransform = bone->GetLocalTransform();
     }
-    mat4 globalTransform = parentTransform * nodeTransform;
+    Matrix4 globalTransform = parentTransform * nodeTransform;
 
     HashMap<BoneInfo>& bonesInfo = animation->GetBonesInfo();
     if(bonesInfo.Contains(node->name))

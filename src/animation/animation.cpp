@@ -16,7 +16,7 @@ static i32 TempNextPower2(u32  x)
 void Animation::Init(const char *filepath, Model *model, i32 memoryType)
 {
     const aiScene *scene = gImporter.ReadFile(filepath, 
-        /*aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder |*/  aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
+        aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
     ASSERT(scene);
     // Handle only one animation per file
     aiAnimation *animation = scene->mAnimations[0];
@@ -40,7 +40,7 @@ void Animation::Init(const char *filepath, Model *model, i32 memoryType)
         {
             BoneInfo boneInfo;
             boneInfo.id = boneCount;
-            boneInfo.offset = mat4(1.0f);
+            boneInfo.offset = Matrix4(1.0f);
             bonesInfo.Add(boneName, boneInfo);
             boneCount++;
         }

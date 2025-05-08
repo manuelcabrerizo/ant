@@ -11,10 +11,10 @@ private:
 public:
     TransformComponent *transform;
 
-    vec3 acceleration;
-    vec3 velocity;
-    vec3 forceAccumulator;
-    vec3 offset;
+    Vector3 acceleration;
+    Vector3 velocity;
+    Vector3 forceAccumulator;
+    Vector3 offset;
     bool grounded = false;
 
     static void Initialize();

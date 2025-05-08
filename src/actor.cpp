@@ -237,17 +237,17 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
          if(strcmp("TransformComponent", componentType) == 0)
          {
               tinyxml2::XMLElement *attributes = component->FirstChildElement();
-              vec3 position;
+              Vector3 position;
               attributes->QueryFloatAttribute("x", &position.x);
               attributes->QueryFloatAttribute("y", &position.y);
               attributes->QueryFloatAttribute("z", &position.z);
               attributes = attributes->NextSiblingElement();
-              vec3 scale;
+              Vector3 scale;
               attributes->QueryFloatAttribute("x", &scale.x);
               attributes->QueryFloatAttribute("y", &scale.y);
               attributes->QueryFloatAttribute("z", &scale.z);
               attributes = attributes->NextSiblingElement();
-              vec3 direction;
+              Vector3 direction;
               attributes->QueryFloatAttribute("x", &direction.x);
               attributes->QueryFloatAttribute("y", &direction.y);
               attributes->QueryFloatAttribute("z", &direction.z);
@@ -260,12 +260,12 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
          else if(strcmp("CameraComponent", componentType) == 0)
          {
               tinyxml2::XMLElement *attributes = component->FirstChildElement();
-              vec3 position;
+              Vector3 position;
               attributes->QueryFloatAttribute("x", &position.x);
               attributes->QueryFloatAttribute("y", &position.y);
               attributes->QueryFloatAttribute("z", &position.z);
               attributes = attributes->NextSiblingElement();
-              vec3 direction;
+              Vector3 direction;
               attributes->QueryFloatAttribute("x", &direction.x);
               attributes->QueryFloatAttribute("y", &direction.y);
               attributes->QueryFloatAttribute("z", &direction.z);
@@ -308,25 +308,35 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
 
               ASSERT(modelPath && texturePath);
 
+              attributes = attributes->NextSiblingElement();
+
+              Vector3 rotationOffset;
+              attributes->QueryFloatAttribute("x", &rotationOffset.x);
+              attributes->QueryFloatAttribute("y", &rotationOffset.y);
+              attributes->QueryFloatAttribute("z", &rotationOffset.z);
+
+              rotationOffset *= (ANT_PI/180.0f);
+
               RenderComponent render;
               render.model = modelManager->Get(modelPath);
               render.texture = textureManager->Get(texturePath);
+              render.rotationOffset = rotationOffset;
               AddComponent<RenderComponent>(actor, render);
          }
          else if(strcmp("PhysicsComponent", componentType) == 0)
          {
                tinyxml2::XMLElement *attributes = component->FirstChildElement();
-               vec3 acceleration;
+               Vector3 acceleration;
                attributes->QueryFloatAttribute("x", &acceleration.x);
                attributes->QueryFloatAttribute("y", &acceleration.y);
                attributes->QueryFloatAttribute("z", &acceleration.z);
                attributes = attributes->NextSiblingElement();
-               vec3 velocity;
+               Vector3 velocity;
                attributes->QueryFloatAttribute("x", &velocity.x);
                attributes->QueryFloatAttribute("y", &velocity.y);
                attributes->QueryFloatAttribute("z", &velocity.z);
                attributes = attributes->NextSiblingElement();
-               vec3 offset;
+               Vector3 offset;
                attributes->QueryFloatAttribute("x", &offset.x);
                attributes->QueryFloatAttribute("y", &offset.y);
                attributes->QueryFloatAttribute("z", &offset.z);
@@ -334,8 +344,8 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
                PhysicsComponent physics;
                physics.acceleration = acceleration;
                physics.velocity = velocity;
-               physics.forceAccumulator = vec3(0.0f);
-               //physics.lastFrameAcceleration = vec3(0.0f);
+               physics.forceAccumulator = Vector3(0.0f);
+               //physics.lastFrameAcceleration = Vector3(0.0f);
                physics.offset = offset;
                AddComponent(actor, physics);
          }
@@ -352,7 +362,7 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
          else if(strcmp("AnchorComponent", componentType) == 0)
          {
                tinyxml2::XMLElement *attributes = component->FirstChildElement();
-               vec3 offset;
+               Vector3 offset;
                attributes->QueryFloatAttribute("x", &offset.x);
                attributes->QueryFloatAttribute("y", &offset.y);
                attributes->QueryFloatAttribute("z", &offset.z);

@@ -144,9 +144,9 @@ public:
      void DebugInit() override;
      void DebugTerminate() override;
      void DebugPresent() override;
-     void DebugDrawLine(vec3& a, vec3& b) override;
-     void DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlice) override;
-     void DebugDrawCube(vec3& c, vec3& hExtend) override;
+     void DebugDrawLine(Vector3& a, Vector3& b) override;
+     void DebugDrawSphere(Vector3& c, f32 r, i32 hSlice, i32 vSlice) override;
+     void DebugDrawCube(Vector3& c, Vector3& hExtend) override;
 
 private:
      void CreateDeviceAndSwapChain();

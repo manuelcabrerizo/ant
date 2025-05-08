@@ -37,9 +37,7 @@ cbuffer Animation : register(b2)
 PS_Input vs_main(VS_Input i)
 {
     PS_Input o = (PS_Input)0;
-
     float4 totalPosition = float4(0.0f, 0.0f, 0.0f, 0.0f);
-
     for(int j = 0; j < MAX_BONE_INFLUENCE; ++j) 
     {
         if(i.boneIds[j] == -1) 
@@ -53,16 +51,16 @@ PS_Input vs_main(VS_Input i)
             break;
         }
 
-        float4 localPosition = mul(boneMatrix[i.boneIds[j]], float4(i.pos, 1.0f));
+        float4 localPosition = mul(float4(i.pos, 1.0f), boneMatrix[i.boneIds[j]]);
         totalPosition += localPosition * i.weigths[j];
     }
 
-    float4 wPos = mul(model, totalPosition);
+    float4 wPos = mul(totalPosition, model);
     float3 fragPos = float3(wPos.xyz);
-    wPos = mul(view, wPos);
-    wPos = mul(proj, wPos);
+    wPos = mul(wPos, view);
+    wPos = mul(wPos, proj);
 
-    float3 wNor = mul((float3x3) model, i.nor);
+    float3 wNor = mul(i.nor, (float3x3)model);
     wNor = normalize(wNor);
 
     o.pos = wPos;

@@ -451,7 +451,7 @@ void GraphicsManagerD3D11::DebugPresent()
 #endif
 }
      
-void GraphicsManagerD3D11::DebugDrawLine(vec3& a, vec3& b)
+void GraphicsManagerD3D11::DebugDrawLine(Vector3& a, Vector3& b)
 {
 #if ANT_DEBUG
      debugRenderer.DrawLine(deviceContext, a, b);
@@ -459,11 +459,13 @@ void GraphicsManagerD3D11::DebugDrawLine(vec3& a, vec3& b)
 }
 
 
-void GraphicsManagerD3D11::DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlice)
+void GraphicsManagerD3D11::DebugDrawSphere(Vector3& c, f32 r, i32 hSlice, i32 vSlice)
 {
 #if ANT_DEBUG
-     vec3 up = vec3(0.0f, 1.0f, 0.0f);
-     vec3 right = vec3(1.0f, 0.0f, 0.0f);
+// TODO: fix this
+/*
+     Vector3 up = Vector3(0.0f, 1.0f, 0.0f);
+     Vector3 right = Vector3(1.0f, 0.0f, 0.0f);
      // TODO: try to make it fit perfectly
 
      // Draw the vertical Lines
@@ -471,12 +473,12 @@ void GraphicsManagerD3D11::DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlic
      f32 vInc = (2.0f * ANT_PI) / (f32)vSlice;
      for(i32 j = 0; j < hSlice; ++j)
      {
-          vec3 dir = up;
+          Vector3 dir = up;
           for(i32 i = 0; i < vSlice; ++i)
           {
-               vec3 a = dir * r;
+               Vector3 a = dir * r;
                dir = mat3(rotate(mat4(1.0f), vInc, right)) * dir;
-               vec3 b = dir * r;
+               Vector3 b = dir * r;
                GraphicsManager::Get()->DebugDrawLine(c + a, c + b);
           }
           right = mat3(rotate(mat4(1.0f), hInc, up)) * right;
@@ -485,23 +487,24 @@ void GraphicsManagerD3D11::DebugDrawSphere(vec3& c, f32 r, i32 hSlice, i32 vSlic
      // Draw the horizontal lines
      hInc = (2.0f * ANT_PI) / (f32)hSlice;
      vInc = ANT_PI / (f32)vSlice;
-     right = vec3(1.0f, 0.0f, 0.0f);
-     vec3 dir = up;
+     right = Vector3(1.0f, 0.0f, 0.0f);
+     Vector3 dir = up;
      for(i32 j = 0; j < vSlice - 2; ++j)
      {
           dir = mat3(rotate(mat4(1.0f), vInc, right)) * dir;
           for(i32 i = 0; i < hSlice; ++i)
           {
-               vec3 a = dir * r;
+               Vector3 a = dir * r;
                dir = mat3(rotate(mat4(1.0f), hInc, up)) * dir;
-               vec3 b = dir * r;
+               Vector3 b = dir * r;
                GraphicsManager::Get()->DebugDrawLine(c + a, c + b);
           }
      }
+*/
 #endif
 }
 
-void GraphicsManagerD3D11::DebugDrawCube(vec3& c, vec3& hExtend)
+void GraphicsManagerD3D11::DebugDrawCube(Vector3& c, Vector3& hExtend)
 {
 #if ANT_DEBUG
      // TODO: ...
@@ -699,7 +702,7 @@ HRESULT GraphicsManagerD3D11::CreateInputLayoutDescFromVertexShaderSignature(ID3
      Array<D3D11_INPUT_ELEMENT_DESC> inputLayoutDesc;
      inputLayoutDesc.Init(shaderDesc.InputParameters, FRAME_MEMORY);
      
-     for ( uint32 i=0; i< shaderDesc.InputParameters; i++ )
+     for (u32 i = 0; i < shaderDesc.InputParameters; i++ )
      {
           D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
           pVertexShaderReflection->GetInputParameterDesc(i, &paramDesc );
@@ -781,7 +784,7 @@ void GraphicsManagerD3D11::CreateRasterizerStates()
      ZeroMemory(&fillRasterizerFrontDesc, sizeof(fillRasterizerFrontDesc));
      fillRasterizerFrontDesc.FillMode = D3D11_FILL_SOLID;
      fillRasterizerFrontDesc.CullMode = D3D11_CULL_FRONT;
-     fillRasterizerFrontDesc.FrontCounterClockwise = true;
+     fillRasterizerFrontDesc.FrontCounterClockwise = false;
      fillRasterizerFrontDesc.DepthClipEnable = true;
      fillRasterizerFrontDesc.AntialiasedLineEnable = true;
      fillRasterizerFrontDesc.MultisampleEnable = true;
@@ -791,7 +794,7 @@ void GraphicsManagerD3D11::CreateRasterizerStates()
      ZeroMemory(&fillRasterizerBackDesc, sizeof(fillRasterizerBackDesc));
      fillRasterizerBackDesc.FillMode = D3D11_FILL_SOLID;
      fillRasterizerBackDesc.CullMode = D3D11_CULL_BACK;
-     fillRasterizerBackDesc.FrontCounterClockwise = true;
+     fillRasterizerBackDesc.FrontCounterClockwise = false;
      fillRasterizerBackDesc.DepthClipEnable = true;
      fillRasterizerBackDesc.AntialiasedLineEnable = true;
      fillRasterizerBackDesc.MultisampleEnable = true;
@@ -801,7 +804,7 @@ void GraphicsManagerD3D11::CreateRasterizerStates()
      ZeroMemory(&fillRasterizerNoneDesc, sizeof(fillRasterizerNoneDesc));
      fillRasterizerNoneDesc.FillMode = D3D11_FILL_SOLID;
      fillRasterizerNoneDesc.CullMode = D3D11_CULL_NONE;
-     fillRasterizerNoneDesc.FrontCounterClockwise = true;
+     fillRasterizerNoneDesc.FrontCounterClockwise = false;
      fillRasterizerNoneDesc.DepthClipEnable = true;
      fillRasterizerNoneDesc.AntialiasedLineEnable = true;
      fillRasterizerNoneDesc.MultisampleEnable = true;
@@ -811,7 +814,7 @@ void GraphicsManagerD3D11::CreateRasterizerStates()
      ZeroMemory(&wireFrameRasterizerDesc, sizeof(wireFrameRasterizerDesc));
      wireFrameRasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
      wireFrameRasterizerDesc.CullMode = D3D11_CULL_NONE;
-     wireFrameRasterizerDesc.FrontCounterClockwise = true;
+     wireFrameRasterizerDesc.FrontCounterClockwise = false;
      wireFrameRasterizerDesc.DepthClipEnable = true;
      wireFrameRasterizerDesc.AntialiasedLineEnable = true;
      wireFrameRasterizerDesc.MultisampleEnable = true;

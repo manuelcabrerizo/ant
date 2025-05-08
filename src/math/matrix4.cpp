@@ -65,10 +65,11 @@ Matrix4 Matrix4::Frustum(float l, float r, float b, float t, float n, float f)
         ASSERT(!"WARNING: Trying to create invalid frustum\n");
     }
     return Matrix4(
-        (2.0f * n) / (r - l), 0, -(r + l) / (r - l), 0,
-        0, (2.0f * n) / (t - b), -(t + b) / (t - b), 0,
-        0, 0, f / (f - n), -(f * n) / (f - n),
-        0, 0, 1, 0);
+        (2*n) /(r-l), 0, -(r+l)/(r-l), 0,
+        0, (2*n)/(t-b), -(t+b)/(t-b), 0,
+        0, 0, f/(f-n), -(f*n)/(f-n),
+        0, 0, 1, 0
+    );
 }
 
 Matrix4 Matrix4::Perspective(float fov, float aspect, float znear, float zfar)
@@ -89,6 +90,7 @@ Matrix4 Matrix4::Ortho(float l, float r, float b, float t, float n, float f)
        0, 2.0f / (t - b), 0, -(t + b) / (t - b),
        0, 0, 1.0f / (f - n), -(n / (f - n)),
        0, 0, 0, 1);
+
 }
 
 Matrix4 Matrix4::LookAt(Vector3 position, Vector3 target, Vector3 up)
@@ -135,25 +137,25 @@ Matrix4 Matrix4::RotateX(float angle)
 {
     return Matrix4(
         1,            0,           0,  0,
-        0,  cosf(angle), sinf(angle),  0,
-        0, -sinf(angle), cosf(angle),  0,
+        0,  cosf(angle),-sinf(angle),  0,
+        0,  sinf(angle), cosf(angle),  0,
         0,            0,           0,  1);
 }
 
 Matrix4 Matrix4::RotateY(float angle)
 {
     return Matrix4(
-        cosf(angle), 0, -sinf(angle), 0,
+        cosf(angle), 0,  sinf(angle), 0,
                   0, 1,            0, 0,
-        sinf(angle), 0,  cosf(angle), 0,
+       -sinf(angle), 0,  cosf(angle), 0,
                   0, 0,            0, 1);
 }
 
 Matrix4 Matrix4::RotateZ(float angle)
 {
     return Matrix4(
-        cosf(angle), sinf(angle), 0, 0,
-       -sinf(angle), cosf(angle), 0, 0,
+        cosf(angle),-sinf(angle), 0, 0,
+        sinf(angle), cosf(angle), 0, 0,
                   0,           0, 1, 0,
                   0,           0, 0, 1);
 }

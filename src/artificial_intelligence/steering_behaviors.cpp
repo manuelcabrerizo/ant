@@ -24,7 +24,7 @@ SteeringOutput SteeringSeek::GetSteering()
     steering.linear = target->position - character->position;
     steering.linear.y = 0.0f;
     // Give full acceleration along this direction
-    steering.linear = normalize(steering.linear);
+    steering.linear.Normalize();
     steering.linear *= maxAcceleration;
     steering.angular = 0.0f;
     return steering;
@@ -54,7 +54,7 @@ SteeringOutput SteeringFlee::GetSteering()
     steering.linear = character->position - target->position;
     steering.linear.y = 0.0f;
     // Give full acceleration along this direction
-    steering.linear = normalize(steering.linear);
+    steering.linear.Normalize();
     steering.linear *= maxAcceleration;
     steering.angular = 0.0f;
     return steering;
@@ -101,9 +101,9 @@ SteeringOutput SteeringArrive::GetSteering()
     ASSERT(target != nullptr);
     SteeringOutput steering;
     // Get the direction to target
-    vec3 direction = target->position - character->position;
+    Vector3 direction = target->position - character->position;
     direction.y =  0;
-    f32 distance = length(direction);
+    f32 distance = direction.Magnitude();
     // Check if we are there, return no steering
     if(distance < targetRadius)
     {
@@ -121,15 +121,15 @@ SteeringOutput SteeringArrive::GetSteering()
         targetSpeed = maxSpeed * distance / slowRadius;
     }
     // Target velocity combines speed and direction
-    vec3 targetVelocity = normalize(direction);
+    Vector3 targetVelocity = direction.Normalized();
     targetVelocity *= targetSpeed;
     // Acceleration tries to get to the target velocity
     steering.linear = targetVelocity - character->velocity;
     steering.linear /= timeToTarget;
     // Chack if the acceleration is too fast
-    if(length(steering.linear) > maxAcceleration)
+    if(steering.linear.Magnitude() > maxAcceleration)
     {
-        steering.linear = normalize(steering.linear) * maxAcceleration;
+        steering.linear = steering.linear.Normalized() * maxAcceleration;
     }
     steering.angular = 0.0f;
     return steering;
@@ -208,7 +208,7 @@ SteeringOutput SteeringAlign::GetSteering()
         steering.angular *= maxAngularAcceleration;
     }
 
-    steering.linear = vec3(0.0f);
+    steering.linear = Vector3(0.0f);
     return steering;
 }
 
@@ -241,9 +241,9 @@ SteeringOutput SteeringVelocityMach::GetSteering()
     steering.linear = target->velocity - character->velocity;
     steering.linear /= timeToTarget;
     // Chack if the acceleration is too fast
-    if(length(steering.linear) > maxAcceleration)
+    if(steering.linear.Magnitude() > maxAcceleration)
     {
-        steering.linear = normalize(steering.linear) * maxAcceleration;
+        steering.linear = steering.linear.Normalized() * maxAcceleration;
     }
     steering.angular = 0.0f;
     return steering;
@@ -256,10 +256,10 @@ void SteeringPursue::SetMaxPrediction(f32 maxPrediction)
 
 SteeringOutput SteeringPursue::GetSteering()
 {
-    vec3 direction = target->position - character->position;
+    Vector3 direction = target->position - character->position;
     direction.y =  0;
-    f32 distance = length(direction);
-    f32 speed = length(character->velocity);
+    f32 distance = direction.Magnitude();
+    f32 speed = character->velocity.Magnitude();
     // Check if we are there, return no steering
     f32 prediction;
     if(speed <= (distance / maxPrediction))
@@ -276,10 +276,10 @@ SteeringOutput SteeringPursue::GetSteering()
 
 SteeringOutput SteeringFace::GetSteering()
 {
-    vec3 direction = target->position - character->position;
+    Vector3 direction = target->position - character->position;
     direction.y =  0;
 
-    if(length(direction) < 0.001f)
+    if(direction.Magnitude() < 0.001f)
     {
         return {};
     }
@@ -289,7 +289,7 @@ SteeringOutput SteeringFace::GetSteering()
 
 SteeringOutput SteeringLookWhereYoureGoing::GetSteering()
 {
-    if(length(character->velocity) < 0.001f)
+    if(character->velocity.Magnitude() < 0.001f)
     {
         return {};
     }
@@ -326,9 +326,9 @@ SteeringOutput SteeringWander::GetSteering()
 {
     wanderOrientation += RandomBinomial() * wanderRate;
     f32 targetOrientation = wanderOrientation + character->orientation;
-    target->position = character->position + wanderOffset * normalize(vec3(-sinf(character->orientation), 0.0f, cosf(character->orientation)));
-    target->position += wanderRadius * normalize(vec3(-sinf(targetOrientation), 0.0f, cosf(targetOrientation)));
+    target->position = character->position + Vector3(-sinf(character->orientation), 0.0f, cosf(character->orientation)).Normalized() * wanderOffset;
+    target->position += Vector3(-sinf(targetOrientation), 0.0f, cosf(targetOrientation)).Normalized() * wanderRadius;
     SteeringOutput steering = SteeringFace::GetSteering();
-    steering.linear = maxAcceleration * normalize(vec3(-sinf(character->orientation), 0.0f, cosf(character->orientation)));
+    steering.linear = Vector3(-sinf(character->orientation), 0.0f, cosf(character->orientation)).Normalized() * maxAcceleration;
     return steering;
 }

@@ -42,7 +42,7 @@ static i32 TempTempNextPower2(u32  x)
 void Model::Init(const char *filepath, i32 memoryType)
 {
      const aiScene *scene = gImporter.ReadFile(filepath,
-          /* aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder |*/  aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
+          aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
      if(scene->mNumMeshes > 0)
      {
           meshes.Init(scene->mNumMeshes, memoryType);

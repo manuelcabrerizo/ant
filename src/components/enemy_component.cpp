@@ -29,8 +29,8 @@ void EnemyComponent::OnInit(ActorManager *actorManager)
     wander.SetMaxAcceleration(5.0f);
     wander.SetMaxAngularAcceleration(5.0f);
     wander.SetMaxRotation(10.0f);
-    wander.SetTargetRadius(pi<float>() * 0.1f);
-    wander.SetSlowRadius(pi<float>() * 0.5f);
+    wander.SetTargetRadius(ANT_PI * 0.1f);
+    wander.SetSlowRadius(ANT_PI * 0.5f);
     wander.SetTimeToTarget(0.001f);
 
     playerMoveNotification = NotificationManager::Get()->AddListener(this, NOTIFICATION_PLAYER_MOVE);
@@ -54,7 +54,7 @@ void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
         character.rotation += steering.angular * dt;
         character.rotation *= powf(0.001f, dt); // angular drag
         character.orientation += character.rotation * dt;
-        transform->direction = normalize(vec3(-sinf(character.orientation), 0.0f, cosf(character.orientation)));
+        transform->direction = Vector3(-sinf(character.orientation), 0.0f, cosf(character.orientation)).Normalized();
     }
 }
 

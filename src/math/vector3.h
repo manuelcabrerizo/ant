@@ -22,6 +22,8 @@ public:
     void operator-=(const Vector3& rhs);
     Vector3 operator*(float rhs);
     void operator*=(float rhs);
+    Vector3 operator/(float rhs);
+    void operator/=(float rhs);
     float Dot(const Vector3& vector);
     Vector3 Cross(const Vector3& vector);
     float Magnitude();

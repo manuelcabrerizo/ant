@@ -6,17 +6,17 @@ void AdjustAngle(f32& angle);
 
 struct KinematicSteeringOutput
 {
-    vec3 velocity = vec3(0.0f);
+    Vector3 velocity = Vector3(0.0f);
     f32 rotation = 0.0f;
 };
 
 struct Kinematic
 {
-    vec3 position = vec3(0.0f);
-    vec3 velocity = vec3(0.0f);
+    Vector3 position = Vector3(0.0f);
+    Vector3 velocity = Vector3(0.0f);
     f32 orientation = 0.0f;
     f32 rotation = 0.0f;
-    static f32 GetNewOrientation(f32 currentOrientation, vec3 velocity);
+    static f32 GetNewOrientation(f32 currentOrientation, Vector3 velocity);
 };
 
 class KinematicSeek

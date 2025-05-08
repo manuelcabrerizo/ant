@@ -29,13 +29,12 @@ cbuffer PerDrawCall : register(b1)
 PS_Input vs_main(VS_Input i)
 {
     PS_Input o = (PS_Input)0;
-
-    float4 wPos = mul(model, float4(i.pos, 1.0f));
+    float4 wPos = mul(float4(i.pos, 1.0f), model);
     float3 fragPos = float3(wPos.xyz);
-    wPos = mul(view, wPos);
-    wPos = mul(proj, wPos);
+    wPos = mul(wPos, view);
+    wPos = mul(wPos, proj);
 
-    float3 wNor = mul((float3x3) model, i.nor);
+    float3 wNor = mul(i.nor, (float3x3)model);
     wNor = normalize(wNor);
 
     o.pos = wPos;

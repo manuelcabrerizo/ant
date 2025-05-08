@@ -4,7 +4,7 @@
 
 struct PerDrawUbo
 {
-     mat4 model;
+    Matrix4 model;
 };
 
 class RenderComponent : public Component<RenderComponent>
@@ -23,6 +23,7 @@ public:
 
     Texture *texture;
     Model *model;
+    Vector3 rotationOffset;
     bool isAnimated = false;
 
      // use to init static variables, must be called by the user at init time

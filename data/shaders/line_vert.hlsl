@@ -21,8 +21,8 @@ PS_Input vs_main(VS_Input i)
     PS_Input o = (PS_Input)0;
 
     float4 wPos = float4(i.pos, 1.0f);
-    wPos = mul(view, wPos);
-    wPos = mul(proj, wPos);
+    wPos = mul(wPos, view);
+    wPos = mul(wPos, proj);
 
     o.pos = wPos;
     o.col = i.col;

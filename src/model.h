@@ -4,9 +4,9 @@
 #define MAX_BONE_INFLUENCE 4
 struct Vertex
 {
-     vec3 pos;
-     vec3 nor;
-     vec2 uvs;
+     Vector3 pos;
+     Vector3 nor;
+     Vector2 uvs;
      i32 boneId[MAX_BONE_INFLUENCE];
      f32 weights[MAX_BONE_INFLUENCE];
 };
@@ -31,7 +31,7 @@ public:
 struct BoneInfo
 {
      i32 id = -1;
-     mat4 offset = mat4(1.0f);
+     Matrix4 offset = Matrix4(1.0f);
 };
 
 class Model

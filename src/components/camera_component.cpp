@@ -3,8 +3,8 @@ CameraUbo CameraComponent::ubo;
 
 void CameraComponent::Initialize()
 {
-     ubo.view = lookAt(vec3(0.0f, 4.0f, -4.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-     ubo.proj = perspective(radians(65.0f), (float)WINDOW_WIDTH/WINDOW_HEIGHT, 0.01f, 100.0f);
+     ubo.view = Matrix4::LookAt(Vector3(0.0f, 4.0f, -4.0f), Vector3(0.0f), Vector3(0.0f, 1.0f, 0.0f));
+     ubo.proj = Matrix4::Perspective(65.0f, (float)WINDOW_WIDTH/WINDOW_HEIGHT, 0.01f, 100.0f);
      uniformBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_VS, &ubo, sizeof(ubo), 0);
      GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
 }
@@ -35,68 +35,68 @@ void CameraComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 
 void CameraComponent::OnNotify(NotificationType type, void *data, size_t size, void *sender)
 {
-     vec2 *extend = (vec2 *)data;
-     ubo.proj = perspective(radians(65.0f), extend->x/extend->y, 0.01f, 100.0f);
+     Vector2 *extend = (Vector2 *)data;
+     ubo.proj = Matrix4::Perspective(65.0f, extend->x/extend->y, 0.01f, 100.0f);
 }
 
-void CameraComponent::Init(vec3 pos, vec3 dir)
+void CameraComponent::Init(Vector3 pos, Vector3 dir)
 {
-     worldUp = vec3(0.0f, 1.0f, 0.0f);
+     worldUp = Vector3(0.0f, 1.0f, 0.0f);
      
      position = pos;
-     front = normalize(dir);
-     right = normalize(cross(worldUp, front));
-     up = cross(front, right);
+     front = dir.Normalized();
+     right = worldUp.Cross(front).Normalized();
+     up = front.Cross(right);
      // TODO: this should never be zero
-     worldFront = normalize(vec3(front.x, 0.0f, front.z));
+     worldFront = Vector3(front.x, 0.0f, front.z).Normalized();
 }
 
-void CameraComponent::SetPosition(vec3 pos)
+void CameraComponent::SetPosition(Vector3 pos)
 {
      position = pos;
 }
 
-void CameraComponent::SetDirection(vec3 dir)
+void CameraComponent::SetDirection(Vector3 dir)
 {
-     front = normalize(dir);
-     right = normalize(cross(worldUp, front));
-     up = cross(front, right);
+     front = dir.Normalized();
+     right = worldUp.Cross(front).Normalized();
+     up = front.Cross(right);
      // TODO: this should never be zero
-     worldFront = normalize(vec3(front.x, 0.0f, front.z));
+     worldFront = Vector3(front.x, 0.0f, front.z).Normalized();
 }
 
-vec3 CameraComponent::GetPosition()
+Vector3 CameraComponent::GetPosition()
 {
      return position;
 }
 
-vec3 CameraComponent::GetFront()
+Vector3 CameraComponent::GetFront()
 {
      return front;
 }
 
-vec3 CameraComponent::GetRight()
+Vector3 CameraComponent::GetRight()
 {
      return right;
 }
 
-vec3 CameraComponent::GetUp()
+Vector3 CameraComponent::GetUp()
 {
      return up;
 }
 
-vec3 CameraComponent::GetWorldFront()
+Vector3 CameraComponent::GetWorldFront()
 {
      return worldFront;
 }
 
-vec3 CameraComponent::GetWorldUp()
+Vector3 CameraComponent::GetWorldUp()
 {
      return worldUp;
 }
 
 
-mat4 CameraComponent::GetView()
+Matrix4 CameraComponent::GetView()
 {
-     return lookAt(position, position + front, worldUp);
+     return Matrix4::LookAt(position, position + front, worldUp);
 }

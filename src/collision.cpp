@@ -1,8 +1,8 @@
 
-void Ray::Init(vec3 o_, vec3 d_)
+void Ray::Init(Vector3 o, Vector3 d)
 {
-     o = o_;
-     d = d_;
+     this->o = o;
+     this->d = d;
 }
 
 bool Ray::Intersect(Triangle& triangle, f32& u, f32& v, f32& w, f32& t)
@@ -12,7 +12,7 @@ bool Ray::Intersect(Triangle& triangle, f32& u, f32& v, f32& w, f32& t)
      
      if(plane.Intersect(*this, t))
      {
-          vec3 hitPos = o + d * t;
+          Vector3 hitPos = o + d * t;
           return triangle.PointInside(hitPos, u, v, w);
      }
      return false;
@@ -20,9 +20,9 @@ bool Ray::Intersect(Triangle& triangle, f32& u, f32& v, f32& w, f32& t)
 
 bool Ray::Intersect(Sphere& sphere, f32& t)
 {
-     vec3 m = o - sphere.c;
-     f32 b = dot(m, d);
-     f32 c = dot(m, m) - sphere.r * sphere.r;
+     Vector3 m = o - sphere.c;
+     f32 b = m.Dot(d);
+     f32 c = m.Dot(m) - sphere.r * sphere.r;
 
      if(c > 0.0f && b > 0.0f)
      {
@@ -47,10 +47,10 @@ bool Ray::Intersect(Sphere& sphere, f32& t)
 }
 
 
-void Segment::Init(vec3 a_, vec3 b_)
+void Segment::Init(Vector3 a, Vector3 b)
 {
-     a = a_;
-     b = b_;
+     this->a = a;
+     this->b = b;
 }
 
 bool Segment::Intersect(Triangle& triangle, f32& u, f32& v, f32& w, f32& t)
@@ -60,7 +60,7 @@ bool Segment::Intersect(Triangle& triangle, f32& u, f32& v, f32& w, f32& t)
 
      if(plane.Intersect(*this, t))
      {
-          vec3 hitPos = a + normalize(b - a) * t;
+          Vector3 hitPos = a + (b - a).Normalized() * t;
           return triangle.PointInside(hitPos, u, v, w);
      }
      return false;
@@ -68,13 +68,13 @@ bool Segment::Intersect(Triangle& triangle, f32& u, f32& v, f32& w, f32& t)
 
 bool Segment::Intersect(Sphere& sphere, f32& t)
 {
-     vec3 ab = b - a;
-     vec3 o = a;
-     vec3 d = normalize(ab);
+     Vector3 ab = b - a;
+     Vector3 o = a;
+     Vector3 d = ab.Normalized();
 
-     vec3 m = o - sphere.c;
-     f32 b_ = dot(m, d);
-     f32 c = dot(m, m) - sphere.r * sphere.r;
+     Vector3 m = o - sphere.c;
+     f32 b_ = m.Dot(d);
+     f32 c = m.Dot(m) - sphere.r * sphere.r;
 
      if(c > 0.0f && b_ > 0.0f)
      {
@@ -90,7 +90,7 @@ bool Segment::Intersect(Sphere& sphere, f32& t)
 
      t = -b_ - sqrtf(discr);
 
-     if(t*t > dot(ab, ab))
+     if(t*t > ab.Dot(ab))
      {
           return false;
      }
@@ -108,10 +108,10 @@ bool Segment::Intersect(Sphere& sphere, f32& t)
 
 bool Segment::Intersect(Cylinder& cylinder, f32& t)
 {
-     vec3 d = cylinder.q - cylinder.p, m = a - cylinder.p, n = b - a;
-     f32 md = dot(m, d);
-     f32 nd = dot(n, d);
-     f32 dd = dot(d, d);
+     Vector3 d = cylinder.q - cylinder.p, m = a - cylinder.p, n = b - a;
+     f32 md = m.Dot(d);
+     f32 nd = n.Dot(d);
+     f32 dd = d.Dot(d);
 
      if(md < 0.0f && md + nd < 0.0f)
      {
@@ -122,10 +122,10 @@ bool Segment::Intersect(Cylinder& cylinder, f32& t)
           return false;
      }
 
-     f32 nn = dot(n, n);
-     f32 mn = dot(m, n);
+     f32 nn = n.Dot(n);
+     f32 mn = m.Dot(n);
      f32 a_ = dd * nn - nd * nd;
-     f32 k = dot(m, m) - cylinder.r * cylinder.r;
+     f32 k = m.Dot(m) - cylinder.r * cylinder.r;
      f32 c = dd * k - md * md;
 
      if(fabsf(a_) < EPSILON)
@@ -187,36 +187,36 @@ bool Segment::Intersect(Cylinder& cylinder, f32& t)
 }
 
 
-vec3 Segment::ClosestPoint(vec3 point, f32& t)
+Vector3 Segment::ClosestPoint(Vector3 point, f32& t)
 {
-     vec3 ab = b - a;
-     t = dot(point - a, ab) / dot(ab, ab);
+     Vector3 ab = b - a;
+     t = (point - a).Dot(ab) / ab.Dot(ab);
 
      if(t < 0.0f) t = 0.0f;
      if(t > 1.0f) t = 1.0f;
 
-     return a + t * ab;
+     return a + ab * t;
 }
 
-void Plane::Init(vec3 n_, f32 d_)
+void Plane::Init(Vector3 n, f32 d)
 {
-     n = n_;
-     d = d_;
+     this->n = n;
+     this->d = d;
 }
 
 void Plane::Init(Triangle &triangle)
 {
-     n = normalize(triangle.n);
-     d = dot(triangle.a, n);
+     n = triangle.n.Normalized();
+     d = triangle.a.Dot(n);
 }
 
 bool Plane::Intersect(Ray& ray, f32& t)
 {
-     f32 denom = dot(n, ray.d);
+     f32 denom = n.Dot(ray.d);
      if (fabsf(denom) > 0.0001f)
      {
-          vec3 center = n * d;
-          t = dot((center - ray.o), n) / denom;
+          Vector3 center = n * d;
+          t = (center - ray.o).Dot(n) / denom;
           if (t >= 0) return true;
      }
      return false;
@@ -224,31 +224,31 @@ bool Plane::Intersect(Ray& ray, f32& t)
 
 bool Plane::Intersect(Segment& segment, f32& t)
 {
-     vec3 ab = segment.b - segment.a;
-     vec3 dir = normalize(ab);
-     f32 len = length(ab);
+     Vector3 ab = segment.b - segment.a;
+     Vector3 dir = ab.Normalized();
+     f32 len = ab.Magnitude();
      
-     f32 denom = dot(n, dir);
+     f32 denom = n.Dot(dir);
      if (fabsf(denom) > 0.0001f)
      {
-          vec3 center = n * d;
-          t = dot((center - segment.a), n) / denom;
+          Vector3 center = n * d;
+          t = (center - segment.a).Dot(n) / denom;
           if (t >= 0 && t <= len) return true;
      }
      return false;
 }
 
 
-vec3 Plane::ClosestPoint(vec3 q)
+Vector3 Plane::ClosestPoint(Vector3 q)
 {
-     f32 t = (dot(n, q) - d) / dot(n, n);
-     return q - t * n;
+     f32 t = (n.Dot(q) - d) / n.Dot(n);
+     return q - n * t;
 }
 
-void Sphere::Init(vec3 c_, f32 r_)
+void Sphere::Init(Vector3 c, f32 r)
 {
-     c = c_;
-     r = r_;
+     this->c = c;
+     this->r = r;
 }
 
 bool Sphere::Intersect(Ray& ray, f32& t)
@@ -261,17 +261,17 @@ bool Sphere::Intersect(Segment& segment, f32& t)
      return segment.Intersect(*this, t);
 }
 
-bool Sphere::Intersect(Triangle& triangle, vec3& n, f32& penetration)
+bool Sphere::Intersect(Triangle& triangle, Vector3& n, f32& penetration)
 {
-     vec3 closest = triangle.ClosestPoint(c);
+     Vector3 closest = triangle.ClosestPoint(c);
 
      //GraphicsManager::Get()->DebugDrawSphere(closest, 0.02f, 4, 6);
 
-     vec3 toSphere = c - closest;
+     Vector3 toSphere = c - closest;
      
-     f32 lenSq = dot(toSphere, toSphere);
+     f32 lenSq = toSphere.Dot(toSphere);
 
-     n = normalize(toSphere);
+     n = toSphere.Normalized();
 
      //GraphicsManager::Get()->DebugDrawLine(closest, closest + n);
      
@@ -284,10 +284,10 @@ bool Sphere::Intersect(Triangle& triangle, vec3& n, f32& penetration)
      return lenSq <= r*r;
 }
 
-bool Sphere::DynamicIntersect(Plane& plane, vec3 movement, f32& t)
+bool Sphere::DynamicIntersect(Plane& plane, Vector3 movement, f32& t)
 {
      // Compute distance of sphere center to plane
-     f32 d = dot(plane.n, c);
+     f32 d = plane.n.Dot(c);
      f32 dist = d - plane.d;
      if(fabsf(dist) <= r)
      {
@@ -298,7 +298,7 @@ bool Sphere::DynamicIntersect(Plane& plane, vec3 movement, f32& t)
      }
      else
      {
-          f32 denom = dot(plane.n, movement);
+          f32 denom = plane.n.Dot(movement);
           if(denom * dist >= 0.0f)
           {
                // No intersection as sphere parallel to or away from plane
@@ -319,8 +319,8 @@ bool Sphere::DynamicIntersect(Plane& plane, vec3 movement, f32& t)
      }
 }
 
-bool Sphere::DynamicIntersect(Triangle& triangle, vec3 movement, f32& u, f32& v, f32& w,
-                              f32& t, vec3& n)
+bool Sphere::DynamicIntersect(Triangle& triangle, Vector3 movement, f32& u, f32& v, f32& w,
+                              f32& t, Vector3& n)
 {         
      Plane plane;
      plane.Init(triangle);
@@ -328,7 +328,7 @@ bool Sphere::DynamicIntersect(Triangle& triangle, vec3 movement, f32& u, f32& v,
      if(DynamicIntersect(plane, movement, t))
      {
           
-          vec3 q = c + t * movement - r * plane.n;
+          Vector3 q = c + movement * t - plane.n * r;
           if(triangle.PointInside(q, u, v, w))
           {
                n = triangle.n;
@@ -357,12 +357,12 @@ bool Sphere::DynamicIntersect(Triangle& triangle, vec3 movement, f32& u, f32& v,
                               segment.Init(cylinders[i].p, cylinders[i].q);
 
                               t = currentT;
-                              vec3 hitPos = c + movement * t;
+                              Vector3 hitPos = c + movement * t;
 
                               f32 t0;
-                              vec3 closest = segment.ClosestPoint(hitPos, t0);
+                              Vector3 closest = segment.ClosestPoint(hitPos, t0);
 
-                              n = normalize(hitPos - closest);                    
+                              n = (hitPos - closest).Normalized();                    
                          }
                     }
                }
@@ -388,8 +388,8 @@ bool Sphere::DynamicIntersect(Triangle& triangle, vec3 movement, f32& u, f32& v,
                               if(currentT < t)
                               {
                                    t = currentT;
-                                   vec3 hitPos = c + movement * t;
-                                   n = normalize(hitPos - spheres[i].c);
+                                   Vector3 hitPos = c + movement * t;
+                                   n = (hitPos - spheres[i].c).Normalized();
                               }
                          }
                     }
@@ -420,12 +420,12 @@ bool Sphere::DynamicIntersect(Triangle& triangle, vec3 movement, f32& u, f32& v,
                          segment.Init(cylinders[i].p, cylinders[i].q);
 
                          t = currentT;
-                         vec3 hitPos = c + movement * t;
+                         Vector3 hitPos = c + movement * t;
 
                          f32 t0;
-                         vec3 closest = segment.ClosestPoint(hitPos, t0);
+                         Vector3 closest = segment.ClosestPoint(hitPos, t0);
 
-                         n = normalize(hitPos - closest);                    
+                         n = (hitPos - closest).Normalized();                    
                     }
                }
           }
@@ -451,8 +451,8 @@ bool Sphere::DynamicIntersect(Triangle& triangle, vec3 movement, f32& u, f32& v,
                          if(currentT < t)
                          {
                               t = currentT;
-                              vec3 hitPos = c + movement * t;
-                              n = normalize(hitPos - spheres[i].c);
+                              Vector3 hitPos = c + movement * t;
+                              n = (hitPos - spheres[i].c).Normalized();
                          }
                     }
                }
@@ -463,22 +463,22 @@ bool Sphere::DynamicIntersect(Triangle& triangle, vec3 movement, f32& u, f32& v,
      return false;
 }
 
-void Cylinder::Init(vec3 p_, vec3 q_, f32 r_)
+void Cylinder::Init(Vector3 p, Vector3 q, f32 r)
 {
-     p = p_;
-     q = q_;
-     r = r_;
+     this->p = p;
+     this->q = q;
+     this->r = r;
 }
 
-void Triangle::Init(vec3 a_, vec3 b_, vec3 c_)
+void Triangle::Init(Vector3 a, Vector3 b, Vector3 c)
 {
-     a = a_;
-     b = b_;
-     c = c_;
-     vec3 ab = b - a;
-     vec3 ac = c - a;
+     this->a = a;
+     this->b = b;
+     this->c = c;
+     Vector3 ab = b - a;
+     Vector3 ac = c - a;
      // test if the normal is correct
-     n = normalize(cross(ac, ab));
+     n = ac.Cross(ab).Normalized();
 }
 
 bool Triangle::Intersect(Ray& ray, f32& u, f32& v, f32& w, f32& t)
@@ -491,17 +491,17 @@ bool Triangle::Intersect(Segment& segment, f32& u, f32& v, f32& w, f32& t)
      return segment.Intersect(*this, u, v, w, t);
 }
 
-bool Triangle::PointInside(vec3 q, f32& u, f32& v, f32& w)
+bool Triangle::PointInside(Vector3 q, f32& u, f32& v, f32& w)
 {
-     vec3 v0 = b - a;
-     vec3 v1 = c - a;
-     vec3 v2 = q - a;
+     Vector3 v0 = b - a;
+     Vector3 v1 = c - a;
+     Vector3 v2 = q - a;
 
-     float d00 = dot(v0, v0);
-     float d10 = dot(v1, v0);
-     float d11 = dot(v1, v1);
-     float d20 = dot(v2, v0);
-     float d21 = dot(v2, v1);
+     float d00 = v0.Dot(v0);
+     float d10 = v1.Dot(v0);
+     float d11 = v1.Dot(v1);
+     float d20 = v2.Dot(v0);
+     float d21 = v2.Dot(v1);
 
      float invDenom = 1.0f / ((d00 * d11) - (d10 * d10));
 
@@ -518,12 +518,12 @@ bool Triangle::PointInside(vec3 q, f32& u, f32& v, f32& w)
           z >= 0.0f && z <= 1.0f;
 }
 
-vec3 Triangle::ClosestPoint(vec3 q)
+Vector3 Triangle::ClosestPoint(Vector3 q)
 {
      Plane plane;
      plane.Init(*this);
 
-     vec3 pointInPlane = plane.ClosestPoint(q);
+     Vector3 pointInPlane = plane.ClosestPoint(q);
      f32 u, v, w;
      if(PointInside(pointInPlane, u, v, w))
      {
@@ -535,15 +535,15 @@ vec3 Triangle::ClosestPoint(vec3 q)
      edges[1].Init(b, c);
      edges[2].Init(c, a);
 
-     vec3 result;
+     Vector3 result;
      
      f32 lenSq = FLT_MAX;
      for(i32 i = 0; i < 3; ++i)
      {
           f32 currentT;
-          vec3 closest = edges[i].ClosestPoint(q, currentT);
+          Vector3 closest = edges[i].ClosestPoint(q, currentT);
 
-          f32 currentLenSq = dot(closest - q, closest - q); 
+          f32 currentLenSq = (closest - q).MagnitudeSq(); 
           if(currentLenSq < lenSq)
           {
                lenSq = currentLenSq;
@@ -557,7 +557,7 @@ vec3 Triangle::ClosestPoint(vec3 q)
 // TODO: fix gImporter architecture
 void CollisionWorld::LoadFromFile(const char *filepath)
 {
-     const aiScene *scene = gImporter.ReadFile(filepath, 0);
+     const aiScene *scene = gImporter.ReadFile(filepath, aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder);
      i32 totalTriangleCount = 0;
      for(i32 i = 0; i < scene->mNumMeshes; i++)
      {
@@ -581,19 +581,18 @@ void CollisionWorld::LoadFromFile(const char *filepath)
                auto v1 = mesh->mVertices[face->mIndices[1]];
                auto v2 = mesh->mVertices[face->mIndices[2]];
 
-               vec3 a = vec3(v0.x, v0.y, v0.z);
-               vec3 b = vec3(v1.x, v1.y, v1.z);                    
-               vec3 c = vec3(v2.x, v2.y, v2.z);
+               Vector3 a = Vector3(v0.x, v0.y, v0.z);
+               Vector3 b = Vector3(v1.x, v1.y, v1.z);                    
+               Vector3 c = Vector3(v2.x, v2.y, v2.z);
                
                Triangle triangle;
                triangle.Init(a, b, c);
-
                triangles.Push(triangle);
           }
      }
 }
 
-bool CollisionWorld::Intersect(Segment& segment, f32& t, vec3& n)
+bool CollisionWorld::Intersect(Segment& segment, f32& t, Vector3& n)
 {
      t = FLT_MAX;
      for(i32 i = 0; i < triangles.size; ++i)
@@ -611,7 +610,7 @@ bool CollisionWorld::Intersect(Segment& segment, f32& t, vec3& n)
      return t != FLT_MAX;
 }
 
-bool CollisionWorld::Intersect(Ray& ray, f32& t, vec3& n)
+bool CollisionWorld::Intersect(Ray& ray, f32& t, Vector3& n)
 {
      t = FLT_MAX;
      for(i32 i = 0; i < triangles.size; ++i)
@@ -666,7 +665,7 @@ bool CollisionWorld::Intersect(Sphere& sphere, Array<CollisionData>& collisionDa
      for(i32 i = 0; i < triangles.size; ++i)
      {
           f32 penetration;
-          vec3 n;
+          Vector3 n;
           if(sphere.Intersect(triangles[i], n, penetration))
           {
                if(collisionData.size < MAX_COLLISION_COUNT)
@@ -682,13 +681,13 @@ bool CollisionWorld::Intersect(Sphere& sphere, Array<CollisionData>& collisionDa
      return collisionData.size > 0;
 }
 
-bool CollisionWorld::DynamicIntersect(Sphere& sphere, vec3 movement,
+bool CollisionWorld::DynamicIntersect(Sphere& sphere, Vector3 movement,
                                       Array<CollisionData>& collisionData)
 {    
      for(i32 i = 0; i < triangles.size; ++i)
      {
           f32 u, v, w, t;
-          vec3 n;
+          Vector3 n;
           if(sphere.DynamicIntersect(triangles[i], movement, u, v, w, t, n))
           {
                if(collisionData.size < MAX_COLLISION_COUNT)
@@ -713,13 +712,13 @@ bool CollisionWorld::DynamicIntersect(Sphere& sphere, vec3 movement,
                {
                     if(i != j)
                     {
-                         vec3 n0 = collisionData[i].n;
-                         vec3 n1 = collisionData[j].n;
-                         f32 proj = dot(n0, n1); 
+                         Vector3 n0 = collisionData[i].n;
+                         Vector3 n1 = collisionData[j].n;
+                         f32 proj = n0.Dot(n1); 
                          if(proj < 0.0f && proj > -0.999f)
                          {
                               CollisionData collision = {};
-                              collision.n = normalize(n0 + n1);
+                              collision.n = (n0 + n1).Normalized();
                               collisionData.Push(collision);
                               collisionAdded = true;
                               break;
