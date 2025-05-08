@@ -68,7 +68,7 @@ void ModelManager::Load(const char *name, const char *path)
 {
      ModelHandle modelHandle;
      modelHandle.name = name;
-     modelHandle.model.Init(path);
+     modelHandle.model.Init(path, STATIC_MEMORY);
      nameIndex.Add(name, assets.Add(modelHandle));
 }
 

@@ -114,6 +114,7 @@ public:
      void Remove(i32 key);
      Type *Get(const char *name);
      Type *Get(i32 key);
+     bool Contains(const char *name);
 
      void PrintHashMap();
      

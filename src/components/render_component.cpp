@@ -47,7 +47,9 @@ void RenderComponent::OnRender(ShaderManager *shaderManager, ActorManager *actor
     mat4 sca = scale(mat4(1.0f), transform->scale);
 
     vec3 front = normalize(transform->direction);
-    vec3 right = normalize(cross(vec3(0.0f, 1.0f, 0.0f), front));
+
+    vec3 worldUp = vec3(0.0f, 1.0f, 0.0f);
+    vec3 right = normalize(cross(worldUp, front));
     vec3 up = cross(front, right);
     mat3 rot = mat3(right, up, front);
     mat4 ori = mat4(rot);

@@ -79,7 +79,7 @@ i32 Bone::GetIndex(Array<Key<Type>> &array, f32 animationTime)
             return i;
         }
     }
-    return array.size - 1;
+    return array.size - 2;
 }
 
 template <>

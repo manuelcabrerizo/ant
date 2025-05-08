@@ -24,7 +24,9 @@ void Game::Init()
      modelManager.Load("sniper", "../data/models/sniper.obj");
      modelManager.Load("warrior", "../data/models/warrior.dae");
      modelManager.Load("test-level", "../data/models/level-rendering.obj");
-     modelManager.Load("anim-gun", "../data/models/fps-animations-vsk/source/FPS_VSK.fbx");
+     //modelManager.Load("anim-gun", "../data/models/bob/bob.md5mesh");
+     modelManager.Load("anim-gun", "../data/models/fps-animations-vsk/source/FPS_VSK1.fbx");
+
 
      // Load a texture
      textureManager.Init(128);
@@ -48,11 +50,13 @@ void Game::Init()
      SlotmapKey<Actor> player = actorManager.CreateActorFromFile("../data/xml/player.xml", &textureManager, &modelManager);
      WeaponComponent *weapon = actorManager.GetComponent<WeaponComponent>(player);
      AnimationComponent animationCmp;
-     animationCmp.skeleton.Init("../data/models/fps-animations-vsk/source/FPS_VSK.fbx", STATIC_MEMORY);
-     animationCmp.animation.Init("../data/models/fps-animations-vsk/source/FPS_VSK.fbx", STATIC_MEMORY);
+     //animationCmp.skeleton.Init("../data/models/bob/bob.md5mesh", STATIC_MEMORY);
+     //animationCmp.animation.Init("../data/models/bob/bob.md5mesh", modelManager.Get("anim-gun"), STATIC_MEMORY);
+     animationCmp.skeleton.Init("../data/models/fps-animations-vsk/source/FPS_VSK1.fbx", STATIC_MEMORY);
+     animationCmp.animation.Init("../data/models/fps-animations-vsk/source/FPS_VSK1.fbx", modelManager.Get("anim-gun"), STATIC_MEMORY);
      actorManager.AddComponent<AnimationComponent>(weapon->weapon, animationCmp);
      RenderComponent *render = actorManager.GetComponent<RenderComponent>(weapon->weapon);
-     render->isAnimated = false;
+     render->isAnimated = true;
      
 
      actorManager.CreateActorFromFile("../data/xml/test-level.xml", &textureManager, &modelManager);
@@ -84,7 +88,7 @@ void Game::Init()
 
      AnimationComponent animation;
      animation.skeleton.Init("../data/models/warrior.dae", STATIC_MEMORY);
-     animation.animation.Init("../data/animations/walk_front.dae", STATIC_MEMORY);
+     animation.animation.Init("../data/animations/walk_front.dae", modelManager.Get("warrior"), STATIC_MEMORY);
      actorManager.AddComponent<AnimationComponent>(enemy[0], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[1], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[2], animation);

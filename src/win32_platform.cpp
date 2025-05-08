@@ -8,7 +8,9 @@
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-// glm
+// TODO: remove glm to see if fix handednes realed problems
+// glm 
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_LEFT_HANDED
@@ -19,6 +21,7 @@
 #include <glm/gtx/quaternion.hpp>
 using namespace glm;
 
+
 // stb
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -27,6 +30,8 @@ using namespace glm;
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
+#include "common.h"
 
 struct File
 {
@@ -44,7 +49,6 @@ File PlatformReadFile(const char *filepath, i32 stackNum);
 // TODO: try to make the unity build work with vc code c++ extension
 //       by moving the header file to their corresponding cpp files
 // engine
-#include "common.h"
 #include "memory.h"
 #include "memory_manager.h"
 #include "containers.h"

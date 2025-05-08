@@ -581,9 +581,9 @@ void CollisionWorld::LoadFromFile(const char *filepath)
                auto v1 = mesh->mVertices[face->mIndices[1]];
                auto v2 = mesh->mVertices[face->mIndices[2]];
 
-               vec3 a = vec3(v0.x, v0.y, v0.z*-1.0f);
-               vec3 b = vec3(v1.x, v1.y, v1.z*-1.0f);                    
-               vec3 c = vec3(v2.x, v2.y, v2.z*-1.0f);
+               vec3 a = vec3(v0.x, v0.y, v0.z);
+               vec3 b = vec3(v1.x, v1.y, v1.z);                    
+               vec3 c = vec3(v2.x, v2.y, v2.z);
                
                Triangle triangle;
                triangle.Init(a, b, c);

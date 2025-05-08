@@ -7,10 +7,12 @@ class Animation
 private:
     f32 duration = 0.0f;
     i32 ticksPerSeconds = 0;
-    Array<Bone> bones;
+    HashMap<Bone> bones;
+    HashMap<BoneInfo> bonesInfo;
 public:
-    void Init(const char *filepath, i32 memoryType);
+    void Init(const char *filepath, Model *model, i32 memoryType);
     f32 GetDuration() { return duration; }
     i32 GetTicksPerSeconds();
-    Array<Bone>& GetBones();
+    HashMap<Bone>& GetBones();
+    HashMap<BoneInfo>& GetBonesInfo();
 };

@@ -71,6 +71,7 @@ void PlayerControllerComponent::ProcessMouseMovement()
          transform->direction = rotate(mat4(1.0f), pitch, vec3(1, 0, 0)) * vec4(dir, 0.0f);
          transform->direction = rotate(mat4(1.0f), yaw, vec3(0, 1, 0)) * vec4(transform->direction, 0.0f);
          transform->direction = normalize(transform->direction);
+         printf("direction: %f, %f, %f\n", transform->direction.x, transform->direction.y, transform->direction.z);
          i32 windowX, windowY, windowW, windowH;
          PlaformGetWindowPos(&windowX, &windowY);
          PlatformClientDimensions(&windowW, &windowH);

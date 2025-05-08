@@ -9,12 +9,11 @@ class  Skeleton
     {
     public:
         mat4 transformation = mat4(1.0f);
-        mat4 inverseBindPose = mat4(1.0f);
-        i32 boneIndex = 0;
+        char name[128];
         Array<Node> childrens;
 
-        i32 FindBoneIndex(aiBone **bones, i32 count, const char *name);
-        void Init(aiNode *node, aiBone **bones, i32 count, i32 memoryType);
+        //i32 FindBoneIndex(aiBone **bones, i32 count, const char *name);
+        void Init(aiNode *node, i32 memoryType);
     };
 
 private:

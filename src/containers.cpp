@@ -204,6 +204,7 @@ template<typename Type>
 void HashMap<Type>::Init(u64 capacity_, i32 stackNum)
 {
      ASSERT(capacity_ > 1);
+     // TODO: remove this
      ASSERT((capacity_ & (capacity_ - 1)) == 0); // capacity_ should be power of two
      capacity = capacity_;
      mask = capacity - 1;
@@ -403,6 +404,37 @@ Type *HashMap<Type>::Get(i32 key)
      }
      
      return &elements[index].value;
+}
+
+template<typename Type>
+bool HashMap<Type>::Contains(const char *name)
+{
+     u32 id = MurMur2(name, strlen(name), 123);
+     u32 index = id % mask;
+
+     if(elements[index].id == INVALID_MAP_ID)
+     {
+          return false;
+     }
+
+     i32 checkCount = 0;
+     while(elements[index].id != id &&
+           elements[index].id != INVALID_MAP_ID)
+     {
+          index = (index + 1) % capacity;
+          if(checkCount >= capacity)
+          {
+               return false;
+          }
+          checkCount++;
+     }
+     
+     if(elements[index].id == INVALID_MAP_ID)
+     {
+          return false;
+     }
+     
+     return true;
 }
 
 template<typename Type>
