@@ -2,13 +2,13 @@
 <Actor>
     <TransformComponent>
         <position x="0" y="0.0" z="0"/>
-        <scale x="1" y="1" z="1"/>
+        <scale x="0.5" y="0.5" z="0.5"/>
         <direction x="0" y="0" z="1"/>
     </TransformComponent>
     <RenderComponent>
         <model name="sniper"/>
         <texture name="default"/>
-        <rotationOffset x="0" y="180" z="0"/>
+        <rotationOffset x="0" y="0" z="0"/>
     </RenderComponent>
     <AnchorComponent>
         <offset x="0" y="0.035" z="0"/>
