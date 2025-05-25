@@ -52,7 +52,7 @@ void RenderComponent::OnRender(ShaderManager *shaderManager, ActorManager *actor
     Vector3 right =  worldUp.Cross(front).Normalized();
     Vector3 up = front.Cross(right);
     Matrix4 ori = Matrix4::TransformFromBasis(Vector3(0.0f), right, up, front);
-    ubo.model =  tra * ori * sca; // TODO: chage order of mul
+    ubo.model =  tra * ori * sca;
 
     Matrix4 rotOffset = Matrix4::RotateX(rotationOffset.x) * Matrix4::RotateY(rotationOffset.y) * Matrix4::RotateZ(rotationOffset.z);
 
@@ -66,8 +66,6 @@ void RenderComponent::OnRender(ShaderManager *shaderManager, ActorManager *actor
     {
         GraphicsManager::Get()->UniformBufferUpdate(matrixBuffer, animation->skeleton.GetMatrices());
         shaderManager->Bind("animation");
-        // TODO: temporal fix becouse warrior animation are wrong
-        //ubo.model *= rotate(mat4(1.0f), radians(180.0f), vec3(0.0f, 1.0f, 0.0f));
     }
 
     GraphicsManager::Get()->TextureBind(texture, 0);

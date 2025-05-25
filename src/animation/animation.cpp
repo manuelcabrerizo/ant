@@ -56,11 +56,6 @@ i32 Animation::GetTicksPerSeconds()
     return ticksPerSeconds;
 }
 
-//Array<Bone>& Animation::GetBones()
-//{
-//    return bones;
-//}
-
 HashMap<Bone>& Animation::GetBones()
 {
     return bones;

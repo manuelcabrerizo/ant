@@ -11,8 +11,6 @@ class  Skeleton
         Matrix4 transformation = Matrix4(1.0f);
         char name[128];
         Array<Node> childrens;
-
-        //i32 FindBoneIndex(aiBone **bones, i32 count, const char *name);
         void Init(aiNode *node, i32 memoryType);
     };
 
