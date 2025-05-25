@@ -177,6 +177,7 @@ LRESULT Wndproc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
      return result;
 }
 
+// Entry point
 #if ANT_CONSOLE
 int main(int argc, char *argv[])
 #else
