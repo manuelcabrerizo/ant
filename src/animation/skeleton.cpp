@@ -21,15 +21,21 @@ void Skeleton::Node::Init(aiNode *node, i32 memoryType)
     }
 }
 
-void Skeleton::Init(const char *filepath, i32 memoryType)
+void Skeleton::Init(const char* filepath, i32 memoryType)
 {
-    const aiScene *scene = Utils::importer.ReadFile(filepath, 
+    const aiScene* scene = Utils::importer.ReadFile(filepath,
         aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
     ASSERT(scene);
-    
+
     root.Init(scene->mRootNode, memoryType);
-    for(i32 i = 0; i < 100; i++) {
+    
+    for (i32 i = 0; i < 100; ++i) {
         finalBoneMatrices[i] = Matrix4(1.0f);
+    }
+    deltaTime = 0.0f;
+    for (i32 i = 0; i < 10; ++i)
+    {
+        currentTime[i] = 0;
     }
 }
 
