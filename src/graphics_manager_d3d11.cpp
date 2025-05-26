@@ -1,6 +1,9 @@
-// Public Interface
+#include <graphics_manager_d3d11.h>
+#include <graphics_manager.h>
+#include <memory_manager.h>
 
-#include "debug_renderer_d3d11.cpp"
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32 stackNum)
 {    
@@ -384,22 +387,24 @@ Texture *GraphicsManagerD3D11::TextureAlloc(const char *filepath)
           ASSERT(!"Error creating texture");
      }
 
-     deviceContext->UpdateSubresource(tx->texture, 0, 0, subresourceData.pSysMem, subresourceData.SysMemPitch, 0);
-
-     D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-     srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-     srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-     srvDesc.Texture2D.MipLevels = -1;
-     srvDesc.Texture2D.MostDetailedMip = 0;
-     if (FAILED(device->CreateShaderResourceView(tx->texture, &srvDesc, &tx->shaderResourceView)))
+     if (tx->texture)
      {
-          ASSERT(!"Error creating texture shader resource view");
+         deviceContext->UpdateSubresource(tx->texture, 0, 0, subresourceData.pSysMem, subresourceData.SysMemPitch, 0);
+         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+         srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+         srvDesc.Texture2D.MipLevels = -1;
+         srvDesc.Texture2D.MostDetailedMip = 0;
+         if (FAILED(device->CreateShaderResourceView(tx->texture, &srvDesc, &tx->shaderResourceView)))
+         {
+             ASSERT(!"Error creating texture shader resource view");
+         }
+         if (tx->shaderResourceView)
+         {
+             deviceContext->GenerateMips(tx->shaderResourceView);
+         }
      }
-
-     deviceContext->GenerateMips(tx->shaderResourceView);
-
      stbi_image_free(data);
-
      return (Texture *)tx;
 }
 
@@ -533,12 +538,11 @@ void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
           D3D_FEATURE_LEVEL_10_0
      };
      
-     i32 driverTypesCount = ARRAY_LENGTH(driverTypes);
-     i32 featureLevelsCount = ARRAY_LENGTH(featureLevels);
+     u32 driverTypesCount = ARRAY_LENGTH(driverTypes);
+     u32 featureLevelsCount = ARRAY_LENGTH(featureLevels);
 
      HRESULT hr = S_OK;
      D3D_FEATURE_LEVEL featureLevel;
-     D3D_DRIVER_TYPE driverType;
      for(u32 driver = 0; driver < driverTypesCount; ++driver)
      {
                hr = D3D11CreateDevice(0, driverTypes[driver], 0, deviceFlags,
@@ -648,7 +652,7 @@ void GraphicsManagerD3D11::CreateRenderTargetView()
      // create render target view
      ID3D11Texture2D *backBufferTexture;
      swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void **)&backBufferTexture);
-     if (FAILED(device->CreateRenderTargetView(backBufferTexture, 0, &renderTargetView)))
+     if (backBufferTexture && FAILED(device->CreateRenderTargetView(backBufferTexture, 0, &renderTargetView)))
      {
           ASSERT(!"Error creating render target.");
      }
@@ -675,7 +679,7 @@ void GraphicsManagerD3D11::CreateDepthStencilView(i32 width, i32 height)
      {
           ASSERT(!"Error creating depth stencil texture.");
      }
-     if (FAILED(device->CreateDepthStencilView(depthStencilTexture, 0, &depthStencilView)))
+     if (depthStencilTexture && FAILED(device->CreateDepthStencilView(depthStencilTexture, 0, &depthStencilView)))
      {
           ASSERT(!"Error creating depth stencil view.");
      }

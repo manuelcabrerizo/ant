@@ -1,9 +1,10 @@
 #include "skeleton.h"
 #include "animation.h"
+#include <utils.h>
 
 void Skeleton::Node::Init(aiNode *node, i32 memoryType)
 {
-    transformation = ai_mat4_to_sd_mat4(node->mTransformation);
+    transformation = Utils::FromAssimp(node->mTransformation);
 
     memset(name, 0, 128);
     i32 length = strlen(node->mName.C_Str());
@@ -22,7 +23,7 @@ void Skeleton::Node::Init(aiNode *node, i32 memoryType)
 
 void Skeleton::Init(const char *filepath, i32 memoryType)
 {
-    const aiScene *scene = gImporter.ReadFile(filepath, 
+    const aiScene *scene = Utils::importer.ReadFile(filepath, 
         aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
     ASSERT(scene);
     

@@ -1,5 +1,5 @@
 #pragma once
-
+#include "component.h"
 #include "animation/skeleton.h"
 #include "animation/animation.h"
 

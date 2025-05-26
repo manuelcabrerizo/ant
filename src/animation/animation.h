@@ -2,6 +2,9 @@
 
 #include "bone.h"
 
+#include <containers.h>
+#include <model.h>
+
 class Animation
 {
 private:

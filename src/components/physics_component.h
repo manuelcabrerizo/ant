@@ -1,5 +1,10 @@
 #pragma once
 
+#include "component.h"
+#include <collision.h>
+
+class TransformComponent;
+
 class PhysicsComponent : public Component<PhysicsComponent>
 {
 private:

@@ -1,5 +1,10 @@
 #pragma once
 
+#include <common.h>
+
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+
 constexpr u32 KEY_COUNT = 256;
 constexpr u32 MOUSE_BUTTON_COUNT = 3;
 

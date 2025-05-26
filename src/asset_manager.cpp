@@ -1,44 +1,5 @@
-template <typename Type>
-void AssetManager<Type>::Init(u32 assetsCapacity)
-{
-     nameIndex.Init(assetsCapacity, STATIC_MEMORY);
-     assets.Init(assetsCapacity, STATIC_MEMORY);
-}
-
-template <typename Type>
-void AssetManager<Type>::Terminate()
-{
-     Clear();
-}
-
-template <typename Type>
-void AssetManager<Type>::Clear()
-{
-     for(i32 i = assets.GetArray()->size - 1; i >= 0; --i)
-     {
-          Type *asset = &assets.GetArray()->data[i];
-          Unload(asset->name);
-     }
-}
-     
-template <typename Type>
-Type *AssetManager<Type>::Get(const char *name)
-{
-     return assets.Get(*nameIndex.Get(name));
-}
-
-template <typename Type>
-Type *AssetManager<Type>::Get(SlotmapKey<Type> handle)
-{
-     return assets.Get(handle);
-}
-
-template <typename Type>
-SlotmapKey<Type> AssetManager<Type>::GetHandle(const char *name)
-{
-     return *nameIndex.Get(name);
-}
-
+#include <asset_manager.h>
+#include <memory_manager.h>
 
 // Texture Manager
 void TextureManager::Load(const char *name, const char *path)

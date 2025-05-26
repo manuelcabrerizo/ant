@@ -1,3 +1,7 @@
+#include <input_manager.h>
+#include <platform.h>
+#include <stdio.h>
+
 InputManager InputManager::instance;
 bool InputManager::initialize = false;
 

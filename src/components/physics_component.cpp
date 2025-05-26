@@ -1,8 +1,15 @@
+#include "physics_component.h"
+#include "transform_component.h"
+
+#include <math.h>
+
+#include <memory_manager.h>
+
 CollisionWorld PhysicsComponent::collisionWorld;
 
 void PhysicsComponent::Initialize()
 {
-    collisionWorld.LoadFromFile("../data/collision/level-collision.obj");
+    collisionWorld.LoadFromFile("data/collision/level-collision.obj");
 }
 
 void PhysicsComponent::Terminate()

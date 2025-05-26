@@ -1,5 +1,11 @@
 #pragma once
 
+#include <containers.h>
+#include <math/vector3.h>
+#include <math/quaternion.h>
+
+#include <assimp/scene.h>
+
 class Animation;
 
 class Bone
@@ -30,7 +36,4 @@ public:
     i32 GetId();
 };
 
-inline Matrix4 ai_mat4_to_sd_mat4(aiMatrix4x4 m);
-inline Vector3 ai_vec3_to_sd_vec3(aiVector3D m);
-inline Quaternion ai_quat_to_sd_quat(aiQuaternion m);
 inline f32 get_scale_factor(f32 last_time_stamp, f32 next_time_stamp, f32 animation_time);

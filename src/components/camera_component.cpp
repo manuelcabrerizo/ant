@@ -1,3 +1,12 @@
+#include "camera_component.h"
+#include "transform_component.h"
+
+#include <math/vector2.h>
+#include <math/matrix4.h>
+
+#include <graphics_manager.h>
+#include <notification_manager.h>
+
 UniformBuffer *CameraComponent::uniformBuffer;
 CameraUbo CameraComponent::ubo;
 

@@ -1,7 +1,12 @@
 #pragma once
 
+#include <containers.h>
+#include <math/matrix4.h>
+
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 class Animation;
-class Skeleton;
 
 class  Skeleton
 {
@@ -9,7 +14,7 @@ class  Skeleton
     {
     public:
         Matrix4 transformation = Matrix4(1.0f);
-        char name[128];
+        char name[128] = {};
         Array<Node> childrens;
         void Init(aiNode *node, i32 memoryType);
     };

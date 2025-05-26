@@ -1,3 +1,10 @@
+#include <collision.h>
+
+#include <math/algebra.h>
+#include <float.h>
+
+#include <utils.h>
+#include <assimp/postprocess.h>
 
 void Ray::Init(Vector3 o, Vector3 d)
 {
@@ -554,10 +561,10 @@ Vector3 Triangle::ClosestPoint(Vector3 q)
      return result;
 }
 
-// TODO: fix gImporter architecture
+
 void CollisionWorld::LoadFromFile(const char *filepath)
 {
-     const aiScene *scene = gImporter.ReadFile(filepath, aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder);
+     const aiScene *scene = Utils::importer.ReadFile(filepath, aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder);
      i32 totalTriangleCount = 0;
      for(i32 i = 0; i < scene->mNumMeshes; i++)
      {

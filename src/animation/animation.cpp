@@ -1,5 +1,8 @@
 #include "animation.h"
 
+#include <utils.h>
+#include <assimp/postprocess.h>
+
 // TODO: remove this
 static i32 TempNextPower2(u32  x)
 {
@@ -11,11 +14,10 @@ static i32 TempNextPower2(u32  x)
      return  value;
 }
 
-// TODO: fix gImporter architecture
 // TODO: remove model from this function
 void Animation::Init(const char *filepath, Model *model, i32 memoryType)
 {
-    const aiScene *scene = gImporter.ReadFile(filepath, 
+    const aiScene *scene = Utils::importer.ReadFile(filepath, 
         aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
     ASSERT(scene);
     // Handle only one animation per file

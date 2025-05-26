@@ -1,5 +1,9 @@
 #pragma once
 
+#include <common.h>
+#include <containers.h>
+#include <math/vector3.h>
+
 class Triangle;
 class Sphere;
 class Cylinder;

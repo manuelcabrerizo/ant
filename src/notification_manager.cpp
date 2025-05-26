@@ -1,3 +1,6 @@
+#include "notification_manager.h"
+#include <memory.h>
+
 NotificationManager NotificationManager::instance;
 bool NotificationManager::initialize = false;
      

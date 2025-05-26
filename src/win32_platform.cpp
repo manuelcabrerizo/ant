@@ -1,99 +1,15 @@
-// tinyxml2
-#include "tinyxml2.h"
-#include "tinyxml2.cpp"
-
 #include <Windows.h>
 #include <Windowsx.h>
-
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
-
-// TODO: remove glm to see if fix handednes realed problems
-// glm 
-/*
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#define GLM_FORCE_LEFT_HANDED
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/compatibility.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
-using namespace glm;
-*/
-
-// stb
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
-// assimp
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include <stdio.h>
 
 #include "common.h"
+#include "math/vector2.h"
 
-#include "math/algebra.cpp"
-#include "math/vector2.cpp"
-#include "math/vector3.cpp"
-#include "math/vector4.cpp"
-#include "math/matrix4.cpp"
-#include "math/quaternion.cpp"
-
-struct File
-{
-     void *data;
-     u64 size;
-};
-
-void *PlatformGetOsWindow();
-void PlaformGetWindowPos(i32 *x, i32 *y);
-void PlaformSetCursorPos(i32 x, i32 y);
-void PlatformShowMouse(bool show);
-void PlatformClientDimensions(i32 *width, i32 *height);
-File PlatformReadFile(const char *filepath, i32 stackNum);
-
-// TODO: try to make the unity build work with vc code c++ extension
-//       by moving the header file to their corresponding cpp files
-// engine
-#include "memory.h"
 #include "memory_manager.h"
-#include "containers.h"
-#include "graphics_manager.h"
-#include "graphics_manager_d3d11.h"
-#include "input_manager.h"
 #include "notification_manager.h"
-#include "model.h"
-#include "asset_manager.h"
-#include "collision.h"
-
-
-#include "actor.h"
-#include "components/component.h"
-
+#include "input_manager.h"
+#include "graphics_manager.h"
 #include "game.h"
-
-// unity build
-#include "memory.cpp"
-#include "memory_manager.cpp"
-#include "containers.cpp"
-#include "graphics_manager.cpp"
-#include "graphics_manager_d3d11.cpp"
-#include "input_manager.cpp"
-#include "notification_manager.cpp"
-#include "model.cpp"
-#include "asset_manager.cpp"
-#include "collision.cpp"
-#include "artificial_intelligence/kinematic_behaviors.cpp"
-#include "artificial_intelligence/steering_behaviors.cpp"
-
-#include "animation/bone.cpp"
-#include "animation/animation.cpp"
-#include "animation/skeleton.cpp"
-
-
-#include "actor.cpp"
-#include "game.cpp"
 
 static bool running;
 static bool pause;

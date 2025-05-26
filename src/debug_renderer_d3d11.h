@@ -1,3 +1,14 @@
+#pragma once
+
+#include <common.h>
+#include <math/vector3.h>
+
+struct Shader;
+
+struct ID3D11Buffer;
+struct ID3D11Device;
+struct ID3D11DeviceContext;
+
 struct VertexLine
 {
      Vector3 pos;

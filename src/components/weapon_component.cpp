@@ -1,3 +1,9 @@
+#include "weapon_component.h"
+#include "anchor_component.h"
+#include "transform_component.h"
+
+#include <stdio.h>
+
 void WeaponComponent::OnInit(ActorManager *actorManager)
 {
     transform = actorManager->GetComponent<TransformComponent>(owner);

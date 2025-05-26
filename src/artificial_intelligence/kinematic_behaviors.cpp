@@ -1,6 +1,7 @@
 #include <random>
 
 #include "kinematic_behaviors.h"
+#include <math/algebra.h>
 
 f32 RandomFloat() 
 {

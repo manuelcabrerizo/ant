@@ -1,3 +1,8 @@
+#include <graphics_manager.h>
+#include <graphics_manager_d3d11.h>
+#include <memory_manager.h>
+#include <new>
+
 GraphicsManager *GraphicsManager::instance = nullptr;
 
 void GraphicsManager::Init(void *osWindow, i32 width, i32 height, GraphicsManagerType type, i32 stackNum)

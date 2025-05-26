@@ -1,4 +1,5 @@
 #include "steering_behaviors.h"
+#include <math.h>
 
 void SteeringSeek::SetCharacter(Kinematic *character)
 {

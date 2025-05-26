@@ -1,5 +1,12 @@
 #pragma once
 
+#include "component.h"
+
+class TransformComponent;
+class CameraComponent;
+class PhysicsComponent;
+class WeaponComponent;
+
 class PlayerControllerComponent : public Component<PlayerControllerComponent>
 {
 private:

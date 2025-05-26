@@ -1,5 +1,8 @@
 #pragma once
 
+#include <common.h>
+#include <math/vector3.h>
+
 f32 RandomFloat();
 f32 RandomBinomial();
 void AdjustAngle(f32& angle);

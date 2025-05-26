@@ -1,5 +1,7 @@
 #include "vector2.h"
 #include "algebra.h"
+#include <common.h>
+#include <float.h>
 
 Vector2::Vector2()
 {

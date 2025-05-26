@@ -1,6 +1,10 @@
 #pragma once
 
-#include "animation_component.h"
+#include "component.h"
+
+class TransformComponent;
+class AnimationComponent;
+class Model;
 
 struct PerDrawUbo
 {

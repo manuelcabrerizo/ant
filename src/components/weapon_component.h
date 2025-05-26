@@ -1,5 +1,10 @@
 #pragma once
 
+#include "component.h"
+#include <notification_manager.h>
+
+class TransformComponent;
+
 class WeaponComponent : public Component<WeaponComponent>, INotificable
 {
 private:

@@ -1,6 +1,8 @@
 #include "matrix4.h"
+#include <math.h>
+#include <common.h>
 
-float *Matrix4::operator[](i32 index)
+float *Matrix4::operator[](int index)
 {
     return &(v[index * 4]);
 }

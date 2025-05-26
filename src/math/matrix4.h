@@ -37,7 +37,7 @@ public:
            m31(_m31), m32(_m32), m33(_m33), m34(_m34),
            m41(_m41), m42(_m42), m43(_m43), m44(_m44) {}
 
-    float *operator[](i32 index);
+    float *operator[](int index);
 
     Matrix4 operator+(Matrix4 &m);
     Matrix4 operator*(float val);

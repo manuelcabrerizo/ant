@@ -1,3 +1,10 @@
+#include "enemy_component.h"
+#include "transform_component.h"
+#include "physics_component.h"
+
+#include <math.h>
+#include <math/algebra.h>
+
 void EnemyComponent::OnInit(ActorManager *actorManager)
 {
     transform = actorManager->GetComponent<TransformComponent>(owner);

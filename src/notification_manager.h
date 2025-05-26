@@ -1,5 +1,7 @@
 #pragma once
 
+#include <containers.h>
+
 #define MAX_LISTENERS_PER_NOTIFICATION 10
 
 enum NotificationType

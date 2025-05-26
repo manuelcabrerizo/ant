@@ -1,5 +1,13 @@
 #pragma once
 
+#include <containers.h>
+
+#include <math/vector3.h>
+#include <math/vector2.h>
+#include <math/matrix4.h>
+
+#include "graphics_manager.h"
+
 // TODO: separate static from animated vertex
 #define MAX_BONE_INFLUENCE 4
 struct Vertex

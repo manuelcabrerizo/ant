@@ -1,7 +1,10 @@
 #include <d3d11_1.h>
 #include <d3dcompiler.h>
 
-#include "debug_renderer_d3d11.h"
+#include <containers.h>
+#include <debug_renderer_d3d11.h>
+
+#include <graphics_manager.h>
 
 struct VertexBufferD3D11 : public VertexBuffer
 {

@@ -1,3 +1,6 @@
+#include <memory_manager.h>
+#include <memory.h>
+
 MemoryManager MemoryManager::instance;
 bool MemoryManager::initialize = false;
 

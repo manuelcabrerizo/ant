@@ -1,3 +1,13 @@
+#include <debug_renderer_d3d11.h>
+
+#include <platform.h>
+#include <memory_manager.h>
+#include <graphics_manager.h>
+
+#include <d3d11_1.h>
+
+#include <stdio.h>
+
 void DebugRendererD3D11::Init(ID3D11Device *device)
 {
      bufferUsed = 0;
@@ -18,8 +28,8 @@ void DebugRendererD3D11::Init(ID3D11Device *device)
      
      Frame frame = MemoryManager::Get()->GetFrame();
      // Load the shader
-     File vertFile = PlatformReadFile("../data/shaders/line_vert.hlsl", FRAME_MEMORY);
-     File fragFile = PlatformReadFile("../data/shaders/line_frag.hlsl", FRAME_MEMORY);
+     File vertFile = PlatformReadFile("data/shaders/line_vert.hlsl", FRAME_MEMORY);
+     File fragFile = PlatformReadFile("data/shaders/line_frag.hlsl", FRAME_MEMORY);
      shader = GraphicsManager::Get()->ShaderAlloc(vertFile, fragFile);
 
      MemoryManager::Get()->ReleaseFrame(frame);

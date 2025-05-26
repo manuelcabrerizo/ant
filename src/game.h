@@ -1,5 +1,8 @@
 #pragma once
 
+#include <actor.h>
+#include <asset_manager.h>
+
 class Game
 {
 private:

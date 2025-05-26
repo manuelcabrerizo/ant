@@ -1,8 +1,13 @@
 #pragma once
 
-#include "artificial_intelligence/kinematic_behaviors.h"
-#include "artificial_intelligence/steering_behaviors.h"
+#include "component.h"
+#include <artificial_intelligence/kinematic_behaviors.h>
+#include <artificial_intelligence/steering_behaviors.h>
 
+#include <notification_manager.h>
+
+class TransformComponent;
+class PhysicsComponent;
 
 class EnemyComponent : public Component<EnemyComponent>, INotificable
 {

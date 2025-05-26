@@ -1,3 +1,12 @@
+#include "render_component.h"
+#include "transform_component.h"
+#include "animation_component.h"
+
+#include <math/matrix4.h>
+#include <model.h>
+
+#include <graphics_manager.h>
+
 UniformBuffer *RenderComponent::uniformBuffer = nullptr;
 PerDrawUbo RenderComponent::ubo;
 UniformBuffer *RenderComponent::matrixBuffer = nullptr;

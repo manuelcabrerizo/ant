@@ -1,5 +1,12 @@
-// TODO: fix gImporter architecture
-static Assimp::Importer gImporter;
+#include <model.h>
+#include <memory_manager.h>
+// assimp
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+#include <utils.h>
+
 
 void Mesh::Init(Vertex *vertices, u32 verticesCount,
                 u32 *indices, u32 indicesCount,
@@ -41,7 +48,7 @@ static i32 TempTempNextPower2(u32  x)
 
 void Model::Init(const char *filepath, i32 memoryType)
 {
-     const aiScene *scene = gImporter.ReadFile(filepath,
+     const aiScene *scene = Utils::importer.ReadFile(filepath,
           aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
      if(scene->mNumMeshes > 0)
      {
@@ -96,14 +103,13 @@ void Model::Init(const char *filepath, i32 memoryType)
           boneCounter = 0;
           for(i32 boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex) 
           {
-
                i32 boneId = -1;
                const char *boneName = mesh->mBones[boneIndex]->mName.C_Str();
                if(bonesInfo.Contains(boneName) == false)
                {
                     BoneInfo boneInfo;
                     boneInfo.id = boneCounter;
-                    boneInfo.offset = ai_mat4_to_sd_mat4(mesh->mBones[boneIndex]->mOffsetMatrix);
+                    boneInfo.offset = Utils::FromAssimp(mesh->mBones[boneIndex]->mOffsetMatrix);
                     bonesInfo.Add(boneName, boneInfo);
                     boneId = boneCounter;
                     boneCounter++;

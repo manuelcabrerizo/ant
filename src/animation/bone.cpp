@@ -1,27 +1,10 @@
 #include "bone.h"
 
+#include <utils.h>
+
 //==========================================================================================
 // TODO: change the name of this functions
 //==========================================================================================
-inline Matrix4 ai_mat4_to_sd_mat4(aiMatrix4x4 m)
-{
-    Matrix4 mat = Matrix4(m.a1, m.b1, m.c1, m.d1,
-                          m.a2, m.b2, m.c2, m.d2, 
-                          m.a3, m.b3, m.c3, m.d3, 
-                          m.a4, m.b4, m.c4, m.d4);                    
-    return Matrix4::Transposed(mat);
-}
-
-inline Vector3 ai_vec3_to_sd_vec3(aiVector3D m) 
-{
-    return Vector3(m.x, m.y, m.z);
-}
-
-inline Quaternion ai_quat_to_sd_quat(aiQuaternion m) 
-{
-    return Quaternion(m.w, m.x, m.y, m.z);
-}
-
 inline f32 get_scale_factor(f32 last_time_stamp, f32 next_time_stamp, f32 animation_time) 
 {
     f32 scale_factor = (animation_time - last_time_stamp) / (next_time_stamp - last_time_stamp);
@@ -43,7 +26,7 @@ void Bone::Init(i32 id, aiNodeAnim *channel, i32 memoryType)
         aiVector3D position = channel->mPositionKeys[i].mValue;
         f32 timeStamp = channel->mPositionKeys[i].mTime;
         Key<Vector3> keyPosition;
-        keyPosition.value = ai_vec3_to_sd_vec3(position);
+        keyPosition.value = Utils::FromAssimp(position);
         keyPosition.timeStamp = timeStamp;
         positions.Push(keyPosition);
     }
@@ -53,7 +36,7 @@ void Bone::Init(i32 id, aiNodeAnim *channel, i32 memoryType)
         aiQuaternion rotation = channel->mRotationKeys[i].mValue;
         f32 timeStamp = channel->mRotationKeys[i].mTime;
         Key<Quaternion> keyRotation;
-        keyRotation.value = ai_quat_to_sd_quat(rotation);
+        keyRotation.value = Utils::FromAssimp(rotation);
         keyRotation.timeStamp = timeStamp;
         rotations.Push(keyRotation);
     }
@@ -63,7 +46,7 @@ void Bone::Init(i32 id, aiNodeAnim *channel, i32 memoryType)
         aiVector3D scale = channel->mScalingKeys[i].mValue;
         f32 timeStamp = channel->mScalingKeys[i].mTime;
         Key<Vector3> keyScale;
-        keyScale.value = ai_vec3_to_sd_vec3(scale);
+        keyScale.value = Utils::FromAssimp(scale);
         keyScale.timeStamp = timeStamp;
         scales.Push(keyScale);
     }

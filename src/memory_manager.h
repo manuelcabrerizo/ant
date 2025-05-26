@@ -1,5 +1,7 @@
 #pragma once
 
+#include "allocator.h"
+
 class MemoryManager
 {
 private:
@@ -7,7 +9,7 @@ private:
      static MemoryManager instance;
      static bool initialize;
 
-     DoubleStackAllocator allocator;
+     DoubleStackAllocator allocator {};
 public:
      static void Init(u64 memorySize, size_t align);
      static void Terminate();

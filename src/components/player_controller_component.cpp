@@ -1,3 +1,21 @@
+#include "player_controller_component.h"
+#include "transform_component.h"
+#include "camera_component.h"
+#include "physics_component.h"
+#include "weapon_component.h"
+#include "anchor_component.h"
+#include "render_component.h"
+
+#include <math/algebra.h>
+#include <math/vector3.h>
+#include <math/matrix4.h>
+
+#include <input_manager.h>
+#include <notification_manager.h>
+#include <graphics_manager.h>
+
+#include <platform.h>
+
 void PlayerControllerComponent::OnInit(ActorManager *actorManager)
 {
     speed = 20.0f;
@@ -70,7 +88,6 @@ void PlayerControllerComponent::ProcessMouseMovement()
          transform->direction = Matrix4::TransformVector(Matrix4::RotateX(pitch), dir);
          transform->direction = Matrix4::TransformVector(Matrix4::RotateY(yaw), transform->direction);
          transform->direction.Normalize();
-         printf("direction: %f, %f, %f\n", transform->direction.x, transform->direction.y, transform->direction.z);
          i32 windowX, windowY, windowW, windowH;
          PlaformGetWindowPos(&windowX, &windowY);
          PlatformClientDimensions(&windowW, &windowH);

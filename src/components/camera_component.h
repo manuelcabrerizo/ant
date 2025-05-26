@@ -1,5 +1,11 @@
 #pragma once
 
+#include "component.h"
+#include <math/vector3.h>
+#include <notification_manager.h>
+
+class TransformComponent;
+
 struct CameraUbo
 {
      Matrix4 view;

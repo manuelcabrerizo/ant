@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../containers.h"
+#include "../actor.h"
+
 struct ComponentBase
 {
     static i32 counter;
@@ -22,5 +25,3 @@ struct Component : public ComponentBase
         return id;
     }
 };
-
-#include "components.h"

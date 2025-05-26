@@ -1,4 +1,7 @@
 #include "quaternion.h"
+#include <common.h>
+#include <math.h>
+#include <float.h>
 
 float Quaternion::operator[](int index)
 {
