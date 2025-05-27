@@ -149,6 +149,7 @@
     <ClCompile Include="src\graphics_manager.cpp" />
     <ClCompile Include="src\graphics_manager_d3d11.cpp" />
     <ClCompile Include="src\input_manager.cpp" />
+    <ClCompile Include="src\material.cpp" />
     <ClCompile Include="src\math\algebra.cpp" />
     <ClCompile Include="src\math\matrix4.cpp" />
     <ClCompile Include="src\math\quaternion.cpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="src\graphics_manager.h" />
     <ClInclude Include="src\graphics_manager_d3d11.h" />
     <ClInclude Include="src\input_manager.h" />
+    <ClInclude Include="src\material.h" />
     <ClInclude Include="src\math\algebra.h" />
     <ClInclude Include="src\math\matrix4.h" />
     <ClInclude Include="src\math\quaternion.h" />

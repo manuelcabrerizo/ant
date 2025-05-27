@@ -46,7 +46,7 @@ Model *ModelManager::Get(const char *name)
      return &AssetManager::Get(name)->model;
 }
 
-
+// Shader Manager
 void ShaderManager::Load(const char *name, const char *vertPath, const char *fragPath)
 {
      Frame frame = MemoryManager::Get()->GetFrame();
@@ -75,5 +75,69 @@ void ShaderManager::Bind(const char *name)
 Shader *ShaderManager::Get(const char *name)
 {
      return AssetManager::Get(name)->shader;
+}
+
+
+// Material Manager
+void MaterialManager::Init(u32 assetsCapacity)
+{
+    AssetManager::Init(assetsCapacity);
+    allocator.Init(STATIC_MEMORY);
+}
+
+void MaterialManager::LoadSolidColor(const char* name,
+    const char* shaderName,
+    ShaderManager* shaderManager,
+    const Vector3& ambient,
+    const Vector3& diffuse,
+    const Vector3& specular,
+    f32 shininess)
+{
+    MaterialHandle materialHandle;
+    materialHandle.name = name;
+    void* buffer = allocator.Alloc();
+    SolidColorMaterial* material = new (buffer) SolidColorMaterial;
+    material->Init(shaderName, shaderManager, ambient, diffuse, specular, shininess);
+    materialHandle.material = material;
+    nameIndex.Add(name, assets.Add(materialHandle));
+}
+
+void MaterialManager::LoadTexture(const char* name,
+    const char* shaderName,
+    ShaderManager* shaderManager,
+    const char* diffuseName,
+    const char* normalName,
+    const char* specularName,
+    f32 shininess,
+    TextureManager* textureManager)
+{
+    MaterialHandle materialHandle;
+    materialHandle.name = name;
+    void* buffer = allocator.Alloc();
+    TextureMaterial* material = new (buffer) TextureMaterial;
+    material->Init(shaderName, shaderManager, diffuseName, normalName, specularName, shininess, textureManager);
+    materialHandle.material = material;
+    nameIndex.Add(name, assets.Add(materialHandle));
+}
+
+
+void MaterialManager::Unload(const char* name)
+{
+    auto handle = *nameIndex.Get(name);
+    Material* material = assets.Get(handle)->material;
+    material->Terminate();
+    allocator.Free(material);
+    assets.Remove(handle);
+    nameIndex.Remove(name);
+}
+
+void MaterialManager::Bind(const char *name)
+{
+    AssetManager::Get(name)->material->Bind();
+}
+
+Material* MaterialManager::Get(const char* name)
+{
+    return AssetManager::Get(name)->material;
 }
 

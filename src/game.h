@@ -9,7 +9,8 @@ private:
      TextureManager textureManager;
      ModelManager modelManager;
      ShaderManager shaderManager;
-     ActorManager actorManager; 
+     MaterialManager materialManager;
+     ActorManager actorManager;
 public:     
      void Init();
      void Terminate();

@@ -260,6 +260,55 @@ void ObjectAllocator<Type>::Free(Type* object)
     firstFree = free;
 }
 
+// Block allocator
+// sparse block allocator for now
+// TODO: make it continuous
+template <int BlockSize>
+class BlockAllocator
+{
+    static_assert(BlockSize >= sizeof(FreeNode), "Object must be at least 8 bytes large");
+private:
+    i32 stackNum = 0;
+    FreeNode* firstFree = 0;
+public:
+    void Init(i32 stackNum);
+
+    void* Alloc();
+    void Free(void* object);
+
+};
+
+template<int BlockSize>
+void BlockAllocator<BlockSize>::Init(i32 stackNum_)
+{
+    firstFree = 0;
+    stackNum = stackNum_;
+}
+
+template<int BlockSize>
+void* BlockAllocator<BlockSize>::Alloc()
+{
+    if (firstFree)
+    {
+        void* data = (void*)firstFree;
+        firstFree = firstFree->next;
+        return data;
+    }
+    else
+    {
+        void* data = MemoryManager::Get()->Alloc(BlockSize, stackNum);
+        return data;
+    }
+}
+
+template<int BlockSize>
+void BlockAllocator<BlockSize>::Free(void* object)
+{
+    FreeNode* free = (FreeNode*)object;
+    free->next = firstFree;
+    firstFree = free;
+}
+
 
 #define INVALID_MAP_ID 0xFFFFFFFF
 #define DELETED_MAP_ID (0xFFFFFFFF - 1)

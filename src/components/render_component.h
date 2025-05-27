@@ -22,6 +22,8 @@ private:
     AnimationComponent *animation = nullptr;
     TransformComponent* transform = nullptr;
 public:
+    // TODO: remove this texture
+    // make this work with materials
     Texture *texture;
     Model *model;
     Vector3 rotationOffset;

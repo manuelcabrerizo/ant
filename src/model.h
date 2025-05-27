@@ -26,12 +26,10 @@ private:
      IndexBuffer *indexBuffer;
      u32 verticesCount;
      u32 indicesCount;
-     Texture *texture;
-     // TODO: add material and other type of textures
+     // TODO: add material id
 public:
      void Init(Vertex *vertices, u32 verticesCount,
-               u32 *indices, u32 indicesCount,
-               Texture *texture = nullptr);
+               u32 *indices, u32 indicesCount);
      void Terminate();
      void Draw();
 };
@@ -50,8 +48,6 @@ private:
      i32 boneCounter = 0;
 public:
      void Init(const char *filepath, i32 memoryType);
-     void Init(Vertex *vertices, u32 verticesCount,
-               u32 *indices, u32 indicesCount);
      void Terminate();
      void Draw();
      HashMap<BoneInfo>& GetBonesInfo();

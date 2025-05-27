@@ -1,6 +1,7 @@
 // TODO:
+// - add support to multiple texture per model
+// - add support for materials instead of just texutres
 // - More colliders and Raycast test
-// - Basic steering behaviors
 // - Implement a small demo with a full loop
 // the player has to have life and be able to shoot at least two weapons
 // the enemies have to move arrown the map and shoot the player
@@ -41,6 +42,7 @@ void Game::Init()
      modelManager.Load("test-level", "data/models/level-rendering.obj");
      modelManager.Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx");
      modelManager.Load("house", "data/models/house.fbx");
+     modelManager.Load("tower", "data/models/MagicTower/MagicStudio.fbx");
 
      // Load a texture
      textureManager.Init(128);
@@ -73,6 +75,7 @@ void Game::Init()
 
      actorManager.CreateActorFromFile("data/xml/test-level.xml", &textureManager, &modelManager);
      actorManager.CreateActorFromFile("data/xml/house.xml", &textureManager, &modelManager);
+     actorManager.CreateActorFromFile("data/xml/tower.xml", &textureManager, &modelManager);
      SlotmapKey<Actor> enemy[3] =
      {
           actorManager.CreateActorFromFile("data/xml/enemy.xml", &textureManager, &modelManager),
@@ -113,6 +116,19 @@ void Game::Init()
 
      GraphicsManager::Get()->DebugInit();
      printf("Game Init!\n");
+
+     // Material Manager Test
+     materialManager.Init(32);
+     materialManager.LoadSolidColor("solid-color-green", "default", &shaderManager,
+           Vector3(0.0f, 0.2f,0.0f), Vector3(0.0f, 0.6f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
+     materialManager.LoadSolidColor("solid-color-red", "default", &shaderManager,
+         Vector3(0.2f, 0.0f, 0.0f), Vector3(0.6f, 0.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
+     materialManager.LoadTexture("texture-default", "default", &shaderManager,
+         "default", "default", "default", 64, &textureManager);
+
+     materialManager.Bind("solid-color-green");
+     materialManager.Bind("solid-color-red");
+     materialManager.Bind("texture-default");
 }
 
 void Game::Update(f32 dt)
@@ -133,6 +149,7 @@ void Game::Update(f32 dt)
 void Game::Render()
 {
      actorManager.RenderComponents<RenderComponent>(&shaderManager);
+
      GraphicsManager::Get()->DebugPresent();
      GraphicsManager::Get()->EndFrame(1);
 
@@ -147,6 +164,8 @@ void Game::Terminate()
      RenderComponent::Terminate();
      PhysicsComponent::Terminate();
      
+     materialManager.Terminate();
+
      actorManager.Terminate();
      textureManager.Terminate();
      modelManager.Terminate();

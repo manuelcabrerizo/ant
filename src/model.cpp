@@ -9,17 +9,12 @@
 
 
 void Mesh::Init(Vertex *vertices, u32 verticesCount,
-                u32 *indices, u32 indicesCount,
-                Texture *texture)
+                u32 *indices, u32 indicesCount)
 {
      this->verticesCount = verticesCount;
      this->indicesCount = indicesCount;
      this->vertexBuffer = GraphicsManager::Get()->VertexBufferAlloc((void *)vertices, verticesCount, sizeof(Vertex));
      this->indexBuffer = GraphicsManager::Get()->IndexBufferAlloc(indices, indicesCount);
-     if(texture != nullptr)
-     {
-          this->texture = texture;
-     }
 }
 
 void Mesh::Terminate()
@@ -50,6 +45,15 @@ void Model::Init(const char *filepath, i32 memoryType)
 {
      const aiScene *scene = Utils::importer.ReadFile(filepath,
           aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
+
+     // TODO: load the model materials
+     for (int i = 0; i < scene->mNumMaterials; ++i)
+     {
+         aiMaterial* material = scene->mMaterials[i];
+         aiString name;
+         material->Get(AI_MATKEY_NAME, name);
+     }
+
      if(scene->mNumMeshes > 0)
      {
           meshes.Init(scene->mNumMeshes, memoryType);
@@ -153,16 +157,11 @@ void Model::Init(const char *filepath, i32 memoryType)
           ASSERT(indicesCount == (mesh->mNumFaces * 3));
 
           Mesh myMesh;
-          myMesh.Init(vertices, mesh->mNumVertices, indices, indicesCount, nullptr);
+          myMesh.Init(vertices, mesh->mNumVertices, indices, indicesCount);
           meshes.Push(myMesh);
 
           MemoryManager::Get()->ReleaseFrame(frame);
      }
-}
-
-void Model::Init(Vertex *vertices, u32 verticesCount, u32 *indices, u32 indicesCount)
-{
-
 }
 
 void Model::Terminate()

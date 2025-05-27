@@ -10,7 +10,7 @@
 UniformBuffer *RenderComponent::uniformBuffer = nullptr;
 PerDrawUbo RenderComponent::ubo;
 UniformBuffer *RenderComponent::matrixBuffer = nullptr;
-     
+
 void RenderComponent::Initialize()
 {
     ubo.model = Matrix4(1.0f);
@@ -48,7 +48,6 @@ void RenderComponent::OnUpdate(ActorManager *actorManager, f32 dt)
         animation->skeleton.Animate(&animation->animation, dt*0.54f);
     }
 }
-
 
 void RenderComponent::OnRender(ShaderManager *shaderManager, ActorManager *actorManager)
 {
