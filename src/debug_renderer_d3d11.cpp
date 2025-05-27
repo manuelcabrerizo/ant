@@ -30,7 +30,8 @@ void DebugRendererD3D11::Init(ID3D11Device *device)
      // Load the shader
      File vertFile = PlatformReadFile("data/shaders/line_vert.hlsl", FRAME_MEMORY);
      File fragFile = PlatformReadFile("data/shaders/line_frag.hlsl", FRAME_MEMORY);
-     shader = GraphicsManager::Get()->ShaderAlloc(vertFile, fragFile);
+     vertexShader = GraphicsManager::Get()->VertexShaderAlloc(vertFile);
+     fragmentShader = GraphicsManager::Get()->FragmentShaderAlloc(fragFile);
 
      MemoryManager::Get()->ReleaseFrame(frame);
 
@@ -41,8 +42,8 @@ void DebugRendererD3D11::Init(ID3D11Device *device)
 void DebugRendererD3D11::Terminate()
 {
      gpuBuffer->Release();
-     GraphicsManager::Get()->ShaderFree(shader);
-
+     GraphicsManager::Get()->VertexShaderFree(vertexShader);
+     GraphicsManager::Get()->FragmentShaderFree(fragmentShader);
      printf("Debug Renderer Terminate!\n");
 }
 
@@ -54,7 +55,8 @@ void DebugRendererD3D11::Present(ID3D11DeviceContext *deviceContext)
      memcpy(bufferData.pData, cpuBuffer, sizeof(VertexLine)*bufferUsed);
      deviceContext->Unmap(gpuBuffer, 0);
 
-     GraphicsManager::Get()->ShaderBind(shader);
+     GraphicsManager::Get()->VertexShaderBind(vertexShader);
+     GraphicsManager::Get()->FragmentShaderBind(fragmentShader);
      
      u32 stride = sizeof(VertexLine);
      u32 offset = 0;

@@ -3,10 +3,8 @@
 
 #include <string.h>
 
-#include <windows.h>
 
-
-void Material::Init(const char* shaderName, ShaderManager *shaderManager)
+void Material::Init(const char* shaderName, FragmentShaderManager* shaderManager)
 {
     size_t shaderNameLen = strlen(shaderName);
     ASSERT(shaderNameLen <= _MAX_PATH);
@@ -20,11 +18,13 @@ void Material::Init(const char* shaderName, ShaderManager *shaderManager)
 void Material::Terminate()
 {
     this->shader = nullptr;
-    OutputDebugString("Material Terminate()\n");
 }
 
+i32 SolidColorMaterial::instanceCount = 0;
+UniformBuffer* SolidColorMaterial::uniformBuffer = nullptr;
+
 void SolidColorMaterial::Init(const char* shaderName,
-                              ShaderManager* shaderManager,
+                              FragmentShaderManager* shaderManager,
                               const Vector3& ambient,
                               const Vector3& diffuse,
                               const Vector3& specular,
@@ -35,26 +35,52 @@ void SolidColorMaterial::Init(const char* shaderName,
     this->diffuse = diffuse;
     this->specular = specular;
     this->shininess = shininess;
+
+    ubo.ambient = this->ambient;
+    ubo.diffuse = this->diffuse;
+    ubo.specular = this->specular;
+    ubo.shininess = this->shininess;
+    if (instanceCount == 0)
+    {
+        uniformBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_PS, &ubo, sizeof(ubo), 0);
+    }
+    instanceCount++;
 }
 
 void SolidColorMaterial::Terminate()
 {
     Material::Terminate();
-    OutputDebugString("SolidColorMaterial Terminate()\n");
+    instanceCount--;
+    ASSERT(instanceCount >= 0);
+    if (instanceCount == 0)
+    {
+        GraphicsManager::Get()->UniformBufferFree(uniformBuffer);
+    }
 }
 
 void SolidColorMaterial::Bind()
 {
-    OutputDebugString("SolidColorMaterial Bind()\n");
+    GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
+    ubo.ambient = this->ambient;
+    ubo.diffuse = this->diffuse;
+    ubo.specular = this->specular;
+    ubo.shininess = this->shininess;
+    GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
+
+
+    GraphicsManager::Get()->FragmentShaderBind(shader);
 }
 
+i32 TextureMaterial::instanceCount = 0;
+UniformBuffer* TextureMaterial::uniformBuffer = nullptr;
+
 void TextureMaterial::Init(const char* shaderName,
-                           ShaderManager* shaderManager,
-                           const char* diffuseName,
-                           const char* normalName,
-                           const char* specularName,
-                           f32 shininess, 
-                           TextureManager *textureManager)
+    FragmentShaderManager* shaderManager,
+    const char* diffuseName,
+    const char* normalName,
+    const char* specularName,
+    f32 shininess,
+    TextureManager* textureManager)
 {
     Material::Init(shaderName, shaderManager);
 
@@ -73,16 +99,42 @@ void TextureMaterial::Init(const char* shaderName,
     memset(this->specularName, 0, _MAX_PATH);
     memcpy(this->specularName, specularName, specularNameLen);
 
-    ASSERT(textureManager->Contains(diffuseName));
-    this->diffuse = textureManager->Get(diffuseName);
+    if (textureManager->Contains(diffuseName))
+    {
+        this->diffuse = textureManager->Get(diffuseName);
+    }
+    else
+    {
+        this->diffuse = textureManager->Get("DefaultMaterial_Diffuse");
+    }
 
-    ASSERT(textureManager->Contains(normalName));
-    this->normal = textureManager->Get(normalName);
+    if (textureManager->Contains(normalName))
+    {
+        this->normal = textureManager->Get(normalName);
+    }
+    else
+    {
+        this->normal = textureManager->Get("DefaultMaterial_Normal");
+    }
 
-    ASSERT(textureManager->Contains(specularName));
-    this->specular = textureManager->Get(specularName);
+    if (textureManager->Contains(specularName))
+    {
+        this->specular = textureManager->Get(specularName);
+    }
+    else
+    {
+        this->specular = textureManager->Get("DefaultMaterial_Specular");
+    }
 
     this->shininess = shininess;
+
+    ubo.shininess = this->shininess;
+    if (instanceCount == 0)
+    {
+        uniformBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_PS, &ubo, sizeof(ubo), 0);
+    }
+    instanceCount++;
+
 }
 
 void TextureMaterial::Terminate()
@@ -90,11 +142,25 @@ void TextureMaterial::Terminate()
     Material::Terminate();
     this->diffuse = nullptr;
     this->normal = nullptr;
-    this->specular = nullptr;   
-    OutputDebugString("TextureMaterial Terminate()\n");
+    this->specular = nullptr;
+
+    instanceCount--;
+    ASSERT(instanceCount >= 0);
+    if (instanceCount == 0)
+    {
+        GraphicsManager::Get()->UniformBufferFree(uniformBuffer);
+    }
 }
 
 void TextureMaterial::Bind()
 {
-    OutputDebugString("TextureMaterial Bind()\n");
+    GraphicsManager::Get()->FragmentShaderBind(shader);
+
+    ubo.shininess = this->shininess;
+    GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
+
+    GraphicsManager::Get()->TextureBind(diffuse, 0);
+    GraphicsManager::Get()->TextureBind(normal, 1);
+    GraphicsManager::Get()->TextureBind(specular, 2);
+    GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
 }

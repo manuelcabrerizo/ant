@@ -1,9 +1,3 @@
-SamplerState samplerState : register(s0);
-
-Texture2D diffuseMap : register(t0);
-Texture2D normalMap : register(t1);
-Texture2D spacularMap : register(t2);
-
 struct PS_Input
 {
     float4 pos : SV_POSITION;
@@ -12,15 +6,16 @@ struct PS_Input
     float3 fragPos : TEXCOORD1;
 };
 
-cbuffer TextureUbo : register(b0)
+cbuffer SolidColorUbo : register(b0)
 {
+    float3 ambient;
+    float3 diffuse;
+    float3 specular;
     float shininess;
 };
 
 float4 fs_main(PS_Input i) : SV_TARGET
 {
-    float3 ambient = float3(0.2f, 0.2f, 0.2f);
-
     float3 ligthPos0 = float3(30.0f, 20.0f, 20.0f);
     float3 ligthDir0 = normalize(ligthPos0 - i.fragPos);
     float3 lightColor0 = float3(0.2f, 0.2f, 0.6f);
@@ -37,7 +32,7 @@ float4 fs_main(PS_Input i) : SV_TARGET
     float3 ligthDir3 = normalize(ligthPos3 - i.fragPos);
     float3 lightColor3 = float3(0.6f, 0.2f, 0.2f);
 
-    float3 color = diffuseMap.Sample(samplerState, i.uv).rgb;
+    float3 color = ambient;
 
     float3 n = normalize(i.nor);
     float diffuse0 = max(dot(ligthDir0, n), 0.1f);

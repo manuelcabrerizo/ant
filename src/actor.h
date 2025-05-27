@@ -48,7 +48,8 @@ public:
      Array<ComponentType>& GetComponents();
 
      SlotmapKey<Actor> CreateActor(i32 componentCount);
-     SlotmapKey<Actor> CreateActorFromFile(const char *filepath, TextureManager *textureManager, ModelManager *modelManager);
+     SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
+         ModelManager *modelManager, MaterialManager *materialManager);
      void DestroyActor(SlotmapKey<Actor> actorKey);
      Actor *GetActor(SlotmapKey<Actor> actorKey);
     
@@ -72,7 +73,7 @@ public:
      void LateUpdateComponents(f32 dt);
 
      template<typename ComponentType>
-     void RenderComponents(ShaderManager *shaderManager);
+     void RenderComponents(VertexShaderManager *shaderManager);
 };
 
 
@@ -194,7 +195,7 @@ void ActorManager::LateUpdateComponents(f32 dt)
 }
 
 template<typename ComponentType>
-void ActorManager::RenderComponents(ShaderManager* shaderManager)
+void ActorManager::RenderComponents(VertexShaderManager* shaderManager)
 {
     Array<ComponentType>& components = GetComponents<ComponentType>();
     for (u32 i = 0; i < components.size; ++i)

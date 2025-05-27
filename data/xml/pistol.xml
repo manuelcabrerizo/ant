@@ -7,8 +7,8 @@
     </TransformComponent>
     <RenderComponent>
         <model name="anim-gun"/>
-        <texture name="default"/>
-        <rotationOffset x="0" y="180" z="0"/>
+		<material name="YellowMaterial"/>
+		<rotationOffset x="0" y="180" z="0"/>
     </RenderComponent>
     <AnchorComponent>
         <offset x="0" y="0.05" z="0"/>

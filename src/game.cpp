@@ -26,10 +26,15 @@
 void Game::Init()
 {
      // Load the shaders
-     shaderManager.Init(4);
-     shaderManager.Load("default", "data/shaders/vert.hlsl", "data/shaders/frag.hlsl");
-     shaderManager.Load("animation", "data/shaders/animation_vert.hlsl", "data/shaders/frag.hlsl");
-     shaderManager.Bind("default");
+     vertexShaderManager.Init(4);
+     vertexShaderManager.Load("default", "data/shaders/vert.hlsl");
+     vertexShaderManager.Load("animation", "data/shaders/animation_vert.hlsl");
+     vertexShaderManager.Bind("default");
+
+     fragmentShaderManager.Init(4);
+     fragmentShaderManager.Load("default", "data/shaders/frag.hlsl");
+     fragmentShaderManager.Load("color", "data/shaders/color.hlsl");
+     fragmentShaderManager.Bind("default");
      
      // Load the models
      modelManager.Init(32);
@@ -46,8 +51,30 @@ void Game::Init()
 
      // Load a texture
      textureManager.Init(128);
-     textureManager.Load("default", "data/textures/GridBox_Default.png");
-     textureManager.Load("warrior", "data/textures/warrior.png");
+     textureManager.Load("DefaultMaterial_Diffuse", "data/textures/DefaultTextures/DefaultMaterial_Diffuse.png");
+     textureManager.Load("DefaultMaterial_Normal", "data/textures/DefaultTextures/DefaultMaterial_Normal.png");
+     textureManager.Load("DefaultMaterial_Specular", "data/textures/DefaultTextures/DefaultMaterial_Specular.png");
+     //textureManager.Load("default", "data/textures/GridBox_Default.png");
+     //textureManager.Load("warrior", "data/textures/warrior.png");
+
+     // Material Manager Test
+     materialManager.Init(32);
+
+     materialManager.LoadTexture("DefaultMaterial",
+         "default", &fragmentShaderManager,
+         "DefaultMaterial_Diffuse",
+         "DefaultMaterial_Normal",
+         "DefaultMaterial_Specular",
+         64, &textureManager);
+
+     materialManager.LoadSolidColor("GreenMaterial", "color", &fragmentShaderManager,
+           Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 0.6f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
+     materialManager.LoadSolidColor("RedMaterial", "color", &fragmentShaderManager,
+         Vector3(1.0f, 0.0f, 0.0f), Vector3(0.6f, 0.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
+     materialManager.LoadSolidColor("YellowMaterial", "color", &fragmentShaderManager,
+         Vector3(1.0f, 1.0f, 0.0f), Vector3(0.6f, 0.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
+     
+
      
      // Initialize the Actor Manager
      actorManager.Init(100, 64, STATIC_MEMORY);
@@ -63,7 +90,7 @@ void Game::Init()
      actorManager.AllocInternalMemory();
 
      // Create Entities
-     SlotmapKey<Actor> player = actorManager.CreateActorFromFile("data/xml/player.xml", &textureManager, &modelManager);
+     SlotmapKey<Actor> player = actorManager.CreateActorFromFile("data/xml/player.xml", &modelManager, &materialManager);
      WeaponComponent *weapon = actorManager.GetComponent<WeaponComponent>(player);
      AnimationComponent animationCmp;
      animationCmp.skeleton.Init("data/models/fps-animations-vsk/source/FPS_VSK1.fbx", STATIC_MEMORY);
@@ -73,14 +100,14 @@ void Game::Init()
      render->isAnimated = true;
      
 
-     actorManager.CreateActorFromFile("data/xml/test-level.xml", &textureManager, &modelManager);
-     actorManager.CreateActorFromFile("data/xml/house.xml", &textureManager, &modelManager);
-     actorManager.CreateActorFromFile("data/xml/tower.xml", &textureManager, &modelManager);
+     actorManager.CreateActorFromFile("data/xml/test-level.xml", &modelManager, &materialManager);
+     actorManager.CreateActorFromFile("data/xml/house.xml", &modelManager, &materialManager);
+     actorManager.CreateActorFromFile("data/xml/tower.xml", &modelManager, &materialManager);
      SlotmapKey<Actor> enemy[3] =
      {
-          actorManager.CreateActorFromFile("data/xml/enemy.xml", &textureManager, &modelManager),
-          actorManager.CreateActorFromFile("data/xml/enemy.xml", &textureManager, &modelManager),
-          actorManager.CreateActorFromFile("data/xml/enemy.xml", &textureManager, &modelManager)
+          actorManager.CreateActorFromFile("data/xml/enemy.xml", &modelManager, &materialManager),
+          actorManager.CreateActorFromFile("data/xml/enemy.xml", &modelManager, &materialManager),
+          actorManager.CreateActorFromFile("data/xml/enemy.xml", &modelManager, &materialManager)
      };
      TransformComponent *transforms[3] =
      {
@@ -115,20 +142,7 @@ void Game::Init()
      PhysicsComponent::Initialize();
 
      GraphicsManager::Get()->DebugInit();
-     printf("Game Init!\n");
-
-     // Material Manager Test
-     materialManager.Init(32);
-     materialManager.LoadSolidColor("solid-color-green", "default", &shaderManager,
-           Vector3(0.0f, 0.2f,0.0f), Vector3(0.0f, 0.6f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
-     materialManager.LoadSolidColor("solid-color-red", "default", &shaderManager,
-         Vector3(0.2f, 0.0f, 0.0f), Vector3(0.6f, 0.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
-     materialManager.LoadTexture("texture-default", "default", &shaderManager,
-         "default", "default", "default", 64, &textureManager);
-
-     materialManager.Bind("solid-color-green");
-     materialManager.Bind("solid-color-red");
-     materialManager.Bind("texture-default");
+     printf("Game Init!\n"); 
 }
 
 void Game::Update(f32 dt)
@@ -148,7 +162,7 @@ void Game::Update(f32 dt)
 
 void Game::Render()
 {
-     actorManager.RenderComponents<RenderComponent>(&shaderManager);
+     actorManager.RenderComponents<RenderComponent>(&vertexShaderManager);
 
      GraphicsManager::Get()->DebugPresent();
      GraphicsManager::Get()->EndFrame(1);
@@ -169,7 +183,8 @@ void Game::Terminate()
      actorManager.Terminate();
      textureManager.Terminate();
      modelManager.Terminate();
-     shaderManager.Terminate();
+     vertexShaderManager.Terminate();
+     fragmentShaderManager.Terminate();
 
      printf("Game Terminate!\n");
 }

@@ -142,7 +142,7 @@ static i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
  }
 
 SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
-     TextureManager *textureManager, ModelManager *modelManager)
+     ModelManager *modelManager, MaterialManager* materialManager)
 {
     tinyxml2::XMLDocument doc;
     doc.LoadFile(filepath);
@@ -212,8 +212,8 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
                     attributes = attributes->NextSiblingElement();
                     attributes->QueryStringAttribute("path", &weaponPath[1]);
 
-                    playerController.weapons[0] = CreateActorFromFile(weaponPath[0], textureManager, modelManager); 
-                    playerController.weapons[1] = CreateActorFromFile(weaponPath[1], textureManager, modelManager);
+                    playerController.weapons[0] = CreateActorFromFile(weaponPath[0], modelManager, materialManager); 
+                    playerController.weapons[1] = CreateActorFromFile(weaponPath[1], modelManager, materialManager);
                     RenderComponent *render = GetComponent<RenderComponent>(playerController.weapons[1]);
                     render->enable = false;
                     WeaponComponent *weapon = GetComponent<WeaponComponent>(actor);
@@ -230,10 +230,10 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
 
               attributes = attributes->NextSiblingElement();
 
-              const char *texturePath = 0;
-              attributes->QueryStringAttribute("name", &texturePath);
+              const char *materialPath = 0;
+              attributes->QueryStringAttribute("name", &materialPath);
 
-              ASSERT(modelPath && texturePath);
+              ASSERT(modelPath && materialPath);
 
               attributes = attributes->NextSiblingElement();
 
@@ -246,7 +246,7 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
 
               RenderComponent render;
               render.model = modelManager->Get(modelPath);
-              render.texture = textureManager->Get(texturePath);
+              render.material = materialManager->Get(materialPath);
               render.rotationOffset = rotationOffset;
               AddComponent<RenderComponent>(actor, render);
          }

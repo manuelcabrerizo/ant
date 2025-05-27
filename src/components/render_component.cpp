@@ -49,7 +49,7 @@ void RenderComponent::OnUpdate(ActorManager *actorManager, f32 dt)
     }
 }
 
-void RenderComponent::OnRender(ShaderManager *shaderManager, ActorManager *actorManager)
+void RenderComponent::OnRender(VertexShaderManager *shaderManager, ActorManager *actorManager)
 {
     Matrix4 tra = Matrix4::Translate(transform->position); 
     Matrix4 sca = Matrix4::Scale(transform->scale);
@@ -66,6 +66,7 @@ void RenderComponent::OnRender(ShaderManager *shaderManager, ActorManager *actor
 
     ubo.model = ubo.model * rotOffset;
 
+    // bind the vertex shader
     if(!isAnimated)
     {
         shaderManager->Bind("default"); 
@@ -75,8 +76,10 @@ void RenderComponent::OnRender(ShaderManager *shaderManager, ActorManager *actor
         GraphicsManager::Get()->UniformBufferUpdate(matrixBuffer, animation->skeleton.GetMatrices());
         shaderManager->Bind("animation");
     }
-
-    GraphicsManager::Get()->TextureBind(texture, 0);
     GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
+
+    // bind the fragment shader/ material
+    material->Bind();
+    
     model->Draw();
 }

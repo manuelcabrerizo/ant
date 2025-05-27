@@ -3,11 +3,12 @@
 #include <common.h>
 #include <math/vector3.h>
 
-struct Shader;
-
 struct ID3D11Buffer;
 struct ID3D11Device;
 struct ID3D11DeviceContext;
+
+struct VertexShader;
+struct FragmentShader;
 
 struct VertexLine
 {
@@ -23,7 +24,8 @@ private:
      u64 bufferSize;
      u32 bufferUsed;
 
-     Shader *shader;
+     VertexShader* vertexShader;
+     FragmentShader* fragmentShader;
 public:
      void Init(ID3D11Device *device);
      void Terminate();

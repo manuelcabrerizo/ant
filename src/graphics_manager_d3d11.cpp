@@ -34,7 +34,8 @@ void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32
      indexBufferAllocator.Init(stackNum);
      uniformBufferAllocator.Init(stackNum);
      frameBufferAllocator.Init(stackNum);
-     shaderAllocator.Init(stackNum);
+     vertexShaderAllocator.Init(stackNum);
+     fragmentShaderAllocator.Init(stackNum);
      textureAllocator.Init(stackNum);
 
      printf("DirectX11 Initialized!\n");
@@ -277,15 +278,14 @@ void GraphicsManagerD3D11::UniformBufferUpdate(UniformBuffer *uniformBuffer, voi
 }
 
 
-Shader *GraphicsManagerD3D11::ShaderAlloc(File vertFile, File fragFile)
+VertexShader* GraphicsManagerD3D11::VertexShaderAlloc(File file)
 {
-     ShaderD3D11 *sh = shaderAllocator.Alloc();
+     VertexShaderD3D11 *sh = vertexShaderAllocator.Alloc();
 
      ID3DBlob *errorShader;
      ID3DBlob *vertShaderCompiled;
-     ID3DBlob *fragShaderCompiled;
      // Compile vertex Shader
-     D3DCompile(vertFile.data, vertFile.size,
+     D3DCompile(file.data, file.size,
                 0, 0, 0, "vs_main", "vs_5_0",
                 D3DCOMPILE_ENABLE_STRICTNESS, 0,
                 &vertShaderCompiled, &errorShader);
@@ -308,48 +308,65 @@ Shader *GraphicsManagerD3D11::ShaderAlloc(File vertFile, File fragFile)
      {
           ASSERT(!"Error creating input layout for this shader");
      }
-     // Compile fragment Shader
-     D3DCompile(fragFile.data, fragFile.size,
-                0, 0, 0, "fs_main", "ps_5_0",
-                D3DCOMPILE_ENABLE_STRICTNESS, 0,
-                &fragShaderCompiled, &errorShader);
-     if (errorShader != 0)
-     {
-          char* errorString = (char*)errorShader->GetBufferPointer();
-          printf("Error compiling FRAGMENT SHADER\n");
-          printf("%s\n", errorString);
-          errorShader->Release();
-     }
-     else
-     {
-          device->CreatePixelShader(
-               fragShaderCompiled->GetBufferPointer(),
-               fragShaderCompiled->GetBufferSize(), 0,
-               &sh->pixelShader);
-     }
-
      vertShaderCompiled->Release();
-     fragShaderCompiled->Release();
-
-     return (Shader *)sh;
+     return (VertexShader *)sh;
 }
 
-void GraphicsManagerD3D11::ShaderFree(Shader *shader)
+void GraphicsManagerD3D11::VertexShaderFree(VertexShader *shader)
 {
-     ShaderD3D11 *sh = (ShaderD3D11 *)shader;
+     VertexShaderD3D11 *sh = (VertexShaderD3D11 *)shader;
      sh->layout->Release();
      sh->vertexShader->Release();
-     sh->pixelShader->Release();
-     shaderAllocator.Free(sh);
+     vertexShaderAllocator.Free(sh);
 
 }
 
-void GraphicsManagerD3D11::ShaderBind(Shader *shader)
+void GraphicsManagerD3D11::VertexShaderBind(VertexShader *shader)
 {
-     ShaderD3D11 *sh = (ShaderD3D11 *)shader;
+    VertexShaderD3D11*sh = (VertexShaderD3D11*)shader;
      deviceContext->IASetInputLayout(sh->layout);
      deviceContext->VSSetShader(sh->vertexShader, 0, 0);
-     deviceContext->PSSetShader(sh->pixelShader, 0, 0);
+}
+
+FragmentShader *GraphicsManagerD3D11::FragmentShaderAlloc(File file)
+{
+    FragmentShaderD3D11* sh = fragmentShaderAllocator.Alloc();
+    ID3DBlob* errorShader;
+    ID3DBlob *fragShaderCompiled;
+    // Compile fragment Shader
+    D3DCompile(file.data, file.size,
+        0, 0, 0, "fs_main", "ps_5_0",
+        D3DCOMPILE_ENABLE_STRICTNESS, 0,
+        &fragShaderCompiled, &errorShader);
+    if (errorShader != 0)
+    {
+        char* errorString = (char*)errorShader->GetBufferPointer();
+        printf("Error compiling FRAGMENT SHADER\n");
+        printf("%s\n", errorString);
+        errorShader->Release();
+    }
+    else
+    {
+        device->CreatePixelShader(
+            fragShaderCompiled->GetBufferPointer(),
+            fragShaderCompiled->GetBufferSize(), 0,
+            &sh->pixelShader);
+    }
+    fragShaderCompiled->Release();
+    return (FragmentShader *)sh;
+}
+
+void GraphicsManagerD3D11::FragmentShaderFree(FragmentShader* shader)
+{
+    FragmentShaderD3D11* sh = (FragmentShaderD3D11*)shader;
+    sh->pixelShader->Release();
+    fragmentShaderAllocator.Free(sh);
+}
+
+void GraphicsManagerD3D11::FragmentShaderBind(FragmentShader* shader)
+{
+    FragmentShaderD3D11* sh = (FragmentShaderD3D11*)shader;
+    deviceContext->PSSetShader(sh->pixelShader, 0, 0);
 }
 
 Texture *GraphicsManagerD3D11::TextureAlloc(const char *filepath)

@@ -7,7 +7,7 @@
     </TransformComponent>
     <RenderComponent>
         <model name="test-level"/>
-        <texture name="default"/>
-        <rotationOffset x="0" y="0" z="0"/>
+		<material name="DefaultMaterial"/>
+		<rotationOffset x="0" y="0" z="0"/>
     </RenderComponent>
 </Actor>

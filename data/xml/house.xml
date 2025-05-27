@@ -7,7 +7,7 @@
     </TransformComponent>
     <RenderComponent>
         <model name="house"/>
-        <texture name="default"/>
-        <rotationOffset x="0" y="0" z="0"/>
+		<material name="RedMaterial"/>
+		<rotationOffset x="0" y="0" z="0"/>
     </RenderComponent>
 </Actor>

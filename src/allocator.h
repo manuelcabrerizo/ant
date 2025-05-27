@@ -37,4 +37,9 @@ public:
      void *Alloc(u64 size, i32 stackNum);
      Frame GetFrame(i32 stackNum);
      void ReleaseFrame(Frame frame);
+
+     size_t GetFreeMemoryCount()
+     {
+         return head[1] - head[0];
+     }
 };

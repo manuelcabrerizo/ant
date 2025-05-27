@@ -8,7 +8,8 @@ class Game
 private:
      TextureManager textureManager;
      ModelManager modelManager;
-     ShaderManager shaderManager;
+     VertexShaderManager vertexShaderManager;
+     FragmentShaderManager fragmentShaderManager;
      MaterialManager materialManager;
      ActorManager actorManager;
 public:     

@@ -18,4 +18,9 @@ public:
      void *Alloc(u64 size, i32 stackNum);
      Frame GetFrame();
      void ReleaseFrame(Frame frame);
+
+     size_t GetFreeMemoryCount()
+     {
+         return allocator.GetFreeMemoryCount();
+     }
 };

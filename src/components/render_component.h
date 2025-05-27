@@ -24,7 +24,7 @@ private:
 public:
     // TODO: remove this texture
     // make this work with materials
-    Texture *texture;
+    Material *material;
     Model *model;
     Vector3 rotationOffset;
     bool isAnimated = false;
@@ -37,5 +37,5 @@ public:
      void OnInit(ActorManager *actorManager);
      void OnTerminate(ActorManager *actorManager) override;
      void OnUpdate(ActorManager *actorManager, f32 dt);
-     void OnRender(ShaderManager *shaderManager, ActorManager *actorManager);
+     void OnRender(VertexShaderManager *shaderManager, ActorManager *actorManager);
 };

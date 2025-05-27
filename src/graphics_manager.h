@@ -28,7 +28,8 @@ struct VertexBuffer {};
 struct IndexBuffer {};
 struct UniformBuffer {};
 struct FrameBuffer {};
-struct Shader {};
+struct VertexShader {};
+struct FragmentShader {};
 struct Texture {};
 
 class GraphicsManager
@@ -70,9 +71,13 @@ public:
      virtual void UniformBufferBind(UniformBuffer *uniformBuffer) = 0;
      virtual void UniformBufferUpdate(UniformBuffer *uniformBuffer, void *data) = 0;
 
-     virtual Shader *ShaderAlloc(File vertFilepath, File fragFilepath) = 0;
-     virtual void ShaderFree(Shader *shader) = 0;
-     virtual void ShaderBind(Shader *shader) = 0;
+     virtual VertexShader *VertexShaderAlloc(File file) = 0;
+     virtual void VertexShaderFree(VertexShader* shader) = 0;
+     virtual void VertexShaderBind(VertexShader* shader) = 0;
+
+     virtual FragmentShader* FragmentShaderAlloc(File file) = 0;
+     virtual void FragmentShaderFree(FragmentShader* shader) = 0;
+     virtual void FragmentShaderBind(FragmentShader* shader) = 0;
 
      virtual Texture *TextureAlloc(const char *filepath) = 0;
      virtual void TextureFree(Texture *texture) = 0;

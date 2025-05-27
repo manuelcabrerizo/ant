@@ -7,8 +7,8 @@
     </TransformComponent>
     <RenderComponent>
         <model name="warrior"/>
-        <texture name="warrior"/>
-        <rotationOffset x="0" y="180" z="0"/>
+		<material name="GreenMaterial"/>
+		<rotationOffset x="0" y="180" z="0"/>
     </RenderComponent>
     <PhysicsComponent>
         <acceleration x="0" y="0" z="0"/>

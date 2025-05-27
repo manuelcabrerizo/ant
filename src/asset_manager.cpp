@@ -47,36 +47,64 @@ Model *ModelManager::Get(const char *name)
 }
 
 // Shader Manager
-void ShaderManager::Load(const char *name, const char *vertPath, const char *fragPath)
+void VertexShaderManager::Load(const char *name, const char *filePath)
 {
      Frame frame = MemoryManager::Get()->GetFrame();
-     File vertFile = PlatformReadFile(vertPath, FRAME_MEMORY);
-     File fragFile = PlatformReadFile(fragPath, FRAME_MEMORY);
-     ShaderHandle shaderHandle;
+     File file = PlatformReadFile(filePath, FRAME_MEMORY);
+     VertexShaderHandle shaderHandle;
      shaderHandle.name = name;
-     shaderHandle.shader =  GraphicsManager::Get()->ShaderAlloc(vertFile, fragFile);
+     shaderHandle.shader =  GraphicsManager::Get()->VertexShaderAlloc(file);
      MemoryManager::Get()->ReleaseFrame(frame);
      nameIndex.Add(name, assets.Add(shaderHandle));
 }
 
-void ShaderManager::Unload(const char *name)
+void VertexShaderManager::Unload(const char *name)
 {
      auto handle = *nameIndex.Get(name);
-     GraphicsManager::Get()->ShaderFree(assets.Get(handle)->shader);
+     GraphicsManager::Get()->VertexShaderFree(assets.Get(handle)->shader);
      assets.Remove(handle);
      nameIndex.Remove(name);
 }
 
-void ShaderManager::Bind(const char *name)
+void VertexShaderManager::Bind(const char *name)
 {
-     GraphicsManager::Get()->ShaderBind(AssetManager::Get(name)->shader);
+     GraphicsManager::Get()->VertexShaderBind(AssetManager::Get(name)->shader);
 }
 
-Shader *ShaderManager::Get(const char *name)
+VertexShader* VertexShaderManager::Get(const char *name)
 {
      return AssetManager::Get(name)->shader;
 }
 
+// Fragment Shader
+void FragmentShaderManager::Load(const char* name, const char* filePath)
+{
+    Frame frame = MemoryManager::Get()->GetFrame();
+    File file = PlatformReadFile(filePath, FRAME_MEMORY);
+    FragmentShaderHandle shaderHandle;
+    shaderHandle.name = name;
+    shaderHandle.shader = GraphicsManager::Get()->FragmentShaderAlloc(file);
+    MemoryManager::Get()->ReleaseFrame(frame);
+    nameIndex.Add(name, assets.Add(shaderHandle));
+}
+
+void FragmentShaderManager::Unload(const char* name)
+{
+    auto handle = *nameIndex.Get(name);
+    GraphicsManager::Get()->FragmentShaderFree(assets.Get(handle)->shader);
+    assets.Remove(handle);
+    nameIndex.Remove(name);
+}
+
+void FragmentShaderManager::Bind(const char* name)
+{
+    GraphicsManager::Get()->FragmentShaderBind(AssetManager::Get(name)->shader);
+}
+
+FragmentShader* FragmentShaderManager::Get(const char* name)
+{
+    return AssetManager::Get(name)->shader;
+}
 
 // Material Manager
 void MaterialManager::Init(u32 assetsCapacity)
@@ -87,7 +115,7 @@ void MaterialManager::Init(u32 assetsCapacity)
 
 void MaterialManager::LoadSolidColor(const char* name,
     const char* shaderName,
-    ShaderManager* shaderManager,
+    FragmentShaderManager* shaderManager,
     const Vector3& ambient,
     const Vector3& diffuse,
     const Vector3& specular,
@@ -104,7 +132,7 @@ void MaterialManager::LoadSolidColor(const char* name,
 
 void MaterialManager::LoadTexture(const char* name,
     const char* shaderName,
-    ShaderManager* shaderManager,
+    FragmentShaderManager* shaderManager,
     const char* diffuseName,
     const char* normalName,
     const char* specularName,

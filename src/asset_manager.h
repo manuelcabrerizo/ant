@@ -103,22 +103,37 @@ public:
      Model *Get(const char *name);
 };
 
-// Shader Manager
-struct ShaderHandle
+// Vertex Shader Manager
+struct VertexShaderHandle
 {
-     const char *name;
-     Shader *shader;
+     const char* name;
+     VertexShader* shader;
 };
 
-class ShaderManager : public AssetManager<ShaderHandle>
+class VertexShaderManager : public AssetManager<VertexShaderHandle>
 {
 public:
-     void Load(const char *name, const char *vertPath, const char *fragPath);
+     void Load(const char *name, const char *filePath);
      void Unload(const char *name) override;
      void Bind(const char *name);
-     Shader *Get(const char *name);
+     VertexShader* Get(const char *name);
 };
 
+// Fragment Shader Manager
+struct FragmentShaderHandle
+{
+    const char* name;
+    FragmentShader* shader;
+};
+
+class FragmentShaderManager : public AssetManager<FragmentShaderHandle>
+{
+public:
+    void Load(const char* name, const char* filePath);
+    void Unload(const char* name) override;
+    void Bind(const char* name);
+    FragmentShader* Get(const char* name);
+};
 
 // Material Manager
 struct MaterialHandle
@@ -141,7 +156,7 @@ public:
 
     void LoadSolidColor(const char* name,
         const char* shaderName,
-        ShaderManager* shaderManager,
+        FragmentShaderManager* shaderManager,
         const Vector3& ambient,
         const Vector3& diffuse,
         const Vector3& specular,
@@ -149,7 +164,7 @@ public:
     
     void LoadTexture(const char* name,
         const char* shaderName,
-        ShaderManager* shaderManager,
+        FragmentShaderManager* shaderManager,
         const char* diffuseName,
         const char* normalName,
         const char* specularName,

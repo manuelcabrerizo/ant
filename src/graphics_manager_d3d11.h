@@ -44,11 +44,15 @@ struct FrameBufferD3D11 : FrameBuffer
      ID3D11ShaderResourceView *shaderResourceView;
 };
 
-struct ShaderD3D11 : Shader
+struct VertexShaderD3D11 : VertexShader
 {
      ID3D11InputLayout *layout;
      ID3D11VertexShader *vertexShader;
-     ID3D11PixelShader *pixelShader;
+};
+
+struct FragmentShaderD3D11 : FragmentShader
+{
+    ID3D11PixelShader* pixelShader;
 };
 
 struct TextureD3D11 : Texture
@@ -97,7 +101,8 @@ private:
      ObjectAllocator<IndexBufferD3D11> indexBufferAllocator;
      ObjectAllocator<UniformBufferD3D11> uniformBufferAllocator;
      ObjectAllocator<FrameBufferD3D11> frameBufferAllocator;
-     ObjectAllocator<ShaderD3D11> shaderAllocator;
+     ObjectAllocator<VertexShaderD3D11> vertexShaderAllocator;
+     ObjectAllocator<FragmentShaderD3D11> fragmentShaderAllocator;
      ObjectAllocator<TextureD3D11> textureAllocator;
 
 #if ANT_DEBUG
@@ -134,9 +139,14 @@ public:
      void UniformBufferBind(UniformBuffer *uniformBuffer) override;
      void UniformBufferUpdate(UniformBuffer *uniformBuffer, void *data) override;
 
-     Shader *ShaderAlloc(File vertFilepath, File fragFilepath) override;
-     void ShaderFree(Shader *shader) override;
-     void ShaderBind(Shader *shader) override;
+     VertexShader* VertexShaderAlloc(File file) override;
+     void VertexShaderFree(VertexShader* shader) override;
+     void VertexShaderBind(VertexShader* shader) override;
+
+     FragmentShader* FragmentShaderAlloc(File file) override;
+     void FragmentShaderFree(FragmentShader* shader) override;
+     void FragmentShaderBind(FragmentShader* shader) override;
+
 
      Texture *TextureAlloc(const char *filepath) override;
      void TextureFree(Texture *texture) override;
