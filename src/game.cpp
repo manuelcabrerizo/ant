@@ -65,6 +65,7 @@ void Game::Init()
      ModelManager::Get()->Load("test-level", "data/models/Level/source/level.fbx");
      ModelManager::Get()->Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx");
      ModelManager::Get()->Load("tower", "data/models/MagicStudio/source/MagicStudio.fbx");
+     ModelManager::Get()->Load("wizard", "data/models/Wizard/source/Wizard.FBX");
 
      // Initialize the Actor Manager
      actorManager.Init(100, 64, STATIC_MEMORY);
@@ -93,6 +94,7 @@ void Game::Init()
      actorManager.CreateActorFromFile("data/xml/test-level.xml");
      actorManager.CreateActorFromFile("data/xml/tower.xml");
      actorManager.CreateActorFromFile("data/xml/house.xml");
+     actorManager.CreateActorFromFile("data/xml/wizard.xml");
 
      SlotmapKey<Actor> enemy[3] =
      {

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Actor>
+	<TransformComponent>
+		<position x="5" y="1.01" z="10"/>
+		<scale x="0.01" y="0.01" z="0.01"/>
+		<direction x="0" y="0" z="1"/>
+	</TransformComponent>
+	<RenderComponent>
+		<model name="wizard"/>
+		<materials>
+		</materials>
+		<rotationOffset x="90" y="0" z="0"/>
+	</RenderComponent>
+</Actor>
