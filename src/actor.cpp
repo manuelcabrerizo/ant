@@ -14,6 +14,9 @@
 #include <math/vector3.h>
 
 #include <tinyxml2.h>
+#include <asset_managers/model_manager.h>
+#include <asset_managers/material_manager.h>
+#include <utils.h>
 
 
 i32 ComponentBase::counter = 0;
@@ -120,16 +123,6 @@ void ActorManager::RemoveComponentById(Actor *actor, i32 id)
      }
 }
 
-static i32 NextPower2(u32  x)
-{
-     int  value  =  1 ;
-     while  ( value  <=  x)
-     {
-          value  =  value  <<  1 ;
-     }
-     return  value;
-}
-
 static i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
      int count = 0;
      for (tinyxml2::XMLElement* child = parent->FirstChildElement();
@@ -141,8 +134,7 @@ static i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
      return count;
  }
 
-SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
-     ModelManager *modelManager, MaterialManager* materialManager)
+SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath)
 {
     tinyxml2::XMLDocument doc;
     doc.LoadFile(filepath);
@@ -152,7 +144,7 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
      i32 componentCount = GetChildElementCount(root) + 2; // TODO: handle this better
      if((componentCount & (componentCount - 1)) != 0)
      {
-          componentCount = NextPower2(componentCount);
+          componentCount = Utils::NextPower2(componentCount);
      }
 
     SlotmapKey<Actor> actor = CreateActor(componentCount);
@@ -212,8 +204,8 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
                     attributes = attributes->NextSiblingElement();
                     attributes->QueryStringAttribute("path", &weaponPath[1]);
 
-                    playerController.weapons[0] = CreateActorFromFile(weaponPath[0], modelManager, materialManager); 
-                    playerController.weapons[1] = CreateActorFromFile(weaponPath[1], modelManager, materialManager);
+                    playerController.weapons[0] = CreateActorFromFile(weaponPath[0]); 
+                    playerController.weapons[1] = CreateActorFromFile(weaponPath[1]);
                     RenderComponent *render = GetComponent<RenderComponent>(playerController.weapons[1]);
                     render->enable = false;
                     WeaponComponent *weapon = GetComponent<WeaponComponent>(actor);
@@ -230,10 +222,24 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
 
               attributes = attributes->NextSiblingElement();
 
-              const char *materialPath = 0;
-              attributes->QueryStringAttribute("name", &materialPath);
+              Frame frame = MemoryManager::Get()->GetFrame();
+              Array<const char*> materialNames;
 
-              ASSERT(modelPath && materialPath);
+              if (attributes->ChildElementCount() > 0)
+              {
+                  materialNames.Init(attributes->ChildElementCount(), FRAME_MEMORY);
+
+                  tinyxml2::XMLElement* material = attributes->FirstChildElement();
+                  while (material != nullptr)
+                  {
+                      const char* materialPath = 0;
+                      material->QueryStringAttribute("name", &materialPath);
+                      materialNames.Push(materialPath);
+                      material = material->NextSiblingElement();
+                  }
+              }
+
+              ASSERT(modelPath);
 
               attributes = attributes->NextSiblingElement();
 
@@ -245,10 +251,16 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath,
               rotationOffset *= (ANT_PI/180.0f);
 
               RenderComponent render;
-              render.model = modelManager->Get(modelPath);
-              render.material = materialManager->Get(materialPath);
+              render.model = ModelManager::Get()->Get(modelPath);
+              ASSERT(materialNames.size <= render.model->GetMeshCount());
+              for (i32 i = 0; i < materialNames.size; ++i)
+              {
+                  render.model->SetMaterialAtMeshIndex(i, MaterialManager::Get()->Get(materialNames[i]));
+              }
               render.rotationOffset = rotationOffset;
               AddComponent<RenderComponent>(actor, render);
+
+              MemoryManager::Get()->ReleaseFrame(frame);
          }
          else if(strcmp("PhysicsComponent", componentType) == 0)
          {

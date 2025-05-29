@@ -6,6 +6,7 @@
 #include <model.h>
 
 #include <graphics_manager.h>
+#include <asset_managers/shader_manager.h>
 
 UniformBuffer *RenderComponent::uniformBuffer = nullptr;
 PerDrawUbo RenderComponent::ubo;
@@ -49,7 +50,7 @@ void RenderComponent::OnUpdate(ActorManager *actorManager, f32 dt)
     }
 }
 
-void RenderComponent::OnRender(VertexShaderManager *shaderManager, ActorManager *actorManager)
+void RenderComponent::OnRender(ActorManager *actorManager)
 {
     Matrix4 tra = Matrix4::Translate(transform->position); 
     Matrix4 sca = Matrix4::Scale(transform->scale);
@@ -69,17 +70,13 @@ void RenderComponent::OnRender(VertexShaderManager *shaderManager, ActorManager 
     // bind the vertex shader
     if(!isAnimated)
     {
-        shaderManager->Bind("default"); 
+        VertexShaderManager::Get()->Bind("default");
     }
     else
     {
         GraphicsManager::Get()->UniformBufferUpdate(matrixBuffer, animation->skeleton.GetMatrices());
-        shaderManager->Bind("animation");
+        VertexShaderManager::Get()->Bind("animation");
     }
-    GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
-
-    // bind the fragment shader/ material
-    material->Bind();
-    
+    GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);    
     model->Draw();
 }

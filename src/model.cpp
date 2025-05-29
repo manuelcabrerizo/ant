@@ -6,52 +6,127 @@
 #include <assimp/postprocess.h>
 
 #include <utils.h>
-
+#include <strings.h>
+#include <asset_managers/texture_manager.h>
+#include <asset_managers/material_manager.h>
 
 void Mesh::Init(Vertex *vertices, u32 verticesCount,
                 u32 *indices, u32 indicesCount)
 {
-     this->verticesCount = verticesCount;
-     this->indicesCount = indicesCount;
-     this->vertexBuffer = GraphicsManager::Get()->VertexBufferAlloc((void *)vertices, verticesCount, sizeof(Vertex));
-     this->indexBuffer = GraphicsManager::Get()->IndexBufferAlloc(indices, indicesCount);
+    this->material = nullptr;
+    this->verticesCount = verticesCount;
+    this->indicesCount = indicesCount;
+    this->vertexBuffer = GraphicsManager::Get()->VertexBufferAlloc((void *)vertices, verticesCount, sizeof(Vertex));
+    this->indexBuffer = GraphicsManager::Get()->IndexBufferAlloc(indices, indicesCount);
 }
 
 void Mesh::Terminate()
 {
-     GraphicsManager::Get()->IndexBufferFree(indexBuffer);
-     GraphicsManager::Get()->VertexBufferFree(vertexBuffer);
+    GraphicsManager::Get()->IndexBufferFree(indexBuffer);
+    GraphicsManager::Get()->VertexBufferFree(vertexBuffer);
 }
 
 void Mesh::Draw()
 {
-     GraphicsManager::Get()->VertexBufferBind(vertexBuffer);
-     GraphicsManager::Get()->IndexBufferBind(indexBuffer);
-     GraphicsManager::Get()->DrawIndexed(indicesCount);
+    material->Bind();
+    GraphicsManager::Get()->VertexBufferBind(vertexBuffer);
+    GraphicsManager::Get()->IndexBufferBind(indexBuffer);
+    GraphicsManager::Get()->DrawIndexed(indicesCount);
 }
 
-// TODO: remove this
-static i32 TempTempNextPower2(u32  x)
+void Mesh::SetMaterial(Material* material)
 {
-     int  value  =  1 ;
-     while  ( value  <=  x)
-     {
-          value  =  value  <<  1 ;
-     }
-     return  value;
+    this->material = material;
 }
 
 void Model::Init(const char *filepath, i32 memoryType)
 {
      const aiScene *scene = Utils::importer.ReadFile(filepath,
-          aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
+            aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder |
+            aiProcess_Triangulate | aiProcess_GenSmoothNormals |
+            aiProcess_CalcTangentSpace);
 
-     // TODO: load the model materials
-     for (int i = 0; i < scene->mNumMaterials; ++i)
+     Frame materialsFrame = MemoryManager::Get()->GetFrame();
+     Array<aiString> materials;
+     if (scene->mNumMaterials > 0)
      {
-         aiMaterial* material = scene->mMaterials[i];
-         aiString name;
-         material->Get(AI_MATKEY_NAME, name);
+         materials.Init(scene->mNumMaterials, FRAME_MEMORY);
+         for (int i = 0; i < scene->mNumMaterials; ++i)
+         {
+             aiMaterial* material = scene->mMaterials[i];
+             aiString name;
+             material->Get(AI_MATKEY_NAME, name);
+             materials.Push(name);
+
+             Frame stringFrame = MemoryManager::Get()->GetFrame();
+
+             const char* materialName = name.C_Str();
+             const char* diffuseTextureName = "DefaultMaterial_Diffuse";
+             const char* normalTextureName = "DefaultMaterial_Normal";
+             const char* specularTextureName = "DefaultMaterial_Specular";
+             
+             if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+             {
+                 aiString path;
+                 if (material->GetTexture(aiTextureType_DIFFUSE, 0, &path, 0, 0, 0, 0, 0) == AI_SUCCESS)
+                 {
+                     i32 prevIndex = Strings::FindPenultimateInstance(filepath, '/');
+                     i32 postIndex = Strings::FindFirstInstance(path.C_Str(), '\\');
+
+                     // ERROR: invalid model foulder structure, (we use source/textures standar)
+                     ASSERT(prevIndex != -1 && postIndex != -1);
+
+                     const char* texturePath = (const char*)MemoryManager::Get()->Alloc(_MAX_PATH, FRAME_MEMORY);
+                     const char* tempPath = (const char*)MemoryManager::Get()->Alloc(_MAX_PATH, FRAME_MEMORY);
+                     memset((void*)texturePath, 0, _MAX_PATH);
+                     memset((void*)tempPath, 0, _MAX_PATH);
+                    
+                     memcpy((void*)texturePath, filepath, prevIndex);
+                     memcpy((void*)tempPath, path.C_Str() + postIndex, path.length - postIndex);
+
+                     Strings::ReplaceInstance((char *)tempPath, '\\', '/');
+
+                     memcpy((void *)(texturePath + strlen(texturePath)), tempPath, strlen(tempPath));
+
+                     i32 nameIndex = Strings::FindLastInstance(tempPath, '/');
+                     i32 extensionIndex = Strings::FindLastInstance(tempPath, '.');
+
+                     // ERROR: invalid model foulder structure, (we use source/textures standar)
+                     ASSERT(nameIndex != -1 && extensionIndex != -1);
+
+                     memset((void*)(tempPath + extensionIndex), 0, strlen(tempPath) - extensionIndex);
+
+                     diffuseTextureName = tempPath + (nameIndex + 1);
+
+                     if (TextureManager::Get()->Contains(diffuseTextureName) == false)
+                     {
+                         // save the name
+                         void* buffer = MemoryManager::Get()->Alloc(strlen(diffuseTextureName) + 1, STATIC_MEMORY);
+                         memset(buffer, 0, strlen(diffuseTextureName) + 1);
+                         memcpy(buffer, diffuseTextureName, strlen(diffuseTextureName));
+                         diffuseTextureName = (const char*)buffer;
+
+                         TextureManager::Get()->Load(diffuseTextureName, texturePath);
+                     }
+                 }
+             }
+
+
+
+             if (MaterialManager::Get()->Contains(materialName) == false)
+             {
+                 //save the name
+                 void* buffer = MemoryManager::Get()->Alloc(strlen(materialName) + 1, STATIC_MEMORY);
+                 memset(buffer, 0, strlen(materialName) + 1);
+                 memcpy(buffer, materialName, strlen(materialName));
+                 materialName = (const char*)buffer;
+
+                 MaterialManager::Get()->LoadTexture(materialName, "default",
+                     diffuseTextureName, normalTextureName, specularTextureName, 64);
+             }
+             
+             MemoryManager::Get()->ReleaseFrame(stringFrame);
+         }
      }
 
      if(scene->mNumMeshes > 0)
@@ -77,7 +152,7 @@ void Model::Init(const char *filepath, i32 memoryType)
      {
           if((maxBoneCount & (maxBoneCount - 1)) != 0)
           {
-               maxBoneCount = TempTempNextPower2(maxBoneCount);
+               maxBoneCount = Utils::NextPower2(maxBoneCount);
           }
           bonesInfo.Init(maxBoneCount*2, memoryType);
      }
@@ -158,10 +233,21 @@ void Model::Init(const char *filepath, i32 memoryType)
 
           Mesh myMesh;
           myMesh.Init(vertices, mesh->mNumVertices, indices, indicesCount);
+
+          if(MaterialManager::Get()->Contains(materials[mesh->mMaterialIndex].C_Str()))
+          {
+              myMesh.SetMaterial(MaterialManager::Get()->Get(materials[mesh->mMaterialIndex].C_Str()));
+          }
+          else
+          {
+              myMesh.SetMaterial(MaterialManager::Get()->Get("DefaultMaterial"));
+          }
           meshes.Push(myMesh);
 
           MemoryManager::Get()->ReleaseFrame(frame);
      }
+
+     MemoryManager::Get()->ReleaseFrame(materialsFrame);
 }
 
 void Model::Terminate()
@@ -183,4 +269,17 @@ void Model::Draw()
 HashMap<BoneInfo>& Model::GetBonesInfo()
 {
      return bonesInfo;
+}
+
+void Model::SetDefaultMaterial(Material* material)
+{
+    for (i32 i = 0; i < meshes.size; ++i)
+    {
+        meshes[i].SetMaterial(material);
+    }
+}
+
+void Model::SetMaterialAtMeshIndex(i32 index, Material* material)
+{
+    meshes[index].SetMaterial(material);
 }

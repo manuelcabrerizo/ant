@@ -1,7 +1,10 @@
 #pragma once
 
 #include "component.h"
+#include <math/vector3.h>
+#include <math/matrix4.h>
 
+struct UniformBuffer;
 class TransformComponent;
 class AnimationComponent;
 class Model;
@@ -22,9 +25,6 @@ private:
     AnimationComponent *animation = nullptr;
     TransformComponent* transform = nullptr;
 public:
-    // TODO: remove this texture
-    // make this work with materials
-    Material *material;
     Model *model;
     Vector3 rotationOffset;
     bool isAnimated = false;
@@ -37,5 +37,5 @@ public:
      void OnInit(ActorManager *actorManager);
      void OnTerminate(ActorManager *actorManager) override;
      void OnUpdate(ActorManager *actorManager, f32 dt);
-     void OnRender(VertexShaderManager *shaderManager, ActorManager *actorManager);
+     void OnRender(ActorManager *actorManager);
 };

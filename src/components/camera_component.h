@@ -2,8 +2,10 @@
 
 #include "component.h"
 #include <math/vector3.h>
+#include <math/matrix4.h>
 #include <notification_manager.h>
 
+struct UniformBuffer;
 class TransformComponent;
 
 struct CameraUbo

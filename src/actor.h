@@ -4,7 +4,6 @@ class ActorManager;
 struct ComponentBase;
 
 #include "containers.h"
-#include "asset_manager.h"
 
 struct Actor
 {
@@ -48,8 +47,7 @@ public:
      Array<ComponentType>& GetComponents();
 
      SlotmapKey<Actor> CreateActor(i32 componentCount);
-     SlotmapKey<Actor> CreateActorFromFile(const char *filepath,
-         ModelManager *modelManager, MaterialManager *materialManager);
+     SlotmapKey<Actor> CreateActorFromFile(const char *filepath);
      void DestroyActor(SlotmapKey<Actor> actorKey);
      Actor *GetActor(SlotmapKey<Actor> actorKey);
     
@@ -73,7 +71,7 @@ public:
      void LateUpdateComponents(f32 dt);
 
      template<typename ComponentType>
-     void RenderComponents(VertexShaderManager *shaderManager);
+     void RenderComponents();
 };
 
 
@@ -195,14 +193,14 @@ void ActorManager::LateUpdateComponents(f32 dt)
 }
 
 template<typename ComponentType>
-void ActorManager::RenderComponents(VertexShaderManager* shaderManager)
+void ActorManager::RenderComponents()
 {
     Array<ComponentType>& components = GetComponents<ComponentType>();
     for (u32 i = 0; i < components.size; ++i)
     {
         if (components[i].initialized && components[i].enable)
         {
-            components[i].OnRender(shaderManager, this);
+            components[i].OnRender(this);
         }
     }
 }

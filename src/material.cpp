@@ -1,18 +1,20 @@
 #include "material.h"
-#include <asset_manager.h>
+
+#include <asset_managers/shader_manager.h>
+#include <asset_managers/texture_manager.h>
 
 #include <string.h>
 
 
-void Material::Init(const char* shaderName, FragmentShaderManager* shaderManager)
+void Material::Init(const char* shaderName)
 {
     size_t shaderNameLen = strlen(shaderName);
     ASSERT(shaderNameLen <= _MAX_PATH);
     memset(this->shaderName, 0, _MAX_PATH);
     memcpy(this->shaderName, shaderName, shaderNameLen);
 
-    ASSERT(shaderManager->Contains(shaderName));
-    this->shader = shaderManager->Get(shaderName);
+    ASSERT(FragmentShaderManager::Get()->Contains(shaderName));
+    this->shader = FragmentShaderManager::Get()->Get(shaderName);
 }
 
 void Material::Terminate()
@@ -23,14 +25,14 @@ void Material::Terminate()
 i32 SolidColorMaterial::instanceCount = 0;
 UniformBuffer* SolidColorMaterial::uniformBuffer = nullptr;
 
-void SolidColorMaterial::Init(const char* shaderName,
-                              FragmentShaderManager* shaderManager,
-                              const Vector3& ambient,
-                              const Vector3& diffuse,
-                              const Vector3& specular,
-                              f32 shininess)
+void SolidColorMaterial::Init(
+    const char* shaderName,
+    const Vector3& ambient,
+    const Vector3& diffuse,
+    const Vector3& specular,
+    f32 shininess)
 {
-    Material::Init(shaderName, shaderManager);
+    Material::Init(shaderName);
     this->ambient = ambient;
     this->diffuse = diffuse;
     this->specular = specular;
@@ -74,15 +76,14 @@ void SolidColorMaterial::Bind()
 i32 TextureMaterial::instanceCount = 0;
 UniformBuffer* TextureMaterial::uniformBuffer = nullptr;
 
-void TextureMaterial::Init(const char* shaderName,
-    FragmentShaderManager* shaderManager,
+void TextureMaterial::Init(
+    const char* shaderName,
     const char* diffuseName,
     const char* normalName,
     const char* specularName,
-    f32 shininess,
-    TextureManager* textureManager)
+    f32 shininess)
 {
-    Material::Init(shaderName, shaderManager);
+    Material::Init(shaderName);
 
     size_t diffuseNameLen = strlen(diffuseName);
     ASSERT(diffuseNameLen <= _MAX_PATH);
@@ -99,31 +100,31 @@ void TextureMaterial::Init(const char* shaderName,
     memset(this->specularName, 0, _MAX_PATH);
     memcpy(this->specularName, specularName, specularNameLen);
 
-    if (textureManager->Contains(diffuseName))
+    if (TextureManager::Get()->Contains(diffuseName))
     {
-        this->diffuse = textureManager->Get(diffuseName);
+        this->diffuse = TextureManager::Get()->Get(diffuseName);
     }
     else
     {
-        this->diffuse = textureManager->Get("DefaultMaterial_Diffuse");
+        this->diffuse = TextureManager::Get()->Get("DefaultMaterial_Diffuse");
     }
 
-    if (textureManager->Contains(normalName))
+    if (TextureManager::Get()->Contains(normalName))
     {
-        this->normal = textureManager->Get(normalName);
+        this->normal = TextureManager::Get()->Get(normalName);
     }
     else
     {
-        this->normal = textureManager->Get("DefaultMaterial_Normal");
+        this->normal = TextureManager::Get()->Get("DefaultMaterial_Normal");
     }
 
-    if (textureManager->Contains(specularName))
+    if (TextureManager::Get()->Contains(specularName))
     {
-        this->specular = textureManager->Get(specularName);
+        this->specular = TextureManager::Get()->Get(specularName);
     }
     else
     {
-        this->specular = textureManager->Get("DefaultMaterial_Specular");
+        this->specular = TextureManager::Get()->Get("DefaultMaterial_Specular");
     }
 
     this->shininess = shininess;

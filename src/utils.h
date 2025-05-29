@@ -7,6 +7,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 
+#include <common.h>
+
 class Utils
 {
 public:
@@ -14,4 +16,5 @@ public:
     static Matrix4 FromAssimp(aiMatrix4x4 m);
     static Vector3 FromAssimp(aiVector3D m);
     static Quaternion FromAssimp(aiQuaternion m);
+    static i32 NextPower2(u32 x);
 };

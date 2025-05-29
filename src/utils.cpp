@@ -20,3 +20,13 @@ Quaternion Utils::FromAssimp(aiQuaternion m)
 {
     return Quaternion(m.w, m.x, m.y, m.z);
 }
+
+i32 Utils::NextPower2(u32  x)
+{
+    int  value = 1;
+    while (value <= x)
+    {
+        value = value << 1;
+    }
+    return  value;
+}

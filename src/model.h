@@ -8,6 +8,8 @@
 
 #include "graphics_manager.h"
 
+class Material;
+
 // TODO: separate static from animated vertex
 #define MAX_BONE_INFLUENCE 4
 struct Vertex
@@ -26,12 +28,14 @@ private:
      IndexBuffer *indexBuffer;
      u32 verticesCount;
      u32 indicesCount;
-     // TODO: add material id
+     Material* material;
 public:
      void Init(Vertex *vertices, u32 verticesCount,
                u32 *indices, u32 indicesCount);
      void Terminate();
      void Draw();
+
+     void SetMaterial(Material* material);
 };
 
 struct BoneInfo
@@ -55,4 +59,13 @@ public:
      {
           return boneCounter;
      }
+
+     i32 GetMeshCount()
+     {
+         return meshes.size;
+     }
+
+     void SetDefaultMaterial(Material* material);
+     void SetMaterialAtMeshIndex(i32 index, Material* material);
+
 };

@@ -7,7 +7,18 @@
     </TransformComponent>
     <RenderComponent>
         <model name="house"/>
-		<material name="RedMaterial"/>
+		<materials>
+			<material name="GreenMaterial"/>
+			<material name="GreenMaterial"/>
+			<material name="GreenMaterial"/>
+			<material name="GreenMaterial"/>
+			<material name="GreenMaterial"/>
+			<material name="GreenMaterial"/>
+			<material name="GreenMaterial"/>
+			<material name="GreenMaterial"/>
+			<material name="GreenMaterial"/>
+			<material name="GreenMaterial"/>
+		</materials>
 		<rotationOffset x="0" y="0" z="0"/>
     </RenderComponent>
 </Actor>

@@ -4,9 +4,6 @@
 #include <math/vector3.h>
 #include <stdlib.h>
 
-class FragmentShaderManager;
-class TextureManager;
-
 class Material
 {
 protected:
@@ -14,7 +11,7 @@ protected:
     FragmentShader* shader = nullptr;
 
     Material() {}
-    void Init(const char* shaderName, FragmentShaderManager* shaderManager);
+    void Init(const char* shaderName);
 public:
     virtual void Bind() = 0;
     virtual void Terminate();
@@ -33,7 +30,7 @@ struct SolidColorUbo
 class SolidColorMaterial : public Material
 {
 public:
-    void Init(const char* shaderName, FragmentShaderManager* shaderManager,
+    void Init(const char* shaderName,
               const Vector3& ambient,
               const Vector3& diffuse,
               const Vector3& specular,
@@ -61,12 +58,11 @@ struct TextureUbo
 class TextureMaterial : public Material
 {
 public:
-    void Init(const char* shaderName, FragmentShaderManager* shaderManager,
+    void Init(const char* shaderName,
               const char* diffuseName,
               const char* normalName,
               const char* specularName,
-              f32 shininess, 
-              TextureManager* textureManager);
+              f32 shininess);
     void Terminate() override;
     void Bind() override;
 private:

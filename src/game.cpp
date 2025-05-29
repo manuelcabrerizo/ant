@@ -10,6 +10,11 @@
 
 #include <game.h>
 
+#include <asset_managers/shader_manager.h>
+#include <asset_managers/texture_manager.h>
+#include <asset_managers/material_manager.h>
+#include <asset_managers/model_manager.h>
+
 #include <components/component.h>
 #include <components/transform_component.h>
 #include <components/render_component.h>
@@ -25,57 +30,44 @@
 
 void Game::Init()
 {
-     // Load the shaders
-     vertexShaderManager.Init(4);
-     vertexShaderManager.Load("default", "data/shaders/vert.hlsl");
-     vertexShaderManager.Load("animation", "data/shaders/animation_vert.hlsl");
-     vertexShaderManager.Bind("default");
+    VertexShaderManager::Initialize(4);
+    FragmentShaderManager::Initialize(4);
+    TextureManager::Initialize(64);
+    MaterialManager::Initialize(64);
+    ModelManager::Initialize(32);
 
-     fragmentShaderManager.Init(4);
-     fragmentShaderManager.Load("default", "data/shaders/frag.hlsl");
-     fragmentShaderManager.Load("color", "data/shaders/color.hlsl");
-     fragmentShaderManager.Bind("default");
+     // Load Vertex the shaders
+     VertexShaderManager::Get()->Load("default", "data/shaders/vert.hlsl");
+     VertexShaderManager::Get()->Load("animation", "data/shaders/animation_vert.hlsl");
+     VertexShaderManager::Get()->Bind("default");
+
+     // Load Fragment the shaders
+     FragmentShaderManager::Get()->Load("default", "data/shaders/frag.hlsl");
+     FragmentShaderManager::Get()->Load("color", "data/shaders/color.hlsl");
+     FragmentShaderManager::Get()->Bind("default");
      
-     // Load the models
-     modelManager.Init(32);
-     modelManager.Load("cube", "data/models/cube.obj");
-     modelManager.Load("sphere", "data/models/sphere.obj");
-     modelManager.Load("plane", "data/models/plane.obj");
-     modelManager.Load("pistol", "data/models/pistol.obj");
-     modelManager.Load("sniper", "data/models/sniper.obj");
-     modelManager.Load("warrior", "data/models/warrior.dae");
-     modelManager.Load("test-level", "data/models/level-rendering.obj");
-     modelManager.Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx");
-     modelManager.Load("house", "data/models/house.fbx");
-     modelManager.Load("tower", "data/models/MagicTower/MagicStudio.fbx");
+     // Load a textures
+     TextureManager::Get()->Load("DefaultMaterial_Diffuse", "data/textures/DefaultTextures/DefaultMaterial_Diffuse.png");
+     TextureManager::Get()->Load("DefaultMaterial_Normal", "data/textures/DefaultTextures/DefaultMaterial_Normal.png");
+     TextureManager::Get()->Load("DefaultMaterial_Specular", "data/textures/DefaultTextures/DefaultMaterial_Specular.png");
 
-     // Load a texture
-     textureManager.Init(128);
-     textureManager.Load("DefaultMaterial_Diffuse", "data/textures/DefaultTextures/DefaultMaterial_Diffuse.png");
-     textureManager.Load("DefaultMaterial_Normal", "data/textures/DefaultTextures/DefaultMaterial_Normal.png");
-     textureManager.Load("DefaultMaterial_Specular", "data/textures/DefaultTextures/DefaultMaterial_Specular.png");
-     //textureManager.Load("default", "data/textures/GridBox_Default.png");
-     //textureManager.Load("warrior", "data/textures/warrior.png");
-
-     // Material Manager Test
-     materialManager.Init(32);
-
-     materialManager.LoadTexture("DefaultMaterial",
-         "default", &fragmentShaderManager,
-         "DefaultMaterial_Diffuse",
-         "DefaultMaterial_Normal",
-         "DefaultMaterial_Specular",
-         64, &textureManager);
-
-     materialManager.LoadSolidColor("GreenMaterial", "color", &fragmentShaderManager,
-           Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 0.6f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
-     materialManager.LoadSolidColor("RedMaterial", "color", &fragmentShaderManager,
+     // Load Materials
+     MaterialManager::Get()->LoadTexture("DefaultMaterial", "default",
+         "DefaultMaterial_Diffuse", "DefaultMaterial_Normal", "DefaultMaterial_Specular", 64);
+     MaterialManager::Get()->LoadSolidColor("GreenMaterial", "color",
+         Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 0.6f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
+     MaterialManager::Get()->LoadSolidColor("RedMaterial", "color",
          Vector3(1.0f, 0.0f, 0.0f), Vector3(0.6f, 0.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
-     materialManager.LoadSolidColor("YellowMaterial", "color", &fragmentShaderManager,
+     MaterialManager::Get()->LoadSolidColor("YellowMaterial", "color",
          Vector3(1.0f, 1.0f, 0.0f), Vector3(0.6f, 0.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
-     
 
-     
+     // Load the models
+     //modelManager.Load("warrior", "data/models/warrior.dae");
+     ModelManager::Get()->Load("test-level", "data/models/Level/source/level.fbx");
+     ModelManager::Get()->Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx");
+     //ModelManager::Get()->Load("house", "data/models/house.fbx");
+     ModelManager::Get()->Load("tower", "data/models/MagicStudio/source/MagicStudio.fbx");
+         
      // Initialize the Actor Manager
      actorManager.Init(100, 64, STATIC_MEMORY);
      actorManager.AddComponentType<TransformComponent, 100>();
@@ -90,24 +82,25 @@ void Game::Init()
      actorManager.AllocInternalMemory();
 
      // Create Entities
-     SlotmapKey<Actor> player = actorManager.CreateActorFromFile("data/xml/player.xml", &modelManager, &materialManager);
-     WeaponComponent *weapon = actorManager.GetComponent<WeaponComponent>(player);
-     AnimationComponent animationCmp;
-     animationCmp.skeleton.Init("data/models/fps-animations-vsk/source/FPS_VSK1.fbx", STATIC_MEMORY);
-     animationCmp.animation.Init("data/models/fps-animations-vsk/source/FPS_VSK1.fbx", modelManager.Get("anim-gun"), STATIC_MEMORY);
-     actorManager.AddComponent<AnimationComponent>(weapon->weapon, animationCmp);
-     RenderComponent *render = actorManager.GetComponent<RenderComponent>(weapon->weapon);
-     render->isAnimated = true;
+     SlotmapKey<Actor> player = actorManager.CreateActorFromFile("data/xml/player.xml");
+     //WeaponComponent *weapon = actorManager.GetComponent<WeaponComponent>(player);
+     //AnimationComponent animationCmp;
+     //animationCmp.skeleton.Init("data/models/fps-animations-vsk/source/FPS_VSK1.fbx", STATIC_MEMORY);
+     //animationCmp.animation.Init("data/models/fps-animations-vsk/source/FPS_VSK1.fbx", ModelManager::Get()->Get("anim-gun"), STATIC_MEMORY);
+     //actorManager.AddComponent<AnimationComponent>(weapon->weapon, animationCmp);
+     //RenderComponent *render = actorManager.GetComponent<RenderComponent>(weapon->weapon);
+     //render->isAnimated = true;
      
 
-     actorManager.CreateActorFromFile("data/xml/test-level.xml", &modelManager, &materialManager);
-     actorManager.CreateActorFromFile("data/xml/house.xml", &modelManager, &materialManager);
-     actorManager.CreateActorFromFile("data/xml/tower.xml", &modelManager, &materialManager);
+     actorManager.CreateActorFromFile("data/xml/test-level.xml");
+     //actorManager.CreateActorFromFile("data/xml/house.xml");
+     actorManager.CreateActorFromFile("data/xml/tower.xml");
+     /*
      SlotmapKey<Actor> enemy[3] =
      {
-          actorManager.CreateActorFromFile("data/xml/enemy.xml", &modelManager, &materialManager),
-          actorManager.CreateActorFromFile("data/xml/enemy.xml", &modelManager, &materialManager),
-          actorManager.CreateActorFromFile("data/xml/enemy.xml", &modelManager, &materialManager)
+          actorManager.CreateActorFromFile("data/xml/enemy.xml", &modelManager),
+          actorManager.CreateActorFromFile("data/xml/enemy.xml", &modelManager),
+          actorManager.CreateActorFromFile("data/xml/enemy.xml", &modelManager)
      };
      TransformComponent *transforms[3] =
      {
@@ -135,8 +128,8 @@ void Game::Init()
      actorManager.AddComponent<AnimationComponent>(enemy[0], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[1], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[2], animation);
+     */
 
-     
      CameraComponent::Initialize();
      RenderComponent::Initialize();
      PhysicsComponent::Initialize();
@@ -162,7 +155,7 @@ void Game::Update(f32 dt)
 
 void Game::Render()
 {
-     actorManager.RenderComponents<RenderComponent>(&vertexShaderManager);
+     actorManager.RenderComponents<RenderComponent>();
 
      GraphicsManager::Get()->DebugPresent();
      GraphicsManager::Get()->EndFrame(1);
@@ -178,13 +171,13 @@ void Game::Terminate()
      RenderComponent::Terminate();
      PhysicsComponent::Terminate();
      
-     materialManager.Terminate();
+     MaterialManager::Shutdown();
+     TextureManager::Shutdown();
+     ModelManager::Shutdown();
+     VertexShaderManager::Shutdown();
+     FragmentShaderManager::Shutdown();
 
      actorManager.Terminate();
-     textureManager.Terminate();
-     modelManager.Terminate();
-     vertexShaderManager.Terminate();
-     fragmentShaderManager.Terminate();
 
      printf("Game Terminate!\n");
 }

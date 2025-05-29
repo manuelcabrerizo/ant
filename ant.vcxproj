@@ -134,7 +134,11 @@
     <ClCompile Include="src\animation\skeleton.cpp" />
     <ClCompile Include="src\artificial_intelligence\kinematic_behaviors.cpp" />
     <ClCompile Include="src\artificial_intelligence\steering_behaviors.cpp" />
-    <ClCompile Include="src\asset_manager.cpp" />
+    <ClCompile Include="src\asset_managers\material_manager.cpp" />
+    <ClCompile Include="src\asset_managers\model_manager.cpp" />
+    <ClCompile Include="src\asset_managers\model_manager.h" />
+    <ClCompile Include="src\asset_managers\shader_manager.cpp" />
+    <ClCompile Include="src\asset_managers\texture_manager.cpp" />
     <ClCompile Include="src\collision.cpp" />
     <ClCompile Include="src\components\animation_component.cpp" />
     <ClCompile Include="src\components\camera_component.cpp" />
@@ -159,6 +163,7 @@
     <ClCompile Include="src\memory_manager.cpp" />
     <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\notification_manager.cpp" />
+    <ClCompile Include="src\strings.cpp" />
     <ClCompile Include="src\tinyxml2.cpp" />
     <ClCompile Include="src\utils.cpp" />
     <ClCompile Include="src\win32_platform.cpp" />
@@ -171,7 +176,10 @@
     <ClInclude Include="src\animation\skeleton.h" />
     <ClInclude Include="src\artificial_intelligence\kinematic_behaviors.h" />
     <ClInclude Include="src\artificial_intelligence\steering_behaviors.h" />
-    <ClInclude Include="src\asset_manager.h" />
+    <ClInclude Include="src\asset_managers\asset_manager.h" />
+    <ClInclude Include="src\asset_managers\material_manager.h" />
+    <ClInclude Include="src\asset_managers\shader_manager.h" />
+    <ClInclude Include="src\asset_managers\texture_manager.h" />
     <ClInclude Include="src\collision.h" />
     <ClInclude Include="src\common.h" />
     <ClInclude Include="src\components\anchor_component.h" />
@@ -201,6 +209,7 @@
     <ClInclude Include="src\model.h" />
     <ClInclude Include="src\notification_manager.h" />
     <ClInclude Include="src\platform.h" />
+    <ClInclude Include="src\strings.h" />
     <ClInclude Include="src\tinyxml2.h" />
     <ClInclude Include="src\utils.h" />
   </ItemGroup>

@@ -3,16 +3,6 @@
 #include <utils.h>
 #include <assimp/postprocess.h>
 
-// TODO: remove this
-static i32 TempNextPower2(u32  x)
-{
-     int  value  =  1 ;
-     while  ( value  <=  x)
-     {
-          value  =  value  <<  1 ;
-     }
-     return  value;
-}
 
 // TODO: remove model from this function
 void Animation::Init(const char *filepath, Model *model, i32 memoryType)
@@ -32,7 +22,7 @@ void Animation::Init(const char *filepath, Model *model, i32 memoryType)
     i32 channelsCount = animation->mNumChannels;
     if((channelsCount & (channelsCount - 1)) != 0)
     {
-        channelsCount = TempNextPower2(channelsCount);
+        channelsCount = Utils::NextPower2(channelsCount);
     }
     bones.Init(channelsCount, memoryType);
     for(i32 i = 0; i < animation->mNumChannels; ++i)
