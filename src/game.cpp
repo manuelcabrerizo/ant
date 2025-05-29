@@ -1,6 +1,4 @@
 // TODO:
-// - add support to multiple texture per model
-// - add support for materials instead of just texutres
 // - More colliders and Raycast test
 // - Implement a small demo with a full loop
 // the player has to have life and be able to shoot at least two weapons
@@ -62,12 +60,12 @@ void Game::Init()
          Vector3(1.0f, 1.0f, 0.0f), Vector3(0.6f, 0.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
 
      // Load the models
-     //modelManager.Load("warrior", "data/models/warrior.dae");
+     ModelManager::Get()->Load("house", "data/models/House/source/house.fbx");
+     ModelManager::Get()->Load("warrior", "data/models/Warrior/source/warrior.fbx");
      ModelManager::Get()->Load("test-level", "data/models/Level/source/level.fbx");
      ModelManager::Get()->Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx");
-     //ModelManager::Get()->Load("house", "data/models/house.fbx");
      ModelManager::Get()->Load("tower", "data/models/MagicStudio/source/MagicStudio.fbx");
-         
+
      // Initialize the Actor Manager
      actorManager.Init(100, 64, STATIC_MEMORY);
      actorManager.AddComponentType<TransformComponent, 100>();
@@ -93,15 +91,18 @@ void Game::Init()
      
 
      actorManager.CreateActorFromFile("data/xml/test-level.xml");
-     //actorManager.CreateActorFromFile("data/xml/house.xml");
      actorManager.CreateActorFromFile("data/xml/tower.xml");
-     /*
+     actorManager.CreateActorFromFile("data/xml/house.xml");
+
      SlotmapKey<Actor> enemy[3] =
      {
-          actorManager.CreateActorFromFile("data/xml/enemy.xml", &modelManager),
-          actorManager.CreateActorFromFile("data/xml/enemy.xml", &modelManager),
-          actorManager.CreateActorFromFile("data/xml/enemy.xml", &modelManager)
+          actorManager.CreateActorFromFile("data/xml/enemy.xml"),
+          actorManager.CreateActorFromFile("data/xml/enemy.xml"),
+          actorManager.CreateActorFromFile("data/xml/enemy.xml")
      };
+
+     // Warrior Animation
+     
      TransformComponent *transforms[3] =
      {
           actorManager.GetComponent<TransformComponent>(enemy[0]),
@@ -124,12 +125,11 @@ void Game::Init()
 
      AnimationComponent animation;
      animation.skeleton.Init("data/models/warrior.dae", STATIC_MEMORY);
-     animation.animation.Init("data/animations/walk_front.dae", modelManager.Get("warrior"), STATIC_MEMORY);
+     animation.animation.Init("data/animations/walk_front.dae", ModelManager::Get()->Get("warrior"), STATIC_MEMORY);
      actorManager.AddComponent<AnimationComponent>(enemy[0], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[1], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[2], animation);
-     */
-
+     
      CameraComponent::Initialize();
      RenderComponent::Initialize();
      PhysicsComponent::Initialize();
@@ -139,7 +139,7 @@ void Game::Init()
 }
 
 void Game::Update(f32 dt)
-{    
+{
      // Initialize new components
      actorManager.InitializeNewComponents();
      // Update

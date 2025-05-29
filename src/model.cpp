@@ -59,7 +59,8 @@ void Model::Init(const char *filepath, i32 memoryType)
              materials.Push(name);
 
              Frame stringFrame = MemoryManager::Get()->GetFrame();
-
+                
+             bool isTextured = false;
              const char* materialName = name.C_Str();
              const char* diffuseTextureName = "DefaultMaterial_Diffuse";
              const char* normalTextureName = "DefaultMaterial_Normal";
@@ -67,6 +68,7 @@ void Model::Init(const char *filepath, i32 memoryType)
              
              if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
              {
+                 isTextured = true;
                  aiString path;
                  if (material->GetTexture(aiTextureType_DIFFUSE, 0, &path, 0, 0, 0, 0, 0) == AI_SUCCESS)
                  {
@@ -100,31 +102,34 @@ void Model::Init(const char *filepath, i32 memoryType)
 
                      if (TextureManager::Get()->Contains(diffuseTextureName) == false)
                      {
-                         // save the name
-                         void* buffer = MemoryManager::Get()->Alloc(strlen(diffuseTextureName) + 1, STATIC_MEMORY);
-                         memset(buffer, 0, strlen(diffuseTextureName) + 1);
-                         memcpy(buffer, diffuseTextureName, strlen(diffuseTextureName));
-                         diffuseTextureName = (const char*)buffer;
-
                          TextureManager::Get()->Load(diffuseTextureName, texturePath);
                      }
                  }
              }
 
-
-
-             if (MaterialManager::Get()->Contains(materialName) == false)
+             aiColor3D aiDiffuseColor;
+             Vector3 diffuseColor;
+             if (material->Get(AI_MATKEY_COLOR_DIFFUSE, aiDiffuseColor) == AI_SUCCESS)
              {
-                 //save the name
-                 void* buffer = MemoryManager::Get()->Alloc(strlen(materialName) + 1, STATIC_MEMORY);
-                 memset(buffer, 0, strlen(materialName) + 1);
-                 memcpy(buffer, materialName, strlen(materialName));
-                 materialName = (const char*)buffer;
-
-                 MaterialManager::Get()->LoadTexture(materialName, "default",
-                     diffuseTextureName, normalTextureName, specularTextureName, 64);
+                 diffuseColor.x = aiDiffuseColor.r;
+                 diffuseColor.y = aiDiffuseColor.g;
+                 diffuseColor.z = aiDiffuseColor.b;
              }
-             
+
+             if (isTextured)
+             {
+                 if (MaterialManager::Get()->Contains(materialName) == false)
+                 {
+                     MaterialManager::Get()->LoadTexture(materialName, "default",
+                         diffuseTextureName, normalTextureName, specularTextureName, 64);
+                 }
+             }
+             else
+             {
+                 MaterialManager::Get()->LoadSolidColor(materialName, "color", diffuseColor,
+                     diffuseColor, Vector3(1.0f, 1.0f, 1.0f), 64);
+             }
+
              MemoryManager::Get()->ReleaseFrame(stringFrame);
          }
      }

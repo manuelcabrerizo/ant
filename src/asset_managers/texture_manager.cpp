@@ -34,10 +34,10 @@ TextureManager* TextureManager::Get()
 
 void TextureManager::Load(const char* name, const char* path)
 {
-    TextureHandle textureHandle;
-    textureHandle.name = name;
+    TextureHandle textureHandle = {};
+    memcpy((void*)textureHandle.name, (void*)name, strlen(name));
     textureHandle.texture = GraphicsManager::Get()->TextureAlloc(path);
-    nameIndex.Add(name, assets.Add(textureHandle));
+    nameIndex.Add(textureHandle.name, assets.Add(textureHandle));
 }
 
 void TextureManager::Unload(const char* name)

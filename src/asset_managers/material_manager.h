@@ -5,7 +5,7 @@
 
 struct MaterialHandle
 {
-    const char* name;
+    char name[_MAX_PATH];
     Material* material;
 };
 

@@ -5,7 +5,7 @@
 
 struct TextureHandle
 {
-    const  char* name;
+    char name[_MAX_PATH + 1];
     Texture* texture;
 };
 
