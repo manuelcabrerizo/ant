@@ -135,6 +135,24 @@
     <ClCompile Include="src\asset_managers\material_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\collisions\ray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collisions\segment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collisions\plane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collisions\sphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collisions\cylinder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collisions\triangle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\actor.h">
@@ -264,6 +282,33 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\asset_managers\material_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collisions\ray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collisions\segment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collisions\plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collisions\sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collisions\cylinder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collisions\capsule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collisions\aabb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collisions\obb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collisions\triangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

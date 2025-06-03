@@ -13,6 +13,7 @@ protected:
     Material() {}
     void Init(const char* shaderName);
 public:
+    virtual ~Material() {}
     virtual void Bind() = 0;
     virtual void Terminate();
 };
@@ -30,11 +31,8 @@ struct SolidColorUbo
 class SolidColorMaterial : public Material
 {
 public:
-    void Init(const char* shaderName,
-              const Vector3& ambient,
-              const Vector3& diffuse,
-              const Vector3& specular,
-              f32 shininess);
+    void Init(const char* shaderName, const Vector3& ambient,
+        const Vector3& diffuse, const Vector3& specular, f32 shininess);
     void Terminate() override;
     void Bind() override;
 private:
@@ -58,11 +56,8 @@ struct TextureUbo
 class TextureMaterial : public Material
 {
 public:
-    void Init(const char* shaderName,
-              const char* diffuseName,
-              const char* normalName,
-              const char* specularName,
-              f32 shininess);
+    void Init(const char* shaderName, const char* diffuseName, 
+        const char* normalName, const char* specularName, f32 shininess);
     void Terminate() override;
     void Bind() override;
 private:

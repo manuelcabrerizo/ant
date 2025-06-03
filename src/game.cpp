@@ -173,13 +173,13 @@ void Game::Terminate()
      RenderComponent::Terminate();
      PhysicsComponent::Terminate();
      
+     actorManager.Terminate();
+     
      MaterialManager::Shutdown();
      TextureManager::Shutdown();
      ModelManager::Shutdown();
      VertexShaderManager::Shutdown();
      FragmentShaderManager::Shutdown();
-
-     actorManager.Terminate();
 
      printf("Game Terminate!\n");
 }

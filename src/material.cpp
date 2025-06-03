@@ -25,12 +25,8 @@ void Material::Terminate()
 i32 SolidColorMaterial::instanceCount = 0;
 UniformBuffer* SolidColorMaterial::uniformBuffer = nullptr;
 
-void SolidColorMaterial::Init(
-    const char* shaderName,
-    const Vector3& ambient,
-    const Vector3& diffuse,
-    const Vector3& specular,
-    f32 shininess)
+void SolidColorMaterial::Init(const char* shaderName, const Vector3& ambient, 
+    const Vector3& diffuse, const Vector3& specular, f32 shininess)
 {
     Material::Init(shaderName);
     this->ambient = ambient;
@@ -76,12 +72,8 @@ void SolidColorMaterial::Bind()
 i32 TextureMaterial::instanceCount = 0;
 UniformBuffer* TextureMaterial::uniformBuffer = nullptr;
 
-void TextureMaterial::Init(
-    const char* shaderName,
-    const char* diffuseName,
-    const char* normalName,
-    const char* specularName,
-    f32 shininess)
+void TextureMaterial::Init(const char* shaderName, const char* diffuseName,
+    const char* normalName, const char* specularName, f32 shininess)
 {
     Material::Init(shaderName);
 

@@ -19,6 +19,8 @@ cbuffer TextureUbo : register(b0)
 
 float4 fs_main(PS_Input i) : SV_TARGET
 {
+    float3 ambient = float3(0.8f, 0.8f, 0.8f);
+    
     float3 ligthPos0 = float3(30.0f, 20.0f, 20.0f);
     float3 ligthDir0 = normalize(ligthPos0 - i.fragPos);
     float3 lightColor0 = float3(0.4f, 0.4f, 0.8f);
@@ -43,7 +45,7 @@ float4 fs_main(PS_Input i) : SV_TARGET
     float diffuse2 = max(dot(ligthDir2, n), 0.1f);
     float diffuse3 = max(dot(ligthDir3, n), 0.1f);
 
-    float3 finalColor = color * ((lightColor0 * diffuse0) + (lightColor1 * diffuse1) + (lightColor2 * diffuse2) + (lightColor3 * diffuse3));
+    float3 finalColor = (ambient * color) + color * ((lightColor0 * diffuse0) + (lightColor1 * diffuse1) + (lightColor2 * diffuse2) + (lightColor3 * diffuse3));
 
     return float4(finalColor, 1.0f);
 }
