@@ -120,13 +120,7 @@
     <ClCompile Include="src\strings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\asset_managers\model_manager.h">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\asset_managers\texture_manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\asset_managers\model_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\asset_managers\shader_manager.cpp">
@@ -151,6 +145,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\collisions\triangle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collisions\aabb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collisions\collision_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collisions\obb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\asset_managers\model_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -309,6 +315,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\collisions\triangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collisions\collision_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\asset_managers\model_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -9,12 +9,14 @@ class Segment;
 class Triangle
 {
 public:
-    void Init(Vector3 a, Vector3 b, Vector3 c);
-    bool Intersect(Ray& ray, f32& t);
-    bool Intersect(Segment& segment, f32& t);
+    void Init(const Vector3& a, const Vector3& b, const Vector3& c);
+    bool Intersect(const Ray& ray, f32& t) const;
+    bool Intersect(const Segment& segment, f32& t) const;
 
-    bool PointInside(Vector3 q);
-    Vector3 ClosestPoint(Vector3 q);
+    bool PointInside(const Vector3& q) const;
+
+    // TODO: test others implementation
+    Vector3 ClosestPoint(const Vector3& q) const;
 
     Vector3 a, b, c;
     Vector3  n;

@@ -7,3 +7,5 @@
 
 float lerp(float a, float b, float t);
 float Radians(float degree);
+float Abs(float value);
+

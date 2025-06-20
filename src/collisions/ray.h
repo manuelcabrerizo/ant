@@ -10,8 +10,8 @@ class Ray
 {
 public:
     void Init(Vector3 o, Vector3 d);
-    bool Intersect(Triangle& triangle, f32& t);
-    bool Intersect(Sphere& sphere, f32& t);
+    bool Intersect(const Triangle& triangle, f32& t) const;
+    bool Intersect(const Sphere& sphere, f32& t) const;
 
     Vector3 o;
     Vector3 d;

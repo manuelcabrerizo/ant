@@ -37,6 +37,7 @@ class GraphicsManager
 private:
      static GraphicsManager *instance;
 public:
+    virtual ~GraphicsManager() {}
 
      static void Init(void *osWindow, i32 width, i32 height, GraphicsManagerType type, i32 stackNum);
      static void Terminate();
@@ -88,8 +89,8 @@ public:
      virtual void DebugInit() = 0;
      virtual void DebugTerminate() = 0;
      virtual void DebugPresent() = 0;
-     virtual void DebugDrawLine(Vector3& a, Vector3& b) = 0;
-     virtual void DebugDrawSphere(Vector3& c, f32 r, i32 hSlice, i32 vSlice) = 0;
-     virtual void DebugDrawCube(Vector3& c, Vector3& hExtend) = 0;
+     virtual void DebugDrawLine(const Vector3& a, const Vector3& b, const Vector3& color) = 0;
+     virtual void DebugDrawSphere(const Vector3& c, f32 r, i32 hSlice, i32 vSlice, const Vector3& color) = 0;
+     virtual void DebugDrawCube(const Vector3& c, const Vector3& hExtend, const Vector3& color) = 0;
 
 };

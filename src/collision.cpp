@@ -137,18 +137,15 @@ bool CollisionWorld::DynamicIntersect(Sphere& sphere, Vector3 movement,
 {    
      for(i32 i = 0; i < triangles.size; ++i)
      {
-          f32 u, v, w, t;
+         f32 t = 0.0f;
           Vector3 n;
-          if(sphere.DynamicIntersect(triangles[i], movement, u, v, w, t, n))
+          if(sphere.DynamicIntersect(triangles[i], movement, t, n))
           {
                if(collisionData.size < MAX_COLLISION_COUNT)
                {
                     CollisionData cd;
                     cd.n = n;
                     cd.t = t;
-                    cd.u = u;
-                    cd.v = v;
-                    cd.w = w;
                     collisionData.Push(cd);
                }
           }

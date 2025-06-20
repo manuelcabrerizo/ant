@@ -23,11 +23,23 @@ Vector2::Vector2(float x, float y)
 
 float& Vector2::operator[](int index)
 {
-    ASSERT(index > 0 && index < 2);
-    return v[index];
+    ASSERT(index >= 0 && index < 2);
+    if (index < 2)
+    {
+        return v[index];
+    }
 }
 
-Vector2 Vector2::operator+(const Vector2& rhs)
+float Vector2::operator[](int index) const
+{
+    ASSERT(index >= 0 && index < 2);
+    if (index < 2)
+    {
+        return v[index];
+    }
+}
+
+Vector2 Vector2::operator+(const Vector2& rhs) const
 {
     Vector2 result;
     result.x = x + rhs.x;
@@ -41,7 +53,7 @@ void Vector2::operator+=(const Vector2& rhs)
     y += rhs.y;
 }
 
-Vector2 Vector2::operator-(const Vector2& rhs)
+Vector2 Vector2::operator-(const Vector2& rhs) const
 {
     Vector2 result;
     result.x = x - rhs.x;
@@ -55,7 +67,7 @@ void Vector2::operator-=(const Vector2& rhs)
     y -= rhs.y;
 }
 
-Vector2 Vector2::operator*(float rhs)
+Vector2 Vector2::operator*(float rhs) const
 {
     Vector2 result;
     result.x = x * rhs;
@@ -69,18 +81,18 @@ void Vector2::operator*=(float rhs)
     y *= rhs;
 }
 
-float Vector2::Dot(const Vector2& vector)
+float Vector2::Dot(const Vector2& vector) const
 {
     return x * vector.x + y * vector.y;
 }
 
-float Vector2::Magnitude()
+float Vector2::Magnitude() const
 {
     return sqrtf(x * x + y * y);
 
 }
 
-float Vector2::MagnitudeSq()
+float Vector2::MagnitudeSq() const
 {
     return x * x + y * y;
 }
@@ -95,7 +107,7 @@ void Vector2::Normalize()
     }
 }
 
-Vector2 Vector2::Normalized()
+Vector2 Vector2::Normalized() const
 {
     Vector2 result = *this;
     float magnitude = sqrtf(x * x + y * y);
@@ -107,7 +119,7 @@ Vector2 Vector2::Normalized()
     return result;
 }
 
-Vector2 Vector2::Lerp(Vector2 vector, float t)
+Vector2 Vector2::Lerp(const Vector2& vector, float t) const
 {
     Vector2 result;
     result.x = lerp(x, vector.x, t);

@@ -5,19 +5,19 @@
 #include "ray.h"
 #include "segment.h"
 
-void Plane::Init(Vector3 n, f32 d)
+void Plane::Init(const Vector3& n, f32 d)
 {
     this->n = n;
     this->d = d;
 }
 
-void Plane::Init(Triangle& triangle)
+void Plane::Init(const Triangle& triangle)
 {
     n = triangle.n.Normalized();
     d = triangle.a.Dot(n);
 }
 
-bool Plane::Intersect(Ray& ray, f32& t)
+bool Plane::Intersect(const Ray& ray, f32& t) const
 {
     f32 denom = n.Dot(ray.d);
     if (fabsf(denom) > 0.0001f)
@@ -29,7 +29,7 @@ bool Plane::Intersect(Ray& ray, f32& t)
     return false;
 }
 
-bool Plane::Intersect(Segment& segment, f32& t)
+bool Plane::Intersect(const Segment& segment, f32& t) const
 {
     Vector3 ab = segment.b - segment.a;
     Vector3 dir = ab.Normalized();
@@ -46,8 +46,13 @@ bool Plane::Intersect(Segment& segment, f32& t)
 }
 
 
-Vector3 Plane::ClosestPoint(Vector3 q)
+Vector3 Plane::ClosestPoint(const Vector3& q) const
 {
     f32 t = (n.Dot(q) - d) / n.Dot(n);
     return q - n * t;
+}
+
+float Plane::DistPoint(const Vector3& q) const
+{
+    return (n.Dot(q) - d) / n.Dot(n);
 }

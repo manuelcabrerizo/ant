@@ -31,5 +31,5 @@ public:
      void Terminate();
      void Present(ID3D11DeviceContext *deviceContext);
 
-     void DrawLine(ID3D11DeviceContext *deviceContext, Vector3& a, Vector3 &b);
+     void DrawLine(ID3D11DeviceContext *deviceContext, const Vector3& a, const Vector3 &b, const Vector3& color);
 };

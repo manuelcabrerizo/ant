@@ -11,10 +11,11 @@ class Segment
 {
 public:
     void Init(Vector3 a, Vector3 b);
-    bool Intersect(Triangle& triangle, f32& t);
-    bool Intersect(Sphere& sphere, f32& t);
-    bool Intersect(Cylinder& cylinder, f32& t);
-    Vector3 ClosestPoint(Vector3 point, f32& t);
+    bool Intersect(const Triangle& triangle, f32& t) const;
+    bool Intersect(const Sphere& sphere, f32& t) const;
+    bool Intersect(const Cylinder& cylinder, f32& t) const;
+    Vector3 ClosestPoint(const Vector3& point, f32& t) const;
+    float SqDistPoint(const Vector3& point) const;
 
     Vector3 a;
     Vector3 b;

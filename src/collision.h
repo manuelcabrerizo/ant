@@ -21,7 +21,6 @@ struct CollisionData
      Vector3 n;
      f32 penetration;
      f32 t;
-     f32 u, v, w;
 };
 
 class CollisionWorld
@@ -35,3 +34,5 @@ public:
 private:
      Array<Triangle> triangles;    
 };
+
+

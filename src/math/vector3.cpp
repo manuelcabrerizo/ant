@@ -26,11 +26,23 @@ Vector3::Vector3(float x, float y, float z)
 
 float& Vector3::operator[](int index)
 {
-    ASSERT(index > 0 && index < 3);
-    return v[index];
+    ASSERT(index >= 0 && index < 3);
+    if (index < 3)
+    {
+        return v[index];
+    }
 }
 
-Vector3 Vector3::operator+(const Vector3& rhs)
+float Vector3::operator[](int index) const
+{
+    ASSERT(index >= 0 && index < 3);
+    if (index < 3)
+    {
+        return v[index];
+    }
+}
+
+Vector3 Vector3::operator+(const Vector3& rhs) const
 {
     Vector3 result;
     result.x = x + rhs.x;
@@ -46,7 +58,7 @@ void Vector3::operator+=(const Vector3& rhs)
     z += rhs.z;
 }
 
-Vector3 Vector3::operator-(const Vector3& rhs)
+Vector3 Vector3::operator-(const Vector3& rhs) const
 {
     Vector3 result;
     result.x = x - rhs.x;
@@ -62,7 +74,7 @@ void Vector3::operator-=(const Vector3& rhs)
     z -= rhs.z;
 }
 
-Vector3 Vector3::operator*(float rhs)
+Vector3 Vector3::operator*(float rhs) const
 {
     Vector3 result;
     result.x = x * rhs;
@@ -78,7 +90,7 @@ void Vector3::operator*=(float rhs)
     z *= rhs;
 }
 
-Vector3 Vector3::operator/(float rhs)
+Vector3 Vector3::operator/(float rhs) const
 {
     Vector3 result;
     result.x = x / rhs;
@@ -94,12 +106,12 @@ void Vector3::operator/=(float rhs)
     z /= rhs;
 }
 
-float Vector3::Dot(const Vector3& vector)
+float Vector3::Dot(const Vector3& vector) const
 {
     return x * vector.x + y * vector.y + z * vector.z;
 }
 
-Vector3 Vector3::Cross(const Vector3& vector)
+Vector3 Vector3::Cross(const Vector3& vector) const
 {
     return Vector3(
         y * vector.z - z * vector.y, 
@@ -108,12 +120,12 @@ Vector3 Vector3::Cross(const Vector3& vector)
     );
 }
 
-float Vector3::Magnitude()
+float Vector3::Magnitude() const
 {
     return sqrtf(x * x + y * y + z * z);
 }
 
-float Vector3::MagnitudeSq()
+float Vector3::MagnitudeSq() const
 {
     return x * x + y * y + z * z;
 }
@@ -129,7 +141,7 @@ void Vector3::Normalize()
     }
 }
 
-Vector3 Vector3::Normalized()
+Vector3 Vector3::Normalized() const
 {
     Vector3 result = *this;
     float magnitude = sqrtf(x * x + y * y + z * z);
@@ -142,11 +154,25 @@ Vector3 Vector3::Normalized()
     return result;
 }
 
-Vector3 Vector3::Lerp(Vector3 vector, float t) 
+Vector3 Vector3::Lerp(const Vector3& vector, float t) const
 {
     Vector3 result;
     result.x = lerp(x, vector.x, t);
     result.y = lerp(y, vector.y, t);
     result.z = lerp(z, vector.z, t);
     return result;
+}
+
+float Vector3::Dot(const Vector3& a, const Vector3& b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+Vector3 Vector3::Cross(const Vector3& a, const Vector3& b)
+{
+    return Vector3(
+        a.y * b.z - a.z * b.y,
+        a.z * b.x - a.x * b.z,
+        a.x * b.y - a.y * b.x
+    );
 }

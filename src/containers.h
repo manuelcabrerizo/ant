@@ -365,7 +365,7 @@ void HashMap<Type>::Init(u64 capacity_, i32 stackNum)
     }
 }
 
-// TODO: Test this to make shoure if we need to use placement new
+// TODO: check if we need to use placement new
 template<typename Type>
 void HashMap<Type>::Add(const char* name, Type value)
 {

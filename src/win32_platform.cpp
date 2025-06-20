@@ -170,7 +170,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                     if(!pause)
                     {
                          game.Update(dt);
-                         game.Render();
+                         game.Render(dt);
                     }    
                }
                game.Terminate();

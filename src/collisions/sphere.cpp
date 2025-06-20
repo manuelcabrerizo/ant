@@ -14,29 +14,43 @@ void Sphere::Init(Vector3 c, f32 r)
     this->r = r;
 }
 
-bool Sphere::Intersect(Ray& ray, f32& t)
+Vector3 Sphere::GetCenter() const
+{
+    return c;
+}
+
+f32 Sphere::GetRadio() const
+{
+    return r;
+}
+
+bool Sphere::Intersect(const Sphere& sphere) const
+{
+    Vector3 d = c - sphere.c;
+    f32 dist2 = d.Dot(d);
+    f32 radiusSum = r + sphere.r;
+    return dist2 <= (radiusSum * radiusSum);
+}
+
+bool Sphere::Intersect(const Ray& ray, f32& t) const
 {
     return ray.Intersect(*this, t);
 }
 
-bool Sphere::Intersect(Segment& segment, f32& t)
+bool Sphere::Intersect(const Segment& segment, f32& t) const
 {
     return segment.Intersect(*this, t);
 }
 
-bool Sphere::Intersect(Triangle& triangle, Vector3& n, f32& penetration)
+bool Sphere::Intersect(const Triangle& triangle, Vector3& n, f32& penetration) const
 {
     Vector3 closest = triangle.ClosestPoint(c);
-
-    //GraphicsManager::Get()->DebugDrawSphere(closest, 0.02f, 4, 6);
 
     Vector3 toSphere = c - closest;
 
     f32 lenSq = toSphere.Dot(toSphere);
 
     n = toSphere.Normalized();
-
-    //GraphicsManager::Get()->DebugDrawLine(closest, closest + n);
 
     penetration = r - sqrtf(lenSq);
     if (lenSq <= r * r)
@@ -47,7 +61,13 @@ bool Sphere::Intersect(Triangle& triangle, Vector3& n, f32& penetration)
     return lenSq <= r * r;
 }
 
-bool Sphere::DynamicIntersect(Plane& plane, Vector3 movement, f32& t)
+bool Sphere::Intersect(const Plane& plane)
+{
+    float dist = Vector3::Dot(c, plane.n) - plane.d;
+    return (dist - r) < 0.0f;
+}
+
+bool Sphere::DynamicIntersect(const Plane& plane, const Vector3& movement, f32& t) const
 {
     // Compute distance of sphere center to plane
     f32 d = plane.n.Dot(c);
@@ -82,8 +102,7 @@ bool Sphere::DynamicIntersect(Plane& plane, Vector3 movement, f32& t)
     }
 }
 
-bool Sphere::DynamicIntersect(Triangle& triangle, Vector3 movement, f32& u, f32& v, f32& w,
-    f32& t, Vector3& n)
+bool Sphere::DynamicIntersect(const Triangle& triangle, const Vector3& movement, f32& t, Vector3& n) const
 {
     Plane plane;
     plane.Init(triangle);
@@ -132,7 +151,6 @@ bool Sphere::DynamicIntersect(Triangle& triangle, Vector3 movement, f32& u, f32&
 
             if (t != FLT_MAX)
             {
-                // TODO: calculate barycentric
                 return true;
             }
             else
@@ -195,7 +213,6 @@ bool Sphere::DynamicIntersect(Triangle& triangle, Vector3 movement, f32& u, f32&
 
         if (t != FLT_MAX)
         {
-            // TODO: calculate barycentric
             return true;
         }
         else
@@ -224,4 +241,10 @@ bool Sphere::DynamicIntersect(Triangle& triangle, Vector3 movement, f32& u, f32&
     }
 
     return false;
+}
+
+Vector3 Sphere::ClosestPoint(const Vector3& point) const
+{
+    Vector3 dir = (point - c).Normalized();
+    return c + dir * r;
 }

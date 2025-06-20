@@ -7,10 +7,12 @@ class Quaternion
 {
 public:
     union {
-        struct {
+        struct
+        {
             float w, x, y, z;
         };
-        struct {
+        struct
+        {
             float scalar;
             Vector3 vector;
         };
@@ -19,19 +21,19 @@ public:
 
     Quaternion() : w(1), x(0), y(0), z(0) {}
     Quaternion(float w, float x, float y, float z) : w(w), x(x), y(y), z(z) {}
-    Quaternion(Vector3 v) : w(1), x(v.x), y(v.y), z(v.z) {}
+    Quaternion(const Vector3& v) : w(1), x(v.x), y(v.y), z(v.z) {}
     
-    float operator[](int index);
-    Quaternion operator*(float f);
-    Quaternion operator/(float f);
-    Quaternion operator+(Quaternion &q);
-    Quaternion operator*(Quaternion &q);
-    Vector3 operator*(Vector3 &v);
+    float operator[](int index) const;
+    Quaternion operator*(float f) const;
+    Quaternion operator/(float f) const;
+    Quaternion operator+(const Quaternion &q) const;
+    Quaternion operator*(const Quaternion &q) const;
+    Vector3 operator*(const Vector3 &v) const;
 
     void Normalize();
-    Quaternion Normalized();
-    Matrix4 ToMatrix4();
+    Quaternion Normalized() const;
+    Matrix4 ToMatrix4() const;
 
-    static Quaternion Slerp(Quaternion a, Quaternion b, float t);
-    static Quaternion AngleAxis(float angle, Vector3 &axis);
+    static Quaternion Slerp(const Quaternion& a, const Quaternion& b, float t);
+    static Quaternion AngleAxis(float angle, const Vector3 &axis);
 };

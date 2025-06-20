@@ -9,3 +9,8 @@ float Radians(float degree)
 {
     return degree * (ANT_PI / 180.0f);
 }
+
+float Abs(float value)
+{
+    return fabsf(value);
+}

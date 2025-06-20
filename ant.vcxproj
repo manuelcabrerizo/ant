@@ -87,7 +87,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;ANT_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)libs\stb;$(SolutionDir)libs\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
@@ -127,6 +127,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\asset_managers\model_manager.cpp" />
+    <ClCompile Include="src\collisions\collision_utils.cpp" />
     <ClCompile Include="src\actor.cpp" />
     <ClCompile Include="src\allocator.cpp" />
     <ClCompile Include="src\animation\animation.cpp" />
@@ -135,12 +137,12 @@
     <ClCompile Include="src\artificial_intelligence\kinematic_behaviors.cpp" />
     <ClCompile Include="src\artificial_intelligence\steering_behaviors.cpp" />
     <ClCompile Include="src\asset_managers\material_manager.cpp" />
-    <ClCompile Include="src\asset_managers\model_manager.cpp" />
-    <ClCompile Include="src\asset_managers\model_manager.h" />
     <ClCompile Include="src\asset_managers\shader_manager.cpp" />
     <ClCompile Include="src\asset_managers\texture_manager.cpp" />
     <ClCompile Include="src\collision.cpp" />
+    <ClCompile Include="src\collisions\aabb.cpp" />
     <ClCompile Include="src\collisions\cylinder.cpp" />
+    <ClCompile Include="src\collisions\obb.cpp" />
     <ClCompile Include="src\collisions\plane.cpp" />
     <ClCompile Include="src\collisions\ray.cpp" />
     <ClCompile Include="src\collisions\segment.cpp" />
@@ -175,6 +177,8 @@
     <ClCompile Include="src\win32_platform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\asset_managers\model_manager.h" />
+    <ClInclude Include="src\collisions\collision_utils.h" />
     <ClInclude Include="src\actor.h" />
     <ClInclude Include="src\allocator.h" />
     <ClInclude Include="src\animation\animation.h" />

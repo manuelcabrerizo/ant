@@ -12,7 +12,7 @@ void Segment::Init(Vector3 a, Vector3 b)
     this->b = b;
 }
 
-bool Segment::Intersect(Triangle& triangle, f32& t)
+bool Segment::Intersect(const Triangle& triangle, f32& t) const
 {
     Plane plane;
     plane.Init(triangle);
@@ -25,15 +25,15 @@ bool Segment::Intersect(Triangle& triangle, f32& t)
     return false;
 }
 
-bool Segment::Intersect(Sphere& sphere, f32& t)
+bool Segment::Intersect(const Sphere& sphere, f32& t) const
 {
     Vector3 ab = b - a;
     Vector3 o = a;
     Vector3 d = ab.Normalized();
 
-    Vector3 m = o - sphere.c;
+    Vector3 m = o - sphere.GetCenter();
     f32 b_ = m.Dot(d);
-    f32 c = m.Dot(m) - sphere.r * sphere.r;
+    f32 c = m.Dot(m) - sphere.GetRadio() * sphere.GetRadio();
 
     if (c > 0.0f && b_ > 0.0f)
     {
@@ -63,9 +63,9 @@ bool Segment::Intersect(Sphere& sphere, f32& t)
 
 }
 
-#define EPSILON 0.001f
+static const float EPSILON = 0.001f;
 
-bool Segment::Intersect(Cylinder& cylinder, f32& t)
+bool Segment::Intersect(const Cylinder& cylinder, f32& t) const
 {
     Vector3 d = cylinder.q - cylinder.p, m = a - cylinder.p, n = b - a;
     f32 md = m.Dot(d);
@@ -146,7 +146,7 @@ bool Segment::Intersect(Cylinder& cylinder, f32& t)
 }
 
 
-Vector3 Segment::ClosestPoint(Vector3 point, f32& t)
+Vector3 Segment::ClosestPoint(const Vector3& point, f32& t) const
 {
     Vector3 ab = b - a;
     t = (point - a).Dot(ab) / ab.Dot(ab);
@@ -155,4 +155,20 @@ Vector3 Segment::ClosestPoint(Vector3 point, f32& t)
     if (t > 1.0f) t = 1.0f;
 
     return a + ab * t;
+}
+
+float Segment::SqDistPoint(const Vector3& point) const
+{
+    Vector3 ab = b - a;
+    Vector3 ac = point - a;
+    Vector3 bc = point - b;
+    float e = Vector3::Dot(ac, ab);
+    // Handle case where c projects outside ab
+    if (e <= 0.0f)
+        return Vector3::Dot(ac, ac);
+    float f = Vector3::Dot(ab, ab);
+    if (e >= f)
+        return Vector3::Dot(bc, bc);
+    // Handle case where c projects onto ab
+    return Vector3::Dot(ac, ac) - e * e / f;
 }

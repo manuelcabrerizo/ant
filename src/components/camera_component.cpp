@@ -12,7 +12,7 @@ CameraUbo CameraComponent::ubo;
 
 void CameraComponent::Initialize()
 {
-     ubo.view = Matrix4::LookAt(Vector3(0.0f, 4.0f, -4.0f), Vector3(0.0f), Vector3(0.0f, 1.0f, 0.0f));
+     ubo.view = Matrix4::LookAt(Vector3(0.0f, 4.0f, 20.0f), Vector3(0.0f, 4.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
      ubo.proj = Matrix4::Perspective(65.0f, (float)WINDOW_WIDTH/WINDOW_HEIGHT, 0.01f, 100.0f);
      uniformBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_VS, &ubo, sizeof(ubo), 0);
      GraphicsManager::Get()->UniformBufferBind(uniformBuffer);

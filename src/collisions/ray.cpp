@@ -11,7 +11,7 @@ void Ray::Init(Vector3 o, Vector3 d)
     this->d = d;
 }
 
-bool Ray::Intersect(Triangle& triangle, f32& t)
+bool Ray::Intersect(const Triangle& triangle, f32& t) const
 {
     Plane plane;
     plane.Init(triangle);
@@ -24,11 +24,11 @@ bool Ray::Intersect(Triangle& triangle, f32& t)
     return false;
 }
 
-bool Ray::Intersect(Sphere& sphere, f32& t)
+bool Ray::Intersect(const Sphere& sphere, f32& t) const
 {
-    Vector3 m = o - sphere.c;
+    Vector3 m = o - sphere.GetCenter();
     f32 b = m.Dot(d);
-    f32 c = m.Dot(m) - sphere.r * sphere.r;
+    f32 c = m.Dot(m) - sphere.GetRadio() * sphere.GetRadio();
 
     if (c > 0.0f && b > 0.0f)
     {

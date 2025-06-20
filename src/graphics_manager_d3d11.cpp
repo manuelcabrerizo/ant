@@ -4,6 +4,8 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include <math/algebra.h>
+#include <math/quaternion.h>
 
 void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32 stackNum)
 {    
@@ -473,19 +475,18 @@ void GraphicsManagerD3D11::DebugPresent()
 #endif
 }
      
-void GraphicsManagerD3D11::DebugDrawLine(Vector3& a, Vector3& b)
+void GraphicsManagerD3D11::DebugDrawLine(const Vector3& a, const Vector3& b, const Vector3& color)
 {
 #if ANT_DEBUG
-     debugRenderer.DrawLine(deviceContext, a, b);
+     debugRenderer.DrawLine(deviceContext, a, b, color);
 #endif
 }
 
-
-void GraphicsManagerD3D11::DebugDrawSphere(Vector3& c, f32 r, i32 hSlice, i32 vSlice)
+void GraphicsManagerD3D11::DebugDrawSphere(const Vector3& c, f32 r, i32 hSlice, i32 vSlice, const Vector3& color)
 {
 #if ANT_DEBUG
 // TODO: fix this
-/*
+
      Vector3 up = Vector3(0.0f, 1.0f, 0.0f);
      Vector3 right = Vector3(1.0f, 0.0f, 0.0f);
      // TODO: try to make it fit perfectly
@@ -499,11 +500,11 @@ void GraphicsManagerD3D11::DebugDrawSphere(Vector3& c, f32 r, i32 hSlice, i32 vS
           for(i32 i = 0; i < vSlice; ++i)
           {
                Vector3 a = dir * r;
-               dir = mat3(rotate(mat4(1.0f), vInc, right)) * dir;
+               dir = Quaternion::AngleAxis(vInc, right) * dir;
                Vector3 b = dir * r;
-               GraphicsManager::Get()->DebugDrawLine(c + a, c + b);
+               GraphicsManager::Get()->DebugDrawLine(c + a, c + b, color);
           }
-          right = mat3(rotate(mat4(1.0f), hInc, up)) * right;
+          right = Quaternion::AngleAxis(hInc, up) * right;
      }
 
      // Draw the horizontal lines
@@ -513,20 +514,20 @@ void GraphicsManagerD3D11::DebugDrawSphere(Vector3& c, f32 r, i32 hSlice, i32 vS
      Vector3 dir = up;
      for(i32 j = 0; j < vSlice - 2; ++j)
      {
-          dir = mat3(rotate(mat4(1.0f), vInc, right)) * dir;
+          dir = Quaternion::AngleAxis(vInc, right) * dir;
           for(i32 i = 0; i < hSlice; ++i)
           {
                Vector3 a = dir * r;
-               dir = mat3(rotate(mat4(1.0f), hInc, up)) * dir;
+               dir = Quaternion::AngleAxis(hInc, up) * dir;
                Vector3 b = dir * r;
-               GraphicsManager::Get()->DebugDrawLine(c + a, c + b);
+               GraphicsManager::Get()->DebugDrawLine(c + a, c + b, color);
           }
      }
-*/
+
 #endif
 }
 
-void GraphicsManagerD3D11::DebugDrawCube(Vector3& c, Vector3& hExtend)
+void GraphicsManagerD3D11::DebugDrawCube(const Vector3& c, const Vector3& hExtend, const Vector3& color)
 {
 #if ANT_DEBUG
      // TODO: ...
@@ -707,7 +708,6 @@ HRESULT GraphicsManagerD3D11::CreateInputLayoutDescFromVertexShaderSignature(ID3
 {
      // Reflect shader info
      ID3D11ShaderReflection* pVertexShaderReflection = NULL;
-     
      if(FAILED(D3DReflect(pShaderBlob->GetBufferPointer(), pShaderBlob->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&pVertexShaderReflection)))
      {
           return S_FALSE;

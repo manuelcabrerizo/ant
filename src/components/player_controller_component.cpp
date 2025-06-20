@@ -59,7 +59,7 @@ void PlayerControllerComponent::OnLateUpdate(ActorManager *actorManager, f32 dt)
          int currentWeapon = usingFirstWeapon ? 0 : 1;
          AnchorComponent *weaponAnchor = actorManager->GetComponent<AnchorComponent>(weapons[currentWeapon]);
          Vector3 targetPosition = camera->GetPosition() + camera->GetFront() * 100.0f;
-         GraphicsManager::Get()->DebugDrawLine(weaponAnchor->position, targetPosition);
+         GraphicsManager::Get()->DebugDrawLine(weaponAnchor->position, targetPosition, Vector3(0, 1, 0));
     }
 }
 

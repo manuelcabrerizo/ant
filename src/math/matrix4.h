@@ -39,31 +39,30 @@ public:
 
     float *operator[](int index);
 
-    Matrix4 operator+(Matrix4 &m);
-    Matrix4 operator*(float val);
-    Matrix4 operator*(Matrix4 &m);
-    Vector4 operator*(Vector4 &vec);
+    Matrix4 operator+(const Matrix4 &m) const;
+    Matrix4 operator*(float val) const;
+    Matrix4 operator*(const Matrix4 &m) const;
+    Vector4 operator*(const Vector4 &vec) const;
 
 
-    static Vector3 TransformPoint(Matrix4 mat, Vector3 &vec);
-    static Vector3 TransformVector(Matrix4 mat, Vector3 &vec);
+    static Vector3 TransformPoint(const Matrix4& mat, const Vector3 &vec);
+    static Vector3 TransformVector(const Matrix4& mat, const Vector3 &vec);
     
     static Matrix4 Frustum(float l, float r, float b, float t, float n, float f);
     static Matrix4 Perspective(float fov, float aspect, float znear, float zfar);
     static Matrix4 Ortho(float l, float r, float b, float t, float n, float f);
-    static Matrix4 LookAt(Vector3 position, Vector3 target, Vector3 up);
+    static Matrix4 LookAt(const Vector3& position, const Vector3& target, const Vector3& up);
     static Matrix4 Translate(float x, float y, float z);
-    static Matrix4 Translate(Vector3 pos);
-    static Matrix4 Scale(Vector3 scale);
+    static Matrix4 Translate(const Vector3& pos);
+    static Matrix4 Scale(const Vector3& scale);
     static Matrix4 Scale(float x, float y, float z);
     static Matrix4 RotateX(float angle);
     static Matrix4 RotateY(float angle);
     static Matrix4 RotateZ(float angle);
-    static Matrix4 TransformFromBasis(Vector3 o, Vector3 r, Vector3 u, Vector3 f);
+    static Matrix4 TransformFromBasis(const Vector3& o, const Vector3& r, const Vector3& u, const Vector3& f);
     // TODO: make them not static
     static Matrix4 Transposed(const Matrix4 &m);
     static float Determinant(const Matrix4 &m);
     static Matrix4 Adjugate(const Matrix4 &m);
     static Matrix4 Inverse(const Matrix4 &m);
-
 };

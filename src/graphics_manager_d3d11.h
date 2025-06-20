@@ -1,3 +1,5 @@
+#pragma once
+
 #include <d3d11_1.h>
 #include <d3dcompiler.h>
 
@@ -157,9 +159,9 @@ public:
      void DebugInit() override;
      void DebugTerminate() override;
      void DebugPresent() override;
-     void DebugDrawLine(Vector3& a, Vector3& b) override;
-     void DebugDrawSphere(Vector3& c, f32 r, i32 hSlice, i32 vSlice) override;
-     void DebugDrawCube(Vector3& c, Vector3& hExtend) override;
+     void DebugDrawLine(const Vector3& a, const Vector3& b, const Vector3& color) override;
+     void DebugDrawSphere(const Vector3& c, f32 r, i32 hSlice, i32 vSlice, const Vector3& color) override;
+     void DebugDrawCube(const Vector3& c, const Vector3& hExtend, const Vector3& color) override;
 
 private:
      void CreateDeviceAndSwapChain();

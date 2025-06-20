@@ -5,7 +5,7 @@
 #include "segment.h"
 #include "plane.h"
 
-void Triangle::Init(Vector3 a, Vector3 b, Vector3 c)
+void Triangle::Init(const Vector3& a, const Vector3& b, const Vector3& c)
 {
     this->a = a;
     this->b = b;
@@ -16,17 +16,17 @@ void Triangle::Init(Vector3 a, Vector3 b, Vector3 c)
     n = ac.Cross(ab).Normalized();
 }
 
-bool Triangle::Intersect(Ray& ray, f32& t)
+bool Triangle::Intersect(const Ray& ray, f32& t) const
 {
     return ray.Intersect(*this, t);
 }
 
-bool Triangle::Intersect(Segment& segment, f32& t)
+bool Triangle::Intersect(const Segment& segment, f32& t) const
 {
     return segment.Intersect(*this, t);
 }
 
-bool Triangle::PointInside(Vector3 q)
+bool Triangle::PointInside(const Vector3& q) const
 {
     Vector3 v0 = b - a;
     Vector3 v1 = c - a;
@@ -49,13 +49,14 @@ bool Triangle::PointInside(Vector3 q)
         z >= 0.0f && z <= 1.0f;
 }
 
-Vector3 Triangle::ClosestPoint(Vector3 q)
+
+// TODO: test others implementation
+Vector3 Triangle::ClosestPoint(const Vector3& q) const
 {
     Plane plane;
     plane.Init(*this);
 
     Vector3 pointInPlane = plane.ClosestPoint(q);
-    f32 u, v, w;
     if (PointInside(pointInPlane))
     {
         return pointInPlane;

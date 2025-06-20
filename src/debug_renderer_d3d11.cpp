@@ -67,13 +67,13 @@ void DebugRendererD3D11::Present(ID3D11DeviceContext *deviceContext)
 }
 
 
-void DebugRendererD3D11::DrawLine(ID3D11DeviceContext *deviceContext, Vector3& a, Vector3 &b)
+void DebugRendererD3D11::DrawLine(ID3D11DeviceContext *deviceContext, const Vector3& a, const Vector3 &b, const Vector3& color)
 {
      VertexLine line[2] = {};
      line[0].pos = a;
-     line[0].col = Vector3(0.0f, 1.0f, 0.0f);
+     line[0].col = color;
      line[1].pos = b;
-     line[1].col = Vector3(0.0f, 1.0f, 0.0f);
+     line[1].col = color;
 
      if(bufferUsed + 2 > bufferSize)
      {

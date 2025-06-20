@@ -67,5 +67,4 @@ public:
 
      void SetDefaultMaterial(Material* material);
      void SetMaterialAtMeshIndex(i32 index, Material* material);
-
 };

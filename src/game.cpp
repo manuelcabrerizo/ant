@@ -28,6 +28,7 @@
 
 void Game::Init()
 {
+    // Move this initialization to the engine
     VertexShaderManager::Initialize(4);
     FragmentShaderManager::Initialize(4);
     TextureManager::Initialize(64);
@@ -44,7 +45,7 @@ void Game::Init()
      FragmentShaderManager::Get()->Load("color", "data/shaders/color.hlsl");
      FragmentShaderManager::Get()->Bind("default");
      
-     // Load a textures
+     // Load textures
      TextureManager::Get()->Load("DefaultMaterial_Diffuse", "data/textures/DefaultTextures/DefaultMaterial_Diffuse.png");
      TextureManager::Get()->Load("DefaultMaterial_Normal", "data/textures/DefaultTextures/DefaultMaterial_Normal.png");
      TextureManager::Get()->Load("DefaultMaterial_Specular", "data/textures/DefaultTextures/DefaultMaterial_Specular.png");
@@ -81,7 +82,7 @@ void Game::Init()
      actorManager.AllocInternalMemory();
 
      // Create Entities
-     SlotmapKey<Actor> player = actorManager.CreateActorFromFile("data/xml/player.xml");
+     player = actorManager.CreateActorFromFile("data/xml/player.xml");
      //WeaponComponent *weapon = actorManager.GetComponent<WeaponComponent>(player);
      //AnimationComponent animationCmp;
      //animationCmp.skeleton.Init("data/models/fps-animations-vsk/source/FPS_VSK1.fbx", STATIC_MEMORY);
@@ -96,12 +97,14 @@ void Game::Init()
      actorManager.CreateActorFromFile("data/xml/house.xml");
      actorManager.CreateActorFromFile("data/xml/wizard.xml");
 
+     
      SlotmapKey<Actor> enemy[3] =
      {
           actorManager.CreateActorFromFile("data/xml/enemy.xml"),
           actorManager.CreateActorFromFile("data/xml/enemy.xml"),
           actorManager.CreateActorFromFile("data/xml/enemy.xml")
      };
+     
 
      // Warrior Animation
      
@@ -132,6 +135,7 @@ void Game::Init()
      actorManager.AddComponent<AnimationComponent>(enemy[1], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[2], animation);
      
+
      CameraComponent::Initialize();
      RenderComponent::Initialize();
      PhysicsComponent::Initialize();
@@ -155,14 +159,77 @@ void Game::Update(f32 dt)
      actorManager.LateUpdateComponents<PlayerControllerComponent>(dt);
 }
 
-void Game::Render()
+#include <math/matrix4.h>
+
+void Game::Render(f32 dt)
 {
-     actorManager.RenderComponents<RenderComponent>();
 
-     GraphicsManager::Get()->DebugPresent();
-     GraphicsManager::Get()->EndFrame(1);
+    // OBB intersection test
+    Vector3 point0 = Vector3(8.0f, 2.0f, 10.0f);
+    Vector3 point1 = Vector3(0.0f, 2.0f, 10.0f);
+    Vector3 point2 = Vector3(8.0f, 10.0f, 10.0f);
 
-     GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
+    static float time = 0.0f;
+    Matrix4 rot = Matrix4::RotateY(time);
+
+    time += dt;
+
+    Vector3 orientation0[] = 
+    {
+        Vector3(rot[0][0], rot[1][0], rot[2][0]),
+        Vector3(rot[0][1], rot[1][1], rot[2][1]),
+        Vector3(rot[0][2], rot[1][2], rot[2][2]) 
+    };
+
+    rot = Matrix4::RotateX(time);
+
+    Vector3 orientation1[] =
+    {
+        Vector3(rot[0][0], rot[1][0], rot[2][0]),
+        Vector3(rot[0][1], rot[1][1], rot[2][1]),
+        Vector3(rot[0][2], rot[1][2], rot[2][2])
+    };
+
+    float t = sinf(time * 0.5) * 0.5f + 0.5f;
+
+    OBB a;
+    a.Init(point1.Lerp(point0, t), orientation0, Vector3(1, 0.5, 1));
+    OBB b;
+    b.Init(point2.Lerp(point0, t), orientation1, Vector3(0.5, 0.5, 0.5));
+    Sphere c;
+    c.Init(point1, 1.0f);
+
+    if(a.Intersect(b))
+    { 
+        a.DebugDraw(Vector3(1, 0, 0));
+        b.DebugDraw(Vector3(1, 0, 0));
+    }
+    else
+    {
+        a.DebugDraw(Vector3(0, 1, 0));
+        b.DebugDraw(Vector3(0, 1, 0));
+    }
+
+    if (a.Intersect(c))
+    {
+        GraphicsManager::Get()->DebugDrawSphere(c.GetCenter(), c.GetRadio(), 12, 12, Vector3(1, 0, 0));
+    }
+    else
+    {
+        GraphicsManager::Get()->DebugDrawSphere(c.GetCenter(), c.GetRadio(), 12, 12, Vector3(0, 1, 0));
+    }
+
+    TransformComponent* transform = actorManager.GetComponent<TransformComponent>(player);
+    GraphicsManager::Get()->DebugDrawSphere(a.ClosestPoint(transform->position), 0.125f, 6, 6, Vector3(1, 1, 0));
+    GraphicsManager::Get()->DebugDrawSphere(b.ClosestPoint(transform->position), 0.125f, 6, 6, Vector3(1, 1, 0));
+    GraphicsManager::Get()->DebugDrawSphere(c.ClosestPoint(transform->position), 0.125f, 6, 6, Vector3(1, 1, 0));
+
+    actorManager.RenderComponents<RenderComponent>();
+
+    GraphicsManager::Get()->DebugPresent();
+    GraphicsManager::Get()->EndFrame(1);
+
+    GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
 }
 
 void Game::Terminate()

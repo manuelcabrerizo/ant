@@ -7,7 +7,7 @@ float *Matrix4::operator[](int index)
     return &(v[index * 4]);
 }
 
-Matrix4 Matrix4::operator+(Matrix4 &m)
+Matrix4 Matrix4::operator+(const Matrix4 &m) const
 {
     return Matrix4(
         m11 + m.m11, m12 + m.m12, m13 + m.m13, m14 + m.m14,
@@ -16,7 +16,7 @@ Matrix4 Matrix4::operator+(Matrix4 &m)
         m41 + m.m41, m42 + m.m42, m43 + m.m43, m44 + m.m44);
 }
 
-Matrix4 Matrix4::operator*(float val)
+Matrix4 Matrix4::operator*(float val) const
 {
     return Matrix4(
         m11 * val, m12 * val, m13 * val, m14 * val,
@@ -25,7 +25,7 @@ Matrix4 Matrix4::operator*(float val)
         m41 * val, m42 * val, m43 * val, m44 * val);
 }
 
-Matrix4 Matrix4::operator*(Matrix4 &m)
+Matrix4 Matrix4::operator*(const Matrix4 &m) const
 {
     Matrix4 result;
     for(int row = 0; row < 4; ++row) {
@@ -40,7 +40,7 @@ Matrix4 Matrix4::operator*(Matrix4 &m)
     return result;
 }
 
-Vector4 Matrix4::operator*(Vector4 &vec)
+Vector4 Matrix4::operator*(const Vector4 &vec) const
 {
     Vector4 result;
     for(int row = 0; row < 4; ++row) {
@@ -49,13 +49,13 @@ Vector4 Matrix4::operator*(Vector4 &vec)
     return result;
 }
 
-Vector3 Matrix4::TransformPoint(Matrix4 mat, Vector3 &vec)
+Vector3 Matrix4::TransformPoint(const Matrix4& mat, const Vector3 &vec)
 {
     Vector4 result = mat * Vector4(vec, 1.0f);
     return Vector3(result.x, result.y, result.z);
 }
 
-Vector3 Matrix4::TransformVector(Matrix4 mat, Vector3 &vec)
+Vector3 Matrix4::TransformVector(const Matrix4& mat, const Vector3 &vec)
 {
     Vector4 result = mat * Vector4(vec, 0.0f);
     return Vector3(result.x, result.y, result.z);
@@ -95,7 +95,7 @@ Matrix4 Matrix4::Ortho(float l, float r, float b, float t, float n, float f)
 
 }
 
-Matrix4 Matrix4::LookAt(Vector3 position, Vector3 target, Vector3 up)
+Matrix4 Matrix4::LookAt(const Vector3& position, const Vector3& target, const Vector3& up)
 {
     Vector3 zaxis = (target - position).Normalized();
     Vector3 xaxis = up.Cross(zaxis).Normalized();
@@ -116,7 +116,7 @@ Matrix4 Matrix4::Translate(float x, float y, float z)
         0, 0, 0, 1);
 }
 
-Matrix4 Matrix4::Translate(Vector3 pos)
+Matrix4 Matrix4::Translate(const Vector3& pos)
 {
     return Translate(pos.x, pos.y, pos.z);
 }
@@ -130,7 +130,7 @@ Matrix4 Matrix4::Scale(float x, float y, float z)
         0, 0, 0, 1);
 }
 
-Matrix4 Matrix4::Scale(Vector3 scale)
+Matrix4 Matrix4::Scale(const Vector3& scale)
 {
     return Scale(scale.x, scale.y, scale.z);
 }
@@ -162,7 +162,7 @@ Matrix4 Matrix4::RotateZ(float angle)
                   0,           0, 0, 1);
 }
 
-Matrix4 Matrix4::TransformFromBasis(Vector3 o, Vector3 r, Vector3 u, Vector3 f)
+Matrix4 Matrix4::TransformFromBasis(const Vector3& o, const Vector3& r, const Vector3& u, const Vector3& f)
 {
     return Matrix4(
         r.x, u.x, f.x, o.x,

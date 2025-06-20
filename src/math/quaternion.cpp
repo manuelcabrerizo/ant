@@ -3,13 +3,13 @@
 #include <math.h>
 #include <float.h>
 
-float Quaternion::operator[](int index)
+float Quaternion::operator[](int index) const
 {
     ASSERT(index > 0 && index < 4);
     return v[index];
 }
 
-Quaternion Quaternion::operator*(float f)
+Quaternion Quaternion::operator*(float f) const
 {
     Quaternion result; 
     result.w = this->w * f;
@@ -19,13 +19,13 @@ Quaternion Quaternion::operator*(float f)
     return result;
 }
 
-Quaternion Quaternion::operator/(float f)
+Quaternion Quaternion::operator/(float f) const
 {
     Quaternion result = *this * (1.0f/f); 
     return result;
 }
 
-Quaternion Quaternion::operator+(Quaternion &q)
+Quaternion Quaternion::operator+(const Quaternion &q) const
 {
     Quaternion result; 
     result.w = this->w + q.w;
@@ -35,7 +35,7 @@ Quaternion Quaternion::operator+(Quaternion &q)
     return result;
 }
 
-Quaternion Quaternion::operator*(Quaternion &q)
+Quaternion Quaternion::operator*(const Quaternion &q) const
 {
 	return Quaternion(
 		-q.x * x - q.y * y - q.z * z + q.w * w,
@@ -45,7 +45,7 @@ Quaternion Quaternion::operator*(Quaternion &q)
 	);
 }
 
-Vector3 Quaternion::operator*(Vector3 &v)
+Vector3 Quaternion::operator*(const Vector3 &v) const
 {
     return vector * 2.0f * vector.Dot(v) +
         v * (scalar * scalar - vector.Dot(vector)) +
@@ -66,7 +66,7 @@ void Quaternion::Normalize()
     z /= magnitude;
 }
 
-Quaternion Quaternion::Normalized()
+Quaternion Quaternion::Normalized() const
 {
     float magnitudeSqr = w*w + x*x + y*y + z*z;
     if(magnitudeSqr < FLT_EPSILON) {
@@ -84,7 +84,7 @@ Quaternion Quaternion::Normalized()
     }
 }
 
-Matrix4 Quaternion::ToMatrix4()
+Matrix4 Quaternion::ToMatrix4() const
 {
     Matrix4 result;
 
@@ -111,10 +111,11 @@ Matrix4 Quaternion::ToMatrix4()
     return result;
 }
 
-Quaternion Quaternion::Slerp(Quaternion a, Quaternion b, float t)
+Quaternion Quaternion::Slerp(const Quaternion& a, const Quaternion& b_, float t)
 {
-    float k0, k1;
+    Quaternion b = b_;
 
+    float k0, k1;
     float cos_omega = a.w*b.w + a.x*b.x + a.y*b.y + a.z*b.z;
     if(cos_omega < 0.0f) {
         b.w = -b.w;
@@ -146,7 +147,7 @@ Quaternion Quaternion::Slerp(Quaternion a, Quaternion b, float t)
     return result;
 }
 
-Quaternion Quaternion::AngleAxis(float angle, Vector3 &axis)
+Quaternion Quaternion::AngleAxis(float angle, const Vector3 &axis)
 {
     Vector3 norm = axis.Normalized();
     float s = sinf(angle * 0.5f);

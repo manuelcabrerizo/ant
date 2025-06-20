@@ -11,13 +11,14 @@ class Plane
 {
 public:
 
-    void Init(Vector3 n, f32 d);
-    void Init(Triangle& triangle);
+    void Init(const Vector3& n, f32 d);
+    void Init(const Triangle& triangle);
 
-    bool Intersect(Ray& ray, f32& t);
-    bool Intersect(Segment& segment, f32& t);
+    bool Intersect(const Ray& ray, f32& t) const;
+    bool Intersect(const Segment& segment, f32& t) const;
 
-    Vector3 ClosestPoint(Vector3 q);
+    Vector3 ClosestPoint(const Vector3& q) const;
+    float DistPoint(const Vector3& q) const;
 
     Vector3 n;
     f32 d;

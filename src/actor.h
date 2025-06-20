@@ -14,6 +14,7 @@ struct Actor
 struct ComponentStorageBase
 {
      virtual void RemoveComponent(ActorManager *actorManager, SlotmapKeyBase keyBase) = 0;
+     virtual ~ComponentStorageBase() {}
 };
 
 template <typename ComponentType>

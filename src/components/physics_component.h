@@ -16,9 +16,9 @@ private:
 public:
     TransformComponent *transform;
 
-    Vector3 acceleration;
-    Vector3 velocity;
-    Vector3 forceAccumulator;
+    Vector3 acceleration = Vector3();
+    Vector3 velocity = Vector3();
+    Vector3 forceAccumulator = Vector3();
     Vector3 offset;
     bool grounded = false;
 

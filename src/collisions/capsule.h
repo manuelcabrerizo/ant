@@ -5,8 +5,10 @@
 
 class Capsule
 {
-public:
-    Vector3 p;
-    Vector3 q;
+private:
+    Vector3 a;
+    Vector3 b;
     f32 r;
+
+public:
 };
