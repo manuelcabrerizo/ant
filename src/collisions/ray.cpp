@@ -4,6 +4,12 @@
 #include "plane.h"
 #include "triangle.h"
 #include "sphere.h"
+#include "cylinder.h"
+#include "capsule.h"
+
+#include <windows.h>
+
+static const float EPSILON = 0.000001f;
 
 void Ray::Init(Vector3 o, Vector3 d)
 {
@@ -52,7 +58,151 @@ bool Ray::Intersect(const Sphere& sphere, f32& t) const
     return true;
 }
 
+bool Ray::Intersect(const Cylinder& cylinder, float& t) const
+{
+    Vector3 p = cylinder.GetP();
+    Vector3 q = cylinder.GetQ();
+    float r = cylinder.GetRadio();
+
+    Vector3 d_ = q - p, m = o - p, n = d;
+    f32 md = m.Dot(d_);
+    f32 nd = n.Dot(d_);
+    f32 dd = d_.Dot(d_);
+    f32 nn = n.Dot(n);
+    f32 mn = m.Dot(n);
+
+    f32 a_ = dd * nn - nd * nd;
+    f32 k = m.Dot(m) - r * r;
+    f32 c = dd * k - md * md;
+
+    if (fabsf(a_) < EPSILON)
+    {
+        if (c > 0.0f)
+        {
+            return false;
+        }
+
+        if (md < 0.0f)
+        {
+            t = -mn / nn;
+        }
+        else if (md > dd)
+        {
+            t = (nd - mn) / nn;
+        }
+        else
+        {
+            t = 0.0f;
+        }
+        return true;
+    }
+
+    f32 b_ = dd * mn - nd * md;
+    f32 discr = b_ * b_ - a_ * c;
+    if (discr < 0.0f)
+    {
+        OutputDebugString("No Hit\n");
+        return false;
+    }
+
+    t = (-b_ - sqrtf(discr)) / a_;
+
+    if ((md + t * nd) < 0)
+    {
+        if (nd <= 0.0f)
+        {
+            return false;
+        }
+        else
+        {
+            t = -md / nd;
+            Vector3 x = o + n * t;
+            return (x - p).MagnitudeSq() <= r * r;
+        }
+    }
+
+    if ((md + t * nd > dd))
+    {
+        if (nd >= 0)
+        {
+            return false;
+        }
+        else
+        {
+            t = (dd - md) / nd;
+            Vector3 x = o + n * t;
+            return (x - q).MagnitudeSq() <= r * r;
+        }
+    }
+
+    return true;
+}
+
 bool Ray::Intersect(const Capsule& capsule, float& t) const
 {
-    return false;
+    Vector3 p = capsule.GetA();
+    Vector3 q = capsule.GetB();
+    float r = capsule.GetRadio();
+
+    Vector3 d_ = q - p, m = o - p, n = d;
+    f32 md = m.Dot(d_);
+    f32 nd = n.Dot(d_);
+    f32 dd = d_.Dot(d_);
+    f32 nn = n.Dot(n);
+    f32 mn = m.Dot(n);
+
+    f32 a_ = dd * nn - nd * nd;
+    f32 k = m.Dot(m) - r * r;
+    f32 c = dd * k - md * md;
+
+    if (fabsf(a_) < EPSILON)
+    {
+        if (c > 0.0f)
+        {
+            return false;
+        }
+
+        if (md < 0.0f)
+        {
+            Sphere sphere;
+            sphere.Init(p, r);
+            Intersect(sphere, t);
+        }
+        else if (md > dd)
+        {
+            Sphere sphere;
+            sphere.Init(q, r);
+            Intersect(sphere, t);
+        }
+        else
+        {
+            t = 0.0f;
+        }
+        return true;
+    }
+
+    f32 b_ = dd * mn - nd * md;
+    f32 discr = b_ * b_ - a_ * c;
+    if (discr < 0.0f)
+    {
+        return false;
+    }
+
+    t = (-b_ - sqrtf(discr)) / a_;
+
+    if ((md + t * nd) < 0)
+    {
+        Sphere sphere;
+        sphere.Init(p, r);
+        return Intersect(sphere, t);
+    }
+
+    if ((md + t * nd > dd))
+    {
+        Sphere sphere;
+        sphere.Init(q, r);
+        return Intersect(sphere, t);
+    }
+
+    return true;
 }

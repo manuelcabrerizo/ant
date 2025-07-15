@@ -24,8 +24,6 @@
 #include <components/enemy_component.h>
 #include <components/animation_component.h>
 
-#include <stdio.h>
-
 void Game::Init()
 {
     // Move this initialization to the engine
@@ -226,28 +224,36 @@ void Game::Render(f32 dt)
     // Cylinder Test
     {
         Cylinder cylinder;
-        cylinder.Init(Vector3(8.0f, 2.0f, 20.0f), Vector3(8.0f, 4.0f, 20.0f), 0.5f);
+        cylinder.Init(Vector3(6.0f, 2.0f, 20.0f), Vector3(8.0f, 2.0f, 20.0f), 0.5f);
         cylinder.DebugDraw(16, Vector3(1, 1, 0));
 
         Segment viewSegment;
-        viewSegment.Init(transform->position, transform->position + transform->direction * 100);
+        viewSegment.Init(transform->position, transform->position + transform->direction * 1);
         float hit;
         if (viewSegment.Intersect(cylinder, hit))
         {
             Vector3 point = viewSegment.a + (viewSegment.b - viewSegment.a) * hit;
             GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
         }
+
+        //Ray viewRay;
+        //viewRay.Init(transform->position, transform->direction);
+        //if (viewRay.Intersect(cylinder, hit))
+        //{
+        //    Vector3 point = viewRay.o + viewRay.d * hit;
+        //    GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
+        //}
     }
     // Capsule Test
     {
-        Capsule cylinder;
-        cylinder.Init(Vector3(6.0f, 2.0f, 20.0f), Vector3(10.0f, 4.0f, 20.0f), 0.5f);
-        cylinder.DebugDraw(16, Vector3(1, 1, 0));
+        Capsule capsule;
+        capsule.Init(Vector3(10.0f, 3.0f, 20.0f), Vector3(10.0f, 4.5f, 20.0f), 0.5f);
+        capsule.DebugDraw(16, Vector3(1, 1, 0));
 
         Segment viewSegment;
-        viewSegment.Init(transform->position, transform->position + transform->direction * 100);
+        viewSegment.Init(transform->position, transform->position + transform->direction*2.0f);
         float hit;
-        if (viewSegment.Intersect(cylinder, hit))
+        if (viewSegment.Intersect(capsule, hit))
         {
             Vector3 point = viewSegment.a + (viewSegment.b - viewSegment.a) * hit;
             GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));

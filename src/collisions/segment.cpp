@@ -7,6 +7,8 @@
 #include "cylinder.h"
 #include "capsule.h"
 
+static const float EPSILON = 0.000001f;
+
 void Segment::Init(Vector3 a, Vector3 b)
 {
     this->a = a;
@@ -64,7 +66,6 @@ bool Segment::Intersect(const Sphere& sphere, f32& t) const
 
 }
 
-static const float EPSILON = 0.000001f;
 bool Segment::Intersect(const Cylinder& cylinder, float& t) const
 {
     Vector3 p = cylinder.GetP();
@@ -123,7 +124,7 @@ bool Segment::Intersect(const Cylinder& cylinder, float& t) const
         {
             t = -md / nd;
             Vector3 x = a + n*t;
-            return (x - p).MagnitudeSq() <= r * r;
+            return  t <= 1.0f && (x - p).MagnitudeSq() <= r * r;
         }
     }
 
@@ -136,12 +137,12 @@ bool Segment::Intersect(const Cylinder& cylinder, float& t) const
         else
         {
             t = (dd - md) / nd;
-            Vector3 x = a + n * t;
-            return (x - q).MagnitudeSq() <= r * r;
+            Vector3 x = a + n*t;
+            return  t <= 1.0f && (x - q).MagnitudeSq() <= r * r;
         }
     }
 
-    return true;
+    return t <= 1.0f;
 }
 
 bool Segment::Intersect(const Capsule& capsule, float& t) const
@@ -167,21 +168,24 @@ bool Segment::Intersect(const Capsule& capsule, float& t) const
         {
             return false;
         }
-        /*
+
         if (md < 0.0f)
         {
-            t = -mn / nn;
+            Sphere sphere;
+            sphere.Init(p, r);
+            Intersect(sphere, t);
         }
         else if (md > dd)
         {
-            t = (nd - mn) / nn;
+            Sphere sphere;
+            sphere.Init(q, r);
+            Intersect(sphere, t);
         }
         else
         {
             t = 0.0f;
         }
-        return true;
-        */
+        return t <= 1.0f;
     }
 
     f32 b_ = dd * mn - nd * md;
@@ -197,19 +201,18 @@ bool Segment::Intersect(const Capsule& capsule, float& t) const
     {
         Sphere sphere;
         sphere.Init(p, r);
-        return Intersect(sphere, t);   
+        return Intersect(sphere, t) && t <= 1.0f;
     }
 
     if ((md + t * nd > dd))
     {
         Sphere sphere;
         sphere.Init(q, r);
-        return Intersect(sphere, t);   
+        return Intersect(sphere, t) && t <= 1.0f;
     }
 
-    return true;
+    return t <= 1.0f;
 }
-
 
 Vector3 Segment::ClosestPoint(const Vector3& point, f32& t) const
 {

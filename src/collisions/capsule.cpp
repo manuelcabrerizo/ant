@@ -120,11 +120,11 @@ void Capsule::DebugDraw(int subdivision, const Vector3& color)
         Vector3 a = current * r;
         current = Quaternion::AngleAxis(inc, axis) * current;
         Vector3 b = current * r;
-        //GraphicsManager::Get()->DebugDrawLine(p + a, p + b, color);
-        //GraphicsManager::Get()->DebugDrawLine(q + a, q + b, color);
+        GraphicsManager::Get()->DebugDrawLine(p + a, p + b, color);
+        GraphicsManager::Get()->DebugDrawLine(q + a, q + b, color);
         GraphicsManager::Get()->DebugDrawLine(p + a, q + a, color);
         GraphicsManager::Get()->DebugDrawLine(p + b, q + b, color);
     }
-    GraphicsManager::Get()->DebugDrawSphere(p, r, subdivision, subdivision, Vector3(0, 0,1));
-    GraphicsManager::Get()->DebugDrawSphere(q, r, subdivision, subdivision, Vector3(0, 0, 1));
+    GraphicsManager::Get()->DebugDrawSphere(p, r, subdivision, subdivision, color);
+    GraphicsManager::Get()->DebugDrawSphere(q, r, subdivision, subdivision, color);
 }
