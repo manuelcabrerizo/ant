@@ -17,4 +17,5 @@ public:
     static Vector3 FromAssimp(aiVector3D m);
     static Quaternion FromAssimp(aiQuaternion m);
     static i32 NextPower2(u32 x);
+    static float Clamp(float n, float min, float max);
 };

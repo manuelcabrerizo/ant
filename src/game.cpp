@@ -265,6 +265,27 @@ void Game::Render(f32 dt)
         }
     }
 
+    // Segment Segment Test
+    {
+        Segment segmentA;
+        segmentA.Init(Vector3(6, 2, 6), Vector3(10, 2, 6));
+
+        Segment segmentB;
+        segmentB.Init(Vector3(6, 4, 10), Vector3(8, 3, 2));
+
+        Vector3 c1, c2;
+        float s, t;
+        segmentA.ClosestPoint(segmentB, c1, s, c2, t);
+
+        GraphicsManager::Get()->DebugDrawLine(segmentA.a, segmentA.b, Vector3(0, 1, 0));
+        GraphicsManager::Get()->DebugDrawSphere(c1, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
+        
+        GraphicsManager::Get()->DebugDrawLine(segmentB.a, segmentB.b, Vector3(0, 1, 0));
+        GraphicsManager::Get()->DebugDrawSphere(c2, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
+
+
+    }
+
     actorManager.RenderComponents<RenderComponent>();
 
     GraphicsManager::Get()->DebugPresent();

@@ -18,6 +18,7 @@ public:
     bool Intersect(const Capsule& capsule, float& t) const;
 
     Vector3 ClosestPoint(const Vector3& point, f32& t) const;
+    float ClosestPoint(const Segment& segment, Vector3& c1, float& s, Vector3& c2, float& t) const;
     float SqDistPoint(const Vector3& point) const;
 
     Vector3 a;

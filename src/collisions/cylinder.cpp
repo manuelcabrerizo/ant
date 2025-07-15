@@ -29,6 +29,12 @@ float Cylinder::GetRadio() const
     return r;
 }
 
+bool Cylinder::Intersect(const Cylinder& cylinder) const
+{
+    Vector3 closest;
+    return false;
+}
+
 Vector3 Cylinder::ClosestPoint(const Vector3& point) const
 {
     Vector3 pq = q - p;

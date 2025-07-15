@@ -16,6 +16,7 @@ public:
     Vector3 GetQ() const;
     float GetRadio() const;
     
+    bool Intersect(const Cylinder& cylinder) const;
 
     Vector3 ClosestPoint(const Vector3& point) const;
     float SqDistPoint(const Vector3& point) const;

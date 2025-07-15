@@ -6,6 +6,7 @@
 #include "sphere.h"
 #include "cylinder.h"
 #include "capsule.h"
+#include <utils.h>
 
 static const float EPSILON = 0.000001f;
 
@@ -224,6 +225,79 @@ Vector3 Segment::ClosestPoint(const Vector3& point, f32& t) const
 
     return a + ab * t;
 }
+
+float Segment::ClosestPoint(const Segment& segment, Vector3& c1, float& s, Vector3& c2, float& t) const
+{
+    Vector3 d1 = b - a;
+    Vector3 d2 = segment.b - segment.a;
+    Vector3 r = a - segment.a;
+
+    float a_ = d1.Dot(d1);
+    float e = d2.Dot(d2);
+    float f = d2.Dot(r);
+
+    // Check if either or both segments degenerate into points
+    if (a_ <= EPSILON && e <= EPSILON)
+    {
+        // Both segments degenerate into points
+        s = t = 0.0f;
+        c1 = a;
+        c2 = segment.a;
+        return (c2 - c1).MagnitudeSq();
+    }
+
+    if (a_ <= EPSILON)
+    {
+        // First segment degenerate into a point
+        s = 0.0f;
+        t = f / e;
+        t = Utils::Clamp(t, 0, 1);
+    }
+    else
+    {
+        float c = d1.Dot(r);
+        if (e <= EPSILON)
+        {
+            // Second segment degenerate into a point
+            t = 0;
+            s = Utils::Clamp(-c / a_, 0, 1);
+        }
+        else
+        {
+            // General non degenerate case start here
+            float b_ = d1.Dot(d2);
+            float denom = a_ * e - b_ * b_;
+            // If segments not parallel, compute closest point on L1 to L2
+            // and clamp to segment S1, Else pick arbitrary s (here 0)
+            if (denom != 0.0f)
+            {
+                s = Utils::Clamp((b_ * f - c * e) / denom, 0, 1);
+            }
+            else
+            {
+                s = 0.0f;
+            }
+            // Compute the point on L2 Closest to S1
+            t = (b_ * s + f) / e;
+
+            if (t < 0.0f)
+            {
+                t = 0.0f;
+                s = Utils::Clamp(-c / a_, 0, 1);
+            }
+            else if (t > 1.0f)
+            {
+                t = 1.0f;
+                s = Utils::Clamp((b_ - c) / a_, 0, 1);
+            }
+        }
+    }
+
+    c1 = a + d1 * s;
+    c2 = segment.a + d2 * t;
+    return (c2 - c1).MagnitudeSq();
+}
+
 
 float Segment::SqDistPoint(const Vector3& point) const
 {
