@@ -265,25 +265,27 @@ void Game::Render(f32 dt)
         }
     }
 
-    // Segment Segment Test
+    // Capsule Capsule Test
     {
-        Segment segmentA;
-        segmentA.Init(Vector3(6, 2, 6), Vector3(10, 2, 6));
-
-        Segment segmentB;
-        segmentB.Init(Vector3(6, 4, 10), Vector3(8, 3, 2));
-
-        Vector3 c1, c2;
-        float s, t;
-        segmentA.ClosestPoint(segmentB, c1, s, c2, t);
-
-        GraphicsManager::Get()->DebugDrawLine(segmentA.a, segmentA.b, Vector3(0, 1, 0));
-        GraphicsManager::Get()->DebugDrawSphere(c1, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
-        
-        GraphicsManager::Get()->DebugDrawLine(segmentB.a, segmentB.b, Vector3(0, 1, 0));
-        GraphicsManager::Get()->DebugDrawSphere(c2, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
+        Vector3 positionA = Vector3(6, 2, 15);
+        Vector3 offsetA = Vector3(0, 0.5f, 0);
+        Capsule capsuleA;
+        capsuleA.Init(positionA - offsetA, positionA + offsetA, 0.5f);
 
 
+        Vector3 positionB = Vector3(6, 5, 15).Lerp(Vector3(6, 2, 15), sinf(time) * 0.5f + 0.5f);
+        Vector3 offsetB = Vector3(1, 0, 0);
+        Capsule capsuleB;
+        capsuleB.Init(positionB - offsetB, positionB + offsetB, 0.5f);
+
+        Vector3 color = Vector3(0, 1, 0);
+        if (capsuleA.Intersect(capsuleB))
+        {
+            color = Vector3(1, 0, 0);
+        }
+
+        capsuleA.DebugDraw(8,color);
+        capsuleB.DebugDraw(8, color);
     }
 
     actorManager.RenderComponents<RenderComponent>();

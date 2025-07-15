@@ -34,6 +34,21 @@ float Capsule::GetRadio() const
     return r;
 }
 
+bool Capsule::Intersect(const Capsule& capsule) const
+{
+    Segment segmentA;
+    segmentA.Init(a, b);
+
+    Segment segmentB;
+    segmentB.Init(capsule.a, capsule.b);
+
+    Vector3 c1, c2;
+    float s, t;
+    float distSq = segmentA.ClosestPoint(segmentB, c1, s, c2, t);
+    float rSum = r + capsule.r;
+    return distSq <= rSum * rSum;
+}
+
 bool Capsule::Intersect(const Sphere& sphere) const
 {
     Segment axis;
@@ -43,16 +58,6 @@ bool Capsule::Intersect(const Sphere& sphere) const
     Vector3 closest = axis.ClosestPoint(center, t);
     float rSum = r + sphere.GetRadio();
     return (closest - center).MagnitudeSq() <= rSum * rSum;
-}
-
-bool Capsule::Intersect(const Ray& ray, float& t) const
-{
-    return ray.Intersect(*this, t);
-}
-
-bool Capsule::Intersect(const Segment& segment, float& t) const
-{
-    return false;
 }
 
 bool Capsule::Intersect(const Triangle& triangle, Vector3& n, float& penetration) const

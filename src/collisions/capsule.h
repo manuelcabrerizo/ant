@@ -24,9 +24,8 @@ public:
     Vector3 GetB() const;
     float GetRadio() const;
 
+    bool Intersect(const Capsule& capsule) const;
     bool Intersect(const Sphere& sphere) const;
-    bool Intersect(const Ray& ray, float& t) const;
-    bool Intersect(const Segment& segment, float& t) const;
     bool Intersect(const Triangle& triangle, Vector3& n, float& penetration) const;
     bool Intersect(const Plane& plane) const;
     bool Intersect(const AABB& aabb);
