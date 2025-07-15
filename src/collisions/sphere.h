@@ -22,8 +22,6 @@ public:
     f32 GetRadio() const;
 
     bool Intersect(const Sphere& sphere) const;
-    bool Intersect(const Ray& ray, f32& t) const;
-    bool Intersect(const Segment& segment, f32& t) const;
     bool Intersect(const Triangle& triangle, Vector3& n, f32& penetration) const;
     bool Intersect(const Plane& plane);
     bool Intersect(const AABB& aabb);
@@ -34,5 +32,4 @@ public:
 
     Vector3 ClosestPoint(const Vector3& point) const;
     float SqDistPoint(const Vector3& point) const;
-
 };

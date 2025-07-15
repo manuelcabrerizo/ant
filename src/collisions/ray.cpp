@@ -7,8 +7,6 @@
 #include "cylinder.h"
 #include "capsule.h"
 
-#include <windows.h>
-
 static const float EPSILON = 0.000001f;
 
 void Ray::Init(Vector3 o, Vector3 d)
@@ -101,7 +99,6 @@ bool Ray::Intersect(const Cylinder& cylinder, float& t) const
     f32 discr = b_ * b_ - a_ * c;
     if (discr < 0.0f)
     {
-        OutputDebugString("No Hit\n");
         return false;
     }
 
@@ -205,4 +202,22 @@ bool Ray::Intersect(const Capsule& capsule, float& t) const
     }
 
     return true;
+}
+
+Vector3 Ray::ClosestPoint(const Vector3& point, float& t) const
+{
+    t = (point - o).Dot(d) / d.Dot(d);
+    if (t < 0) 
+    {
+        t = 0.0f;
+    }
+    return o + d * t;
+}
+
+float Ray::SqDistPoint(const Vector3& point) const
+{
+    float t;
+    Vector3 closest = ClosestPoint(point, t);
+    float sqDist = Vector3::Dot(closest - point, closest - point);
+    return sqDist;
 }

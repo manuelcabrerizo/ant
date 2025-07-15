@@ -34,16 +34,6 @@ bool Sphere::Intersect(const Sphere& sphere) const
     return dist2 <= (radiusSum * radiusSum);
 }
 
-bool Sphere::Intersect(const Ray& ray, f32& t) const
-{
-    return ray.Intersect(*this, t);
-}
-
-bool Sphere::Intersect(const Segment& segment, f32& t) const
-{
-    return segment.Intersect(*this, t);
-}
-
 bool Sphere::Intersect(const Triangle& triangle, Vector3& n, f32& penetration) const
 {
     Vector3 closest = triangle.ClosestPoint(c);

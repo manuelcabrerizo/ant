@@ -3,6 +3,9 @@
 #include <math/algebra.h>
 #include <math/quaternion.h>
 
+#include "segment.h"
+#include "plane.h"
+
 
 void Cylinder::Init(Vector3 p, Vector3 q, f32 r)
 {
@@ -24,6 +27,54 @@ Vector3 Cylinder::GetQ() const
 float Cylinder::GetRadio() const
 {
     return r;
+}
+
+Vector3 Cylinder::ClosestPoint(const Vector3& point) const
+{
+    Vector3 pq = q - p;
+    float t = (point - p).Dot(pq) / pq.Dot(pq);
+
+    Vector3 normal = pq.Normalized();
+    if (t < 0.0f)
+    {
+        Plane pCap;
+        pCap.Init(p, normal);
+        Vector3 closest = pCap.ClosestPoint(point);
+        if ((closest - p).MagnitudeSq() > r * r)
+        {
+            closest = p + (closest - p).Normalized() * r;
+        }
+        return closest;
+    }
+    else if (t > 1.0f)
+    {
+        Plane qCap;
+        qCap.Init(q, normal * -1.0f);
+        Vector3 closest = qCap.ClosestPoint(point);
+        if ((closest - q).MagnitudeSq() > r * r)
+        {
+            closest = q + (closest - q).Normalized() * r;
+        }
+        return closest;
+    }
+    else
+    {
+        Vector3 closestToAxis = p + pq * t;
+        Vector3 delta = point - closestToAxis;
+        if (delta.MagnitudeSq() < r * r)
+        {
+            return point;
+        }
+        Vector3 dir = (point - closestToAxis).Normalized();
+        return closestToAxis + dir * r;
+    }
+}
+
+float Cylinder::SqDistPoint(const Vector3& point) const
+{
+    Vector3 closest = ClosestPoint(point);
+    float sqDist = Vector3::Dot(closest - point, closest - point);
+    return sqDist;
 }
 
 void Cylinder::DebugDraw(int subdivision, const Vector3& color)

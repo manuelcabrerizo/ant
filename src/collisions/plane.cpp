@@ -11,6 +11,13 @@ void Plane::Init(const Vector3& n, f32 d)
     this->d = d;
 }
 
+void Plane::Init(const Vector3& point, const Vector3 n)
+{
+    this->n = n;
+    this->d = point.Dot(n);
+}
+
+
 void Plane::Init(const Triangle& triangle)
 {
     n = triangle.n.Normalized();
@@ -45,6 +52,10 @@ bool Plane::Intersect(const Segment& segment, f32& t) const
     return false;
 }
 
+bool Plane::Intersect(const Vector3& point) const
+{
+    return n.Dot(point) - d <= 0.0f;
+}
 
 Vector3 Plane::ClosestPoint(const Vector3& q) const
 {

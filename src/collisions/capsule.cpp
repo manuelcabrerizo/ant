@@ -88,9 +88,8 @@ Vector3 Capsule::ClosestPoint(const Vector3& point) const
         return point;
     }
 
-    Sphere sphere;
-    sphere.Init(closestInSegment, r);
-    return sphere.ClosestPoint(point);
+    Vector3 dir = (point - closestInSegment).Normalized();
+    return closestInSegment + dir * r;
 }
 
 float Capsule::SqDistPoint(const Vector3& point) const

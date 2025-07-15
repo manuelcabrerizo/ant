@@ -16,6 +16,9 @@ public:
     Vector3 GetQ() const;
     float GetRadio() const;
     
-    void DebugDraw(int subdivision, const Vector3& color);
 
+    Vector3 ClosestPoint(const Vector3& point) const;
+    float SqDistPoint(const Vector3& point) const;
+
+    void DebugDraw(int subdivision, const Vector3& color);
 };
