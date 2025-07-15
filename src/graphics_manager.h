@@ -92,5 +92,4 @@ public:
      virtual void DebugDrawLine(const Vector3& a, const Vector3& b, const Vector3& color) = 0;
      virtual void DebugDrawSphere(const Vector3& c, f32 r, i32 hSlice, i32 vSlice, const Vector3& color) = 0;
      virtual void DebugDrawCube(const Vector3& c, const Vector3& hExtend, const Vector3& color) = 0;
-
 };

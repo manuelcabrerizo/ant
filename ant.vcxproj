@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\asset_managers\model_manager.cpp" />
+    <ClCompile Include="src\collisions\capsule.cpp" />
     <ClCompile Include="src\collisions\collision_utils.cpp" />
     <ClCompile Include="src\actor.cpp" />
     <ClCompile Include="src\allocator.cpp" />

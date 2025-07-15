@@ -453,7 +453,7 @@ i32 GraphicsManagerD3D11::TextureHeight(Texture *texture)
      return tx->h;
 }
 
-
+// TODO: use macros for debug build
 void GraphicsManagerD3D11::DebugInit()
 {
 #if ANT_DEBUG
@@ -485,8 +485,6 @@ void GraphicsManagerD3D11::DebugDrawLine(const Vector3& a, const Vector3& b, con
 void GraphicsManagerD3D11::DebugDrawSphere(const Vector3& c, f32 r, i32 hSlice, i32 vSlice, const Vector3& color)
 {
 #if ANT_DEBUG
-// TODO: fix this
-
      Vector3 up = Vector3(0.0f, 1.0f, 0.0f);
      Vector3 right = Vector3(1.0f, 0.0f, 0.0f);
      // TODO: try to make it fit perfectly

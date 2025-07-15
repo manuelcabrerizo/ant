@@ -12,7 +12,6 @@ private:
     Vector3 c;
     Vector3 u[3];
     Vector3 e;
-
 public:
     void Init(const Vector3& center, const Vector3 orientation[], const Vector3& extent);
 

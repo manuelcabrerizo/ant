@@ -91,13 +91,11 @@ void Game::Init()
      //RenderComponent *render = actorManager.GetComponent<RenderComponent>(weapon->weapon);
      //render->isAnimated = true;
      
-
      actorManager.CreateActorFromFile("data/xml/test-level.xml");
      actorManager.CreateActorFromFile("data/xml/tower.xml");
      actorManager.CreateActorFromFile("data/xml/house.xml");
      actorManager.CreateActorFromFile("data/xml/wizard.xml");
 
-     
      SlotmapKey<Actor> enemy[3] =
      {
           actorManager.CreateActorFromFile("data/xml/enemy.xml"),
@@ -224,11 +222,44 @@ void Game::Render(f32 dt)
     GraphicsManager::Get()->DebugDrawSphere(b.ClosestPoint(transform->position), 0.125f, 6, 6, Vector3(1, 1, 0));
     GraphicsManager::Get()->DebugDrawSphere(c.ClosestPoint(transform->position), 0.125f, 6, 6, Vector3(1, 1, 0));
 
+
+    // Cylinder Test
+    {
+        Cylinder cylinder;
+        cylinder.Init(Vector3(8.0f, 2.0f, 20.0f), Vector3(8.0f, 4.0f, 20.0f), 0.5f);
+        cylinder.DebugDraw(16, Vector3(1, 1, 0));
+
+        Segment viewSegment;
+        viewSegment.Init(transform->position, transform->position + transform->direction * 100);
+        float hit;
+        if (viewSegment.Intersect(cylinder, hit))
+        {
+            Vector3 point = viewSegment.a + (viewSegment.b - viewSegment.a) * hit;
+            GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
+        }
+    }
+    // Capsule Test
+    {
+        Capsule cylinder;
+        cylinder.Init(Vector3(6.0f, 2.0f, 20.0f), Vector3(10.0f, 4.0f, 20.0f), 0.5f);
+        cylinder.DebugDraw(16, Vector3(1, 1, 0));
+
+        Segment viewSegment;
+        viewSegment.Init(transform->position, transform->position + transform->direction * 100);
+        float hit;
+        if (viewSegment.Intersect(cylinder, hit))
+        {
+            Vector3 point = viewSegment.a + (viewSegment.b - viewSegment.a) * hit;
+            GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
+        }
+    }
+
     actorManager.RenderComponents<RenderComponent>();
 
     GraphicsManager::Get()->DebugPresent();
     GraphicsManager::Get()->EndFrame(1);
 
+    // TODO: this is down here for the debug renderer
     GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
 }
 

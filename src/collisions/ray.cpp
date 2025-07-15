@@ -51,3 +51,8 @@ bool Ray::Intersect(const Sphere& sphere, f32& t) const
 
     return true;
 }
+
+bool Ray::Intersect(const Capsule& capsule, float& t) const
+{
+    return false;
+}

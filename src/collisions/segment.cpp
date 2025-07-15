@@ -5,6 +5,7 @@
 #include "triangle.h"
 #include "sphere.h"
 #include "cylinder.h"
+#include "capsule.h"
 
 void Segment::Init(Vector3 a, Vector3 b)
 {
@@ -28,10 +29,9 @@ bool Segment::Intersect(const Triangle& triangle, f32& t) const
 bool Segment::Intersect(const Sphere& sphere, f32& t) const
 {
     Vector3 ab = b - a;
-    Vector3 o = a;
     Vector3 d = ab.Normalized();
 
-    Vector3 m = o - sphere.GetCenter();
+    Vector3 m = a - sphere.GetCenter();
     f32 b_ = m.Dot(d);
     f32 c = m.Dot(m) - sphere.GetRadio() * sphere.GetRadio();
 
@@ -49,11 +49,12 @@ bool Segment::Intersect(const Sphere& sphere, f32& t) const
 
     t = -b_ - sqrtf(discr);
 
-    if (t * t > ab.Dot(ab))
+    if (t*t > ab.MagnitudeSq())
     {
         return false;
     }
 
+    t /= ab.Magnitude();
     if (t < 0.0f)
     {
         t = 0.0f;
@@ -63,28 +64,22 @@ bool Segment::Intersect(const Sphere& sphere, f32& t) const
 
 }
 
-static const float EPSILON = 0.001f;
-
-bool Segment::Intersect(const Cylinder& cylinder, f32& t) const
+static const float EPSILON = 0.000001f;
+bool Segment::Intersect(const Cylinder& cylinder, float& t) const
 {
-    Vector3 d = cylinder.q - cylinder.p, m = a - cylinder.p, n = b - a;
+    Vector3 p = cylinder.GetP();
+    Vector3 q = cylinder.GetQ();
+    float r = cylinder.GetRadio();
+
+    Vector3 d = q - p, m = a - p, n = b - a;
     f32 md = m.Dot(d);
     f32 nd = n.Dot(d);
     f32 dd = d.Dot(d);
-
-    if (md < 0.0f && md + nd < 0.0f)
-    {
-        return false;
-    }
-    if (md > dd && md + nd > dd)
-    {
-        return false;
-    }
-
     f32 nn = n.Dot(n);
     f32 mn = m.Dot(n);
+
     f32 a_ = dd * nn - nd * nd;
-    f32 k = m.Dot(m) - cylinder.r * cylinder.r;
+    f32 k = m.Dot(m) - r * r;
     f32 c = dd * k - md * md;
 
     if (fabsf(a_) < EPSILON)
@@ -118,28 +113,98 @@ bool Segment::Intersect(const Cylinder& cylinder, f32& t) const
 
     t = (-b_ - sqrtf(discr)) / a_;
 
-    if (t < 0.0f || t > 1.0f)
-    {
-        return false;
-    }
-
-    if (md + t * nd < 0.0f)
+    if ((md + t * nd) < 0)
     {
         if (nd <= 0.0f)
         {
             return false;
         }
-        t = -md / nd;
-        return k + 2 * t * (mn + t * nn) <= 0.0f;
+        else
+        {
+            t = -md / nd;
+            Vector3 x = a + n*t;
+            return (x - p).MagnitudeSq() <= r * r;
+        }
     }
-    else if (md + t * nd > dd)
+
+    if ((md + t * nd > dd))
     {
-        if (nd >= 0.0f)
+        if (nd >= 0)
         {
             return false;
         }
-        t = (dd - md) / nd;
-        return k + dd - 2 * md + t * (2 * (mn - nd) + t * nn) <= 0.0f;
+        else
+        {
+            t = (dd - md) / nd;
+            Vector3 x = a + n * t;
+            return (x - q).MagnitudeSq() <= r * r;
+        }
+    }
+
+    return true;
+}
+
+bool Segment::Intersect(const Capsule& capsule, float& t) const
+{
+    Vector3 p = capsule.GetA();
+    Vector3 q = capsule.GetB();
+    float r = capsule.GetRadio();
+
+    Vector3 d = q - p, m = a - p, n = b - a;
+    f32 md = m.Dot(d);
+    f32 nd = n.Dot(d);
+    f32 dd = d.Dot(d);
+    f32 nn = n.Dot(n);
+    f32 mn = m.Dot(n);
+
+    f32 a_ = dd * nn - nd * nd;
+    f32 k = m.Dot(m) - r * r;
+    f32 c = dd * k - md * md;
+
+    if (fabsf(a_) < EPSILON)
+    {
+        if (c > 0.0f)
+        {
+            return false;
+        }
+        /*
+        if (md < 0.0f)
+        {
+            t = -mn / nn;
+        }
+        else if (md > dd)
+        {
+            t = (nd - mn) / nn;
+        }
+        else
+        {
+            t = 0.0f;
+        }
+        return true;
+        */
+    }
+
+    f32 b_ = dd * mn - nd * md;
+    f32 discr = b_ * b_ - a_ * c;
+    if (discr < 0.0f)
+    {
+        return false;
+    }
+
+    t = (-b_ - sqrtf(discr)) / a_;
+
+    if ((md + t * nd) < 0)
+    {
+        Sphere sphere;
+        sphere.Init(p, r);
+        return Intersect(sphere, t);   
+    }
+
+    if ((md + t * nd > dd))
+    {
+        Sphere sphere;
+        sphere.Init(q, r);
+        return Intersect(sphere, t);   
     }
 
     return true;

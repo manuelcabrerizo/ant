@@ -7,6 +7,8 @@
 #include "triangle.h"
 #include "plane.h"
 #include "cylinder.h"
+#include "aabb.h"
+#include "obb.h"
 
 void Sphere::Init(Vector3 c, f32 r)
 {
@@ -65,6 +67,16 @@ bool Sphere::Intersect(const Plane& plane)
 {
     float dist = Vector3::Dot(c, plane.n) - plane.d;
     return (dist - r) < 0.0f;
+}
+
+bool Sphere::Intersect(const AABB& aabb)
+{
+    return aabb.Intersect(*this);
+}
+
+bool Sphere::Intersect(const OBB& obb)
+{
+    return obb.Intersect(*this);
 }
 
 bool Sphere::DynamicIntersect(const Plane& plane, const Vector3& movement, f32& t) const
@@ -136,7 +148,7 @@ bool Sphere::DynamicIntersect(const Triangle& triangle, const Vector3& movement,
                     if (currentT < t)
                     {
                         Segment segment;
-                        segment.Init(cylinders[i].p, cylinders[i].q);
+                        segment.Init(cylinders[i].GetP(), cylinders[i].GetQ());
 
                         t = currentT;
                         Vector3 hitPos = c + movement * t;
@@ -198,7 +210,7 @@ bool Sphere::DynamicIntersect(const Triangle& triangle, const Vector3& movement,
                 if (currentT < t)
                 {
                     Segment segment;
-                    segment.Init(cylinders[i].p, cylinders[i].q);
+                    segment.Init(cylinders[i].GetP(), cylinders[i].GetQ());
 
                     t = currentT;
                     Vector3 hitPos = c + movement * t;
@@ -245,6 +257,19 @@ bool Sphere::DynamicIntersect(const Triangle& triangle, const Vector3& movement,
 
 Vector3 Sphere::ClosestPoint(const Vector3& point) const
 {
+    Vector3 delta = point - c;
+    if (delta.MagnitudeSq() < r * r)
+    {
+        return point;
+    }
+
     Vector3 dir = (point - c).Normalized();
     return c + dir * r;
+}
+
+float Sphere::SqDistPoint(const Vector3& point) const
+{
+    Vector3 closest = ClosestPoint(point);
+    float sqDist = Vector3::Dot(closest - point, closest - point);
+    return sqDist;
 }
