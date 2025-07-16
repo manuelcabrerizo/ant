@@ -226,12 +226,67 @@ bool Segment::Intersect(const Plane& plane, float& t) const
 
 bool Segment::Intersect(const AABB& aabb, float& t) const
 {
-    return false;
+    Vector3 min = aabb.GetMin();
+    Vector3 max = aabb.GetMax();
+    Vector3 ab = b - a;
+    float length = ab.Magnitude();
+
+    float tmin = 0.0f;
+    float tmax = length;
+
+    ab.Normalize();
+
+    // For all three slabs
+    for (int i = 0; i < 3; i++)
+    {
+        if (fabsf(ab[i]) < EPSILON)
+        {
+            // Ray is parallel to the slab, No hit if origin not within slab
+            if (a[i] < min[i] || a[i] > max[i])
+            {
+                return false;
+            }
+        }
+        else
+        {
+            // Compute intersection t value of ray with near and far plane of slab
+            float ood = 1.0f / ab[i];
+            float t1 = (min[i] - a[i]) * ood;
+            float t2 = (max[i] - a[i]) * ood;
+            // Make t1  be intersection with near plane. t2 with far plane
+            if (t1 > t2) Utils::Swap(t1, t2);
+            // Compute the intersection of slab intersection intervals
+            tmin = std::max(tmin, t1);
+            tmax = std::min(tmax, t2);
+            if (tmin > tmax) return false;
+        }
+    }
+    t = tmin / length;
+    return t >= 0;
 }
 
 bool Segment::Intersect(const OBB& obb, float& t) const
 {
-    return false;
+    // transform the segment in the obb local space
+    Vector3 x = obb.GetOrientation(0);
+    Vector3 y = obb.GetOrientation(1);
+    Vector3 z = obb.GetOrientation(2);
+
+    Matrix4 invRotMat = Matrix4(
+        x[0], x[1], x[2], 0,
+        y[0], y[1], y[2], 0,
+        z[0], z[1], z[2], 0,
+        0, 0, 0, 1);
+
+    Vector3 relA = Matrix4::TransformPoint(invRotMat, a - obb.GetCenter());
+    Vector3 relB = Matrix4::TransformPoint(invRotMat, b - obb.GetCenter());
+
+    Segment relSegment;
+    relSegment.Init(relA, relB);
+
+    AABB aabb;
+    aabb.Init(obb.GetExtent() * -1.0f, obb.GetExtent());
+    return relSegment.Intersect(aabb, t);
 }
 
 Vector3 Segment::ClosestPoint(const Vector3& point, f32& t) const

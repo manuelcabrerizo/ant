@@ -299,13 +299,23 @@ void Game::Render(f32 dt)
         Vector3 extent = Vector3(0.5f, 0.5f, 0.5f);
         aabb.Init(position - extent, position + extent);
 
-
+        /*
         Ray viewRay;
         viewRay.Init(transform->position, transform->direction);
         float hit;
         if (viewRay.Intersect(aabb, hit))
         {
             Vector3 point = viewRay.o + viewRay.d * hit;
+            GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
+        }
+        */
+
+        Segment viewSegment;
+        viewSegment.Init(transform->position, transform->position + transform->direction * 10.0f);
+        float hit;
+        if (viewSegment.Intersect(aabb, hit))
+        {
+            Vector3 point = viewSegment.a + (viewSegment.b - viewSegment.a) * hit;
             GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
         }
 
@@ -318,13 +328,22 @@ void Game::Render(f32 dt)
         OBB obb;
         Vector3 position = Vector3(-2.5, 2, 14);
         obb.Init(position, orientation1, Vector3(0.5, 0.75, 0.5));
-
+        /*
         Ray viewRay;
         viewRay.Init(transform->position, transform->direction);
         float hit;
         if (viewRay.Intersect(obb, hit))
         {
             Vector3 point = viewRay.o + viewRay.d * hit;
+            GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
+        }*/
+
+        Segment viewSegment;
+        viewSegment.Init(transform->position, transform->position + transform->direction * 10.0f);
+        float hit;
+        if (viewSegment.Intersect(obb, hit))
+        {
+            Vector3 point = viewSegment.a + (viewSegment.b - viewSegment.a) * hit;
             GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
         }
 

@@ -254,7 +254,7 @@ bool Ray::Intersect(const AABB& aabb, float& t) const
 
 bool Ray::Intersect(const OBB& obb, float& t) const
 {
-    // create a ray in the obb local space
+    // transform the ray in the obb local space
     Vector3 x = obb.GetOrientation(0);
     Vector3 y = obb.GetOrientation(1);
     Vector3 z = obb.GetOrientation(2);
