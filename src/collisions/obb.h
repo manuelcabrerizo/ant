@@ -5,6 +5,7 @@
 
 class Plane;
 class Sphere;
+class Capsule;
 
 class OBB
 {
@@ -22,6 +23,7 @@ public:
     bool Intersect(const OBB& obb) const;
     bool Intersect(const Plane& plane) const;
     bool Intersect(const Sphere& sphere) const;
+    bool Intersect(const Capsule& capsule) const;
 
 
     Vector3 ClosestPoint(const Vector3& point) const;

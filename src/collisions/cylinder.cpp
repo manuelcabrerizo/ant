@@ -31,6 +31,25 @@ float Cylinder::GetRadio() const
 
 bool Cylinder::Intersect(const Cylinder& cylinder) const
 {
+    Segment segmentA;
+    segmentA.Init(p, q);
+
+    Segment segmentB;
+    segmentB.Init(cylinder.p, cylinder.q);
+
+    Vector3 c1, c2;
+    float s, t;
+    float distSq = segmentA.ClosestPoint(segmentB, c1, s, c2, t);
+    float rSum = r + cylinder.r;
+    if (distSq > rSum * rSum)
+    {
+        // early out
+        return false;
+    }
+
+    Vector3 pq = q - p;
+    float t1 = (c1 - p).Dot(pq) / pq.Dot(pq);
+
     Vector3 closest;
     return false;
 }

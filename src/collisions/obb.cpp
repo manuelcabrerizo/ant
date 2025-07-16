@@ -6,6 +6,9 @@
 
 #include "plane.h"
 #include "sphere.h"
+#include "capsule.h"
+#include "segment.h"
+#include <cfloat>
 
 void OBB::Init(const Vector3& center, const Vector3 orientation[], const Vector3& extent)
 {
@@ -153,6 +156,37 @@ bool OBB::Intersect(const Sphere& sphere) const
     float r = sphere.GetRadio();
     return SqDistPoint(center) <= r * r;
 }
+
+bool OBB::Intersect(const Capsule& capsule) const
+{
+    Vector3 testPoints[3];
+    testPoints[0] = capsule.GetA();
+    testPoints[1] = capsule.GetB();
+    testPoints[2] = testPoints[0] + (testPoints[1] - testPoints[0]) * 0.5f;
+
+    Vector3 closestOnBox;
+    float minDistSq = FLT_MAX;
+    for (int i = 0; i < 3; ++i)
+    {
+        Vector3 closest = ClosestPoint(testPoints[i]);
+        float distSq = (testPoints[i] - closest).MagnitudeSq();
+        if (distSq < minDistSq)
+        {
+            minDistSq = distSq;
+            closestOnBox = closest;
+        }
+    }
+
+    Segment axis;
+    axis.Init(capsule.GetA(), capsule.GetB());
+    float t;
+    Vector3 closestOnSegment = axis.ClosestPoint(closestOnBox, t);
+    
+    Sphere sphere;
+    sphere.Init(closestOnSegment, capsule.GetRadio());
+    return Intersect(sphere);
+}
+
 
 
 Vector3 OBB::ClosestPoint(const Vector3& point) const

@@ -3,6 +3,7 @@
 #include "collision_utils.h"
 #include "plane.h"
 #include "sphere.h"
+#include <graphics_manager.h>
 
 void AABB::Init(const Vector3& min, const Vector3& max)
 {
@@ -95,4 +96,39 @@ float AABB::SqDistPoint(const Vector3& point) const
         if (v > max[i]) sqDist += (v - max[i]) * (v - max[i]);
     }
     return sqDist;
+}
+
+
+void AABB::DebugDraw(const Vector3& color)
+{
+    Vector3 FLB = min;
+    Vector3 FLT = Vector3(min.x, max.y, min.z);
+    Vector3 FRT = Vector3(max.x, max.y, min.z);
+    Vector3 FRB = Vector3(max.x, min.y, min.z);
+
+    Vector3 BRT = max;
+    Vector3 BLB = Vector3(min.x, min.y, max.z);
+    Vector3 BLT = Vector3(min.x, max.y, max.z);
+    Vector3 BRB = Vector3(max.x, min.y, max.z);
+
+
+    // Front face
+    GraphicsManager::Get()->DebugDrawLine(FLB, FLT, color);
+    GraphicsManager::Get()->DebugDrawLine(FLT, FRT, color);
+    GraphicsManager::Get()->DebugDrawLine(FRT, FRB, color);
+    GraphicsManager::Get()->DebugDrawLine(FRB, FLB, color);
+
+    // Back face
+    GraphicsManager::Get()->DebugDrawLine(BLB, BLT, color);
+    GraphicsManager::Get()->DebugDrawLine(BLT, BRT, color);
+    GraphicsManager::Get()->DebugDrawLine(BRT, BRB, color);
+    GraphicsManager::Get()->DebugDrawLine(BRB, BLB, color);
+
+    // Left face
+    GraphicsManager::Get()->DebugDrawLine(BLB, FLB, color);
+    GraphicsManager::Get()->DebugDrawLine(FLT, BLT, color);
+
+    // Right face
+    GraphicsManager::Get()->DebugDrawLine(BRB, FRB, color);
+    GraphicsManager::Get()->DebugDrawLine(FRT, BRT, color);
 }

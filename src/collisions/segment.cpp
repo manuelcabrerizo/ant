@@ -6,6 +6,9 @@
 #include "sphere.h"
 #include "cylinder.h"
 #include "capsule.h"
+#include "aabb.h"
+#include "obb.h"
+
 #include <utils.h>
 
 static const float EPSILON = 0.000001f;
@@ -213,6 +216,22 @@ bool Segment::Intersect(const Capsule& capsule, float& t) const
     }
 
     return t <= 1.0f;
+}
+
+bool Segment::Intersect(const Plane& plane, float& t) const
+{
+    t = (plane.d - Vector3::Dot(plane.n, a)) / Vector3::Dot(plane.n, (b - a));
+    return t >= 0.0f && t <= 1.0f;
+}
+
+bool Segment::Intersect(const AABB& aabb, float& t) const
+{
+    return false;
+}
+
+bool Segment::Intersect(const OBB& obb, float& t) const
+{
+    return false;
 }
 
 Vector3 Segment::ClosestPoint(const Vector3& point, f32& t) const

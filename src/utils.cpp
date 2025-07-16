@@ -38,3 +38,9 @@ float Utils::Clamp(float n, float min, float max)
     return n;
 }
 
+void Utils::Swap(float& a, float& b)
+{
+    float temp = a;
+    a = b;
+    b = temp;
+}

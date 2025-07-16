@@ -177,7 +177,7 @@ void Game::Render(f32 dt)
         Vector3(rot[0][2], rot[1][2], rot[2][2]) 
     };
 
-    rot = Matrix4::RotateX(time);
+    rot = Matrix4::RotateX(time) * Matrix4::RotateZ(time);
 
     Vector3 orientation1[] =
     {
@@ -246,6 +246,7 @@ void Game::Render(f32 dt)
         //    GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
         //}
     }
+
     // Capsule Test
     {
         Capsule capsule;
@@ -265,28 +266,71 @@ void Game::Render(f32 dt)
         }
     }
 
-    // Capsule Capsule Test
+    // Capsule OBB Test
     {
         Vector3 positionA = Vector3(6, 2, 15);
         Vector3 offsetA = Vector3(0, 0.5f, 0);
         Capsule capsuleA;
         capsuleA.Init(positionA - offsetA, positionA + offsetA, 0.5f);
 
-
+        OBB obb;
         Vector3 positionB = Vector3(6, 5, 15).Lerp(Vector3(6, 2, 15), sinf(time) * 0.5f + 0.5f);
-        Vector3 offsetB = Vector3(1, 0, 0);
-        Capsule capsuleB;
-        capsuleB.Init(positionB - offsetB, positionB + offsetB, 0.5f);
+        obb.Init(positionB, orientation1, Vector3(1, 1, 1));
+
+        //Vector3 offsetB = Vector3(1, 0, 0);
+        //Capsule capsuleB;
+        //capsuleB.Init(positionB - offsetB, positionB + offsetB, 0.5f);
 
         Vector3 color = Vector3(0, 1, 0);
-        if (capsuleA.Intersect(capsuleB))
+        if (obb.Intersect(capsuleA))
         {
             color = Vector3(1, 0, 0);
         }
 
         capsuleA.DebugDraw(8,color);
-        capsuleB.DebugDraw(8, color);
+        obb.DebugDraw(color);
     }
+
+    
+    // AABB Ray Test
+    {
+        AABB aabb;
+        Vector3 position = Vector3(-1, 2, 14);
+        Vector3 extent = Vector3(0.5f, 0.5f, 0.5f);
+        aabb.Init(position - extent, position + extent);
+
+
+        Ray viewRay;
+        viewRay.Init(transform->position, transform->direction);
+        float hit;
+        if (viewRay.Intersect(aabb, hit))
+        {
+            Vector3 point = viewRay.o + viewRay.d * hit;
+            GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
+        }
+
+        aabb.DebugDraw(Vector3(0, 1, 0));
+    }
+    
+    
+    // OBB Ray Test
+    {
+        OBB obb;
+        Vector3 position = Vector3(-2.5, 2, 14);
+        obb.Init(position, orientation1, Vector3(0.5, 0.75, 0.5));
+
+        Ray viewRay;
+        viewRay.Init(transform->position, transform->direction);
+        float hit;
+        if (viewRay.Intersect(obb, hit))
+        {
+            Vector3 point = viewRay.o + viewRay.d * hit;
+            GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
+        }
+
+        obb.DebugDraw(Vector3(0, 1, 0));
+    }
+    
 
     actorManager.RenderComponents<RenderComponent>();
 

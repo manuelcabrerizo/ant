@@ -18,4 +18,5 @@ public:
     static Quaternion FromAssimp(aiQuaternion m);
     static i32 NextPower2(u32 x);
     static float Clamp(float n, float min, float max);
+    static void Swap(float& a, float& b);
 };

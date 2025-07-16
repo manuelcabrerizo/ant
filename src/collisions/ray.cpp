@@ -6,6 +6,11 @@
 #include "sphere.h"
 #include "cylinder.h"
 #include "capsule.h"
+#include "aabb.h"
+#include "obb.h"
+
+#include <utils.h>
+#include <cfloat>
 
 static const float EPSILON = 0.000001f;
 
@@ -202,6 +207,75 @@ bool Ray::Intersect(const Capsule& capsule, float& t) const
     }
 
     return true;
+}
+
+bool Ray::Intersect(const Plane& plane, float& t) const
+{
+    t = (plane.d - Vector3::Dot(plane.n, o)) / Vector3::Dot(plane.n, d);
+    return t >= 0.0f;
+}
+
+bool Ray::Intersect(const AABB& aabb, float& t) const
+{
+    Vector3 min = aabb.GetMin();
+    Vector3 max = aabb.GetMax();
+
+    float tmin = 0.0f;
+    float tmax = FLT_MAX;
+
+    // For all three slabs
+    for (int i = 0; i < 3; i++)
+    {
+        if (fabsf(d[i]) < EPSILON)
+        {
+            // Ray is parallel to the slab, No hit if origin not within slab
+            if (o[i] < min[i] || o[i] > max[i])
+            {
+                return false;
+            }
+        }
+        else
+        {
+            // Compute intersection t value of ray with near and far plane of slab
+            float ood = 1.0f / d[i];
+            float t1 = (min[i] - o[i]) * ood;
+            float t2 = (max[i] - o[i]) * ood;
+            // Make t1  be intersection with near plane. t2 with far plane
+            if (t1 > t2) Utils::Swap(t1, t2);
+            // Compute the intersection of slab intersection intervals
+            tmin = std::max(tmin, t1);
+            tmax = std::min(tmax, t2);
+            if (tmin > tmax) return false;
+        }
+    }
+    t = tmin;
+    return true;
+}
+
+bool Ray::Intersect(const OBB& obb, float& t) const
+{
+    // create a ray in the obb local space
+    Vector3 x = obb.GetOrientation(0);
+    Vector3 y = obb.GetOrientation(1);
+    Vector3 z = obb.GetOrientation(2);
+
+    Matrix4 invRotMat = Matrix4(
+        x[0], y[0], z[0], 0,
+        x[1], y[1], z[1], 0,
+        x[2], y[2], z[2], 0,
+        0, 0, 0, 1);
+
+    invRotMat = Matrix4::Transposed(invRotMat);
+
+    Vector3 relOrigin = Matrix4::TransformPoint(invRotMat, o - obb.GetCenter());
+    Vector3 relDirection = Matrix4::TransformVector(invRotMat, d).Normalized();
+
+    Ray relRay;
+    relRay.Init(relOrigin, relDirection);
+
+    AABB aabb;
+    aabb.Init(obb.GetExtent() * -1.0f, obb.GetExtent());
+    return relRay.Intersect(aabb, t);
 }
 
 Vector3 Ray::ClosestPoint(const Vector3& point, float& t) const
