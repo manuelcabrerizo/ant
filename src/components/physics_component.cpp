@@ -48,7 +48,7 @@ void PhysicsComponent::ProcessPhysics(float dt)
 
 void PhysicsComponent::ProcessColisionDetectionAndResolution()
 {
-    f32 colliderRadius = 0.5f;
+    f32 colliderRadius = 0.25f;
 
     // Grounded test
     Segment groundSegment;
@@ -62,7 +62,7 @@ void PhysicsComponent::ProcessColisionDetectionAndResolution()
     Array<CollisionData> collisionData;
     collisionData.Init(MAX_COLLISION_COUNT, FRAME_MEMORY);
 
-    Vector3 halfHeight = Vector3(0, 0.75, 0);
+    Vector3 halfHeight = Vector3(0, 0.5, 0);
     Capsule capsule;
     capsule.Init(
         (transform->position - halfHeight) + offset,
@@ -76,27 +76,29 @@ void PhysicsComponent::ProcessColisionDetectionAndResolution()
 
     if(collisionWorld.Intersect(capsule, collisionData))
     {
-         while(collisionData.size > 0)
-         {
+        int iterations = 0;
+        while(collisionData.size > 0 && iterations < 10)
+        {
             Vector3 n = collisionData[0].n;
-              f32 penetration = collisionData[0].penetration;
-              transform->position += n * penetration;
-              transform->position += n * 0.001f;
-              acceleration = Vector3(0.0f);
-              velocity -= n * velocity.Dot(n);
+            f32 penetration = collisionData[0].penetration;
+            transform->position += n * penetration;
+            transform->position += n * 0.001f;
+            acceleration = Vector3(0.0f);
+            velocity -= n * velocity.Dot(n);
 
-              collisionData.Clear();
+            collisionData.Clear();
 
-              //sphere.Init(transform->position + offset, colliderRadius);
-              capsule.Init(
-                  (transform->position - halfHeight) + offset,
-                  (transform->position + halfHeight) + offset,
-                  colliderRadius);
-              collisionWorld.Intersect(capsule, collisionData);                    
-         }    
+            //sphere.Init(transform->position + offset, colliderRadius);
+            capsule.Init(
+                (transform->position - halfHeight) + offset,
+                (transform->position + halfHeight) + offset,
+                colliderRadius);
+            collisionWorld.Intersect(capsule, collisionData);
+            iterations++;
+        }    
     }
 
-    capsule.DebugDraw(16, Vector3(0, 1, 0));
+    //capsule.DebugDraw(16, Vector3(0, 1, 0));
 
     MemoryManager::Get()->ReleaseFrame(frame);
 }
