@@ -53,7 +53,7 @@ void PhysicsComponent::ProcessColisionDetectionAndResolution()
     // Grounded test
     Segment groundSegment;
     Vector3 colliderPos = transform->position + offset;
-    groundSegment.Init(colliderPos, colliderPos - Vector3(0.0f, colliderRadius + 0.05f, 0.0f));
+    groundSegment.Init(colliderPos, colliderPos - Vector3(0.0f, colliderRadius + 0.80f, 0.0f));
     float tOut; Vector3 nOut;
     grounded = collisionWorld.Intersect(groundSegment, tOut, nOut);
 
@@ -62,9 +62,19 @@ void PhysicsComponent::ProcessColisionDetectionAndResolution()
     Array<CollisionData> collisionData;
     collisionData.Init(MAX_COLLISION_COUNT, FRAME_MEMORY);
 
+    Vector3 halfHeight = Vector3(0, 0.75, 0);
+    Capsule capsule;
+    capsule.Init(
+        (transform->position - halfHeight) + offset,
+        (transform->position + halfHeight) + offset,
+        colliderRadius);
+
+    /*
     Sphere sphere;
     sphere.Init(transform->position + offset, colliderRadius);
-    if(collisionWorld.Intersect(sphere, collisionData))
+    */
+
+    if(collisionWorld.Intersect(capsule, collisionData))
     {
          while(collisionData.size > 0)
          {
@@ -77,9 +87,16 @@ void PhysicsComponent::ProcessColisionDetectionAndResolution()
 
               collisionData.Clear();
 
-              sphere.Init(transform->position + offset, colliderRadius);
-              collisionWorld.Intersect(sphere, collisionData);                    
+              //sphere.Init(transform->position + offset, colliderRadius);
+              capsule.Init(
+                  (transform->position - halfHeight) + offset,
+                  (transform->position + halfHeight) + offset,
+                  colliderRadius);
+              collisionWorld.Intersect(capsule, collisionData);                    
          }    
     }
+
+    capsule.DebugDraw(16, Vector3(0, 1, 0));
+
     MemoryManager::Get()->ReleaseFrame(frame);
 }

@@ -1,9 +1,15 @@
 #include "aabb.h"
 
 #include "collision_utils.h"
+
+#include "obb.h"
 #include "plane.h"
 #include "sphere.h"
+#include "capsule.h"
+#include "segment.h"
+
 #include <graphics_manager.h>
+#include <cfloat>
 
 void AABB::Init(const Vector3& min, const Vector3& max)
 {
@@ -47,6 +53,12 @@ bool AABB::Intersect(const AABB& aabb) const
     return true;
 }
 
+bool AABB::Intersect(const OBB& obb) const
+{
+    return obb.Intersect(*this);
+}
+
+
 bool AABB::Intersect(const Plane& plane) const
 {
     Vector3 vertices[8] = 
@@ -65,6 +77,37 @@ bool AABB::Intersect(const Plane& plane) const
     }
     return contactFound > 0;
 }
+
+bool AABB::Intersect(const Capsule& capsule) const
+{
+    Vector3 testPoints[3];
+    testPoints[0] = capsule.GetA();
+    testPoints[1] = capsule.GetB();
+    testPoints[2] = testPoints[0] + (testPoints[1] - testPoints[0]) * 0.5f;
+
+    Vector3 closestOnBox;
+    float minDistSq = FLT_MAX;
+    for (int i = 0; i < 3; ++i)
+    {
+        Vector3 closest = ClosestPoint(testPoints[i]);
+        float distSq = (testPoints[i] - closest).MagnitudeSq();
+        if (distSq < minDistSq)
+        {
+            minDistSq = distSq;
+            closestOnBox = closest;
+        }
+    }
+
+    Segment axis;
+    axis.Init(capsule.GetA(), capsule.GetB());
+    float t;
+    Vector3 closestOnSegment = axis.ClosestPoint(closestOnBox, t);
+
+    Sphere sphere;
+    sphere.Init(closestOnSegment, capsule.GetRadio());
+    return Intersect(sphere);
+}
+
 
 bool AABB::Intersect(const Sphere& sphere) const
 {

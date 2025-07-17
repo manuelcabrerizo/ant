@@ -132,6 +132,27 @@ bool CollisionWorld::Intersect(Sphere& sphere, Array<CollisionData>& collisionDa
      return collisionData.size > 0;
 }
 
+bool CollisionWorld::Intersect(const Capsule& capsule, Array<CollisionData>& collisionData)
+{
+    for (i32 i = 0; i < triangles.size; ++i)
+    {
+        f32 penetration;
+        Vector3 n;
+        if (capsule.Intersect(triangles[i], n, penetration))
+        {
+            if (collisionData.size < MAX_COLLISION_COUNT)
+            {
+                CollisionData cd;
+                cd.n = n;
+                cd.penetration = penetration;
+                collisionData.Push(cd);
+            }
+        }
+    }
+    SortCollisionByPenetration(collisionData);
+    return collisionData.size > 0;
+}
+
 bool CollisionWorld::DynamicIntersect(Sphere& sphere, Vector3 movement,
                                       Array<CollisionData>& collisionData)
 {    

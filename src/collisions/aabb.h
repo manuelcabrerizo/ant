@@ -6,6 +6,8 @@
 
 class Plane;
 class Sphere;
+class Capsule;
+class OBB;
 
 class AABB
 {
@@ -20,8 +22,10 @@ public:
     Vector3 GetMax() const;
 
     bool Intersect(const AABB& aabb) const;
+    bool Intersect(const OBB& obb) const;
     bool Intersect(const Plane& plane) const;
     bool Intersect(const Sphere& sphere) const;
+    bool Intersect(const Capsule& capsule) const;
 
     Vector3 ClosestPoint(const Vector3& point) const;
     float SqDistPoint(const Vector3& point) const;

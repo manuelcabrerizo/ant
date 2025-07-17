@@ -13,6 +13,7 @@
 #include <collisions/cylinder.h>
 #include <collisions/capsule.h>
 #include <collisions/triangle.h>
+#include <collisions/capsule.h>
 
 #define MAX_COLLISION_COUNT 16
 
@@ -30,6 +31,8 @@ public:
      bool Intersect(Segment& segment, f32& t, Vector3& n);
      bool Intersect(Ray& ray, f32& t, Vector3& n);
      bool Intersect(Sphere& sphere, Array<CollisionData>& collisionData);
+     bool Intersect(const Capsule& capsule, Array<CollisionData>& collisionData);
+
      bool DynamicIntersect(Sphere& sphere, Vector3 movement, Array<CollisionData>& collisionData);
 private:
      Array<Triangle> triangles;    

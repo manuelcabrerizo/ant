@@ -9,6 +9,7 @@
 #include "cylinder.h"
 #include "aabb.h"
 #include "obb.h"
+#include "capsule.h"
 
 void Sphere::Init(Vector3 c, f32 r)
 {
@@ -53,21 +54,27 @@ bool Sphere::Intersect(const Triangle& triangle, Vector3& n, f32& penetration) c
     return lenSq <= r * r;
 }
 
-bool Sphere::Intersect(const Plane& plane)
+bool Sphere::Intersect(const Plane& plane) const
 {
     float dist = Vector3::Dot(c, plane.n) - plane.d;
     return (dist - r) < 0.0f;
 }
 
-bool Sphere::Intersect(const AABB& aabb)
+bool Sphere::Intersect(const AABB& aabb) const
 {
     return aabb.Intersect(*this);
 }
 
-bool Sphere::Intersect(const OBB& obb)
+bool Sphere::Intersect(const OBB& obb) const
 {
     return obb.Intersect(*this);
 }
+
+bool Sphere::Intersect(const Capsule& capsule) const
+{
+    return capsule.Intersect(*this);
+}
+
 
 bool Sphere::DynamicIntersect(const Plane& plane, const Vector3& movement, f32& t) const
 {

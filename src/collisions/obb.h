@@ -3,6 +3,7 @@
 #include <common.h>
 #include <math/vector3.h>
 
+class AABB;
 class Plane;
 class Sphere;
 class Capsule;
@@ -21,6 +22,7 @@ public:
     Vector3 GetExtent() const;
 
     bool Intersect(const OBB& obb) const;
+    bool Intersect(const AABB& aabb) const;
     bool Intersect(const Plane& plane) const;
     bool Intersect(const Sphere& sphere) const;
     bool Intersect(const Capsule& capsule) const;

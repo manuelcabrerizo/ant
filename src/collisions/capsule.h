@@ -28,8 +28,8 @@ public:
     bool Intersect(const Sphere& sphere) const;
     bool Intersect(const Triangle& triangle, Vector3& n, float& penetration) const;
     bool Intersect(const Plane& plane) const;
-    bool Intersect(const AABB& aabb);
-    bool Intersect(const OBB& obb);
+    bool Intersect(const AABB& aabb) const;
+    bool Intersect(const OBB& obb) const;
 
     Vector3 ClosestPoint(const Vector3& point) const;
     float SqDistPoint(const Vector3& point) const;

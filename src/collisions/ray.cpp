@@ -10,7 +10,6 @@
 #include "obb.h"
 
 #include <utils.h>
-#include <cfloat>
 
 static const float EPSILON = 0.000001f;
 

@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\collisions\collider.cpp" />
     <ClCompile Include="src\asset_managers\model_manager.cpp" />
     <ClCompile Include="src\collisions\capsule.cpp" />
     <ClCompile Include="src\collisions\collision_utils.cpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="src\win32_platform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\collisions\collider.h" />
     <ClInclude Include="src\asset_managers\model_manager.h" />
     <ClInclude Include="src\collisions\collision_utils.h" />
     <ClInclude Include="src\actor.h" />

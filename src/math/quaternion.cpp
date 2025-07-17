@@ -5,7 +5,7 @@
 
 float Quaternion::operator[](int index) const
 {
-    ASSERT(index > 0 && index < 4);
+    ASSERT(index >= 0 && index < 4);
     return v[index];
 }
 

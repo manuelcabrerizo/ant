@@ -4,6 +4,7 @@
 
 #include <graphics_manager.h>
 
+#include "aabb.h"
 #include "plane.h"
 #include "sphere.h"
 #include "capsule.h"
@@ -123,6 +124,26 @@ bool OBB::Intersect(const OBB& b) const
     if (Abs(t[1] * R[0][2] - t[0] * R[1][2]) > ra + rb) return false;
 
     return true;
+}
+
+
+bool OBB::Intersect(const AABB& aabb) const
+{
+    // TODO: implement the real version of this funciton
+    Vector3 min = aabb.GetMin();
+    Vector3 max = aabb.GetMax();
+
+    Vector3 extent = (max - min) * 0.5f;
+    Vector3 center = min + extent;
+    Vector3 orientation[3] = {
+        Vector3(1, 0, 0),
+        Vector3(0, 1, 0),
+        Vector3(0, 0, 1)
+    };
+
+    OBB obb;
+    obb.Init(center, orientation, extent);
+    return Intersect(obb);
 }
 
 bool OBB::Intersect(const Plane& plane) const

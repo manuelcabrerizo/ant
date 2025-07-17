@@ -62,22 +62,39 @@ bool Capsule::Intersect(const Sphere& sphere) const
 
 bool Capsule::Intersect(const Triangle& triangle, Vector3& n, float& penetration) const
 {
-    return false;
+    Plane plane;
+    plane.Init(triangle);
+    float t = (plane.d - Vector3::Dot(plane.n, a)) / Vector3::Dot(plane.n, (b - a));
+
+    Vector3 closestOnPlane = a + (b - a) * t;
+    Vector3 closestOnTriangle = triangle.ClosestPoint(closestOnPlane);
+
+    Segment axis;
+    axis.Init(a, b);
+    Vector3 closestOnSegment = axis.ClosestPoint(closestOnTriangle, t);
+
+    Sphere sphere;
+    sphere.Init(closestOnSegment, r);
+    return sphere.Intersect(triangle, n, penetration);
 }
 
 bool Capsule::Intersect(const Plane& plane) const
 {
-    return false;
+    Sphere aSphere;
+    aSphere.Init(a, r);
+    Sphere bSphere;
+    bSphere.Init(b, r);
+    return aSphere.Intersect(plane) || bSphere.Intersect(plane);
 }
 
-bool Capsule::Intersect(const AABB& aabb)
+bool Capsule::Intersect(const AABB& aabb) const
 {
-    return false;
+    return aabb.Intersect(*this);
 }
 
-bool Capsule::Intersect(const OBB& obb)
+bool Capsule::Intersect(const OBB& obb) const
 {
-    return false;
+    return obb.Intersect(*this);
 }
 
 Vector3 Capsule::ClosestPoint(const Vector3& point) const

@@ -18,6 +18,6 @@
     <PhysicsComponent>
         <acceleration x="0" y="0" z="0"/>
         <velocity x="0" y="0" z="0"/>
-        <offset x="0" y="-0.5" z="0"/>
+        <offset x="0" y="0" z="0"/>
     </PhysicsComponent>
 </Actor>
