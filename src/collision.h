@@ -13,20 +13,22 @@
 #include <collisions/cylinder.h>
 #include <collisions/capsule.h>
 #include <collisions/triangle.h>
-#include <collisions/capsule.h>
 
 #define MAX_COLLISION_COUNT 16
 
 struct CollisionData
 {
-     Vector3 n;
-     f32 penetration;
-     f32 t;
+    Vector3 point;
+    Vector3 n;
+    f32 penetration;
+    f32 t;
 };
 
 class CollisionWorld
 {
 public:
+    void AddOBB(const OBB& obb);
+
      void LoadFromFile(const char *);
      bool Intersect(Segment& segment, f32& t, Vector3& n);
      bool Intersect(Ray& ray, f32& t, Vector3& n);
@@ -35,7 +37,11 @@ public:
 
      bool DynamicIntersect(Sphere& sphere, Vector3 movement, Array<CollisionData>& collisionData);
 private:
-     Array<Triangle> triangles;    
+     Array<Triangle> triangles;  
+     Array<AABB> aabbs;
+     Array<OBB> obbs;
+     Array<Sphere> spheres;
+     Array<Capsule> capsules;
 };
 
 

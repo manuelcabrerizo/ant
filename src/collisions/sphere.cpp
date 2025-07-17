@@ -38,19 +38,10 @@ bool Sphere::Intersect(const Sphere& sphere) const
 bool Sphere::Intersect(const Triangle& triangle, Vector3& n, f32& penetration) const
 {
     Vector3 closest = triangle.ClosestPoint(c);
-
     Vector3 toSphere = c - closest;
-
     f32 lenSq = toSphere.Dot(toSphere);
-
     n = toSphere.Normalized();
-
     penetration = r - sqrtf(lenSq);
-    if (lenSq <= r * r)
-    {
-        i32 StopHere = 0;
-    }
-
     return lenSq <= r * r;
 }
 

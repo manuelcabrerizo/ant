@@ -5,11 +5,50 @@
 
 #include <memory_manager.h>
 
+#include <collisions/obb.h>
+#include <math/algebra.h>
+
 CollisionWorld PhysicsComponent::collisionWorld;
 
 void PhysicsComponent::Initialize()
 {
     collisionWorld.LoadFromFile("data/collision/level-collision.obj");
+
+    Matrix4 rot = Matrix4::RotateY(ANT_PI/4);
+    Vector3 orientation[] =
+    {
+        Vector3(rot[0][0], rot[1][0], rot[2][0]),
+        Vector3(rot[0][1], rot[1][1], rot[2][1]),
+        Vector3(rot[0][2], rot[1][2], rot[2][2])
+    };
+
+    OBB obb;
+    obb.Init(Vector3(6, 1.5, 3), orientation, Vector3(1, 0.5f, 1));
+    collisionWorld.AddOBB(obb);
+
+    OBB obb1;
+    obb1.Init(Vector3(8, 2.5, 3), orientation, Vector3(1, 0.5f, 1));
+    collisionWorld.AddOBB(obb1);
+
+    OBB obb2;
+    obb2.Init(Vector3(10, 3.5, 3), orientation, Vector3(1, 0.5f, 1));
+    collisionWorld.AddOBB(obb2);
+
+    Vector3 orientation2[] =
+    {
+        Vector3(1, 0, 0),
+        Vector3(0, 1, 0),
+        Vector3(0, 0, 1)
+    };
+
+    OBB obb3;
+    obb3.Init(Vector3(-3, 2.25, 10), orientation2, Vector3(2, 1, 2));
+    collisionWorld.AddOBB(obb3);
+
+    OBB obb4;
+    obb4.Init(Vector3(-3, 1.5, 7.5), orientation2, Vector3(1, 0.5, 1));
+    collisionWorld.AddOBB(obb4);
+
 }
 
 void PhysicsComponent::Terminate()

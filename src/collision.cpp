@@ -6,6 +6,15 @@
 #include <utils.h>
 #include <assimp/postprocess.h>
 
+void CollisionWorld::AddOBB(const OBB& obb)
+{
+    if (obbs.capacity == 0)
+    {
+        obbs.Init(10, STATIC_MEMORY);
+    }   
+    obbs.Push(obb);
+}
+
 void CollisionWorld::LoadFromFile(const char *filepath)
 {
      const aiScene *scene = Utils::importer.ReadFile(filepath, aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder);
@@ -58,6 +67,21 @@ bool CollisionWorld::Intersect(Segment& segment, f32& t, Vector3& n)
                }
           }
      }
+
+     for (i32 i = 0; i < obbs.size; ++i)
+     {
+         f32 currentT;
+         if (segment.Intersect(obbs[i], currentT))
+         {
+             if (currentT < t)
+             {
+                 t = currentT;
+                 // TODO:
+                 n = Vector3();
+             }
+         }
+     }
+
      return t != FLT_MAX;
 }
 
@@ -149,6 +173,20 @@ bool CollisionWorld::Intersect(const Capsule& capsule, Array<CollisionData>& col
             }
         }
     }
+
+    for (i32 i = 0; i < obbs.size; ++i)
+    {
+        obbs[i].DebugDraw(Vector3(0, 1, 0));
+        CollisionData cd;
+        if (capsule.Intersect(obbs[i], &cd))
+        {
+            if (collisionData.size < MAX_COLLISION_COUNT)
+            {
+                collisionData.Push(cd);
+            }
+        }
+    }
+
     SortCollisionByPenetration(collisionData);
     return collisionData.size > 0;
 }

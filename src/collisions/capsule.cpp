@@ -92,9 +92,9 @@ bool Capsule::Intersect(const AABB& aabb) const
     return aabb.Intersect(*this);
 }
 
-bool Capsule::Intersect(const OBB& obb) const
+bool Capsule::Intersect(const OBB& obb, CollisionData* collisionData) const
 {
-    return obb.Intersect(*this);
+    return obb.Intersect(*this, collisionData);
 }
 
 Vector3 Capsule::ClosestPoint(const Vector3& point) const
