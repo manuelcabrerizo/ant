@@ -15,6 +15,15 @@ void CollisionWorld::AddOBB(const OBB& obb)
     obbs.Push(obb);
 }
 
+void CollisionWorld::AddTriangle(const Triangle& triangle)
+{
+    if (triangles.capacity == 0)
+    {
+        triangles.Init(10, STATIC_MEMORY);
+    }
+    triangles.Push(triangle);
+}
+
 void CollisionWorld::LoadFromFile(const char *filepath)
 {
      const aiScene *scene = Utils::importer.ReadFile(filepath, aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder);
@@ -190,6 +199,41 @@ bool CollisionWorld::Intersect(const Capsule& capsule, Array<CollisionData>& col
     SortCollisionByPenetration(collisionData);
     return collisionData.size > 0;
 }
+
+bool CollisionWorld::Intersect(const OBB& obb, Array<CollisionData>& collisionData)
+{
+    for (i32 i = 0; i < triangles.size; ++i)
+    {
+        Vector3 color = Vector3(0, 1, 0);
+        CollisionData cd;
+        if (obb.Intersect(triangles[i], &cd))
+        {
+            color = Vector3(1, 0, 0);
+            if (collisionData.size < MAX_COLLISION_COUNT)
+            {
+                collisionData.Push(cd);
+            }
+        }
+        triangles[i].DebugDraw(color);
+    }   
+
+    for (i32 i = 0; i < obbs.size; ++i)
+    {
+        obbs[i].DebugDraw(Vector3(0, 1, 0));
+        CollisionData cd;
+        if (obb.Intersect(obbs[i], &cd))
+        {
+            if (collisionData.size < MAX_COLLISION_COUNT)
+            {
+                collisionData.Push(cd);
+            }
+        }
+    }
+
+    SortCollisionByPenetration(collisionData);
+    return collisionData.size > 0;
+}
+
 
 bool CollisionWorld::DynamicIntersect(Sphere& sphere, Vector3 movement,
                                       Array<CollisionData>& collisionData)

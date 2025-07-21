@@ -28,20 +28,23 @@ class CollisionWorld
 {
 public:
     void AddOBB(const OBB& obb);
+    void AddTriangle(const Triangle& triangle);
 
-     void LoadFromFile(const char *);
-     bool Intersect(Segment& segment, f32& t, Vector3& n);
-     bool Intersect(Ray& ray, f32& t, Vector3& n);
-     bool Intersect(Sphere& sphere, Array<CollisionData>& collisionData);
-     bool Intersect(const Capsule& capsule, Array<CollisionData>& collisionData);
+    void LoadFromFile(const char *);
+    bool Intersect(Segment& segment, f32& t, Vector3& n);
+    bool Intersect(Ray& ray, f32& t, Vector3& n);
+    bool Intersect(Sphere& sphere, Array<CollisionData>& collisionData);
+    bool Intersect(const Capsule& capsule, Array<CollisionData>& collisionData);
+    bool Intersect(const OBB& obb, Array<CollisionData>& collisionData);
 
-     bool DynamicIntersect(Sphere& sphere, Vector3 movement, Array<CollisionData>& collisionData);
+
+    bool DynamicIntersect(Sphere& sphere, Vector3 movement, Array<CollisionData>& collisionData);
 private:
-     Array<Triangle> triangles;  
-     Array<AABB> aabbs;
-     Array<OBB> obbs;
-     Array<Sphere> spheres;
-     Array<Capsule> capsules;
+    Array<Triangle> triangles;  
+    Array<AABB> aabbs;
+    Array<OBB> obbs;
+    Array<Sphere> spheres;
+    Array<Capsule> capsules;
 };
 
 

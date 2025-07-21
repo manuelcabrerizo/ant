@@ -13,8 +13,13 @@ CollisionWorld PhysicsComponent::collisionWorld;
 void PhysicsComponent::Initialize()
 {
     collisionWorld.LoadFromFile("data/collision/level-collision.obj");
+    
+    //Triangle tri;
+    //tri.Init(Vector3(10, 0, 10), Vector3(12, 0, 0), Vector3(10, 6, 10));
+    //collisionWorld.AddTriangle(tri);
 
-    Matrix4 rot = Matrix4::RotateY(ANT_PI/4);
+
+    Matrix4 rot = Matrix4::RotateY(ANT_PI / 4);
     Vector3 orientation[] =
     {
         Vector3(rot[0][0], rot[1][0], rot[2][0]),
@@ -41,6 +46,10 @@ void PhysicsComponent::Initialize()
         Vector3(0, 0, 1)
     };
 
+    OBB floor;
+    floor.Init(Vector3(0, -0.5, 0), orientation2, Vector3(25, 0.5, 25));
+    collisionWorld.AddOBB(floor);
+
     OBB obb3;
     obb3.Init(Vector3(-3, 2.25, 10), orientation2, Vector3(2, 1, 2));
     collisionWorld.AddOBB(obb3);
@@ -48,7 +57,6 @@ void PhysicsComponent::Initialize()
     OBB obb4;
     obb4.Init(Vector3(-3, 1.5, 7.5), orientation2, Vector3(1, 0.5, 1));
     collisionWorld.AddOBB(obb4);
-
 }
 
 void PhysicsComponent::Terminate()
@@ -101,19 +109,35 @@ void PhysicsComponent::ProcessColisionDetectionAndResolution()
     Array<CollisionData> collisionData;
     collisionData.Init(MAX_COLLISION_COUNT, FRAME_MEMORY);
 
+    /*
     Vector3 halfHeight = Vector3(0, 0.5, 0);
     Capsule capsule;
     capsule.Init(
         (transform->position - halfHeight) + offset,
         (transform->position + halfHeight) + offset,
         colliderRadius);
+    */
 
     /*
     Sphere sphere;
     sphere.Init(transform->position + offset, colliderRadius);
     */
 
-    if(collisionWorld.Intersect(capsule, collisionData))
+    Matrix4 rot = Matrix4::RotateY(ANT_PI / 4);
+    Vector3 orientation[] =
+    {
+        Vector3(rot[0][0], rot[1][0], rot[2][0]),
+        Vector3(rot[0][1], rot[1][1], rot[2][1]),
+        Vector3(rot[0][2], rot[1][2], rot[2][2])
+    };
+
+    Vector3 extent = Vector3(0.25, 0.75, 0.25);
+
+    OBB obb;
+    obb.Init(transform->position + offset, orientation, extent);
+    obb.DebugDraw(Vector3(0, 1, 1));
+
+    if(collisionWorld.Intersect(obb, collisionData))
     {
         int iterations = 0;
         while(collisionData.size > 0 && iterations < 10)
@@ -128,11 +152,13 @@ void PhysicsComponent::ProcessColisionDetectionAndResolution()
             collisionData.Clear();
 
             //sphere.Init(transform->position + offset, colliderRadius);
-            capsule.Init(
-                (transform->position - halfHeight) + offset,
-                (transform->position + halfHeight) + offset,
-                colliderRadius);
-            collisionWorld.Intersect(capsule, collisionData);
+            //capsule.Init(
+            //    (transform->position - halfHeight) + offset,
+            //    (transform->position + halfHeight) + offset,
+            //    colliderRadius);
+            obb.Init(transform->position + offset, orientation, extent);
+
+            collisionWorld.Intersect(obb, collisionData);
             iterations++;
         }    
     }

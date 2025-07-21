@@ -18,6 +18,8 @@ public:
     // TODO: test others implementation
     Vector3 ClosestPoint(const Vector3& q) const;
 
+    void DebugDraw(const Vector3& color);
+
     Vector3 a, b, c;
     Vector3  n;
 };

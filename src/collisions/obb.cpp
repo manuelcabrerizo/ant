@@ -9,23 +9,31 @@
 #include "sphere.h"
 #include "capsule.h"
 #include "segment.h"
+#include "triangle.h"
+
+#include <windows.h>
+#undef min
+#undef max
 
 #include <cfloat>
+#include <algorithm>
 
-float OBB::TransformToAxis(const OBB& obb, const Vector3& axis)
+// Static functions
+
+float OBB::ProjectToAxis(const OBB& obb, const Vector3& axis)
 {
     return
-        obb.e.x * fabsf(axis.Dot(obb.u[0])) +
-        obb.e.y * fabsf(axis.Dot(obb.u[1])) +
-        obb.e.z * fabsf(axis.Dot(obb.u[2]));
+        obb.e.x * fabsf(Vector3::Dot(axis, obb.u[0])) +
+        obb.e.y * fabsf(Vector3::Dot(axis, obb.u[1])) +
+        obb.e.z * fabsf(Vector3::Dot(axis, obb.u[2]));
 }
 
 float OBB::PenetraionOnAxis(const OBB& one, const OBB& two,
     const Vector3& axis, const Vector3& toCenter)
 {
-    float oneProject = TransformToAxis(one, axis);
-    float twoProject = TransformToAxis(two, axis);
-    float distance = fabsf(toCenter.Dot(axis));
+    float oneProject = ProjectToAxis(one, axis);
+    float twoProject = ProjectToAxis(two, axis);
+    float distance = fabsf(Vector3::Dot(toCenter, axis));
     // Return overlap,
     // positive indicates overlap,
     // negative indicates separation
@@ -100,6 +108,8 @@ Vector3 OBB::ContactPoint(
     }
 }
 
+// Member functions
+
 void OBB::Init(const Vector3& center, const Vector3 orientation[], const Vector3& extent)
 {
     this->c = center;
@@ -122,6 +132,11 @@ Vector3 OBB::GetOrientation(int axis) const
 Vector3 OBB::GetExtent() const
 {
     return e;
+}
+
+Matrix4 OBB::GetTransform() const
+{
+    return Matrix4::TransformFromBasis(c, u[0], u[1], u[2]);
 }
 
 #define CHECK_OVERLAP(axis, index) \
@@ -154,9 +169,11 @@ bool OBB::Intersect(const OBB& two, CollisionData* collisionData) const
     CHECK_OVERLAP(Vector3::Cross(one.u[0], two.u[0]), 6);
     CHECK_OVERLAP(Vector3::Cross(one.u[0], two.u[1]), 7);
     CHECK_OVERLAP(Vector3::Cross(one.u[0], two.u[2]), 8);
+
     CHECK_OVERLAP(Vector3::Cross(one.u[1], two.u[0]), 9);
     CHECK_OVERLAP(Vector3::Cross(one.u[1], two.u[1]), 10);
     CHECK_OVERLAP(Vector3::Cross(one.u[1], two.u[2]), 11);
+    
     CHECK_OVERLAP(Vector3::Cross(one.u[2], two.u[0]), 12);
     CHECK_OVERLAP(Vector3::Cross(one.u[2], two.u[1]), 13);
     CHECK_OVERLAP(Vector3::Cross(one.u[2], two.u[2]), 14);
@@ -225,7 +242,7 @@ bool OBB::Intersect(const OBB& two, CollisionData* collisionData) const
         Vector3 axis = oneAxis.Cross(twoAxis);
         axis.Normalize();
 
-        // The axis should point from box one to bos two
+        // The axis should point from box one to box two
         if (axis.Dot(toCenter) > 0) axis *= -1.0f;
 
         // We have the axes, but not the edges: each axis has 4 edges parallel
@@ -248,7 +265,7 @@ bool OBB::Intersect(const OBB& two, CollisionData* collisionData) const
         // Move them into world coordinates (they are already oriented
         // correctly, since thet have been derived from the axes)
         ptOnOneEdge = Matrix4::TransformPoint(one.GetTransform(), ptOnOneEdge);
-        ptOnTwoEdge = Matrix4::TransformPoint(one.GetTransform(), ptOnTwoEdge);
+        ptOnTwoEdge = Matrix4::TransformPoint(two.GetTransform(), ptOnTwoEdge);
 
         // So we have a point and a direction for the colliding edges
         // we need to find out point of closest approach of the two
@@ -324,6 +341,47 @@ bool OBB::Intersect(const Plane& plane, CollisionData* collisionData) const
     return contactFound > 0;
 }
 
+bool OBB::Intersect(const Plane& plane, CollisionData* collisionData, float& smallestPenetration) const
+{
+    Vector3 vertices[8] =
+    {
+        (u[0] * -e.x + u[1] * -e.y + u[2] * -e.z) + c,
+        (u[0] * -e.x + u[1] * e.y + u[2] * -e.z) + c,
+        (u[0] * e.x + u[1] * e.y + u[2] * -e.z) + c,
+        (u[0] * e.x + u[1] * -e.y + u[2] * -e.z) + c,
+        (u[0] * -e.x + u[1] * -e.y + u[2] * e.z) + c,
+        (u[0] * -e.x + u[1] * e.y + u[2] * e.z) + c,
+        (u[0] * e.x + u[1] * e.y + u[2] * e.z) + c,
+        (u[0] * e.x + u[1] * -e.y + u[2] * e.z) + c
+    };
+
+    int contactFound = 0;
+    for (int i = 0; i < 8; i++)
+    {
+        float dist = Vector3::Dot(vertices[i], plane.n);
+        if (dist <= plane.d)
+        {
+            float penetration = plane.d - dist;
+            if (penetration < smallestPenetration)
+            {
+                if (collisionData)
+                {
+                    collisionData->point = plane.n;
+                    collisionData->point *= (dist - plane.d);
+                    collisionData->point += vertices[i];
+                    collisionData->n = plane.n;
+                    collisionData->penetration = penetration;
+                }
+                smallestPenetration = penetration;
+            }
+            contactFound++;
+        }
+    }
+    return contactFound > 0;
+}
+
+
+
 bool OBB::Intersect(const Sphere& sphere, CollisionData* collisionData) const
 {
     Vector3 center = sphere.GetCenter();
@@ -373,7 +431,164 @@ bool OBB::Intersect(const Capsule& capsule, CollisionData* collisionData) const
     return Intersect(sphere, collisionData);
 }
 
+bool OBB::Intersect(const Triangle& triangle, CollisionData* collisionData) const
+{
+    // transform the triangle in the obb local space
+    Vector3 x = u[0];
+    Vector3 y = u[1];
+    Vector3 z = u[2];
 
+    Matrix4 invRotMat = Matrix4(
+        x[0], x[1], x[2], 0,
+        y[0], y[1], y[2], 0,
+        z[0], z[1], z[2], 0,
+        0, 0, 0, 1);
+    Matrix4 rotMat = Matrix4::Transposed(invRotMat);
+
+    Vector3 v0 = Matrix4::TransformPoint(invRotMat, triangle.a - c);
+    Vector3 v1 = Matrix4::TransformPoint(invRotMat, triangle.b - c);
+    Vector3 v2 = Matrix4::TransformPoint(invRotMat, triangle.c - c);
+
+    Vector3 f0 = v1 - v0;
+    Vector3 f1 = v2 - v1;
+    Vector3 f2 = v0 - v2;
+
+    // Category 3
+    Vector3 axes[] =
+    {
+        Vector3::right.Cross(f0),
+        Vector3::right.Cross(f1),
+        Vector3::right.Cross(f2),
+
+        Vector3::up.Cross(f0),
+        Vector3::up.Cross(f1),
+        Vector3::up.Cross(f2),
+
+        Vector3::forward.Cross(f0),
+        Vector3::forward.Cross(f1),
+        Vector3::forward.Cross(f2)
+    };
+    
+    float smallestPenetration = FLT_MAX;
+    int axisIndex;
+
+    /*
+    TODO: Test this:
+    if (pMin > r || pMax < -r)
+    return false;
+    float penetration = std::min(r, pMax) - std::max(-r, pMin);
+    */
+
+    for (int i = 0; i < ARRAY_LENGTH(axes); ++i)
+    {
+        Vector3 axis = axes[i];
+        if (axis.MagnitudeSq() < 0.0001f)
+        {
+            continue;
+        }
+
+        axis.Normalize();
+
+        float r = e[0] * fabsf(Vector3::Dot(Vector3::right, axis)) +
+                  e[1] * fabsf(Vector3::Dot(Vector3::up, axis)) +
+                  e[2] * fabsf(Vector3::Dot(Vector3::forward, axis));
+
+        float p0 = Vector3::Dot(v0, axis);
+        float p1 = Vector3::Dot(v1, axis);
+        float p2 = Vector3::Dot(v2, axis);
+        
+        float pMin = std::min({ p0, p1, p2 });
+        float pMax = std::max({ p0, p1, p2 });
+
+        float proj = std::max(-std::max(pMin, pMax), std::min(pMin, pMax));        
+        if (proj > r)
+        {
+            return false;
+        }
+
+        float penetration = r - proj;
+        if (penetration < smallestPenetration)
+        {
+            smallestPenetration = penetration;
+            axisIndex = i;
+        }
+    }
+
+    Vector3 normal = axes[axisIndex].Normalized();
+
+    // Category 1
+    {
+        float pMin = std::min({ v0.x, v1.x, v2.x });
+        float pMax = std::max({ v0.x, v1.x, v2.x });
+        float proj = std::max(-std::max(pMin, pMax), std::min(pMin, pMax));
+        float r = e[0];
+        if (proj > r)
+        {
+            return false;
+        }
+        float penetration = r - proj;
+        if (penetration < smallestPenetration)
+        {
+            smallestPenetration = penetration;
+            normal = Vector3::right;
+        }
+    }
+
+    {
+        float pMin = std::min({ v0.y, v1.y, v2.y });
+        float pMax = std::max({ v0.y, v1.y, v2.y });
+        float proj = std::max(-std::max(pMin, pMax), std::min(pMin, pMax));
+        float r = e[1];
+        if (proj > r)
+        {
+            return false;
+        }
+        float penetration = r - proj;
+        if (penetration < smallestPenetration)
+        {
+            smallestPenetration = penetration;
+            normal = Vector3::up;
+        }
+    }
+
+    {
+        float pMin = std::min({ v0.z, v1.z, v2.z });
+        float pMax = std::max({ v0.z, v1.z, v2.z });
+        float proj = std::max(-std::max(pMin, pMax), std::min(pMin, pMax));
+        float r = e[2];
+        if (proj > r)
+        {
+            return false;
+        }
+        float penetration = r - proj;
+        if (penetration < smallestPenetration)
+        {
+            smallestPenetration = penetration;
+            normal = Vector3::forward;
+        }
+    }
+
+    collisionData->n = Matrix4::TransformVector(rotMat, normal);;
+    collisionData->penetration = smallestPenetration;
+
+    // Category 2
+    Plane p;
+    p.Init(triangle.n, Vector3::Dot(triangle.n, triangle.a));
+    bool result = Intersect(p, collisionData, smallestPenetration);
+
+    // revers the normal if we are on the other side of the triangle
+    if (collisionData)
+    {
+        Vector3 triCenter = (triangle.a + triangle.b + triangle.c) / 3.0f;
+        Vector3 toCenter = triCenter - c;
+        if (toCenter.Dot(collisionData->n) > 0)
+        {
+            collisionData->n *= -1.0f;
+        }
+    }
+
+    return result;
+}
 
 Vector3 OBB::ClosestPoint(const Vector3& point) const
 {
@@ -441,9 +656,4 @@ void OBB::DebugDraw(const Vector3& color)
     // Right face
     GraphicsManager::Get()->DebugDrawLine(BRB, FRB, color);
     GraphicsManager::Get()->DebugDrawLine(FRT, BRT, color);
-}
-
-Matrix4 OBB::GetTransform() const
-{
-    return Matrix4::TransformFromBasis(c, u[0], u[1], u[2]);
 }

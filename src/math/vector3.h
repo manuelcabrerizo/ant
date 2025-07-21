@@ -36,4 +36,8 @@ public:
     static float Dot(const Vector3& a, const Vector3& b);
     static Vector3 Cross(const Vector3& a, const Vector3& b);
 
+    static Vector3 zero;
+    static Vector3 right;
+    static Vector3 up;
+    static Vector3 forward;
 };

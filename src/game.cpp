@@ -93,7 +93,7 @@ void Game::Init()
      actorManager.CreateActorFromFile("data/xml/tower.xml");
      actorManager.CreateActorFromFile("data/xml/house.xml");
      actorManager.CreateActorFromFile("data/xml/wizard.xml");
-
+     /*
      SlotmapKey<Actor> enemy[3] =
      {
           actorManager.CreateActorFromFile("data/xml/enemy.xml"),
@@ -130,7 +130,7 @@ void Game::Init()
      actorManager.AddComponent<AnimationComponent>(enemy[0], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[1], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[2], animation);
-     
+     */
 
      CameraComponent::Initialize();
      RenderComponent::Initialize();
@@ -195,8 +195,10 @@ void Game::Render(f32 dt)
     Sphere c;
     c.Init(point1, 1.0f);
 
-    if(a.Intersect(b))
+    CollisionData obbCollisionData;
+    if(a.Intersect(b, &obbCollisionData))
     { 
+        int StopHere = 0;
         a.DebugDraw(Vector3(1, 0, 0));
         b.DebugDraw(Vector3(1, 0, 0));
     }

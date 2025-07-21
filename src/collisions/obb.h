@@ -8,6 +8,7 @@ class AABB;
 class Plane;
 class Sphere;
 class Capsule;
+class Triangle;
 
 struct CollisionData;
 
@@ -29,6 +30,7 @@ public:
     bool Intersect(const Plane& plane, CollisionData *collisionData = nullptr) const;
     bool Intersect(const Sphere& sphere, CollisionData* collisionData = nullptr) const;
     bool Intersect(const Capsule& capsule, CollisionData* collisionData = nullptr) const;
+    bool Intersect(const Triangle& triangle, CollisionData* collisionData = nullptr) const;
 
     Vector3 ClosestPoint(const Vector3& point) const;
     float SqDistPoint(const Vector3& point) const;
@@ -38,8 +40,9 @@ public:
 private:
 
     Matrix4 GetTransform() const;
+    bool Intersect(const Plane& plane, CollisionData* collisionData, float& smallestPenetration) const;
 
-    static float TransformToAxis(const OBB& obb, const Vector3& axis);
+    static float ProjectToAxis(const OBB& obb, const Vector3& axis);
 
     static float PenetraionOnAxis(const OBB& one, const OBB& two,
         const Vector3& axis, const Vector3& toCenter);

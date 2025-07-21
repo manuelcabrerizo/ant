@@ -4,6 +4,7 @@
 #include "ray.h"
 #include "segment.h"
 #include "plane.h"
+#include <graphics_manager.h>
 
 void Triangle::Init(const Vector3& a, const Vector3& b, const Vector3& c)
 {
@@ -84,4 +85,11 @@ Vector3 Triangle::ClosestPoint(const Vector3& q) const
     }
 
     return result;
+}
+
+void Triangle::DebugDraw(const Vector3& color)
+{
+    GraphicsManager::Get()->DebugDrawLine(a, b, color);
+    GraphicsManager::Get()->DebugDrawLine(b, c, color);
+    GraphicsManager::Get()->DebugDrawLine(c, a, color);
 }
