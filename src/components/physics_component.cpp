@@ -123,7 +123,7 @@ void PhysicsComponent::ProcessColisionDetectionAndResolution()
     sphere.Init(transform->position + offset, colliderRadius);
     */
 
-    Matrix4 rot = Matrix4::RotateY(ANT_PI / 4);
+    Matrix4 rot = Matrix4::RotateY(0);
     Vector3 orientation[] =
     {
         Vector3(rot[0][0], rot[1][0], rot[2][0]),

@@ -1,5 +1,4 @@
 // TODO:
-// - More colliders and Raycast test
 // - Implement a small demo with a full loop
 // the player has to have life and be able to shoot at least two weapons
 // the enemies have to move arrown the map and shoot the player
@@ -93,7 +92,7 @@ void Game::Init()
      actorManager.CreateActorFromFile("data/xml/tower.xml");
      actorManager.CreateActorFromFile("data/xml/house.xml");
      actorManager.CreateActorFromFile("data/xml/wizard.xml");
-     /*
+     
      SlotmapKey<Actor> enemy[3] =
      {
           actorManager.CreateActorFromFile("data/xml/enemy.xml"),
@@ -130,7 +129,7 @@ void Game::Init()
      actorManager.AddComponent<AnimationComponent>(enemy[0], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[1], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[2], animation);
-     */
+     
 
      CameraComponent::Initialize();
      RenderComponent::Initialize();
