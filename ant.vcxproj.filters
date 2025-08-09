@@ -165,6 +165,9 @@
     <ClCompile Include="src\collisions\collider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\collisions\mesh_collider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\actor.h">
@@ -330,6 +333,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\collisions\collider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\collisions\mesh_collider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

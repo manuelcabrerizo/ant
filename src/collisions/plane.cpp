@@ -26,11 +26,11 @@ void Plane::Init(const Triangle& triangle)
 
 bool Plane::Intersect(const Ray& ray, f32& t) const
 {
-    f32 denom = n.Dot(ray.d);
+    f32 denom = n.Dot(ray.GetDirection());
     if (fabsf(denom) > 0.0001f)
     {
         Vector3 center = n * d;
-        t = (center - ray.o).Dot(n) / denom;
+        t = (center - ray.GetOrigin()).Dot(n) / denom;
         if (t >= 0) return true;
     }
     return false;
@@ -38,7 +38,7 @@ bool Plane::Intersect(const Ray& ray, f32& t) const
 
 bool Plane::Intersect(const Segment& segment, f32& t) const
 {
-    Vector3 ab = segment.b - segment.a;
+    Vector3 ab = segment.GetB() - segment.GetA();
     Vector3 dir = ab.Normalized();
     f32 len = ab.Magnitude();
 
@@ -46,7 +46,7 @@ bool Plane::Intersect(const Segment& segment, f32& t) const
     if (fabsf(denom) > 0.0001f)
     {
         Vector3 center = n * d;
-        t = (center - segment.a).Dot(n) / denom;
+        t = (center - segment.GetA()).Dot(n) / denom;
         if (t >= 0 && t <= len) return true;
     }
     return false;
@@ -66,4 +66,14 @@ Vector3 Plane::ClosestPoint(const Vector3& q) const
 float Plane::DistPoint(const Vector3& q) const
 {
     return (n.Dot(q) - d) / n.Dot(n);
+}
+
+Vector3 Plane::GetNormal() const
+{
+    return n;
+}
+
+float Plane::GetDistance() const
+{
+    return d;
 }

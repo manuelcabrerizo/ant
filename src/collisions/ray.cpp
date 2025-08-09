@@ -8,6 +8,7 @@
 #include "capsule.h"
 #include "aabb.h"
 #include "obb.h"
+#include "mesh_collider.h"
 
 #include <utils.h>
 
@@ -210,7 +211,8 @@ bool Ray::Intersect(const Capsule& capsule, float& t) const
 
 bool Ray::Intersect(const Plane& plane, float& t) const
 {
-    t = (plane.d - Vector3::Dot(plane.n, o)) / Vector3::Dot(plane.n, d);
+    Vector3 planeNormal = plane.GetNormal();
+    t = (plane.GetDistance() - Vector3::Dot(planeNormal, o)) / Vector3::Dot(planeNormal, d);
     return t >= 0.0f;
 }
 
@@ -275,6 +277,25 @@ bool Ray::Intersect(const OBB& obb, float& t) const
     return relRay.Intersect(aabb, t);
 }
 
+bool Ray::Intersect(const MeshCollider& meshCollider, float &t) const
+{
+    const Array<Triangle>& triangles = meshCollider.GetTriangles();
+    t = FLT_MAX;
+    for (i32 i = 0; i < triangles.size; ++i)
+    {
+        f32 currentT;
+        if (Intersect(triangles[i], currentT))
+        {
+            if (currentT < t)
+            {
+                t = currentT;
+            }
+        }
+    }
+    return t != FLT_MAX;
+}
+
+
 Vector3 Ray::ClosestPoint(const Vector3& point, float& t) const
 {
     t = (point - o).Dot(d) / d.Dot(d);
@@ -291,4 +312,14 @@ float Ray::SqDistPoint(const Vector3& point) const
     Vector3 closest = ClosestPoint(point, t);
     float sqDist = Vector3::Dot(closest - point, closest - point);
     return sqDist;
+}
+
+Vector3 Ray::GetOrigin() const
+{
+    return o;
+}
+
+Vector3 Ray::GetDirection() const
+{
+    return d;
 }

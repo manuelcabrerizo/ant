@@ -141,6 +141,9 @@ void Game::Init()
 
 void Game::Update(f32 dt)
 {
+    // TODO: this is down here for the debug renderer
+    GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
+
      // Initialize new components
      actorManager.InitializeNewComponents();
      // Update
@@ -235,7 +238,7 @@ void Game::Render(f32 dt)
         float hit;
         if (viewSegment.Intersect(cylinder, hit))
         {
-            Vector3 point = viewSegment.a + (viewSegment.b - viewSegment.a) * hit;
+            Vector3 point = viewSegment.Lerp(hit);
             GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
         }
 
@@ -262,7 +265,7 @@ void Game::Render(f32 dt)
         float hit;
         if (viewSegment.Intersect(capsule, hit))
         {
-            Vector3 point = viewSegment.a + (viewSegment.b - viewSegment.a) * hit;
+            Vector3 point = viewSegment.Lerp(hit);
             GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
         }
     }
@@ -316,7 +319,7 @@ void Game::Render(f32 dt)
         float hit;
         if (viewSegment.Intersect(aabb, hit))
         {
-            Vector3 point = viewSegment.a + (viewSegment.b - viewSegment.a) * hit;
+            Vector3 point = viewSegment.Lerp(hit);
             GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
         }
 
@@ -344,7 +347,7 @@ void Game::Render(f32 dt)
         float hit;
         if (viewSegment.Intersect(obb, hit))
         {
-            Vector3 point = viewSegment.a + (viewSegment.b - viewSegment.a) * hit;
+            Vector3 point = viewSegment.Lerp(hit);
             GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
         }
 
@@ -356,9 +359,6 @@ void Game::Render(f32 dt)
 
     GraphicsManager::Get()->DebugPresent();
     GraphicsManager::Get()->EndFrame(1);
-
-    // TODO: this is down here for the debug renderer
-    GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
 }
 
 void Game::Terminate()

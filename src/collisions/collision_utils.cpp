@@ -1,5 +1,5 @@
 #include "collision_utils.h"
-
+#include <collision.h>
 #include <float.h>
 
 void CollisionUtils::ExtremePointsAlongDirection(const Vector3& dir, Array<Vector3>& points, i32* imin, i32* imax)
@@ -24,3 +24,36 @@ void CollisionUtils::ExtremePointsAlongDirection(const Vector3& dir, Array<Vecto
         }
     }
 }
+
+void CollisionUtils::SortCollisionByTime(Array<CollisionData>& arr)
+{
+    for (i32 i = 1; i < arr.size; ++i)
+    {
+        auto key = arr[i];
+        i32 j = i - 1;
+
+        while (j >= 0 && arr[j].t > key.t)
+        {
+            arr[j + 1] = arr[j];
+            j = j - 1;
+        }
+        arr[j + 1] = key;
+    }
+}
+
+void CollisionUtils::SortCollisionByPenetration(Array<CollisionData>& arr)
+{
+    for (i32 i = 1; i < arr.size; ++i)
+    {
+        auto key = arr[i];
+        i32 j = i - 1;
+
+        while (j >= 0 && arr[j].penetration < key.penetration)
+        {
+            arr[j + 1] = arr[j];
+            j = j - 1;
+        }
+        arr[j + 1] = key;
+    }
+}
+

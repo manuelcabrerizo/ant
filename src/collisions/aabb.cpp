@@ -70,7 +70,7 @@ bool AABB::Intersect(const Plane& plane) const
     int contactFound = 0;
     for (int i = 0; i < 8; i++)
     {
-        if (Vector3::Dot(vertices[i], plane.n) <= plane.d)
+        if (Vector3::Dot(vertices[i], plane.GetNormal()) <= plane.GetDistance())
         {
             contactFound++;
         }

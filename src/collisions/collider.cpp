@@ -1,5 +1,29 @@
 #include "collider.h"
 
+Collider::Collider(const AABB& aabb)
+{
+    this->type = ColliderType::AABB;
+    this->aabb = aabb;
+}
+
+Collider::Collider(const OBB& obb)
+{
+    this->type = ColliderType::OBB;
+    this->obb = obb;
+}
+
+Collider::Collider(const Sphere& sphere)
+{
+    this->type = ColliderType::SPHERE;
+    this->sphere = sphere;
+}
+
+Collider::Collider(const Capsule& calpsule)
+{
+    this->type = ColliderType::CAPSULE;
+    this->capsule = capsule;
+}
+
 bool Collider::Intersect(const Ray& ray, float& t) const
 {
     switch (type)

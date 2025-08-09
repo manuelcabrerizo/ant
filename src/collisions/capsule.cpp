@@ -64,7 +64,8 @@ bool Capsule::Intersect(const Triangle& triangle, Vector3& n, float& penetration
 {
     Plane plane;
     plane.Init(triangle);
-    float t = (plane.d - Vector3::Dot(plane.n, a)) / Vector3::Dot(plane.n, (b - a));
+    Vector3 planeNormal = plane.GetNormal();
+    float t = (plane.GetDistance() - Vector3::Dot(planeNormal, a)) / Vector3::Dot(planeNormal, (b - a));
 
     Vector3 closestOnPlane = a + (b - a) * t;
     Vector3 closestOnTriangle = triangle.ClosestPoint(closestOnPlane);

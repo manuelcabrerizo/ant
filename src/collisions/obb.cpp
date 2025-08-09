@@ -321,19 +321,22 @@ bool OBB::Intersect(const Plane& plane, CollisionData* collisionData) const
         (u[0] * e.x + u[1] * -e.y + u[2] * e.z) + c
     };
 
+    Vector3 planeNormal = plane.GetNormal();
+    float planeDistance = plane.GetDistance();
+
     int contactFound = 0;
     for (int i = 0; i < 8; i++)
     {
-        float dist = Vector3::Dot(vertices[i], plane.n);
-        if (dist <= plane.d)
+        float dist = Vector3::Dot(vertices[i], planeNormal);
+        if (dist <= planeDistance)
         {
             if (collisionData)
             {
-                collisionData->point = plane.n;
-                collisionData->point *= (dist - plane.d);
+                collisionData->point = planeNormal;
+                collisionData->point *= (dist - planeDistance);
                 collisionData->point += vertices[i];
-                collisionData->n = plane.n;
-                collisionData->penetration = plane.d - dist;
+                collisionData->n = planeNormal;
+                collisionData->penetration = planeDistance - dist;
             }
             contactFound++;
         }
@@ -355,21 +358,24 @@ bool OBB::Intersect(const Plane& plane, CollisionData* collisionData, float& sma
         (u[0] * e.x + u[1] * -e.y + u[2] * e.z) + c
     };
 
+    Vector3 planeNormal = plane.GetNormal();
+    float planeDistance = plane.GetDistance();
+
     int contactFound = 0;
     for (int i = 0; i < 8; i++)
     {
-        float dist = Vector3::Dot(vertices[i], plane.n);
-        if (dist <= plane.d)
+        float dist = Vector3::Dot(vertices[i], planeNormal);
+        if (dist <= planeDistance)
         {
-            float penetration = plane.d - dist;
+            float penetration = planeDistance - dist;
             if (penetration < smallestPenetration)
             {
                 if (collisionData)
                 {
-                    collisionData->point = plane.n;
-                    collisionData->point *= (dist - plane.d);
+                    collisionData->point = planeNormal;
+                    collisionData->point *= (dist - planeDistance);
                     collisionData->point += vertices[i];
-                    collisionData->n = plane.n;
+                    collisionData->n = planeNormal;
                     collisionData->penetration = penetration;
                 }
                 smallestPenetration = penetration;

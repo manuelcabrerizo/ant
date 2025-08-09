@@ -47,7 +47,7 @@ bool Sphere::Intersect(const Triangle& triangle, Vector3& n, f32& penetration) c
 
 bool Sphere::Intersect(const Plane& plane) const
 {
-    float dist = Vector3::Dot(c, plane.n) - plane.d;
+    float dist = Vector3::Dot(c, plane.GetNormal()) - plane.GetDistance();
     return (dist - r) < 0.0f;
 }
 
@@ -69,9 +69,10 @@ bool Sphere::Intersect(const Capsule& capsule) const
 
 bool Sphere::DynamicIntersect(const Plane& plane, const Vector3& movement, f32& t) const
 {
+    Vector3 planeNormal = plane.GetNormal();
     // Compute distance of sphere center to plane
-    f32 d = plane.n.Dot(c);
-    f32 dist = d - plane.d;
+    f32 d = planeNormal.Dot(c);
+    f32 dist = d - plane.GetDistance();
     if (fabsf(dist) <= r)
     {
         // The sphere is already overlapping the plane. Set time of
@@ -81,7 +82,7 @@ bool Sphere::DynamicIntersect(const Plane& plane, const Vector3& movement, f32& 
     }
     else
     {
-        f32 denom = plane.n.Dot(movement);
+        f32 denom = planeNormal.Dot(movement);
         if (denom * dist >= 0.0f)
         {
             // No intersection as sphere parallel to or away from plane
@@ -110,7 +111,7 @@ bool Sphere::DynamicIntersect(const Triangle& triangle, const Vector3& movement,
     if (DynamicIntersect(plane, movement, t))
     {
 
-        Vector3 q = c + movement * t - plane.n * r;
+        Vector3 q = c + movement * t - plane.GetNormal() * r;
         if (triangle.PointInside(q))
         {
             n = triangle.n;

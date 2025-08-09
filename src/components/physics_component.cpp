@@ -13,11 +13,6 @@ CollisionWorld PhysicsComponent::collisionWorld;
 void PhysicsComponent::Initialize()
 {
     collisionWorld.LoadFromFile("data/collision/level-collision.obj");
-    
-    //Triangle tri;
-    //tri.Init(Vector3(10, 0, 10), Vector3(12, 0, 0), Vector3(10, 6, 10));
-    //collisionWorld.AddTriangle(tri);
-
 
     Matrix4 rot = Matrix4::RotateY(ANT_PI / 4);
     Vector3 orientation[] =

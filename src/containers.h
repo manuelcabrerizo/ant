@@ -19,10 +19,28 @@ public:
      void Clear();
 
      Type *Push(Type value);
-     
-     Type& operator[](u32 index) {
+
+     // TODO: this has to be const
+     // CHECK ME: !!!!!!!!!!!!!!!!
+     Type& operator[](u32 index) const 
+     {
+         return data[index];
+     }
+
+     Type& operator[](u32 index) 
+     {
           return data[index];
-     }   
+     }
+
+     Type& operator[](int index) const
+     {
+         return data[index];
+     }
+
+     Type& operator[](int index)
+     {
+         return data[index];
+     }
 };
 
 template <typename Type>

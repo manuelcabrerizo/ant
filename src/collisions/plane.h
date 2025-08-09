@@ -9,6 +9,9 @@ class Segment;
 
 class Plane
 {
+private:
+    Vector3 n;
+    f32 d;
 public:
 
     void Init(const Vector3& n, f32 d);
@@ -22,6 +25,6 @@ public:
     Vector3 ClosestPoint(const Vector3& q) const;
     float DistPoint(const Vector3& q) const;
 
-    Vector3 n;
-    f32 d;
+    Vector3 GetNormal() const;
+    float GetDistance() const;
 };

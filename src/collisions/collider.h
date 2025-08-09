@@ -12,7 +12,8 @@ enum class ColliderType
     AABB,
     OBB,
     SPHERE,
-    CAPSULE
+    CAPSULE,
+    MESH
 };
 
 class Collider
@@ -27,6 +28,11 @@ private:
         Capsule capsule;
     };
 public:
+    Collider(const AABB& aabb);
+    Collider(const OBB& obb);
+    Collider(const Sphere& sphere);
+    Collider(const Capsule& calpsule);
+
     bool Intersect(const Ray& ray, float& t) const;
     bool Intersect(const Segment& segment, float& t) const;
     bool Intersect(const Collider& other) const;

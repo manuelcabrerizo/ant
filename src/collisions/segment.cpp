@@ -8,6 +8,7 @@
 #include "capsule.h"
 #include "aabb.h"
 #include "obb.h"
+#include "mesh_collider.h"
 
 #include <utils.h>
 
@@ -220,7 +221,8 @@ bool Segment::Intersect(const Capsule& capsule, float& t) const
 
 bool Segment::Intersect(const Plane& plane, float& t) const
 {
-    t = (plane.d - Vector3::Dot(plane.n, a)) / Vector3::Dot(plane.n, (b - a));
+    Vector3 planeNormal = plane.GetNormal();
+    t = (plane.GetDistance() - Vector3::Dot(planeNormal, a)) / Vector3::Dot(planeNormal, (b - a));
     return t >= 0.0f && t <= 1.0f;
 }
 
@@ -287,6 +289,24 @@ bool Segment::Intersect(const OBB& obb, float& t) const
     AABB aabb;
     aabb.Init(obb.GetExtent() * -1.0f, obb.GetExtent());
     return relSegment.Intersect(aabb, t);
+}
+
+bool Segment::Intersect(const MeshCollider& meshCollider, float& t) const
+{
+    const Array<Triangle>& triangles = meshCollider.GetTriangles();
+    t = FLT_MAX;
+    for (i32 i = 0; i < triangles.size; ++i)
+    {
+        f32 currentT;
+        if (Intersect(triangles[i], currentT))
+        {
+            if (currentT < t)
+            {
+                t = currentT;
+            }
+        }
+    }
+    return t != FLT_MAX;
 }
 
 Vector3 Segment::ClosestPoint(const Vector3& point, f32& t) const
@@ -388,3 +408,19 @@ float Segment::SqDistPoint(const Vector3& point) const
     // Handle case where c projects onto ab
     return Vector3::Dot(ac, ac) - e * e / f;
 }
+
+Vector3 Segment::GetA() const
+{
+    return a;
+}
+
+Vector3 Segment::GetB() const
+{
+    return b;
+}
+
+Vector3 Segment::Lerp(float t) const
+{
+    return a + (b - a) * t;
+}
+
