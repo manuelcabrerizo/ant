@@ -13,21 +13,6 @@ void PhysicsComponent::Initialize()
 {
     collisionWorld.Initialize(50);
 
-    // Enviroment Colliders Creation
-    MeshCollider meshCollider;
-    meshCollider.InitFromFile("data/collision/level-collision.obj");
-    collisionWorld.AddCollider(Collider(meshCollider));
-
-    Vector3 orientation2[] =
-    {
-        Vector3(1, 0, 0),
-        Vector3(0, 1, 0),
-        Vector3(0, 0, 1)
-    };
-    OBB floor;
-    floor.Init(Vector3(0, -0.5, 0), orientation2, Vector3(25, 0.5, 25));
-    collisionWorld.AddCollider(Collider(floor));
-
     Matrix4 rot = Matrix4::RotateY(ANT_PI / 4);
     Vector3 orientation[] =
     {
@@ -36,6 +21,22 @@ void PhysicsComponent::Initialize()
         Vector3(rot[0][2], rot[1][2], rot[2][2])
     };
 
+    Vector3 orientation2[] =
+    {
+        Vector3(1, 0, 0),
+        Vector3(0, 1, 0),
+        Vector3(0, 0, 1)
+    };
+
+    // Enviroment Colliders Creation
+    MeshCollider meshCollider;
+    meshCollider.InitFromFile("data/collision/level-collision.obj");
+    collisionWorld.AddCollider(Collider(meshCollider));
+
+    OBB floor;
+    floor.Init(Vector3(0, -0.5, 0), orientation2, Vector3(25, 0.5, 25));
+    collisionWorld.AddCollider(Collider(floor));
+
     OBB obb;
     obb.Init(Vector3(6, 1.5, 3), orientation, Vector3(1, 0.5f, 1));
     collisionWorld.AddCollider(Collider(obb));
@@ -43,7 +44,6 @@ void PhysicsComponent::Initialize()
     OBB obb1;
     obb1.Init(Vector3(8, 2.5, 3), orientation, Vector3(1, 0.5f, 1));
     collisionWorld.AddCollider(Collider(obb1));
-
 
     OBB obb2;
     obb2.Init(Vector3(10, 3.5, 3), orientation, Vector3(1, 0.5f, 1));
@@ -104,7 +104,6 @@ void PhysicsComponent::OnTerminate(ActorManager *actorManager)
 {
 
 }
-
 
 void PhysicsComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
