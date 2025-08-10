@@ -36,7 +36,7 @@ public:
     Vector3 ClosestPoint(const Vector3& point) const;
     float SqDistPoint(const Vector3& point) const;
 
-    void DebugDraw(const Vector3& color);
+    void DebugDraw(const Vector3& color) const;
 
 private:
 

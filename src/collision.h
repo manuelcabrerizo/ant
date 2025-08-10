@@ -9,6 +9,7 @@ class CollisionWorld
 {
 public:
     void Initialize(int maxColllidersCount);
+    void DebugDraw();
 
     Collider *AddCollider(const Collider& collider);
     void RemoveCollider(const Collider& collider);

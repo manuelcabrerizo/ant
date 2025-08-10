@@ -12,6 +12,8 @@
 #include "capsule.h"
 #include "mesh_collider.h"
 
+#include <graphics_manager_d3d11.h>
+
 void Sphere::Init(Vector3 c, f32 r)
 {
     this->c = c;
@@ -284,4 +286,9 @@ float Sphere::SqDistPoint(const Vector3& point) const
     Vector3 closest = ClosestPoint(point);
     float sqDist = Vector3::Dot(closest - point, closest - point);
     return sqDist;
+}
+
+void Sphere::DebugDraw(int subdivision, const Vector3& color) const
+{
+    GraphicsManager::Get()->DebugDrawSphere(c, r, subdivision, subdivision, color);
 }

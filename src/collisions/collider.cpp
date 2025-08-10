@@ -168,3 +168,27 @@ void Collider::UpdatePosition(const Vector3& position)
         } break;
     }
 }
+
+void Collider::DebugDraw() const
+{
+    Vector3 color = Vector3(0, 1, 0);
+    switch (type)
+    {
+        case ColliderType::AABB:
+        {
+            aabb.DebugDraw(color);
+        } break;
+        case ColliderType::OBB:
+        {
+            obb.DebugDraw(color);
+        } break;
+        case ColliderType::SPHERE:
+        {
+            sphere.DebugDraw(12, color);
+        } break;
+        case ColliderType::CAPSULE:
+        {
+            capsule.DebugDraw(12, color);
+        } break;
+    }
+}

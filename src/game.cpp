@@ -93,7 +93,7 @@ void Game::Init()
      actorManager.CreateActorFromFile("data/xml/house.xml");
      actorManager.CreateActorFromFile("data/xml/wizard.xml");
      
-     /*
+     
      SlotmapKey<Actor> enemy[3] =
      {
           actorManager.CreateActorFromFile("data/xml/enemy.xml"),
@@ -129,7 +129,7 @@ void Game::Init()
      actorManager.AddComponent<AnimationComponent>(enemy[0], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[1], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[2], animation);
-     */
+     
 
      CameraComponent::Initialize();
      RenderComponent::Initialize();
@@ -143,6 +143,8 @@ void Game::Update(f32 dt)
 {
     // TODO: this is down here for the debug renderer
     GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
+    PhysicsComponent::DebugDraw();
+
 
      // Initialize new components
      actorManager.InitializeNewComponents();

@@ -58,3 +58,11 @@ bool CollisionWorld::Intersect(const Collider& collider, Array<CollisionData>& c
     CollisionUtils::SortCollisionByPenetration(collisionData);
     return isIntersecting;
 }
+
+void CollisionWorld::DebugDraw()
+{
+    for (int i = 0; i < colliders.size; ++i)
+    {
+        colliders[i].DebugDraw();
+    }
+}

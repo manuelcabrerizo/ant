@@ -136,7 +136,7 @@ float Capsule::SqDistPoint(const Vector3& point) const
     return sqDist;
 }
 
-void Capsule::DebugDraw(int subdivision, const Vector3& color)
+void Capsule::DebugDraw(int subdivision, const Vector3& color) const
 {
     Vector3 p = this->a;
     Vector3 q = this->b;

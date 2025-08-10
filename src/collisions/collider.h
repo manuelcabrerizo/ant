@@ -44,6 +44,7 @@ public:
     Collider(const MeshCollider& meshCollider);
 
     unsigned int GetId() const;
+    void DebugDraw() const;
 
     bool Intersect(const Ray& ray, float& t) const;
     bool Intersect(const Segment& segment, float& t) const;

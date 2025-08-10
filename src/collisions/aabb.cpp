@@ -158,7 +158,7 @@ float AABB::SqDistPoint(const Vector3& point) const
 }
 
 
-void AABB::DebugDraw(const Vector3& color)
+void AABB::DebugDraw(const Vector3& color) const
 {
     Vector3 FLB = min;
     Vector3 FLT = Vector3(min.x, max.y, min.z);

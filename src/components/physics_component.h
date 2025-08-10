@@ -27,6 +27,7 @@ public:
 
     static void Initialize();
     static void Terminate();
+    static void DebugDraw();
 
     void OnInit(ActorManager *actorManager);
     void OnTerminate(ActorManager *actorManager) override;

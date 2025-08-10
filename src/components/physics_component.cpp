@@ -63,6 +63,11 @@ void PhysicsComponent::Terminate()
 
 }
 
+void PhysicsComponent::DebugDraw()
+{
+    collisionWorld.DebugDraw();
+}
+
 void PhysicsComponent::OnInit(ActorManager *actorManager)
 {
     transform = actorManager->GetComponent<TransformComponent>(owner);
@@ -92,8 +97,7 @@ void PhysicsComponent::OnInit(ActorManager *actorManager)
     Sphere sphere;
     sphere.Init(transform->position + offset, colliderRadius);
 
-
-    collider = collisionWorld.AddCollider(Collider(capsule));
+    collider = collisionWorld.AddCollider(Collider(obb));
 }
 
 void PhysicsComponent::OnTerminate(ActorManager *actorManager)

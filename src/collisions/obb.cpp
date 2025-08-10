@@ -642,7 +642,7 @@ float OBB::SqDistPoint(const Vector3& point) const
     return sqDist;
 }
 
-void OBB::DebugDraw(const Vector3& color)
+void OBB::DebugDraw(const Vector3& color) const
 {
     Vector3 FLB = u[0] * -e.x + u[1] * -e.y + u[2] * -e.z;
     Vector3 FLT = u[0] * -e.x + u[1] *  e.y + u[2] * -e.z;
