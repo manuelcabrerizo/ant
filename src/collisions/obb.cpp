@@ -214,7 +214,6 @@ bool OBB::Intersect(const OBB& two, Array<CollisionData>* collisionData) const
             collision.point = Matrix4::TransformPoint(two.GetTransform(), vertex);
             collisionData->Push(collision);
         }
-
         return true;
     }
     else if (best < 6)
@@ -408,8 +407,8 @@ bool OBB::Intersect(const Sphere& sphere, Array<CollisionData>* collisionData) c
     Vector3 closest = ClosestPoint(center);
     Vector3 toObb = center - closest;
     float lenSq = toObb.MagnitudeSq();
-
-    if (collisionData && collisionData->size < MAX_COLLISION_COUNT)
+    bool isIntersecting = lenSq <= r * r;
+    if (isIntersecting && collisionData && collisionData->size < MAX_COLLISION_COUNT)
     {
         CollisionData collision;
         collision.n = toObb.Normalized();
@@ -418,7 +417,7 @@ bool OBB::Intersect(const Sphere& sphere, Array<CollisionData>* collisionData) c
         collisionData->Push(collision);
     }
 
-    return lenSq <= r * r;
+    return isIntersecting;
 }
 
 bool OBB::Intersect(const Capsule& capsule, Array<CollisionData>* collisionData) const
@@ -595,10 +594,10 @@ bool OBB::Intersect(const Triangle& triangle, Array<CollisionData>* collisionDat
     // Category 2
     Plane p;
     p.Init(triangle.n, Vector3::Dot(triangle.n, triangle.a));
-    bool result = Intersect(p, &collision, smallestPenetration);
+    bool isIntersecting = Intersect(p, &collision, smallestPenetration);
 
     // revers the normal if we are on the other side of the triangle
-    if (collisionData && collisionData->size < MAX_COLLISION_COUNT)
+    if (isIntersecting && collisionData && collisionData->size < MAX_COLLISION_COUNT)
     {
         Vector3 triCenter = (triangle.a + triangle.b + triangle.c) / 3.0f;
         Vector3 toCenter = triCenter - c;
@@ -610,7 +609,7 @@ bool OBB::Intersect(const Triangle& triangle, Array<CollisionData>* collisionDat
         collisionData->Push(collision);
     }
 
-    return result;
+    return isIntersecting;
 }
 
 bool OBB::Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData) const

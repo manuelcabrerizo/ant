@@ -46,26 +46,28 @@ bool Sphere::Intersect(const Triangle& triangle, Array<CollisionData>* collision
     Vector3 closest = triangle.ClosestPoint(c);
     Vector3 toSphere = c - closest;
     f32 lenSq = toSphere.Dot(toSphere);
-    if (collisionData && collisionData->size < MAX_COLLISION_COUNT)
+    bool isIntersecting = lenSq <= r * r;
+    if (isIntersecting&& collisionData && collisionData->size < MAX_COLLISION_COUNT)
     {
         CollisionData collision;
         collision.n = toSphere.Normalized();
         collision.penetration = r - sqrtf(lenSq);
         collisionData->Push(collision);
     }
-    return lenSq <= r * r;
+    return isIntersecting;
 }
 
 bool Sphere::Intersect(const Plane& plane, Array<CollisionData>* collisionData) const
 {
     float dist = Vector3::Dot(c, plane.GetNormal()) - plane.GetDistance();
-    if (collisionData && collisionData->size < MAX_COLLISION_COUNT)
+    bool isIntersecting = (dist - r) < 0.0f;
+    if (isIntersecting && collisionData && collisionData->size < MAX_COLLISION_COUNT)
     {
         CollisionData collision;
         // TODO: ...
         collisionData->Push(collision);
     }
-    return (dist - r) < 0.0f;
+    return isIntersecting;
 }
 
 bool Sphere::Intersect(const AABB& aabb, Array<CollisionData>* collisionData) const
