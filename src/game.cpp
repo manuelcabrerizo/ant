@@ -93,6 +93,7 @@ void Game::Init()
      actorManager.CreateActorFromFile("data/xml/house.xml");
      actorManager.CreateActorFromFile("data/xml/wizard.xml");
      
+     /*
      SlotmapKey<Actor> enemy[3] =
      {
           actorManager.CreateActorFromFile("data/xml/enemy.xml"),
@@ -102,7 +103,6 @@ void Game::Init()
      
 
      // Warrior Animation
-     
      TransformComponent *transforms[3] =
      {
           actorManager.GetComponent<TransformComponent>(enemy[0]),
@@ -129,7 +129,7 @@ void Game::Init()
      actorManager.AddComponent<AnimationComponent>(enemy[0], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[1], animation);
      actorManager.AddComponent<AnimationComponent>(enemy[2], animation);
-     
+     */
 
      CameraComponent::Initialize();
      RenderComponent::Initialize();
@@ -161,200 +161,6 @@ void Game::Update(f32 dt)
 
 void Game::Render(f32 dt)
 {
-
-    // OBB intersection test
-    Vector3 point0 = Vector3(8.0f, 2.0f, 10.0f);
-    Vector3 point1 = Vector3(0.0f, 2.0f, 10.0f);
-    Vector3 point2 = Vector3(8.0f, 10.0f, 10.0f);
-
-    static float time = 0.0f;
-    Matrix4 rot = Matrix4::RotateY(time);
-
-    time += dt;
-
-    Vector3 orientation0[] = 
-    {
-        Vector3(rot[0][0], rot[1][0], rot[2][0]),
-        Vector3(rot[0][1], rot[1][1], rot[2][1]),
-        Vector3(rot[0][2], rot[1][2], rot[2][2]) 
-    };
-
-    rot = Matrix4::RotateX(time) * Matrix4::RotateZ(time);
-
-    Vector3 orientation1[] =
-    {
-        Vector3(rot[0][0], rot[1][0], rot[2][0]),
-        Vector3(rot[0][1], rot[1][1], rot[2][1]),
-        Vector3(rot[0][2], rot[1][2], rot[2][2])
-    };
-
-    float t = sinf(time * 0.5) * 0.5f + 0.5f;
-
-    OBB a;
-    a.Init(point1.Lerp(point0, t), orientation0, Vector3(1, 0.5, 1));
-    OBB b;
-    b.Init(point2.Lerp(point0, t), orientation1, Vector3(0.5, 0.5, 0.5));
-    Sphere c;
-    c.Init(point1, 1.0f);
-
-    CollisionData obbCollisionData;
-    if(a.Intersect(b, &obbCollisionData))
-    { 
-        int StopHere = 0;
-        a.DebugDraw(Vector3(1, 0, 0));
-        b.DebugDraw(Vector3(1, 0, 0));
-    }
-    else
-    {
-        a.DebugDraw(Vector3(0, 1, 0));
-        b.DebugDraw(Vector3(0, 1, 0));
-    }
-
-    if (a.Intersect(c))
-    {
-        GraphicsManager::Get()->DebugDrawSphere(c.GetCenter(), c.GetRadio(), 12, 12, Vector3(1, 0, 0));
-    }
-    else
-    {
-        GraphicsManager::Get()->DebugDrawSphere(c.GetCenter(), c.GetRadio(), 12, 12, Vector3(0, 1, 0));
-    }
-
-    TransformComponent* transform = actorManager.GetComponent<TransformComponent>(player);
-    GraphicsManager::Get()->DebugDrawSphere(a.ClosestPoint(transform->position), 0.125f, 6, 6, Vector3(1, 1, 0));
-    GraphicsManager::Get()->DebugDrawSphere(b.ClosestPoint(transform->position), 0.125f, 6, 6, Vector3(1, 1, 0));
-    GraphicsManager::Get()->DebugDrawSphere(c.ClosestPoint(transform->position), 0.125f, 6, 6, Vector3(1, 1, 0));
-
-
-    // Cylinder Test
-    {
-        Cylinder cylinder;
-        cylinder.Init(Vector3(6.0f, 2.0f, 20.0f), Vector3(8.0f, 2.0f, 20.0f), 0.5f);
-        cylinder.DebugDraw(16, Vector3(1, 1, 0));
-
-        GraphicsManager::Get()->DebugDrawSphere(cylinder.ClosestPoint(transform->position), 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
-
-        Segment viewSegment;
-        viewSegment.Init(transform->position, transform->position + transform->direction * 1);
-        float hit;
-        if (viewSegment.Intersect(cylinder, hit))
-        {
-            Vector3 point = viewSegment.Lerp(hit);
-            GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
-        }
-
-        //Ray viewRay;
-        //viewRay.Init(transform->position, transform->direction);
-        //if (viewRay.Intersect(cylinder, hit))
-        //{
-        //    Vector3 point = viewRay.o + viewRay.d * hit;
-        //    GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
-        //}
-    }
-
-    // Capsule Test
-    {
-        Capsule capsule;
-        capsule.Init(Vector3(10.0f, 3.0f, 20.0f), Vector3(10.0f, 4.5f, 20.0f), 0.5f);
-        capsule.DebugDraw(16, Vector3(1, 1, 0));
-
-        GraphicsManager::Get()->DebugDrawSphere(capsule.ClosestPoint(transform->position), 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
-
-
-        Segment viewSegment;
-        viewSegment.Init(transform->position, transform->position + transform->direction*2.0f);
-        float hit;
-        if (viewSegment.Intersect(capsule, hit))
-        {
-            Vector3 point = viewSegment.Lerp(hit);
-            GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
-        }
-    }
-
-    // Capsule OBB Test
-    {
-        Vector3 positionA = Vector3(6, 2, 15);
-        Vector3 offsetA = Vector3(0, 0.5f, 0);
-        Capsule capsuleA;
-        capsuleA.Init(positionA - offsetA, positionA + offsetA, 0.5f);
-
-        OBB obb;
-        Vector3 positionB = Vector3(6, 5, 15).Lerp(Vector3(6, 2, 15), sinf(time) * 0.5f + 0.5f);
-        obb.Init(positionB, orientation1, Vector3(1, 1, 1));
-
-        //Vector3 offsetB = Vector3(1, 0, 0);
-        //Capsule capsuleB;
-        //capsuleB.Init(positionB - offsetB, positionB + offsetB, 0.5f);
-
-        Vector3 color = Vector3(0, 1, 0);
-        if (obb.Intersect(capsuleA))
-        {
-            color = Vector3(1, 0, 0);
-        }
-
-        capsuleA.DebugDraw(8,color);
-        obb.DebugDraw(color);
-    }
-
-    
-    // AABB Ray Test
-    {
-        AABB aabb;
-        Vector3 position = Vector3(-1, 2, 14);
-        Vector3 extent = Vector3(0.5f, 0.5f, 0.5f);
-        aabb.Init(position - extent, position + extent);
-
-        /*
-        Ray viewRay;
-        viewRay.Init(transform->position, transform->direction);
-        float hit;
-        if (viewRay.Intersect(aabb, hit))
-        {
-            Vector3 point = viewRay.o + viewRay.d * hit;
-            GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
-        }
-        */
-
-        Segment viewSegment;
-        viewSegment.Init(transform->position, transform->position + transform->direction * 10.0f);
-        float hit;
-        if (viewSegment.Intersect(aabb, hit))
-        {
-            Vector3 point = viewSegment.Lerp(hit);
-            GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
-        }
-
-        aabb.DebugDraw(Vector3(0, 1, 0));
-    }
-    
-    
-    // OBB Ray Test
-    {
-        OBB obb;
-        Vector3 position = Vector3(-2.5, 2, 14);
-        obb.Init(position, orientation1, Vector3(0.5, 0.75, 0.5));
-        /*
-        Ray viewRay;
-        viewRay.Init(transform->position, transform->direction);
-        float hit;
-        if (viewRay.Intersect(obb, hit))
-        {
-            Vector3 point = viewRay.o + viewRay.d * hit;
-            GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
-        }*/
-
-        Segment viewSegment;
-        viewSegment.Init(transform->position, transform->position + transform->direction * 10.0f);
-        float hit;
-        if (viewSegment.Intersect(obb, hit))
-        {
-            Vector3 point = viewSegment.Lerp(hit);
-            GraphicsManager::Get()->DebugDrawSphere(point, 0.125f * 0.5f, 6, 6, Vector3(1, 0, 0));
-        }
-
-        obb.DebugDraw(Vector3(0, 1, 0));
-    }
-    
-
     actorManager.RenderComponents<RenderComponent>();
 
     GraphicsManager::Get()->DebugPresent();

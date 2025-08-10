@@ -1,50 +1,21 @@
 #pragma once
 
-#include <common.h>
-#include <containers.h>
-#include <math/vector3.h>
-
-#include <collisions/segment.h>
+#include <collisions/collision_utils.h>
+#include <collisions/collider.h>
 #include <collisions/ray.h>
-#include <collisions/aabb.h>
-#include <collisions/obb.h>
-#include <collisions/plane.h>
-#include <collisions/sphere.h>
-#include <collisions/cylinder.h>
-#include <collisions/capsule.h>
-#include <collisions/triangle.h>
-
-#define MAX_COLLISION_COUNT 16
-
-struct CollisionData
-{
-    Vector3 point;
-    Vector3 n;
-    f32 penetration;
-    f32 t;
-};
+#include <collisions/segment.h>
 
 class CollisionWorld
 {
 public:
-    void AddOBB(const OBB& obb);
-    void AddTriangle(const Triangle& triangle);
+    void Initialize(int maxColllidersCount);
 
-    void LoadFromFile(const char *);
-    bool Intersect(Segment& segment, f32& t, Vector3& n);
-    bool Intersect(Ray& ray, f32& t, Vector3& n);
-    bool Intersect(Sphere& sphere, Array<CollisionData>& collisionData);
-    bool Intersect(const Capsule& capsule, Array<CollisionData>& collisionData);
-    bool Intersect(const OBB& obb, Array<CollisionData>& collisionData);
+    Collider *AddCollider(const Collider& collider);
+    void RemoveCollider(const Collider& collider);
 
-
-    bool DynamicIntersect(Sphere& sphere, Vector3 movement, Array<CollisionData>& collisionData);
+    bool Intersect(const Ray& ray, float& t, unsigned int ignoreId = 0) const;
+    bool Intersect(const Segment& segment, float& t, unsigned int ignoreId = 0) const;
+    bool Intersect(const Collider& collider, Array<CollisionData>& collisionData) const;
 private:
-    Array<Triangle> triangles;  
-    Array<AABB> aabbs;
-    Array<OBB> obbs;
-    Array<Sphere> spheres;
-    Array<Capsule> capsules;
+    Array<Collider> colliders;
 };
-
-

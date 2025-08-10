@@ -17,12 +17,12 @@ void Triangle::Init(const Vector3& a, const Vector3& b, const Vector3& c)
     n = ac.Cross(ab).Normalized();
 }
 
-bool Triangle::Intersect(const Ray& ray, f32& t) const
+bool Triangle::Intersect(const Ray& ray, float& t) const
 {
     return ray.Intersect(*this, t);
 }
 
-bool Triangle::Intersect(const Segment& segment, f32& t) const
+bool Triangle::Intersect(const Segment& segment, float& t) const
 {
     return segment.Intersect(*this, t);
 }
@@ -70,13 +70,13 @@ Vector3 Triangle::ClosestPoint(const Vector3& q) const
 
     Vector3 result;
 
-    f32 lenSq = FLT_MAX;
+    float lenSq = FLT_MAX;
     for (i32 i = 0; i < 3; ++i)
     {
-        f32 currentT;
+        float currentT;
         Vector3 closest = edges[i].ClosestPoint(q, currentT);
 
-        f32 currentLenSq = (closest - q).MagnitudeSq();
+        float currentLenSq = (closest - q).MagnitudeSq();
         if (currentLenSq < lenSq)
         {
             lenSq = currentLenSq;

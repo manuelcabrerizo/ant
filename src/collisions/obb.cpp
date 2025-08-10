@@ -2,7 +2,6 @@
 #include <math/algebra.h>
 
 #include <graphics_manager.h>
-#include <collision.h>
 
 #include "aabb.h"
 #include "plane.h"
@@ -10,6 +9,7 @@
 #include "capsule.h"
 #include "segment.h"
 #include "triangle.h"
+#include "mesh_collider.h"
 
 #include <windows.h>
 #undef min
@@ -119,6 +119,11 @@ void OBB::Init(const Vector3& center, const Vector3 orientation[], const Vector3
     this->e = extent;
 }
 
+void OBB::SetCenter(const Vector3& center)
+{
+    this->c = center;
+}
+
 Vector3 OBB::GetCenter() const
 {
     return c;
@@ -142,7 +147,7 @@ Matrix4 OBB::GetTransform() const
 #define CHECK_OVERLAP(axis, index) \
     if (!TryAxis(one, two, (axis), toCenter, (index), pen, best)) return false;
 
-bool OBB::Intersect(const OBB& two, CollisionData* collisionData) const
+bool OBB::Intersect(const OBB& two, Array<CollisionData>* collisionData) const
 {
     const OBB& one = *this;
 
@@ -201,11 +206,13 @@ bool OBB::Intersect(const OBB& two, CollisionData* collisionData) const
         if (two.u[1].Dot(normal) < 0) vertex.y = -vertex.y;
         if (two.u[2].Dot(normal) < 0) vertex.z = -vertex.z;
 
-        if (collisionData)
+        if (collisionData->size < MAX_COLLISION_COUNT)
         {
-            collisionData->n = normal;
-            collisionData->penetration = pen;
-            collisionData->point = Matrix4::TransformPoint(two.GetTransform(), vertex);
+            CollisionData collision;
+            collision.n = normal;
+            collision.penetration = pen;
+            collision.point = Matrix4::TransformPoint(two.GetTransform(), vertex);
+            collisionData->Push(collision);
         }
 
         return true;
@@ -223,11 +230,13 @@ bool OBB::Intersect(const OBB& two, CollisionData* collisionData) const
         if (one.u[1].Dot(normal) < 0) vertex.y = -vertex.y;
         if (one.u[2].Dot(normal) < 0) vertex.z = -vertex.z;
 
-        if (collisionData)
+        if (collisionData->size < MAX_COLLISION_COUNT)
         {
-            collisionData->n = normal;
-            collisionData->penetration = pen;
-            collisionData->point = Matrix4::TransformPoint(one.GetTransform(), vertex);
+            CollisionData collision;
+            collision.n = normal;
+            collision.penetration = pen;
+            collision.point = Matrix4::TransformPoint(one.GetTransform(), vertex);
+            collisionData->Push(collision);
         }
         return true;
     }
@@ -275,20 +284,21 @@ bool OBB::Intersect(const OBB& two, CollisionData* collisionData) const
             ptOnTwoEdge, twoAxis, two.e[twoAxisIndex],
             bestSingleAxis > 2);
 
-        if (collisionData)
+        if (collisionData->size < MAX_COLLISION_COUNT)
         {
-            collisionData->n = axis;
-            collisionData->penetration = pen;
-            collisionData->point = vertex;
+            CollisionData collision;
+            collision.n = axis;
+            collision.penetration = pen;
+            collision.point = vertex;
+            collisionData->Push(collision);
         }
-
         return true;
     }
     return false;
 }
 #undef CHECK_OVERLAP
 
-bool OBB::Intersect(const AABB& aabb, CollisionData *collisionData) const
+bool OBB::Intersect(const AABB& aabb, Array<CollisionData>* collisionData) const
 {
     // TODO: implement the real version of this funciton
     Vector3 min = aabb.GetMin();
@@ -307,7 +317,7 @@ bool OBB::Intersect(const AABB& aabb, CollisionData *collisionData) const
     return Intersect(obb, collisionData);
 }
 
-bool OBB::Intersect(const Plane& plane, CollisionData* collisionData) const
+bool OBB::Intersect(const Plane& plane, Array<CollisionData>* collisionData) const
 {
     Vector3 vertices[8] =
     {
@@ -330,13 +340,15 @@ bool OBB::Intersect(const Plane& plane, CollisionData* collisionData) const
         float dist = Vector3::Dot(vertices[i], planeNormal);
         if (dist <= planeDistance)
         {
-            if (collisionData)
+            if (collisionData && collisionData->size < MAX_COLLISION_COUNT)
             {
-                collisionData->point = planeNormal;
-                collisionData->point *= (dist - planeDistance);
-                collisionData->point += vertices[i];
-                collisionData->n = planeNormal;
-                collisionData->penetration = planeDistance - dist;
+                CollisionData collision;
+                collision.point = planeNormal;
+                collision.point *= (dist - planeDistance);
+                collision.point += vertices[i];
+                collision.n = planeNormal;
+                collision.penetration = planeDistance - dist;
+                collisionData->Push(collision);
             }
             contactFound++;
         }
@@ -388,7 +400,7 @@ bool OBB::Intersect(const Plane& plane, CollisionData* collisionData, float& sma
 
 
 
-bool OBB::Intersect(const Sphere& sphere, CollisionData* collisionData) const
+bool OBB::Intersect(const Sphere& sphere, Array<CollisionData>* collisionData) const
 {
     Vector3 center = sphere.GetCenter();
     float r = sphere.GetRadio();
@@ -397,17 +409,19 @@ bool OBB::Intersect(const Sphere& sphere, CollisionData* collisionData) const
     Vector3 toObb = center - closest;
     float lenSq = toObb.MagnitudeSq();
 
-    if (collisionData)
+    if (collisionData && collisionData->size < MAX_COLLISION_COUNT)
     {
-        collisionData->n = toObb.Normalized();
-        collisionData->penetration = r - sqrtf(lenSq);
-        collisionData->point = closest;
+        CollisionData collision;
+        collision.n = toObb.Normalized();
+        collision.penetration = r - sqrtf(lenSq);
+        collision.point = closest;
+        collisionData->Push(collision);
     }
 
     return lenSq <= r * r;
 }
 
-bool OBB::Intersect(const Capsule& capsule, CollisionData* collisionData) const
+bool OBB::Intersect(const Capsule& capsule, Array<CollisionData>* collisionData) const
 {
     Vector3 testPoints[3];
     testPoints[0] = capsule.GetA();
@@ -437,7 +451,7 @@ bool OBB::Intersect(const Capsule& capsule, CollisionData* collisionData) const
     return Intersect(sphere, collisionData);
 }
 
-bool OBB::Intersect(const Triangle& triangle, CollisionData* collisionData) const
+bool OBB::Intersect(const Triangle& triangle, Array<CollisionData>* collisionData) const
 {
     // transform the triangle in the obb local space
     Vector3 x = u[0];
@@ -574,26 +588,34 @@ bool OBB::Intersect(const Triangle& triangle, CollisionData* collisionData) cons
         }
     }
 
-    collisionData->n = Matrix4::TransformVector(rotMat, normal);;
-    collisionData->penetration = smallestPenetration;
+    CollisionData collision;
+    collision.n = Matrix4::TransformVector(rotMat, normal);;
+    collision.penetration = smallestPenetration;
 
     // Category 2
     Plane p;
     p.Init(triangle.n, Vector3::Dot(triangle.n, triangle.a));
-    bool result = Intersect(p, collisionData, smallestPenetration);
+    bool result = Intersect(p, &collision, smallestPenetration);
 
     // revers the normal if we are on the other side of the triangle
-    if (collisionData)
+    if (collisionData && collisionData->size < MAX_COLLISION_COUNT)
     {
         Vector3 triCenter = (triangle.a + triangle.b + triangle.c) / 3.0f;
         Vector3 toCenter = triCenter - c;
-        if (toCenter.Dot(collisionData->n) > 0)
+        if (toCenter.Dot(collision.n) > 0)
         {
-            collisionData->n *= -1.0f;
+            collision.n *= -1.0f;
         }
+
+        collisionData->Push(collision);
     }
 
     return result;
+}
+
+bool OBB::Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData) const
+{
+    return meshCollider.Intersect(*this, collisionData);
 }
 
 Vector3 OBB::ClosestPoint(const Vector3& point) const

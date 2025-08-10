@@ -1,7 +1,6 @@
 #pragma once
-#include <common.h>
-#include <containers.h>
 
+#include "collision_utils.h"
 #include "triangle.h"
 
 class AABB;
@@ -10,17 +9,18 @@ class Plane;
 class Sphere;
 class Capsule;
 
-struct CollisionData;
-
 class MeshCollider
 {
 private:
     Array<Triangle> triangles;
 public:
-    bool Intersect(const AABB& aabb, Array<CollisionData>& collisionData) const;
-    bool Intersect(const OBB& obb, Array<CollisionData>& collisionData) const;
-    bool Intersect(const Sphere& sphere, Array<CollisionData>& collisionData) const;
-    bool Intersect(const Capsule& capsule, Array<CollisionData>& collisionData) const;
+
+    void InitFromFile(const char* filepath);
+
+    bool Intersect(const AABB& aabb, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const OBB& obb, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const Sphere& sphere, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const Capsule& capsule, Array<CollisionData>* collisionData = nullptr) const;
 
     const Array<Triangle>& GetTriangles() const;
 };

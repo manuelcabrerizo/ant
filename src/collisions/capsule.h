@@ -1,7 +1,6 @@
 #pragma once
 
-#include <common.h>
-#include <math/vector3.h>
+#include "collision_utils.h"
 
 class Sphere;
 class Ray;
@@ -10,8 +9,7 @@ class Triangle;
 class Plane;
 class AABB;
 class OBB;
-
-struct CollisionData;
+class MeshCollider;
 
 class Capsule
 {
@@ -22,16 +20,19 @@ private:
 public:
     void Init(Vector3 p, Vector3 q, f32 r);
 
+    void SetPosition(const Vector3& position);
+
     Vector3 GetA() const;
     Vector3 GetB() const;
     float GetRadio() const;
 
-    bool Intersect(const Capsule& capsule) const;
-    bool Intersect(const Sphere& sphere) const;
-    bool Intersect(const Triangle& triangle, Vector3& n, float& penetration) const;
-    bool Intersect(const Plane& plane) const;
-    bool Intersect(const AABB& aabb) const;
-    bool Intersect(const OBB& obb, CollisionData* collisionData = nullptr) const;
+    bool Intersect(const Capsule& capsule, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const Sphere& sphere, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const Triangle& triangle, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const Plane& plane, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const AABB& aabb, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const OBB& obb, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData = nullptr) const;
 
     Vector3 ClosestPoint(const Vector3& point) const;
     float SqDistPoint(const Vector3& point) const;

@@ -1,7 +1,6 @@
 #pragma once
 
-#include <common.h>
-#include <math/vector3.h>
+#include "collision_utils.h"
 
 class Cylinder
 {

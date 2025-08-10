@@ -10,6 +10,7 @@ class PhysicsComponent : public Component<PhysicsComponent>
 private:
     static CollisionWorld collisionWorld;
 
+    void UpdateCollider();
     void ProcessPhysics(float dt);
     void ProcessColisionDetectionAndResolution();
 
@@ -21,6 +22,8 @@ public:
     Vector3 forceAccumulator = Vector3();
     Vector3 offset;
     bool grounded = false;
+
+    Collider *collider = nullptr;
 
     static void Initialize();
     static void Terminate();

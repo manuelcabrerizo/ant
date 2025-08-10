@@ -10,11 +10,17 @@
 #include "aabb.h"
 #include "obb.h"
 #include "capsule.h"
+#include "mesh_collider.h"
 
 void Sphere::Init(Vector3 c, f32 r)
 {
     this->c = c;
     this->r = r;
+}
+
+void Sphere::SetCenter(const Vector3& center)
+{
+    this->c = center;
 }
 
 Vector3 Sphere::GetCenter() const
@@ -27,7 +33,7 @@ f32 Sphere::GetRadio() const
     return r;
 }
 
-bool Sphere::Intersect(const Sphere& sphere) const
+bool Sphere::Intersect(const Sphere& sphere, Array<CollisionData>* collisionData) const
 {
     Vector3 d = c - sphere.c;
     f32 dist2 = d.Dot(d);
@@ -35,37 +41,52 @@ bool Sphere::Intersect(const Sphere& sphere) const
     return dist2 <= (radiusSum * radiusSum);
 }
 
-bool Sphere::Intersect(const Triangle& triangle, Vector3& n, f32& penetration) const
+bool Sphere::Intersect(const Triangle& triangle, Array<CollisionData>* collisionData) const
 {
     Vector3 closest = triangle.ClosestPoint(c);
     Vector3 toSphere = c - closest;
     f32 lenSq = toSphere.Dot(toSphere);
-    n = toSphere.Normalized();
-    penetration = r - sqrtf(lenSq);
+    if (collisionData && collisionData->size < MAX_COLLISION_COUNT)
+    {
+        CollisionData collision;
+        collision.n = toSphere.Normalized();
+        collision.penetration = r - sqrtf(lenSq);
+        collisionData->Push(collision);
+    }
     return lenSq <= r * r;
 }
 
-bool Sphere::Intersect(const Plane& plane) const
+bool Sphere::Intersect(const Plane& plane, Array<CollisionData>* collisionData) const
 {
     float dist = Vector3::Dot(c, plane.GetNormal()) - plane.GetDistance();
+    if (collisionData && collisionData->size < MAX_COLLISION_COUNT)
+    {
+        CollisionData collision;
+        // TODO: ...
+        collisionData->Push(collision);
+    }
     return (dist - r) < 0.0f;
 }
 
-bool Sphere::Intersect(const AABB& aabb) const
+bool Sphere::Intersect(const AABB& aabb, Array<CollisionData>* collisionData) const
 {
-    return aabb.Intersect(*this);
+    return aabb.Intersect(*this, collisionData);
 }
 
-bool Sphere::Intersect(const OBB& obb) const
+bool Sphere::Intersect(const OBB& obb, Array<CollisionData>* collisionData) const
 {
-    return obb.Intersect(*this);
+    return obb.Intersect(*this, collisionData);
 }
 
-bool Sphere::Intersect(const Capsule& capsule) const
+bool Sphere::Intersect(const Capsule& capsule, Array<CollisionData>* collisionData) const
 {
-    return capsule.Intersect(*this);
+    return capsule.Intersect(*this, collisionData);
 }
 
+bool Sphere::Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData) const
+{
+    return meshCollider.Intersect(*this, collisionData);
+}
 
 bool Sphere::DynamicIntersect(const Plane& plane, const Vector3& movement, f32& t) const
 {

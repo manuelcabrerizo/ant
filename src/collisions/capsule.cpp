@@ -6,17 +6,26 @@
 #include "plane.h"
 #include "aabb.h"
 #include "obb.h"
+#include "mesh_collider.h"
 
 #include <graphics_manager_d3d11.h>
 #include <math/algebra.h>
 #include <math/quaternion.h>
-
 
 void Capsule::Init(Vector3 p, Vector3 q, f32 r)
 {
     this->a = p;
     this->b = q;
     this->r = r;
+}
+
+void Capsule::SetPosition(const Vector3& position)
+{
+    Vector3 axis = b - a;
+    float halfExtent = axis.Magnitude() * 0.5f;
+    axis.Normalize();
+    a = position - axis * halfExtent;
+    b = position + axis * halfExtent;
 }
 
 Vector3 Capsule::GetA() const
@@ -34,7 +43,7 @@ float Capsule::GetRadio() const
     return r;
 }
 
-bool Capsule::Intersect(const Capsule& capsule) const
+bool Capsule::Intersect(const Capsule& capsule, Array<CollisionData>* collisionData) const
 {
     Segment segmentA;
     segmentA.Init(a, b);
@@ -49,7 +58,7 @@ bool Capsule::Intersect(const Capsule& capsule) const
     return distSq <= rSum * rSum;
 }
 
-bool Capsule::Intersect(const Sphere& sphere) const
+bool Capsule::Intersect(const Sphere& sphere, Array<CollisionData>* collisionData) const
 {
     Segment axis;
     axis.Init(a, b);
@@ -60,7 +69,7 @@ bool Capsule::Intersect(const Sphere& sphere) const
     return (closest - center).MagnitudeSq() <= rSum * rSum;
 }
 
-bool Capsule::Intersect(const Triangle& triangle, Vector3& n, float& penetration) const
+bool Capsule::Intersect(const Triangle& triangle, Array<CollisionData>* collisionData) const
 {
     Plane plane;
     plane.Init(triangle);
@@ -76,26 +85,31 @@ bool Capsule::Intersect(const Triangle& triangle, Vector3& n, float& penetration
 
     Sphere sphere;
     sphere.Init(closestOnSegment, r);
-    return sphere.Intersect(triangle, n, penetration);
+    return sphere.Intersect(triangle, collisionData);
 }
 
-bool Capsule::Intersect(const Plane& plane) const
+bool Capsule::Intersect(const Plane& plane, Array<CollisionData>* collisionData) const
 {
     Sphere aSphere;
     aSphere.Init(a, r);
     Sphere bSphere;
     bSphere.Init(b, r);
-    return aSphere.Intersect(plane) || bSphere.Intersect(plane);
+    return aSphere.Intersect(plane, collisionData) || bSphere.Intersect(plane, collisionData);
 }
 
-bool Capsule::Intersect(const AABB& aabb) const
+bool Capsule::Intersect(const AABB& aabb, Array<CollisionData>* collisionData) const
 {
-    return aabb.Intersect(*this);
+    return aabb.Intersect(*this, collisionData);
 }
 
-bool Capsule::Intersect(const OBB& obb, CollisionData* collisionData) const
+bool Capsule::Intersect(const OBB& obb, Array<CollisionData>* collisionData) const
 {
     return obb.Intersect(*this, collisionData);
+}
+
+bool Capsule::Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData) const
+{
+    return meshCollider.Intersect(*this, collisionData);
 }
 
 Vector3 Capsule::ClosestPoint(const Vector3& point) const

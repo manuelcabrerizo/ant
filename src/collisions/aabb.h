@@ -1,13 +1,12 @@
 #pragma once
 
-#include <common.h>
-#include <containers.h>
-#include <math/vector3.h>
+#include "collision_utils.h"
 
 class Plane;
 class Sphere;
 class Capsule;
 class OBB;
+class MeshCollider;
 
 class AABB
 {
@@ -18,14 +17,17 @@ public:
     void Init(const Vector3& min, const Vector3& max);
     void Init(Array<Vector3>& points);
 
+    void SetMin(const Vector3& min);
+    void SetMax(const Vector3& max);
     Vector3 GetMin() const;
     Vector3 GetMax() const;
 
-    bool Intersect(const AABB& aabb) const;
-    bool Intersect(const OBB& obb) const;
-    bool Intersect(const Plane& plane) const;
-    bool Intersect(const Sphere& sphere) const;
-    bool Intersect(const Capsule& capsule) const;
+    bool Intersect(const AABB& aabb, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const OBB& obb, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const Plane& plane, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const Sphere& sphere, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const Capsule& capsule, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData = nullptr) const;
 
     Vector3 ClosestPoint(const Vector3& point) const;
     float SqDistPoint(const Vector3& point) const;

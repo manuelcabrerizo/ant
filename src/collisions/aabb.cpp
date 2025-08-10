@@ -7,6 +7,7 @@
 #include "sphere.h"
 #include "capsule.h"
 #include "segment.h"
+#include "mesh_collider.h"
 
 #include <graphics_manager.h>
 #include <cfloat>
@@ -35,6 +36,16 @@ void AABB::Init(Array<Vector3>& points)
     this->max.z = points[zIndexMax].z;
 }
 
+void AABB::SetMin(const Vector3& min)
+{
+    this->min = min;
+}
+
+void AABB::SetMax(const Vector3& max)
+{
+    this->max = max;
+}
+
 Vector3 AABB::GetMin() const
 {
     return min;
@@ -45,7 +56,7 @@ Vector3 AABB::GetMax() const
     return max;
 }
 
-bool AABB::Intersect(const AABB& aabb) const
+bool AABB::Intersect(const AABB& aabb, Array<CollisionData>* collisionData) const
 {
     if (max[0] < aabb.min[0] || min[0] > aabb.max[0]) return false;
     if (max[1] < aabb.min[1] || min[1] > aabb.max[1]) return false;
@@ -53,13 +64,13 @@ bool AABB::Intersect(const AABB& aabb) const
     return true;
 }
 
-bool AABB::Intersect(const OBB& obb) const
+bool AABB::Intersect(const OBB& obb, Array<CollisionData>* collisionData) const
 {
-    return obb.Intersect(*this);
+    return obb.Intersect(*this, collisionData);
 }
 
 
-bool AABB::Intersect(const Plane& plane) const
+bool AABB::Intersect(const Plane& plane, Array<CollisionData>* collisionData) const
 {
     Vector3 vertices[8] = 
     {
@@ -78,7 +89,7 @@ bool AABB::Intersect(const Plane& plane) const
     return contactFound > 0;
 }
 
-bool AABB::Intersect(const Capsule& capsule) const
+bool AABB::Intersect(const Capsule& capsule, Array<CollisionData>* collisionData) const
 {
     Vector3 testPoints[3];
     testPoints[0] = capsule.GetA();
@@ -105,15 +116,20 @@ bool AABB::Intersect(const Capsule& capsule) const
 
     Sphere sphere;
     sphere.Init(closestOnSegment, capsule.GetRadio());
-    return Intersect(sphere);
+    return Intersect(sphere, collisionData);
 }
 
 
-bool AABB::Intersect(const Sphere& sphere) const
+bool AABB::Intersect(const Sphere& sphere, Array<CollisionData>* collisionData) const
 {
     Vector3 center = sphere.GetCenter();
     float r = sphere.GetRadio();
     return SqDistPoint(center) <= r * r;
+}
+
+bool AABB::Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData) const
+{
+    return meshCollider.Intersect(*this, collisionData);
 }
 
 Vector3 AABB::ClosestPoint(const Vector3& point) const

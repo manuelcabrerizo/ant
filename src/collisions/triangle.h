@@ -1,7 +1,6 @@
 #pragma once
 
-#include <common.h>
-#include <math/vector3.h>
+#include "collision_utils.h"
 
 class Ray;
 class Segment;
@@ -10,8 +9,8 @@ class Triangle
 {
 public:
     void Init(const Vector3& a, const Vector3& b, const Vector3& c);
-    bool Intersect(const Ray& ray, f32& t) const;
-    bool Intersect(const Segment& segment, f32& t) const;
+    bool Intersect(const Ray& ray, float& t) const;
+    bool Intersect(const Segment& segment, float& t) const;
 
     bool PointInside(const Vector3& q) const;
 
