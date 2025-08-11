@@ -61,14 +61,24 @@ bool AABB::Intersect(const AABB& aabb, Array<CollisionData>* collisionData) cons
     if (max[0] < aabb.min[0] || min[0] > aabb.max[0]) return false;
     if (max[1] < aabb.min[1] || min[1] > aabb.max[1]) return false;
     if (max[2] < aabb.min[2] || min[2] > aabb.max[2]) return false;
+    if (collisionData && collisionData->size < MAX_COLLISION_COUNT)
+    {
+        OBB obb;
+        obb.Init(*this);
+        obb.Intersect(aabb, collisionData);
+    }
     return true;
 }
 
 bool AABB::Intersect(const OBB& obb, Array<CollisionData>* collisionData) const
 {
-    return obb.Intersect(*this, collisionData);
+    bool isIntersecting = obb.Intersect(*this, collisionData);
+    if (isIntersecting)
+    {
+        collisionData->data[collisionData->size - 1].n *= -1.0f;
+    }
+    return isIntersecting;
 }
-
 
 bool AABB::Intersect(const Plane& plane, Array<CollisionData>* collisionData) const
 {
@@ -78,11 +88,25 @@ bool AABB::Intersect(const Plane& plane, Array<CollisionData>* collisionData) co
         Vector3(min.x, max.y, min.z), Vector3(min.x, max.y, max.z), Vector3(max.x, max.y, max.z), Vector3(max.x, max.y, min.z)
     };
 
+    Vector3 planeNormal = plane.GetNormal();
+    float planeDistance = plane.GetDistance();
+
     int contactFound = 0;
     for (int i = 0; i < 8; i++)
     {
-        if (Vector3::Dot(vertices[i], plane.GetNormal()) <= plane.GetDistance())
+        float dist = Vector3::Dot(vertices[i], planeNormal);
+        if (dist <= planeDistance)
         {
+            if (collisionData && collisionData->size < MAX_COLLISION_COUNT)
+            {
+                CollisionData collision;
+                collision.point = planeNormal;
+                collision.point *= (dist - planeDistance);
+                collision.point += vertices[i];
+                collision.n = planeNormal;
+                collision.penetration = planeDistance - dist;
+                collisionData->Push(collision);
+            }
             contactFound++;
         }
     }
@@ -124,8 +148,28 @@ bool AABB::Intersect(const Sphere& sphere, Array<CollisionData>* collisionData) 
 {
     Vector3 center = sphere.GetCenter();
     float r = sphere.GetRadio();
-    return SqDistPoint(center) <= r * r;
+    Vector3 closest = ClosestPoint(center);
+    Vector3 toAABB = closest - center;
+    float distSq = toAABB.MagnitudeSq();
+    bool isIntersecting = distSq <= r * r;
+    if (isIntersecting && collisionData && collisionData->size < MAX_COLLISION_COUNT)
+    {
+        CollisionData collision;
+        collision.n = toAABB.Normalized();
+        collision.penetration = r - sqrtf(distSq);
+        collision.point = closest;
+        collisionData->Push(collision);
+    }
+    return  isIntersecting;
 }
+
+bool AABB::Intersect(const Triangle& triangle, Array<CollisionData>* collisionData) const
+{
+    OBB obb;
+    obb.Init(*this);
+    return obb.Intersect(triangle, collisionData);
+}
+
 
 bool AABB::Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData) const
 {

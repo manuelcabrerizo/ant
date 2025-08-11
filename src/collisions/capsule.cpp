@@ -55,7 +55,18 @@ bool Capsule::Intersect(const Capsule& capsule, Array<CollisionData>* collisionD
     float s, t;
     float distSq = segmentA.ClosestPoint(segmentB, c1, s, c2, t);
     float rSum = r + capsule.r;
-    return distSq <= rSum * rSum;
+
+    bool isIntersecting = distSq <= rSum * rSum;
+    if (isIntersecting && collisionData && collisionData->size < MAX_COLLISION_COUNT)
+    {
+        float dist = sqrtf(distSq);
+
+        CollisionData collision;
+        collision.n = (c1 - c2).Normalized();
+        collision.penetration = rSum - dist;
+        collisionData->Push(collision);
+    }
+    return isIntersecting;
 }
 
 bool Capsule::Intersect(const Sphere& sphere, Array<CollisionData>* collisionData) const
@@ -65,8 +76,18 @@ bool Capsule::Intersect(const Sphere& sphere, Array<CollisionData>* collisionDat
     float t;
     Vector3 center = sphere.GetCenter();
     Vector3 closest = axis.ClosestPoint(center, t);
+    float distSq = (closest - center).MagnitudeSq();
     float rSum = r + sphere.GetRadio();
-    return (closest - center).MagnitudeSq() <= rSum * rSum;
+    bool isIntersecting = distSq <= rSum * rSum;
+    if (isIntersecting && collisionData && collisionData->size < MAX_COLLISION_COUNT)
+    {
+        float dist = sqrtf(distSq);
+        CollisionData collision;
+        collision.n = (closest - center).Normalized();
+        collision.penetration = rSum - dist;
+        collisionData->Push(collision);
+    }
+    return isIntersecting;
 }
 
 bool Capsule::Intersect(const Triangle& triangle, Array<CollisionData>* collisionData) const
@@ -99,12 +120,22 @@ bool Capsule::Intersect(const Plane& plane, Array<CollisionData>* collisionData)
 
 bool Capsule::Intersect(const AABB& aabb, Array<CollisionData>* collisionData) const
 {
-    return aabb.Intersect(*this, collisionData);
+    bool isIntersecting = aabb.Intersect(*this, collisionData);
+    if (isIntersecting)
+    {
+        collisionData->data[collisionData->size - 1].n *= -1.0f;
+    }
+    return isIntersecting;
 }
 
 bool Capsule::Intersect(const OBB& obb, Array<CollisionData>* collisionData) const
 {
-    return obb.Intersect(*this, collisionData);
+    bool isIntersecting = obb.Intersect(*this, collisionData);
+    if (isIntersecting)
+    {
+        collisionData->data[collisionData->size - 1].n *= -1.0f;
+    }
+    return isIntersecting;
 }
 
 bool Capsule::Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData) const

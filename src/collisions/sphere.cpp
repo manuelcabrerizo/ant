@@ -38,9 +38,18 @@ f32 Sphere::GetRadio() const
 bool Sphere::Intersect(const Sphere& sphere, Array<CollisionData>* collisionData) const
 {
     Vector3 d = c - sphere.c;
-    f32 dist2 = d.Dot(d);
-    f32 radiusSum = r + sphere.r;
-    return dist2 <= (radiusSum * radiusSum);
+    float dist2 = d.Dot(d);
+    float radiusSum = r + sphere.r;
+    bool isIntersecting = dist2 <= (radiusSum * radiusSum);
+    if (isIntersecting && collisionData && collisionData->size < MAX_COLLISION_COUNT)
+    {
+        float dist = sqrtf(dist2);
+        CollisionData collision;
+        collision.n = d.Normalized();
+        collision.penetration = radiusSum - dist;
+        collisionData->Push(collision);
+    }
+    return isIntersecting;
 }
 
 bool Sphere::Intersect(const Triangle& triangle, Array<CollisionData>* collisionData) const
@@ -62,11 +71,12 @@ bool Sphere::Intersect(const Triangle& triangle, Array<CollisionData>* collision
 bool Sphere::Intersect(const Plane& plane, Array<CollisionData>* collisionData) const
 {
     float dist = Vector3::Dot(c, plane.GetNormal()) - plane.GetDistance();
-    bool isIntersecting = (dist - r) < 0.0f;
+    bool isIntersecting = dist <= r;
     if (isIntersecting && collisionData && collisionData->size < MAX_COLLISION_COUNT)
     {
         CollisionData collision;
-        // TODO: ...
+        collision.n - plane.GetNormal();
+        collision.penetration = r - dist;
         collisionData->Push(collision);
     }
     return isIntersecting;
@@ -74,17 +84,32 @@ bool Sphere::Intersect(const Plane& plane, Array<CollisionData>* collisionData) 
 
 bool Sphere::Intersect(const AABB& aabb, Array<CollisionData>* collisionData) const
 {
-    return aabb.Intersect(*this, collisionData);
+    bool isIntersecting = aabb.Intersect(*this, collisionData);
+    if (isIntersecting)
+    {
+        collisionData->data[collisionData->size - 1].n *= -1.0f;
+    }
+    return isIntersecting;
 }
 
 bool Sphere::Intersect(const OBB& obb, Array<CollisionData>* collisionData) const
 {
-    return obb.Intersect(*this, collisionData);
+    bool isIntersecting = obb.Intersect(*this, collisionData);
+    if (isIntersecting)
+    {
+        collisionData->data[collisionData->size - 1].n *= -1.0f;
+    }
+    return isIntersecting;
 }
 
 bool Sphere::Intersect(const Capsule& capsule, Array<CollisionData>* collisionData) const
 {
-    return capsule.Intersect(*this, collisionData);
+    bool isIntersecting = capsule.Intersect(*this, collisionData);
+    if (isIntersecting)
+    {
+        collisionData->data[collisionData->size - 1].n *= -1.0f;
+    }
+    return isIntersecting;
 }
 
 bool Sphere::Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData) const

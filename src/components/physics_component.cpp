@@ -56,6 +56,14 @@ void PhysicsComponent::Initialize()
     OBB obb4;
     obb4.Init(Vector3(-3, 1.5, 7.5), orientation2, Vector3(1, 0.5, 1));
     collisionWorld.AddCollider(Collider(obb4));
+
+    Sphere sphe;
+    sphe.Init(Vector3(0, 1.5, 7.5), 1.0f);
+    collisionWorld.AddCollider(Collider(sphe));
+
+    Capsule cap;
+    cap.Init(Vector3(3, 1.5, 7.5), Vector3(3, 2.0f, 7.5), 0.25f);
+    collisionWorld.AddCollider(Collider(cap));
 }
 
 void PhysicsComponent::Terminate()
@@ -83,6 +91,9 @@ void PhysicsComponent::OnInit(ActorManager *actorManager)
 
     Vector3 extent = Vector3(0.25, 0.75, 0.25);
 
+    AABB aabb;
+    aabb.Init(transform->position - extent, transform->position + extent);
+
     OBB obb;
     obb.Init(transform->position + offset, orientation, extent);
 
@@ -97,7 +108,7 @@ void PhysicsComponent::OnInit(ActorManager *actorManager)
     Sphere sphere;
     sphere.Init(transform->position + offset, colliderRadius);
 
-    collider = collisionWorld.AddCollider(Collider(obb));
+    collider = collisionWorld.AddCollider(Collider(capsule));
 }
 
 void PhysicsComponent::OnTerminate(ActorManager *actorManager)
@@ -109,7 +120,7 @@ void PhysicsComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
     ProcessPhysics(dt);
     UpdateCollider();
-    ProcessColisionDetectionAndResolution();
+    ProcessCollisionDetectionAndResolution();
 }
 
 void PhysicsComponent::UpdateCollider()
@@ -130,9 +141,8 @@ void PhysicsComponent::ProcessPhysics(float dt)
     forceAccumulator = Vector3(0.0f);
 }
 
-void PhysicsComponent::ProcessColisionDetectionAndResolution()
+void PhysicsComponent::ProcessCollisionDetectionAndResolution()
 {
-    
     f32 colliderRadius = 0.25f;
     // Grounded test
     Segment groundSegment;
@@ -142,7 +152,7 @@ void PhysicsComponent::ProcessColisionDetectionAndResolution()
 
     grounded = collisionWorld.Intersect(groundSegment, tOut, collider->GetId());
     
-    // Colission detection and resolution
+    // Collision detection and resolution
     Frame frame = MemoryManager::Get()->GetFrame();
 
     Array<CollisionData> collisionData;

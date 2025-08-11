@@ -6,6 +6,7 @@ class Plane;
 class Sphere;
 class Capsule;
 class OBB;
+class Triangle;
 class MeshCollider;
 
 class AABB
@@ -27,6 +28,7 @@ public:
     bool Intersect(const Plane& plane, Array<CollisionData>* collisionData = nullptr) const;
     bool Intersect(const Sphere& sphere, Array<CollisionData>* collisionData = nullptr) const;
     bool Intersect(const Capsule& capsule, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const Triangle& triangle, Array<CollisionData>* collisionData = nullptr) const;
     bool Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData = nullptr) const;
 
     Vector3 ClosestPoint(const Vector3& point) const;

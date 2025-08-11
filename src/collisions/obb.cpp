@@ -109,7 +109,6 @@ Vector3 OBB::ContactPoint(
 }
 
 // Member functions
-
 void OBB::Init(const Vector3& center, const Vector3 orientation[], const Vector3& extent)
 {
     this->c = center;
@@ -118,6 +117,20 @@ void OBB::Init(const Vector3& center, const Vector3 orientation[], const Vector3
     this->u[2] = orientation[2];
     this->e = extent;
 }
+
+void OBB::Init(const AABB& aabb)
+{
+    Vector3 center = aabb.GetMin() + (aabb.GetMax() - aabb.GetMin()) * 0.5f;
+    Vector3 orientation[] =
+    {
+        Vector3(1, 0, 0),
+        Vector3(0, 1, 0),
+        Vector3(0, 0, 1)
+    };
+    Vector3 extent = (aabb.GetMax() - aabb.GetMin()) * 0.5f;
+    Init(center, orientation, extent);
+}
+
 
 void OBB::SetCenter(const Vector3& center)
 {
@@ -397,15 +410,13 @@ bool OBB::Intersect(const Plane& plane, CollisionData* collisionData, float& sma
     return contactFound > 0;
 }
 
-
-
 bool OBB::Intersect(const Sphere& sphere, Array<CollisionData>* collisionData) const
 {
     Vector3 center = sphere.GetCenter();
     float r = sphere.GetRadio();
 
     Vector3 closest = ClosestPoint(center);
-    Vector3 toObb = center - closest;
+    Vector3 toObb =  closest - center;
     float lenSq = toObb.MagnitudeSq();
     bool isIntersecting = lenSq <= r * r;
     if (isIntersecting && collisionData && collisionData->size < MAX_COLLISION_COUNT)
@@ -490,13 +501,6 @@ bool OBB::Intersect(const Triangle& triangle, Array<CollisionData>* collisionDat
     
     float smallestPenetration = FLT_MAX;
     int axisIndex;
-
-    /*
-    TODO: Test this:
-    if (pMin > r || pMax < -r)
-    return false;
-    float penetration = std::min(r, pMax) - std::max(-r, pMin);
-    */
 
     for (int i = 0; i < ARRAY_LENGTH(axes); ++i)
     {

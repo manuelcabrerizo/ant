@@ -4,6 +4,7 @@
 #include <collisions/collider.h>
 #include <collisions/ray.h>
 #include <collisions/segment.h>
+#include <collisions/plane.h>
 
 class CollisionWorld
 {

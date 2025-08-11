@@ -12,7 +12,7 @@ private:
 
     void UpdateCollider();
     void ProcessPhysics(float dt);
-    void ProcessColisionDetectionAndResolution();
+    void ProcessCollisionDetectionAndResolution();
 
 public:
     TransformComponent *transform;

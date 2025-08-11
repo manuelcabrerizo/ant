@@ -50,8 +50,14 @@ void MeshCollider::InitFromFile(const char* filepath)
 
 bool MeshCollider::Intersect(const AABB& aabb, Array<CollisionData>* collisionData) const
 {
-    // TODO: implement this function
-    return false;
+    OBB obb;
+    obb.Init(aabb);
+    bool isIntersecting = false;
+    for (int i = 0; i < triangles.size; ++i)
+    {
+        isIntersecting |= obb.Intersect(triangles[i], collisionData);
+    }
+    return isIntersecting;
 }
 
 bool MeshCollider::Intersect(const OBB& obb, Array<CollisionData>* collisionData) const
