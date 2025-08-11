@@ -79,15 +79,7 @@ void Game::Init()
      actorManager.AllocInternalMemory();
 
      // Create Entities
-     player = actorManager.CreateActorFromFile("data/xml/player.xml");
-     //WeaponComponent *weapon = actorManager.GetComponent<WeaponComponent>(player);
-     //AnimationComponent animationCmp;
-     //animationCmp.skeleton.Init("data/models/fps-animations-vsk/source/FPS_VSK1.fbx", STATIC_MEMORY);
-     //animationCmp.animation.Init("data/models/fps-animations-vsk/source/FPS_VSK1.fbx", ModelManager::Get()->Get("anim-gun"), STATIC_MEMORY);
-     //actorManager.AddComponent<AnimationComponent>(weapon->weapon, animationCmp);
-     //RenderComponent *render = actorManager.GetComponent<RenderComponent>(weapon->weapon);
-     //render->isAnimated = true;
-     
+     player = actorManager.CreateActorFromFile("data/xml/player.xml");     
      actorManager.CreateActorFromFile("data/xml/test-level.xml");
      actorManager.CreateActorFromFile("data/xml/tower.xml");
      actorManager.CreateActorFromFile("data/xml/house.xml");
@@ -141,10 +133,8 @@ void Game::Init()
 
 void Game::Update(f32 dt)
 {
-    // TODO: this is down here for the debug renderer
     GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
     PhysicsComponent::DebugDraw();
-
 
      // Initialize new components
      actorManager.InitializeNewComponents();
@@ -158,8 +148,6 @@ void Game::Update(f32 dt)
      // Late Update
      actorManager.LateUpdateComponents<PlayerControllerComponent>(dt);
 }
-
-#include <math/matrix4.h>
 
 void Game::Render(f32 dt)
 {
