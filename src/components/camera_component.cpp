@@ -12,8 +12,6 @@ CameraUbo CameraComponent::ubo;
 
 void CameraComponent::Initialize()
 {
-     ubo.view = Matrix4::LookAt(Vector3(0.0f, 4.0f, 20.0f), Vector3(0.0f, 4.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
-     ubo.proj = Matrix4::Perspective(65.0f, (float)WINDOW_WIDTH/WINDOW_HEIGHT, 0.01f, 100.0f);
      uniformBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_VS, &ubo, sizeof(ubo), 0);
      GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
 }
@@ -25,13 +23,17 @@ void CameraComponent::Terminate()
 
 void CameraComponent::OnInit(ActorManager *actorManager)
 {
-     resizeNotification = NotificationManager::Get()->AddListener(this, NOTIFICATION_ON_RESIZE);
+    ubo.view = Matrix4::LookAt(Vector3(0.0f, 4.0f, 20.0f), Vector3(0.0f, 4.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
+    ubo.proj = Matrix4::Perspective(65.0f, (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.01f, 100.0f);
+    GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
+
+     NotificationManager::Get()->AddListener(this, NOTIFICATION_ON_RESIZE);
      transform = actorManager->GetComponent<TransformComponent>(owner);
 }
 
 void CameraComponent::OnTerminate(ActorManager *actorManager)
 {
-     NotificationManager::Get()->RemoveListener(resizeNotification, NOTIFICATION_ON_RESIZE);
+     NotificationManager::Get()->RemoveListener(this, NOTIFICATION_ON_RESIZE);
 }
 
 void CameraComponent::OnUpdate(ActorManager *actorManager, f32 dt)

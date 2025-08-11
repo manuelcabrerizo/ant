@@ -9,7 +9,6 @@ class WeaponComponent : public Component<WeaponComponent>, INotificable
 {
 private:
     TransformComponent *transform;
-    SlotmapKey<INotificable *> shootNotification;
 public:
     SlotmapKey<Actor> weapon;
 

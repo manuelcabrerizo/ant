@@ -50,23 +50,9 @@ void Game::Init()
      // Load Materials
      MaterialManager::Get()->LoadTexture("DefaultMaterial", "default",
          "DefaultMaterial_Diffuse", "DefaultMaterial_Normal", "DefaultMaterial_Specular", 64);
-     MaterialManager::Get()->LoadSolidColor("GreenMaterial", "color",
-         Vector3(0.0f, 1.0f, 0.0f), Vector3(0.0f, 0.6f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
-     MaterialManager::Get()->LoadSolidColor("RedMaterial", "color",
-         Vector3(1.0f, 0.0f, 0.0f), Vector3(0.6f, 0.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
-     MaterialManager::Get()->LoadSolidColor("YellowMaterial", "color",
-         Vector3(1.0f, 1.0f, 0.0f), Vector3(0.6f, 0.0f, 0.0f), Vector3(1.0f, 1.0f, 1.0f), 32);
-
-     // Load the models
-     ModelManager::Get()->Load("house", "data/models/House/source/house.fbx");
-     ModelManager::Get()->Load("warrior", "data/models/Warrior/source/warrior.fbx");
-     ModelManager::Get()->Load("test-level", "data/models/Level/source/level.fbx");
-     ModelManager::Get()->Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx");
-     ModelManager::Get()->Load("tower", "data/models/MagicStudio/source/MagicStudio.fbx");
-     ModelManager::Get()->Load("wizard", "data/models/Wizard/source/Wizard.FBX");
 
      // Initialize the Actor Manager
-     actorManager.Init(100, 64, STATIC_MEMORY);
+     actorManager.BeingInitialization(100, 64, STATIC_MEMORY);
      actorManager.AddComponentType<TransformComponent, 100>();
      actorManager.AddComponentType<RenderComponent, 100>();
      actorManager.AddComponentType<PhysicsComponent, 100>();
@@ -76,59 +62,19 @@ void Game::Init()
      actorManager.AddComponentType<EnemyComponent, 10>();
      actorManager.AddComponentType<AnchorComponent, 10>();
      actorManager.AddComponentType<AnimationComponent, 10>();
-     actorManager.AllocInternalMemory();
-
-     // Create Entities
-     player = actorManager.CreateActorFromFile("data/xml/player.xml");     
-     actorManager.CreateActorFromFile("data/xml/test-level.xml");
-     actorManager.CreateActorFromFile("data/xml/tower.xml");
-     actorManager.CreateActorFromFile("data/xml/house.xml");
-     actorManager.CreateActorFromFile("data/xml/wizard.xml");
-     
-     
-     SlotmapKey<Actor> enemy[3] =
-     {
-          actorManager.CreateActorFromFile("data/xml/enemy.xml"),
-          actorManager.CreateActorFromFile("data/xml/enemy.xml"),
-          actorManager.CreateActorFromFile("data/xml/enemy.xml")
-     };
-     
-
-     // Warrior Animation
-     TransformComponent *transforms[3] =
-     {
-          actorManager.GetComponent<TransformComponent>(enemy[0]),
-          actorManager.GetComponent<TransformComponent>(enemy[1]),
-          actorManager.GetComponent<TransformComponent>(enemy[2])
-     };
-     transforms[0]->position.x = 0.0f;
-     transforms[1]->position.x = -2.0f;
-     transforms[2]->position.x = -4.0f;
-
-     RenderComponent *renders[3] =
-     {
-          actorManager.GetComponent<RenderComponent>(enemy[0]),
-          actorManager.GetComponent<RenderComponent>(enemy[1]),
-          actorManager.GetComponent<RenderComponent>(enemy[2])
-     };
-     renders[0]->isAnimated = true;
-     renders[1]->isAnimated = true;
-     renders[2]->isAnimated = true;
-
-     AnimationComponent animation;
-     animation.skeleton.Init("data/models/warrior.dae", STATIC_MEMORY);
-     animation.animation.Init("data/animations/walk_front.dae", ModelManager::Get()->Get("warrior"), STATIC_MEMORY);
-     actorManager.AddComponent<AnimationComponent>(enemy[0], animation);
-     actorManager.AddComponent<AnimationComponent>(enemy[1], animation);
-     actorManager.AddComponent<AnimationComponent>(enemy[2], animation);
-     
+     // TODO: add more component types ...
+     actorManager.EndInitialization();
 
      CameraComponent::Initialize();
      RenderComponent::Initialize();
      PhysicsComponent::Initialize();
 
      GraphicsManager::Get()->DebugInit();
-     printf("Game Init!\n"); 
+
+     scenes.Init(1, STATIC_MEMORY);
+     scenes[0].Load(&actorManager, "");
+
+     printf("Game Init!\n");
 }
 
 void Game::Update(f32 dt)
@@ -159,19 +105,21 @@ void Game::Render(f32 dt)
 
 void Game::Terminate()
 {
-     GraphicsManager::Get()->DebugTerminate();
+    scenes[0].Unload();
 
-     CameraComponent::Terminate();
-     RenderComponent::Terminate();
-     PhysicsComponent::Terminate();
-     
-     actorManager.Terminate();
-     
-     MaterialManager::Shutdown();
-     TextureManager::Shutdown();
-     ModelManager::Shutdown();
-     VertexShaderManager::Shutdown();
-     FragmentShaderManager::Shutdown();
+    GraphicsManager::Get()->DebugTerminate();
 
-     printf("Game Terminate!\n");
+    CameraComponent::Terminate();
+    RenderComponent::Terminate();
+    PhysicsComponent::Terminate();
+     
+    actorManager.Terminate();
+     
+    MaterialManager::Shutdown();
+    TextureManager::Shutdown();
+    ModelManager::Shutdown();
+    VertexShaderManager::Shutdown();
+    FragmentShaderManager::Shutdown();
+
+    printf("Game Terminate!\n");
 }

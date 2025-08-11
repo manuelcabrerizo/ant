@@ -1,12 +1,13 @@
 #pragma once
 
 #include <actor.h>
+#include <scene.h>
 
 class Game
 {
 private:
+    Array<Scene> scenes;
     ActorManager actorManager;
-    SlotmapKey<Actor> player;
 public:     
     void Init();
     void Terminate();

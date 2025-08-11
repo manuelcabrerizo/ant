@@ -21,7 +21,7 @@
 
 i32 ComponentBase::counter = 0;
 
-void ActorManager::Init(i32 actorCount, i32 componentCount_, i32 memoryType_)
+void ActorManager::BeingInitialization(i32 actorCount, i32 componentCount_, i32 memoryType_)
 {
      memoryType = memoryType_;
      componentCount = componentCount_;
@@ -31,24 +31,28 @@ void ActorManager::Init(i32 actorCount, i32 componentCount_, i32 memoryType_)
      componentStorageMap.Init(componentCount, memoryType);
 }
 
-void ActorManager::Terminate()
+void ActorManager::EndInitialization()
 {
-     
-     Array<Actor> *actorsArray = actors.GetArray();
-     for(i32 i = 0; i < actorsArray->size; ++i)
-     {
-          Actor *actor = &(*actorsArray)[i];
-          for(i32 j = actor->componentsIds.size - 1; j >= 0; --j)
-          {
-               RemoveComponentById(actor, actor->componentsIds[j]);  
-          }
-     }
-     actors.Clear();
+    componentsToInit.Init(maxComponentCount, STATIC_MEMORY);
 }
 
-void ActorManager::AllocInternalMemory()
+void ActorManager::Terminate()
 {
-     componentsToInit.Init(maxComponentCount, STATIC_MEMORY);
+    Clear();
+}
+
+void ActorManager::Clear()
+{
+    Array<Actor>* actorsArray = actors.GetArray();
+    for (i32 i = 0; i < actorsArray->size; ++i)
+    {
+        Actor* actor = &(*actorsArray)[i];
+        for (i32 j = actor->componentsIds.size - 1; j >= 0; --j)
+        {
+            RemoveComponentById(actor, actor->componentsIds[j]);
+        }
+    }
+    actors.Clear();
 }
 
 SlotmapKey<Actor> ActorManager::CreateActor(i32 componentCount_)

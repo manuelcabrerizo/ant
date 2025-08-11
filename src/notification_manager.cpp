@@ -14,11 +14,7 @@ void NotificationManager::Init(i32 stackNum)
 
      instance.registries.Init(NOTIFICATION_TYPE_COUNT, stackNum);
      instance.registries.size = NOTIFICATION_TYPE_COUNT;
-
-     for(i32 i = 0; i < instance.registries.size; i++)
-     {
-          instance.registries[i].listeners.Init(MAX_LISTENERS_PER_NOTIFICATION, stackNum);
-     }
+     instance.allocator.Init(stackNum);
 
      initialize = true;
 }
@@ -41,21 +37,91 @@ NotificationManager *NotificationManager::Get()
      return &instance;
 }
 
-SlotmapKey<INotificable *> NotificationManager::AddListener(INotificable *listener, NotificationType type)
+void NotificationManager::AddListener(INotificable *listener, NotificationType type)
 {
-     return registries[type].listeners.Add(listener);
+    ASSERT(GetNode(listener, type) == nullptr);
+
+    NotificationNode* node = allocator.Alloc();
+    node->listener = listener;
+
+    auto& reg = registries[type];
+    if (reg.firstNode == nullptr)
+    {
+        node->next = nullptr;
+        reg.firstNode = node;
+    }
+    else
+    {
+        node->next = reg.firstNode;
+        reg.firstNode = node;
+    }
 }
 
-void NotificationManager::RemoveListener(SlotmapKey<INotificable *> listenerKey, NotificationType type)
+void NotificationManager::RemoveListener(INotificable *listener, NotificationType type)
 {
-     return registries[type].listeners.Remove(listenerKey);
+    NotificationNode* prev = GetPrev(listener, type);
+    NotificationNode* node;
+
+    auto& reg = registries[type];
+    if (prev)
+    {
+        node = prev->next;
+    }
+    else
+    {
+        node = reg.firstNode;
+    }
+
+    ASSERT(node != nullptr);
+
+    if (prev)
+    {
+        prev->next = node->next;
+    }
+    else
+    {
+        reg.firstNode = node->next;
+    }
+    allocator.Free(node);
 }
-     
+
 void NotificationManager::SendNotification(NotificationType type, void *data, size_t size, void *sender)
 {
-     Array<INotificable *> *listeners = registries[type].listeners.GetArray();;
-     for(i32 i = 0; i < listeners->size; ++i)
-     {
-          (*listeners)[i]->OnNotify(type, data, size, sender);
-     }
+    auto& reg = registries[type];
+    NotificationNode* node = reg.firstNode;
+    while (node != nullptr)
+    {
+        node->listener->OnNotify(type, data, size, sender);
+        node = node->next;
+    }
+}
+
+NotificationNode* NotificationManager::GetNode(INotificable* listener, NotificationType type) const
+{
+    auto& reg = registries[type];
+    NotificationNode* node = reg.firstNode;
+    while (node != nullptr)
+    {
+        if (node->listener == listener)
+        {
+            return node;
+        }
+        node = node->next;
+    }
+    return nullptr;
+}
+
+NotificationNode* NotificationManager::GetPrev(INotificable* listener, NotificationType type) const
+{
+    auto& reg = registries[type];
+    NotificationNode* node = reg.firstNode;
+    while (node != nullptr)
+    {
+        if (node->next && node->next->listener == listener)
+        {
+            return node;
+        }
+        node = node->next;
+    }
+    return nullptr;
 }

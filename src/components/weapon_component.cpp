@@ -7,12 +7,12 @@
 void WeaponComponent::OnInit(ActorManager *actorManager)
 {
     transform = actorManager->GetComponent<TransformComponent>(owner);
-    shootNotification = NotificationManager::Get()->AddListener(this, NOTIFICATION_SHOOT);
+    NotificationManager::Get()->AddListener(this, NOTIFICATION_SHOOT);
 }
 
 void WeaponComponent::OnTerminate(ActorManager *actorManager)
 {
-    NotificationManager::Get()->RemoveListener(shootNotification, NOTIFICATION_SHOOT);
+    NotificationManager::Get()->RemoveListener(this, NOTIFICATION_SHOOT);
 }
 
 void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)

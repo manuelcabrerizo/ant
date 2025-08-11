@@ -241,7 +241,6 @@ public:
 
      Type *Alloc();
      void Free(Type *object);
-     
 };
 
 template<typename Type>
@@ -350,7 +349,10 @@ public:
      Type *Get(const char *name);
      Type *Get(i32 key);
      bool Contains(const char *name);
-
+     int Count()
+     {
+         return occupied;
+     }
      void PrintHashMap();
      
 private:

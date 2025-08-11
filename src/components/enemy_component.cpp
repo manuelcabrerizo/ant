@@ -40,12 +40,12 @@ void EnemyComponent::OnInit(ActorManager *actorManager)
     wander.SetSlowRadius(ANT_PI * 0.5f);
     wander.SetTimeToTarget(0.001f);
 
-    playerMoveNotification = NotificationManager::Get()->AddListener(this, NOTIFICATION_PLAYER_MOVE);
+    NotificationManager::Get()->AddListener(this, NOTIFICATION_PLAYER_MOVE);
 }
 
 void EnemyComponent::OnTerminate(ActorManager *actorManager)
 {
-    NotificationManager::Get()->RemoveListener(playerMoveNotification, NOTIFICATION_PLAYER_MOVE);
+    NotificationManager::Get()->RemoveListener(this, NOTIFICATION_PLAYER_MOVE);
 }
 
 void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)

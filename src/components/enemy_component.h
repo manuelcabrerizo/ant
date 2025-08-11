@@ -20,8 +20,6 @@ private:
     //SteeringPursue movement;
     //SteeringLookWhereYoureGoing turn;
     SteeringWander wander;
-
-    SlotmapKey<INotificable *> playerMoveNotification;
 public:
     void OnInit(ActorManager *actorManager);
     void OnTerminate(ActorManager *actorManager) override;

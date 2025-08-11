@@ -36,13 +36,15 @@ private:
      HashMap<ComponentStorageBase *> componentStorageMap;
      Array<ComponentBase *> componentsToInit;
 public:
-     void Init(i32 actorCount, i32 componentCount, i32 memoryType);
+     void BeingInitialization(i32 actorCount, i32 componentCount, i32 memoryType);
+     void EndInitialization();
+
      void Terminate();
+     void Clear();
 
      template <typename ComponentType, i32 Count>
      void AddComponentType();
 
-     void AllocInternalMemory();
 
      template <typename ComponentType>
      Array<ComponentType>& GetComponents();
@@ -75,7 +77,6 @@ public:
      void RenderComponents();
 };
 
-
 // template functions
 template <typename ComponentType>
 void ComponentStorage<ComponentType>::RemoveComponent(ActorManager* actorManager, SlotmapKeyBase keyBase)
@@ -89,6 +90,8 @@ void ComponentStorage<ComponentType>::RemoveComponent(ActorManager* actorManager
 template <typename ComponentType, i32 Count>
 void ActorManager::AddComponentType()
 {
+    ASSERT(componentStorageMap.Count() + 1 <= componentCount);
+
     void* buffer = MemoryManager::Get()->Alloc(sizeof(ComponentStorage<ComponentType>), memoryType);
     ComponentStorage<ComponentType>* componentStorage = new (buffer) ComponentStorage<ComponentType>();
     componentStorage->components.Init(Count, memoryType);
