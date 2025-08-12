@@ -39,13 +39,10 @@ void EnemyComponent::OnInit(ActorManager *actorManager)
     wander.SetTargetRadius(ANT_PI * 0.1f);
     wander.SetSlowRadius(ANT_PI * 0.5f);
     wander.SetTimeToTarget(0.001f);
-
-    NotificationManager::Get()->AddListener(this, NOTIFICATION_PLAYER_MOVE);
 }
 
 void EnemyComponent::OnTerminate(ActorManager *actorManager)
 {
-    NotificationManager::Get()->RemoveListener(this, NOTIFICATION_PLAYER_MOVE);
 }
 
 void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
@@ -63,14 +60,4 @@ void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
         character.orientation += character.rotation * dt;
         transform->direction = Vector3(-sinf(character.orientation), 0.0f, cosf(character.orientation)).Normalized();
     }
-}
-
-void EnemyComponent::OnNotify(NotificationType type, void *data, size_t size, void *sender)
-{
-    void **components = (void **)data;
-    TransformComponent *playerTransform = (TransformComponent *)components[0];
-    PhysicsComponent *playerPhysics = (PhysicsComponent *)components[1];
-    target.position = playerTransform->position;
-    target.velocity = playerPhysics->velocity;
-    target.orientation = Kinematic::GetNewOrientation(target.orientation, playerTransform->direction);
 }

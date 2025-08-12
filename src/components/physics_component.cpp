@@ -61,6 +61,10 @@ void PhysicsComponent::Initialize()
     sphe.Init(Vector3(0, 1.5, 7.5), 1.0f);
     collisionWorld.AddCollider(Collider(sphe));
 
+    Sphere sphe0;
+    sphe0.Init(Vector3(1.25f, 1.5, 7.5), 1.0f);
+    collisionWorld.AddCollider(Collider(sphe0));
+
     Capsule cap;
     cap.Init(Vector3(3, 1.5, 7.5), Vector3(3, 2.0f, 7.5), 0.25f);
     collisionWorld.AddCollider(Collider(cap));

@@ -12,8 +12,8 @@ void NotificationManager::Init(i32 stackNum)
      }
      memset(&instance, 0, sizeof(NotificationManager));
 
-     instance.registries.Init(NOTIFICATION_TYPE_COUNT, stackNum);
-     instance.registries.size = NOTIFICATION_TYPE_COUNT;
+     instance.registries.Init((unsigned int)NotificationType::Count, stackNum);
+     instance.registries.size = (unsigned int)NotificationType::Count;
      instance.allocator.Init(stackNum);
 
      initialize = true;
@@ -44,7 +44,7 @@ void NotificationManager::AddListener(INotificable *listener, NotificationType t
     NotificationNode* node = allocator.Alloc();
     node->listener = listener;
 
-    auto& reg = registries[type];
+    auto& reg = registries[(unsigned int)type];
     if (reg.firstNode == nullptr)
     {
         node->next = nullptr;
@@ -62,7 +62,7 @@ void NotificationManager::RemoveListener(INotificable *listener, NotificationTyp
     NotificationNode* prev = GetPrev(listener, type);
     NotificationNode* node;
 
-    auto& reg = registries[type];
+    auto& reg = registries[(unsigned int)type];
     if (prev)
     {
         node = prev->next;
@@ -85,20 +85,20 @@ void NotificationManager::RemoveListener(INotificable *listener, NotificationTyp
     allocator.Free(node);
 }
 
-void NotificationManager::SendNotification(NotificationType type, void *data, size_t size, void *sender)
+void NotificationManager::SendNotification(NotificationType type, Notification *notification)
 {
-    auto& reg = registries[type];
+    auto& reg = registries[(unsigned int)type];
     NotificationNode* node = reg.firstNode;
     while (node != nullptr)
     {
-        node->listener->OnNotify(type, data, size, sender);
+        node->listener->OnNotify(type, notification);
         node = node->next;
     }
 }
 
 NotificationNode* NotificationManager::GetNode(INotificable* listener, NotificationType type) const
 {
-    auto& reg = registries[type];
+    auto& reg = registries[(unsigned int)type];
     NotificationNode* node = reg.firstNode;
     while (node != nullptr)
     {
@@ -113,7 +113,7 @@ NotificationNode* NotificationManager::GetNode(INotificable* listener, Notificat
 
 NotificationNode* NotificationManager::GetPrev(INotificable* listener, NotificationType type) const
 {
-    auto& reg = registries[type];
+    auto& reg = registries[(unsigned int)type];
     NotificationNode* node = reg.firstNode;
     while (node != nullptr)
     {

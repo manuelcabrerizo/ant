@@ -59,8 +59,6 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     actorManager->AddComponent<AnimationComponent>(enemy[0], animation);
     actorManager->AddComponent<AnimationComponent>(enemy[1], animation);
     actorManager->AddComponent<AnimationComponent>(enemy[2], animation);
-
-
 }
 
 void Scene::Unload()

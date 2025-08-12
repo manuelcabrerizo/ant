@@ -23,17 +23,16 @@ void CameraComponent::Terminate()
 
 void CameraComponent::OnInit(ActorManager *actorManager)
 {
-    ubo.view = Matrix4::LookAt(Vector3(0.0f, 4.0f, 20.0f), Vector3(0.0f, 4.0f, 0.0f), Vector3(0.0f, 1.0f, 0.0f));
+    NotificationManager::Get()->AddListener(this, NotificationType::OnResize);
+
     ubo.proj = Matrix4::Perspective(65.0f, (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.01f, 100.0f);
     GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
-
-     NotificationManager::Get()->AddListener(this, NOTIFICATION_ON_RESIZE);
-     transform = actorManager->GetComponent<TransformComponent>(owner);
+    transform = actorManager->GetComponent<TransformComponent>(owner);
 }
 
 void CameraComponent::OnTerminate(ActorManager *actorManager)
 {
-     NotificationManager::Get()->RemoveListener(this, NOTIFICATION_ON_RESIZE);
+     NotificationManager::Get()->RemoveListener(this, NotificationType::OnResize);
 }
 
 void CameraComponent::OnUpdate(ActorManager *actorManager, f32 dt)
@@ -44,10 +43,10 @@ void CameraComponent::OnUpdate(ActorManager *actorManager, f32 dt)
      GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
 }
 
-void CameraComponent::OnNotify(NotificationType type, void *data, size_t size, void *sender)
+void CameraComponent::OnNotify(NotificationType type, Notification *notification)
 {
-     Vector2 *extend = (Vector2 *)data;
-     ubo.proj = Matrix4::Perspective(65.0f, extend->x/extend->y, 0.01f, 100.0f);
+    OnResizeNotification* onResize = (OnResizeNotification *)notification;
+    ubo.proj = Matrix4::Perspective(65.0f, onResize->extent.x/onResize->extent.y, 0.01f, 100.0f);
 }
 
 void CameraComponent::Init(Vector3 pos, Vector3 dir)

@@ -48,8 +48,11 @@ LRESULT Wndproc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
           {
                GraphicsManager::Get()->OnResize(gWindowWidth, gWindowHeight);
           }
-          Vector2 extend = Vector2((f32)gWindowWidth, (f32)gWindowHeight);
-          NotificationManager::Get()->SendNotification(NOTIFICATION_ON_RESIZE, &extend, sizeof(extend), nullptr);   
+
+          OnResizeNotification onResize;
+          onResize.extent = Vector2((f32)gWindowWidth, (f32)gWindowHeight);
+          NotificationManager::Get()->SendNotification(NotificationType::OnResize, &onResize); 
+
      } break;
      
      case WM_MOVE: {

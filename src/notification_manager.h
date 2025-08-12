@@ -1,21 +1,13 @@
 #pragma once
 
+#include <notification.h>
 #include <containers.h>
-
-enum NotificationType
-{
-     NOTIFICATION_PLAYER_MOVE = 0,
-     NOTIFICATION_SHOOT,
-     NOTIFICATION_ON_RESIZE,
-     
-     NOTIFICATION_TYPE_COUNT
-};
 
 class INotificable
 {
 public:
      virtual ~INotificable() {}
-     virtual void OnNotify(NotificationType type, void *data, size_t size, void *sender) = 0;
+     virtual void OnNotify(NotificationType type, Notification *notification) = 0;
 };
 
 struct NotificationNode
@@ -48,5 +40,5 @@ public:
 
      void AddListener(INotificable *listener, NotificationType type);
      void RemoveListener(INotificable* listener, NotificationType type);
-     void SendNotification(NotificationType type, void *data, size_t size, void *sender);
+     void SendNotification(NotificationType type, Notification *notification);
 };

@@ -12,6 +12,6 @@
 		<rotationOffset x="0" y="0" z="0"/>
     </RenderComponent>
     <AnchorComponent>
-        <offset x="0" y="0.05" z="0"/>
+        <offset x="0.03" y="0.2" z="0.8"/>
     </AnchorComponent>
 </Actor>

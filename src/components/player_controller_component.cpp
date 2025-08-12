@@ -43,23 +43,22 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 
 void PlayerControllerComponent::OnLateUpdate(ActorManager *actorManager, f32 dt)
 {
-     void *data[2];
-     data[0] = transform;
-     data[1] = physics;
-     NotificationManager::Get()->SendNotification(NOTIFICATION_PLAYER_MOVE, (void *)data, sizeof(void *)*2, (void *)this);
-
     if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
     {
-         const char *message = "te dispare gato\n";
-         NotificationManager::Get()->SendNotification(NOTIFICATION_SHOOT, (void *)message, strlen(message), (void *)this);
+        ShootNotification shootNoti;
+        NotificationManager::Get()->SendNotification(NotificationType::Shoot, &shootNoti);
     }  
 
+    // Debug visualization the the shoot position and target
     if(InputManager::Get()->MouseButtonDown(MOUSE_BUTTON_LEFT))
     {
-         int currentWeapon = usingFirstWeapon ? 0 : 1;
-         AnchorComponent *weaponAnchor = actorManager->GetComponent<AnchorComponent>(weapons[currentWeapon]);
-         Vector3 targetPosition = camera->GetPosition() + camera->GetFront() * 100.0f;
-         GraphicsManager::Get()->DebugDrawLine(weaponAnchor->position, targetPosition, Vector3(0, 1, 0));
+        int currentWeapon = usingFirstWeapon ? 0 : 1;
+        AnchorComponent *weaponAnchor = actorManager->GetComponent<AnchorComponent>(weapons[currentWeapon]);
+        Vector3 targetPosition = camera->GetPosition() + camera->GetFront() * 100.0f;
+
+        GraphicsManager::Get()->DebugDrawSphere(weaponAnchor->position, 0.05f, 12, 12, Vector3(1, 1, 0));
+        GraphicsManager::Get()->DebugDrawSphere(targetPosition, 0.5f, 12, 12, Vector3(1, 0, 1));
+        GraphicsManager::Get()->DebugDrawLine(weaponAnchor->position, targetPosition, Vector3(0, 1, 0));
     }
 }
 

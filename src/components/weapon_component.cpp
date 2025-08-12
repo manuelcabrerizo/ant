@@ -7,12 +7,12 @@
 void WeaponComponent::OnInit(ActorManager *actorManager)
 {
     transform = actorManager->GetComponent<TransformComponent>(owner);
-    NotificationManager::Get()->AddListener(this, NOTIFICATION_SHOOT);
+    NotificationManager::Get()->AddListener(this, NotificationType::Shoot);
 }
 
 void WeaponComponent::OnTerminate(ActorManager *actorManager)
 {
-    NotificationManager::Get()->RemoveListener(this, NOTIFICATION_SHOOT);
+    NotificationManager::Get()->RemoveListener(this, NotificationType::Shoot);
 }
 
 void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)
@@ -32,13 +32,13 @@ void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)
          front * weaponAnchor->offset.z;
 }
 
-void WeaponComponent::OnNotify(NotificationType type, void *data, size_t size, void *sender) 
+void WeaponComponent::OnNotify(NotificationType type, Notification *notification) 
 {
     switch(type)
     {
-        case NOTIFICATION_SHOOT:
+        case NotificationType::Shoot:
         {
-            printf((const char *)data);
+            ShootNotification* shoot = (ShootNotification*)notification;
         } break;
     }
 }

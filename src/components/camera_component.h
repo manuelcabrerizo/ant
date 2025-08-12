@@ -37,7 +37,7 @@ public:
      void OnInit(ActorManager *actorManager);
      void OnTerminate(ActorManager *actorManager) override;
      void OnUpdate(ActorManager *actorManager, f32 dt);
-     void OnNotify(NotificationType type, void *data, size_t size, void *sender) override;
+     void OnNotify(NotificationType type, Notification *notification) override;
 
      // Camera custom functions
      void Init(Vector3 pos, Vector3 dir);
