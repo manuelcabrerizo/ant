@@ -23,7 +23,6 @@ private:
     static UniformBuffer *matrixBuffer;
 
     AnimationComponent *animation = nullptr;
-    TransformComponent* transform = nullptr;
 public:
     Model *model;
     Vector3 rotationOffset;

@@ -22,6 +22,7 @@
 #include <components/player_controller_component.h>
 #include <components/enemy_component.h>
 #include <components/animation_component.h>
+#include <components/bullet_component.h>
 
 void Game::Init()
 {
@@ -62,6 +63,7 @@ void Game::Init()
      actorManager.AddComponentType<EnemyComponent, 10>();
      actorManager.AddComponentType<AnchorComponent, 10>();
      actorManager.AddComponentType<AnimationComponent, 10>();
+     actorManager.AddComponentType<BulletComponent, 100>();
      // TODO: add more component types ...
      actorManager.EndInitialization();
 
@@ -91,8 +93,10 @@ void Game::Update(f32 dt)
      actorManager.UpdateComponents<EnemyComponent>(dt);
      actorManager.UpdateComponents<PhysicsComponent>(dt);
      actorManager.UpdateComponents<RenderComponent>(dt);
-     // Late Update
-     actorManager.LateUpdateComponents<PlayerControllerComponent>(dt);
+     actorManager.UpdateComponents<BulletComponent>(dt);
+
+
+     actorManager.ProcessActorsToRemove();
 }
 
 void Game::Render(f32 dt)

@@ -9,6 +9,7 @@
 #include <components/anchor_component.h>
 #include <components/player_controller_component.h>
 #include <components/enemy_component.h>
+#include <components/bullet_component.h>
 
 #include <math/algebra.h>
 #include <math/vector3.h>
@@ -28,6 +29,7 @@ void ActorManager::BeingInitialization(i32 actorCount, i32 componentCount_, i32 
      maxActorCount = actorCount;
 
      actors.Init(maxActorCount, memoryType);
+     toRemove.Init(maxActorCount, memoryType);
      componentStorageMap.Init(componentCount, memoryType);
 }
 
@@ -66,18 +68,52 @@ SlotmapKey<Actor> ActorManager::CreateActor(i32 componentCount_)
 
 void ActorManager::DestroyActor(SlotmapKey<Actor> actorKey)
 {
-     Actor *actor = actors.Get(actorKey);
-     for(i32 i = actor->componentsIds.size - 1; i >= 0; --i)
-     {
-          RemoveComponentById(actorKey, actor->componentsIds[i]);  
-     }
-     actor->componentsIds.Clear();
-     actors.Remove(actorKey);
+    toRemove.Push(actorKey);
+}
+
+void ActorManager::ProcessActorsToRemove()
+{
+    for (int j = 0; j < toRemove.size; ++j)
+    {
+        SlotmapKey<Actor> actorKey = toRemove[j];
+        Actor* actor = actors.Get(actorKey);
+        for (i32 i = actor->componentsIds.size - 1; i >= 0; --i)
+        {
+            RemoveComponentById(actorKey, actor->componentsIds[i]);
+        }
+        actor->componentsIds.Clear();
+        actors.Remove(actorKey);
+    }
+    toRemove.Clear();
 }
 
 Actor *ActorManager::GetActor(SlotmapKey<Actor> actorKey)
 {
      return actors.Get(actorKey);
+}
+
+void ActorManager::AddAndCloneComponentById(SlotmapKey<Actor> dstActorKey, SlotmapKey<Actor> srcActorKey, int id)
+{
+    ComponentStorageBase* componentStorage = *componentStorageMap.Get(id);
+
+    Actor* srcActor = GetActor(srcActorKey);
+
+    SlotmapKeyBase dstKeyBase = componentStorage->AddComponent();
+    SlotmapKeyBase srcKeyBase = *srcActor->componentsMap.Get(id);
+
+    Actor* dstActor = GetActor(dstActorKey);
+    dstActor->componentsMap.Add(id, dstKeyBase);
+    dstActor->componentsIds.Push(id);
+
+    ComponentBase* dstComponentBase = componentStorage->GetComponent(dstKeyBase);
+    ComponentBase* srcComponentBase = componentStorage->GetComponent(srcKeyBase);
+    componentStorage->CopyComponent(dstComponentBase, srcComponentBase);
+
+    dstComponentBase->enable = true;
+    dstComponentBase->initialized = false;
+    dstComponentBase->owner = dstActorKey;
+
+    componentsToInit.Push(dstComponentBase);
 }
 
 void ActorManager::RemoveComponentById(SlotmapKey<Actor> actorKey, i32 id)
@@ -99,7 +135,7 @@ void ActorManager::RemoveComponentById(SlotmapKey<Actor> actorKey, i32 id)
      if(foundIndex >= 0)
      {
           actor->componentsIds[foundIndex] = actor->componentsIds[actor->componentsIds.size - 1];
-          actor->componentsIds[actor->componentsIds.size - 1] = 0;
+          actor->componentsIds[actor->componentsIds.size - 1] = -1;
           actor->componentsIds.size--;
      }
 }
@@ -137,6 +173,17 @@ static i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
      }
      return count;
  }
+
+SlotmapKey<Actor> ActorManager::CloneActor(SlotmapKey<Actor> actorKey)
+{
+    Actor* srcActor = actors.Get(actorKey);
+    SlotmapKey<Actor> dstActor = CreateActor(srcActor->componentsIds.capacity);
+    for (int i = 0; i < srcActor->componentsIds.size; ++i)
+    {
+        AddAndCloneComponentById(dstActor, actorKey, srcActor->componentsIds[i]);
+    }
+    return dstActor;
+}
 
 SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath)
 {
@@ -313,6 +360,11 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char *filepath)
                AnchorComponent anchor;
                anchor.offset = offset;
                AddComponent<AnchorComponent>(actor, anchor);
+         }
+         else if (strcmp("BulletComponent", componentType) == 0)
+         {
+             BulletComponent bullet;
+             AddComponent<BulletComponent>(actor, bullet);
          }
          else
          {

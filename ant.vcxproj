@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\components\bullet_component.cpp" />
     <ClCompile Include="src\scene.cpp" />
     <ClCompile Include="src\collisions\mesh_collider.cpp" />
     <ClCompile Include="src\collisions\collider.cpp" />
@@ -181,6 +182,7 @@
     <ClCompile Include="src\win32_platform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\components\bullet_component.h" />
     <ClInclude Include="src\notification.h" />
     <ClInclude Include="src\scene.h" />
     <ClInclude Include="src\collisions\mesh_collider.h" />
@@ -239,6 +241,17 @@
     <ClInclude Include="src\strings.h" />
     <ClInclude Include="src\tinyxml2.h" />
     <ClInclude Include="src\utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="data\xml\bullet.xml" />
+    <Xml Include="data\xml\enemy.xml" />
+    <Xml Include="data\xml\house.xml" />
+    <Xml Include="data\xml\pistol.xml" />
+    <Xml Include="data\xml\player.xml" />
+    <Xml Include="data\xml\sniper.xml" />
+    <Xml Include="data\xml\test-level.xml" />
+    <Xml Include="data\xml\tower.xml" />
+    <Xml Include="data\xml\wizard.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

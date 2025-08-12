@@ -39,26 +39,16 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
     ChangeWeapon(actorManager);
     ProcessMouseMovement();
     ProcessKeyboardMovement();
-}
 
-void PlayerControllerComponent::OnLateUpdate(ActorManager *actorManager, f32 dt)
-{
-    if(InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
-    {
-        ShootNotification shootNoti;
-        NotificationManager::Get()->SendNotification(NotificationType::Shoot, &shootNoti);
-    }  
-
-    // Debug visualization the the shoot position and target
-    if(InputManager::Get()->MouseButtonDown(MOUSE_BUTTON_LEFT))
+    if (InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
     {
         int currentWeapon = usingFirstWeapon ? 0 : 1;
-        AnchorComponent *weaponAnchor = actorManager->GetComponent<AnchorComponent>(weapons[currentWeapon]);
-        Vector3 targetPosition = camera->GetPosition() + camera->GetFront() * 100.0f;
+        AnchorComponent* weaponAnchor = actorManager->GetComponent<AnchorComponent>(weapons[currentWeapon]);
 
-        GraphicsManager::Get()->DebugDrawSphere(weaponAnchor->position, 0.05f, 12, 12, Vector3(1, 1, 0));
-        GraphicsManager::Get()->DebugDrawSphere(targetPosition, 0.5f, 12, 12, Vector3(1, 0, 1));
-        GraphicsManager::Get()->DebugDrawLine(weaponAnchor->position, targetPosition, Vector3(0, 1, 0));
+        ShootNotification notification;
+        notification.shootPosition = weaponAnchor->position;
+        notification.shootDirection = camera->GetFront();
+        NotificationManager::Get()->SendNotification(NotificationType::Shoot, &notification);
     }
 }
 

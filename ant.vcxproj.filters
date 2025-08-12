@@ -171,6 +171,9 @@
     <ClCompile Include="src\scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\components\bullet_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\actor.h">
@@ -347,5 +350,19 @@
     <ClInclude Include="src\notification.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\components\bullet_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="data\xml\bullet.xml" />
+    <Xml Include="data\xml\enemy.xml" />
+    <Xml Include="data\xml\house.xml" />
+    <Xml Include="data\xml\pistol.xml" />
+    <Xml Include="data\xml\player.xml" />
+    <Xml Include="data\xml\sniper.xml" />
+    <Xml Include="data\xml\test-level.xml" />
+    <Xml Include="data\xml\tower.xml" />
+    <Xml Include="data\xml\wizard.xml" />
   </ItemGroup>
 </Project>

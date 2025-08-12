@@ -13,14 +13,21 @@ struct Actor
 
 struct ComponentStorageBase
 {
-     virtual void RemoveComponent(ActorManager *actorManager, SlotmapKeyBase keyBase) = 0;
-     virtual ~ComponentStorageBase() {}
+    virtual SlotmapKeyBase AddComponent() = 0;
+    virtual ComponentBase* GetComponent(SlotmapKeyBase keyBase) = 0;
+    virtual void RemoveComponent(ActorManager *actorManager, SlotmapKeyBase keyBase) = 0;
+    virtual void CopyComponent(ComponentBase* dst, ComponentBase* src) = 0;
+
+    virtual ~ComponentStorageBase() {}
 };
 
 template <typename ComponentType>
 struct ComponentStorage : ComponentStorageBase
 {
      Slotmap<ComponentType> components;
+     SlotmapKeyBase AddComponent() override;
+     ComponentBase* GetComponent(SlotmapKeyBase keyBase) override;
+     void CopyComponent(ComponentBase* dst, ComponentBase* src) override;
      void RemoveComponent(ActorManager *actorManager, SlotmapKeyBase keyBase) override;
 };
 
@@ -35,6 +42,7 @@ private:
      Slotmap<Actor> actors;
      HashMap<ComponentStorageBase *> componentStorageMap;
      Array<ComponentBase *> componentsToInit;
+     Array<SlotmapKey<Actor>> toRemove;
 public:
      void BeingInitialization(i32 actorCount, i32 componentCount, i32 memoryType);
      void EndInitialization();
@@ -51,11 +59,13 @@ public:
 
      SlotmapKey<Actor> CreateActor(i32 componentCount);
      SlotmapKey<Actor> CreateActorFromFile(const char *filepath);
+     SlotmapKey<Actor> CloneActor(SlotmapKey<Actor> actorKey);
      void DestroyActor(SlotmapKey<Actor> actorKey);
      Actor *GetActor(SlotmapKey<Actor> actorKey);
     
      template <typename ComponentType>
      void AddComponent(SlotmapKey<Actor> actorKey, ComponentType component);
+     void AddAndCloneComponentById(SlotmapKey<Actor> dstActorKey, SlotmapKey<Actor> srcActorKey, int id);
 
      template <typename ComponentType>
      void RemoveComponent(SlotmapKey<Actor> actorKey);
@@ -66,6 +76,7 @@ public:
      ComponentType *GetComponent(SlotmapKey<Actor> actorKey);
 
      void InitializeNewComponents();
+     void ProcessActorsToRemove();
 
      template<typename ComponentType>
      void UpdateComponents(f32 dt);
@@ -79,12 +90,32 @@ public:
 
 // template functions
 template <typename ComponentType>
+SlotmapKeyBase ComponentStorage<ComponentType>::AddComponent()
+{
+    return FromKey(components.Add({}));
+}
+
+template <typename ComponentType>
+ComponentBase* ComponentStorage<ComponentType>::GetComponent(SlotmapKeyBase keyBase)
+{
+    return components.Get(FromKeyBase<ComponentType>(keyBase));
+}
+
+template <typename ComponentType>
 void ComponentStorage<ComponentType>::RemoveComponent(ActorManager* actorManager, SlotmapKeyBase keyBase)
 {
     SlotmapKey<ComponentType> key = FromKeyBase<ComponentType>(keyBase);
     ComponentType* component = components.Get(key);
     component->OnTerminate(actorManager);
     components.Remove(key);
+}
+
+template <typename ComponentType>
+void ComponentStorage<ComponentType>::CopyComponent(ComponentBase* dstBase, ComponentBase* srcBase)
+{
+    ComponentType* dst = (ComponentType*)dstBase;
+    ComponentType* src = (ComponentType*)srcBase;
+    *dst = *src;
 }
 
 template <typename ComponentType, i32 Count>
@@ -152,7 +183,7 @@ void ActorManager::RemoveComponent(SlotmapKey<Actor> actorKey)
     if (foundIndex >= 0)
     {
         actor->componentsIds[foundIndex] = actor->componentsIds[actor->componentsIds.size - 1];
-        actor->componentsIds[actor->componentsIds.size - 1] = 0;
+        actor->componentsIds[actor->componentsIds.size - 1] = -1;
         actor->componentsIds.size--;
     }
 }
@@ -169,6 +200,8 @@ ComponentType* ActorManager::GetComponent(SlotmapKey<Actor> actorKey)
     ASSERT(key.gen != INVALID_KEY);
     return compoentStorage->components.Get(key);
 }
+
+
 
 template<typename ComponentType>
 void ActorManager::UpdateComponents(f32 dt)

@@ -31,7 +31,6 @@ void RenderComponent::Terminate()
 
 void RenderComponent::OnInit(ActorManager *actorManager)
 {
-    transform = actorManager->GetComponent<TransformComponent>(owner);
     if(isAnimated)
     {
         animation = actorManager->GetComponent<AnimationComponent>(owner);
@@ -52,6 +51,8 @@ void RenderComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 
 void RenderComponent::OnRender(ActorManager *actorManager)
 {
+    TransformComponent* transform = actorManager->GetComponent<TransformComponent>(owner);
+
     Matrix4 tra = Matrix4::Translate(transform->position); 
     Matrix4 sca = Matrix4::Scale(transform->scale);
 

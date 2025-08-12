@@ -18,6 +18,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     ModelManager::Get()->Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx");
     ModelManager::Get()->Load("tower", "data/models/MagicStudio/source/MagicStudio.fbx");
     ModelManager::Get()->Load("wizard", "data/models/Wizard/source/Wizard.FBX");
+    ModelManager::Get()->Load("bullet", "data/models/testBullet.fbx");
 
     // TODO: load all entities from the scene file
     // Create Entities
@@ -26,6 +27,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     actorManager->CreateActorFromFile("data/xml/tower.xml");
     actorManager->CreateActorFromFile("data/xml/house.xml");
     actorManager->CreateActorFromFile("data/xml/wizard.xml");
+
     SlotmapKey<Actor> enemy[3] =
     {
          actorManager->CreateActorFromFile("data/xml/enemy.xml"),

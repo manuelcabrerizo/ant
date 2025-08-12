@@ -1,13 +1,27 @@
 #include "weapon_component.h"
 #include "anchor_component.h"
 #include "transform_component.h"
+#include "bullet_component.h"
 
 #include <stdio.h>
+#include "render_component.h"
+
+#include <windows.h>
+
+static unsigned long long shootCounter = 0;
 
 void WeaponComponent::OnInit(ActorManager *actorManager)
 {
-    transform = actorManager->GetComponent<TransformComponent>(owner);
     NotificationManager::Get()->AddListener(this, NotificationType::Shoot);
+
+    am = actorManager;
+    transform = actorManager->GetComponent<TransformComponent>(owner);
+
+    bulletPrefab = am->CreateActorFromFile("data/xml/bullet.xml");
+    BulletComponent* bullet = actorManager->GetComponent<BulletComponent>(bulletPrefab);
+    bullet->enable = false;
+    RenderComponent* render = actorManager->GetComponent<RenderComponent>(bulletPrefab);
+    render->enable = false;
 }
 
 void WeaponComponent::OnTerminate(ActorManager *actorManager)
@@ -32,13 +46,19 @@ void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)
          front * weaponAnchor->offset.z;
 }
 
-void WeaponComponent::OnNotify(NotificationType type, Notification *notification) 
+void WeaponComponent::OnShoot(ShootNotification* notification)
 {
-    switch(type)
+    SlotmapKey<Actor> bullet = am->CloneActor(bulletPrefab);
+    TransformComponent *bulletTransform = am->GetComponent<TransformComponent>(bullet);
+    bulletTransform->position = notification->shootPosition;
+    bulletTransform->direction = notification->shootDirection;
+    am->InitializeNewComponents();
+}
+
+void WeaponComponent::OnNotify(NotificationType type, Notification* notification)
+{
+    switch (type)
     {
-        case NotificationType::Shoot:
-        {
-            ShootNotification* shoot = (ShootNotification*)notification;
-        } break;
+    case NotificationType::Shoot: OnShoot((ShootNotification*)notification); break;
     }
 }
