@@ -27,7 +27,10 @@ void CameraComponent::OnInit(ActorManager *actorManager)
 
     ubo.proj = Matrix4::Perspective(65.0f, (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.01f, 100.0f);
     GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
-    transform = actorManager->GetComponent<TransformComponent>(owner);
+
+    Actor* actor = actorManager->GetActor(owner);
+
+    transform = actor->GetComponent<TransformComponent>();
 }
 
 void CameraComponent::OnTerminate(ActorManager *actorManager)

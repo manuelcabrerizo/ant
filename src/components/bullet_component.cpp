@@ -3,6 +3,8 @@
 void BulletComponent::OnInit(ActorManager* actorManager)
 {
     currentLifeTime = lifeTime;
+    Actor* actor = actorManager->GetActor(owner);
+    transform = actor->GetComponent<TransformComponent>();
 }
 
 void BulletComponent::OnTerminate(ActorManager* actorManager)
@@ -11,7 +13,6 @@ void BulletComponent::OnTerminate(ActorManager* actorManager)
 
 void BulletComponent::OnUpdate(ActorManager* actorManager, float dt)
 {
-    TransformComponent *transform = actorManager->GetComponent<TransformComponent>(owner);
     transform->position += transform->direction * (speed * dt);
 
     currentLifeTime -= dt;

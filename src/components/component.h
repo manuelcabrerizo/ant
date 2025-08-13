@@ -1,15 +1,18 @@
 #pragma once
 
 #include "../containers.h"
-#include "../actor.h"
+#include "../actor_manager.h"
 
 struct ComponentBase
 {
-    static i32 counter;
+    static int counter;
 
     SlotmapKey<Actor> owner;
     bool enable = true;
     bool initialized = false;
+
+    ComponentBase* next = nullptr;
+    ComponentBase* prev = nullptr;
 
     virtual ~ComponentBase() {}
     virtual void OnInit(ActorManager *actorManager) {}
@@ -19,9 +22,9 @@ struct ComponentBase
 template <typename>
 struct Component : public ComponentBase
 {
-    static i32 GetID()
+    static int GetID()
     {
-        static i32 id = ++counter;
+        static int id = ++counter;
         return id;
     }
 };

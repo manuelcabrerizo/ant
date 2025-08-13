@@ -15,13 +15,16 @@ void WeaponComponent::OnInit(ActorManager *actorManager)
     NotificationManager::Get()->AddListener(this, NotificationType::Shoot);
 
     am = actorManager;
-    transform = actorManager->GetComponent<TransformComponent>(owner);
+    Actor* actor = actorManager->GetActor(owner);
+    transform = actor->GetComponent<TransformComponent>();
 
+    /*
     bulletPrefab = am->CreateActorFromFile("data/xml/bullet.xml");
     BulletComponent* bullet = actorManager->GetComponent<BulletComponent>(bulletPrefab);
     bullet->enable = false;
     RenderComponent* render = actorManager->GetComponent<RenderComponent>(bulletPrefab);
     render->enable = false;
+    */
 }
 
 void WeaponComponent::OnTerminate(ActorManager *actorManager)
@@ -31,8 +34,9 @@ void WeaponComponent::OnTerminate(ActorManager *actorManager)
 
 void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
-    TransformComponent *weaponTransform = actorManager->GetComponent<TransformComponent>(weapon);
-    AnchorComponent *weaponAnchor = actorManager->GetComponent<AnchorComponent>(weapon);
+    Actor* actor = actorManager->GetActor(weapon);
+    TransformComponent *weaponTransform = actor->GetComponent<TransformComponent>();
+    AnchorComponent *weaponAnchor = actor->GetComponent<AnchorComponent>();
 
     Vector3 front = transform->direction.Normalized();
     Vector3 right = Vector3(0.0f, 1.0f, 0.0f).Cross(front).Normalized();
@@ -48,8 +52,9 @@ void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 
 void WeaponComponent::OnShoot(ShootNotification* notification)
 {
-    SlotmapKey<Actor> bullet = am->CloneActor(bulletPrefab);
-    TransformComponent *bulletTransform = am->GetComponent<TransformComponent>(bullet);
+    SlotmapKey<Actor> bullet = am->CreateActorFromFile("data/xml/bullet.xml");
+    Actor* actor = am->GetActor(bullet);
+    TransformComponent *bulletTransform = actor->GetComponent<TransformComponent>();
     bulletTransform->position = notification->shootPosition;
     bulletTransform->direction = notification->shootDirection;
     am->InitializeNewComponents();

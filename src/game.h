@@ -1,6 +1,6 @@
 #pragma once
 
-#include <actor.h>
+#include <actor_manager.h>
 #include <scene.h>
 
 class Game

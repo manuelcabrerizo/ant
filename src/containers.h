@@ -278,54 +278,106 @@ void ObjectAllocator<Type>::Free(Type* object)
 }
 
 // Block allocator
-// sparse block allocator for now
-// TODO: make it continuous
-template <int BlockSize>
+struct BlockHeader
+{
+    bool occupied = false;
+};
+
+struct BlockIterator
+{
+};
+
+template <size_t BlockSize, size_t BlockCount>
 class BlockAllocator
 {
     static_assert(BlockSize >= sizeof(FreeNode), "Object must be at least 8 bytes large");
 private:
-    i32 stackNum = 0;
-    FreeNode* firstFree = 0;
+    FreeNode* firstFree = nullptr;
+
+    unsigned char* buffer = nullptr;
+    size_t capacityInBytes = 0;
+    size_t bytesUsed = 0;
+    size_t blockUsed = 0;
+    size_t realBlockSize = 0;
 public:
-    void Init(i32 stackNum);
-
+    void Init(i32 memoryType);
+    void Clear();
     void* Alloc();
-    void Free(void* object);
-
+    void Free(void* data);
 };
 
-template<int BlockSize>
-void BlockAllocator<BlockSize>::Init(i32 stackNum_)
+template<size_t BlockSize, size_t BlockCount>
+void BlockAllocator<BlockSize, BlockCount>::Init(i32 memoryType)
 {
-    firstFree = 0;
-    stackNum = stackNum_;
+    // Alloc memory for the block
+    realBlockSize = sizeof(BlockHeader) + BlockSize;
+    capacityInBytes = realBlockSize * BlockCount;
+    bytesUsed = 0;
+    blockUsed = 0;
+    buffer = (unsigned char *)MemoryManager::Get()->Alloc(capacityInBytes, memoryType);
+    Clear();
 }
 
-template<int BlockSize>
-void* BlockAllocator<BlockSize>::Alloc()
+template<size_t BlockSize, size_t BlockCount>
+void BlockAllocator<BlockSize, BlockCount>::Clear()
 {
-    if (firstFree)
+    // Initialize the free list
+    memset(buffer, 0, capacityInBytes);
+    for (size_t byteOffset = 0; byteOffset < capacityInBytes; byteOffset += realBlockSize)
     {
-        void* data = (void*)firstFree;
-        firstFree = firstFree->next;
-        return data;
+        unsigned char* block = buffer + byteOffset;
+        
+        BlockHeader* header = (BlockHeader*)block;
+        header->occupied = false;
+
+        FreeNode* node = (FreeNode*)(block + sizeof(BlockHeader));
+
+        if ((byteOffset + realBlockSize) < capacityInBytes)
+        {
+            node->next = (FreeNode*)(block + realBlockSize + sizeof(BlockHeader));
+        }
+        else
+        {
+            node->next = nullptr;
+        }
     }
-    else
-    {
-        void* data = MemoryManager::Get()->Alloc(BlockSize, stackNum);
-        return data;
-    }
+    firstFree = (FreeNode*)(buffer + sizeof(BlockHeader));
+    bytesUsed = 0;
+    blockUsed = 0;
 }
 
-template<int BlockSize>
-void BlockAllocator<BlockSize>::Free(void* object)
+template<size_t BlockSize, size_t BlockCount>
+void* BlockAllocator<BlockSize, BlockCount>::Alloc()
 {
+    ASSERT(firstFree);
+
+    BlockHeader* header = (BlockHeader*)((unsigned char*)firstFree - sizeof(BlockHeader));
+    ASSERT(header->occupied == false);
+    header->occupied = true;
+
+    void* memory = firstFree;
+    firstFree = firstFree->next;
+
+    blockUsed++;
+    bytesUsed += realBlockSize;
+
+    return memory;
+}
+
+template<size_t BlockSize, size_t BlockCount>
+void BlockAllocator<BlockSize, BlockCount>::Free(void* object)
+{
+    BlockHeader* header = (BlockHeader*)((unsigned char*)object - sizeof(BlockHeader));
+    ASSERT(header->occupied == true);
+    header->occupied = false;
+
     FreeNode* free = (FreeNode*)object;
     free->next = firstFree;
     firstFree = free;
-}
 
+    blockUsed--;
+    bytesUsed -= realBlockSize;
+}
 
 #define INVALID_MAP_ID 0xFFFFFFFF
 #define DELETED_MAP_ID (0xFFFFFFFF - 1)

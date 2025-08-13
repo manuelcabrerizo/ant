@@ -7,8 +7,9 @@
 
 void EnemyComponent::OnInit(ActorManager *actorManager)
 {
-    transform = actorManager->GetComponent<TransformComponent>(owner);
-    physics = actorManager->GetComponent<PhysicsComponent>(owner);
+    Actor* actor = actorManager->GetActor(owner);
+    transform = actor->GetComponent<TransformComponent>();
+    physics = actor->GetComponent<PhysicsComponent>();
 
     //movement.SetCharacter(&character);
     //movement.SetTarget(&target);

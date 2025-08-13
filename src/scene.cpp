@@ -28,6 +28,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     actorManager->CreateActorFromFile("data/xml/house.xml");
     actorManager->CreateActorFromFile("data/xml/wizard.xml");
 
+    /*
     SlotmapKey<Actor> enemy[3] =
     {
          actorManager->CreateActorFromFile("data/xml/enemy.xml"),
@@ -61,6 +62,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     actorManager->AddComponent<AnimationComponent>(enemy[0], animation);
     actorManager->AddComponent<AnimationComponent>(enemy[1], animation);
     actorManager->AddComponent<AnimationComponent>(enemy[2], animation);
+    */
 }
 
 void Scene::Unload()

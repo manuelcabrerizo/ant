@@ -22,10 +22,11 @@ void PlayerControllerComponent::OnInit(ActorManager *actorManager)
     showMouse = false;
     PlatformShowMouse(showMouse);
     
-    transform = actorManager->GetComponent<TransformComponent>(owner);
-    camera = actorManager->GetComponent<CameraComponent>(owner);
-    physics = actorManager->GetComponent<PhysicsComponent>(owner);
-    weapon = actorManager->GetComponent<WeaponComponent>(owner);
+    Actor* actor = actorManager->GetActor(owner);
+    transform = actor->GetComponent<TransformComponent>();
+    camera = actor->GetComponent<CameraComponent>();
+    physics = actor->GetComponent<PhysicsComponent>();
+    weapon = actor->GetComponent<WeaponComponent>();
 }
 
 void PlayerControllerComponent::OnTerminate(ActorManager *actorManager)
@@ -43,7 +44,8 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
     if (InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
     {
         int currentWeapon = usingFirstWeapon ? 0 : 1;
-        AnchorComponent* weaponAnchor = actorManager->GetComponent<AnchorComponent>(weapons[currentWeapon]);
+        Actor* actor = actorManager->GetActor(weapons[currentWeapon]);
+        AnchorComponent* weaponAnchor = actor->GetComponent<AnchorComponent>();
 
         ShootNotification notification;
         notification.shootPosition = weaponAnchor->position;
@@ -125,8 +127,11 @@ void PlayerControllerComponent::ProcessKeyboardMovement()
 void PlayerControllerComponent::ChangeWeapon(ActorManager *actorManager)
 {
     RenderComponent *weaponRenderComponents[2];
-    weaponRenderComponents[0] = actorManager->GetComponent<RenderComponent>(weapons[0]);
-    weaponRenderComponents[1] = actorManager->GetComponent<RenderComponent>(weapons[1]);
+
+    Actor* actor0 = actorManager->GetActor(weapons[0]);
+    weaponRenderComponents[0] = actor0->GetComponent<RenderComponent>();
+    Actor* actor1 = actorManager->GetActor(weapons[1]);
+    weaponRenderComponents[1] = actor1->GetComponent<RenderComponent>();
 
     if(InputManager::Get()->KeyJustDown(KEY_1) && !usingFirstWeapon)
     {

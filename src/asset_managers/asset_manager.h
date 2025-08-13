@@ -6,6 +6,7 @@ template <typename Type>
 class AssetManager
 {
 protected:
+    // change slotmap for a BlockArray
      Slotmap<Type> assets;
      HashMap<SlotmapKey<Type>> nameIndex;
 public:
