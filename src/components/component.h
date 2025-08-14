@@ -11,9 +11,6 @@ struct ComponentBase
     bool enable = true;
     bool initialized = false;
 
-    ComponentBase* next = nullptr;
-    ComponentBase* prev = nullptr;
-
     virtual ~ComponentBase() {}
     virtual void OnInit(ActorManager *actorManager) {}
     virtual void OnTerminate(ActorManager *actorManager) {}

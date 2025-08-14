@@ -20,7 +20,7 @@ private:
     // of the larger material derived class
     static_assert(KB(2) >= sizeof(SolidColorMaterial), "not enough memory for SolidColorMateial");
     static_assert(KB(2) >= sizeof(TextureMaterial), "not enough memory for TextureMaterial");
-    BlockAllocator<KB(2), 100> allocator;
+    BlockAllocator<KB(2)> allocator;
 public:
     static void Initialize(u32 assetsCapacity);
     static void Shutdown();

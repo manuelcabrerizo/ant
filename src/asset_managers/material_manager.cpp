@@ -35,7 +35,7 @@ MaterialManager* MaterialManager::Get()
 void MaterialManager::Init(u32 assetsCapacity)
 {
     AssetManager::Init(assetsCapacity);
-    allocator.Init(STATIC_MEMORY);
+    allocator.Init(100, STATIC_MEMORY);
 }
 
 void MaterialManager::LoadSolidColor(const char* name,

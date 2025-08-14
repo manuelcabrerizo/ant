@@ -283,14 +283,18 @@ struct BlockHeader
     bool occupied = false;
 };
 
-struct BlockIterator
-{
-};
-
-template <size_t BlockSize, size_t BlockCount>
+template <size_t BlockSize>
 class BlockAllocator
 {
     static_assert(BlockSize >= sizeof(FreeNode), "Object must be at least 8 bytes large");
+
+public:
+    struct Iterator
+    {
+        BlockHeader header;
+        unsigned char data[BlockSize];
+    };
+
 private:
     FreeNode* firstFree = nullptr;
 
@@ -299,30 +303,47 @@ private:
     size_t bytesUsed = 0;
     size_t blockUsed = 0;
     size_t realBlockSize = 0;
+    size_t blockCount = 0;
 public:
-    void Init(i32 memoryType);
+    void Init(size_t blockCount, int memoryType);
     void Clear();
     void* Alloc();
     void Free(void* data);
+
+    size_t GetBlockUsed()
+    {
+        return blockUsed;
+    }
+
+    size_t GetBlockCount()
+    {
+        return blockCount;
+    }
+
+    Iterator* GetBlockArray()
+    {
+        return (Iterator*)buffer;
+    }
 };
 
-template<size_t BlockSize, size_t BlockCount>
-void BlockAllocator<BlockSize, BlockCount>::Init(i32 memoryType)
+template<size_t BlockSize>
+void BlockAllocator<BlockSize>::Init(size_t blockCount_, int memoryType)
 {
     // Alloc memory for the block
+    blockCount = blockCount_;
     realBlockSize = sizeof(BlockHeader) + BlockSize;
-    capacityInBytes = realBlockSize * BlockCount;
+    capacityInBytes = realBlockSize * blockCount;
     bytesUsed = 0;
     blockUsed = 0;
     buffer = (unsigned char *)MemoryManager::Get()->Alloc(capacityInBytes, memoryType);
     Clear();
 }
 
-template<size_t BlockSize, size_t BlockCount>
-void BlockAllocator<BlockSize, BlockCount>::Clear()
+template<size_t BlockSize>
+void BlockAllocator<BlockSize>::Clear()
 {
     // Initialize the free list
-    memset(buffer, 0, capacityInBytes);
+    memset((void *)buffer, 0, capacityInBytes);
     for (size_t byteOffset = 0; byteOffset < capacityInBytes; byteOffset += realBlockSize)
     {
         unsigned char* block = buffer + byteOffset;
@@ -346,8 +367,8 @@ void BlockAllocator<BlockSize, BlockCount>::Clear()
     blockUsed = 0;
 }
 
-template<size_t BlockSize, size_t BlockCount>
-void* BlockAllocator<BlockSize, BlockCount>::Alloc()
+template<size_t BlockSize>
+void* BlockAllocator<BlockSize>::Alloc()
 {
     ASSERT(firstFree);
 
@@ -364,8 +385,8 @@ void* BlockAllocator<BlockSize, BlockCount>::Alloc()
     return memory;
 }
 
-template<size_t BlockSize, size_t BlockCount>
-void BlockAllocator<BlockSize, BlockCount>::Free(void* object)
+template<size_t BlockSize>
+void BlockAllocator<BlockSize>::Free(void* object)
 {
     BlockHeader* header = (BlockHeader*)((unsigned char*)object - sizeof(BlockHeader));
     ASSERT(header->occupied == true);

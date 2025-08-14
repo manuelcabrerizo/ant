@@ -79,6 +79,8 @@ void Game::Init()
      printf("Game Init!\n");
 }
 
+#include <windows.h>
+
 void Game::Update(f32 dt)
 {
     GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
@@ -95,8 +97,12 @@ void Game::Update(f32 dt)
      actorManager.UpdateComponents<RenderComponent>(dt);
      actorManager.UpdateComponents<BulletComponent>(dt);
 
-
      actorManager.ProcessActorsToRemove();
+
+     size_t freeMemory = MemoryManager::Get()->GetFreeMemoryCount();
+     char buffer[256];
+     sprintf(buffer, "free memory: %zu\n", freeMemory / MB(1));
+     OutputDebugString(buffer);
 }
 
 void Game::Render(f32 dt)

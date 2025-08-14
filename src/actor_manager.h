@@ -25,7 +25,7 @@ public:
     void Terminate();
     void Clear();
 
-    template <typename ComponentType, i32 Count>
+    template <typename ComponentType, size_t Count>
     void AddComponentType();
     template <typename ComponentType>
     ComponentList<ComponentType> *GetComponents();
@@ -60,15 +60,14 @@ public:
 
 
 // template functions
-template <typename ComponentType, i32 Count>
+template <typename ComponentType, size_t Count>
 void ActorManager::AddComponentType()
 {
     ASSERT(componentListMap.Count() + 1 <= componentTypeCount);
 
     void* buffer = MemoryManager::Get()->Alloc(sizeof(ComponentList<ComponentType>), memoryType);
     ComponentList<ComponentType>* componentList = new (buffer) ComponentList<ComponentType>();
-    componentList->first = nullptr;
-    componentList->allocator.Init(memoryType);
+    componentList->allocator.Init(Count, memoryType);
     componentListMap.Add(ComponentType::GetID(), (ComponentListBase*)componentList);
     maxComponentCount += Count;
 }
@@ -84,22 +83,9 @@ template <typename ComponentType>
 void ActorManager::AddComponent(SlotmapKey<Actor> actorKey, ComponentType value)
 {
     ComponentList<ComponentType>* list = (ComponentList<ComponentType> *)(*componentListMap.Get(ComponentType::GetID()));
-    ComponentType* component = list->allocator.Alloc();
+    void *buffer = list->allocator.Alloc();
+    ComponentType* component = new (buffer) ComponentType();
     *component = value;
-
-    // TODO: insert at the end of the link list
-    component->prev = nullptr;
-    component->next = nullptr;
-    if (list->first == nullptr)
-    {
-        list->first = component;
-    }
-    else
-    {
-        component->next = list->first;
-        component->next->prev = component;
-        list->first = component;
-    }
     component->owner = actorKey;
 
     Actor* actor = GetActor(actorKey);
@@ -117,27 +103,6 @@ void ActorManager::RemoveComponent(SlotmapKey<Actor> actorKey)
 
     ComponentType* component = actor->GetComponent<ComponentType>();
     component->OnTerminate(this);
-
-    if (component->prev == nullptr)
-    {
-        list->first = component->next;
-        if (list->first)
-        {
-            list->first->prev = nullptr;
-        }
-    }
-    else if (component->next == nullptr)
-    {
-        component->prev->next = nullptr;
-    }
-    else
-    {
-        component->prev->next = component->next;
-        component->next->prev = component->prev;
-    }
-
-    component->prev = nullptr;
-    component->next = nullptr;
 
     actor->componentsMap.Remove(ComponentType::GetID());
     i32 foundIndex = -1;
@@ -163,13 +128,28 @@ template<typename ComponentType>
 void ActorManager::UpdateComponents(f32 dt)
 {
     ComponentList<ComponentType> *list = GetComponents<ComponentType>();
-    for (ComponentType *component = (ComponentType *)list->first;
-        component != nullptr;
-        component = (ComponentType*)component->next)
+    auto componentArray = list->allocator.GetBlockArray();
+    size_t size = list->allocator.GetBlockCount();
+    size_t used = list->allocator.GetBlockUsed();
+
+    size_t usedFound = 0;
+    for (int i = 0; i < size; ++i)
     {
+        if (!componentArray[i].header.occupied)
+        {
+            continue;
+        }
+        usedFound++;
+
+        ComponentType* component = (ComponentType*)&componentArray[i].data[0];
         if (component->initialized && component->enable)
         {
             component->OnUpdate(this, dt);
+        }
+
+        if (usedFound == used)
+        {
+            break;
         }
     }
 }
@@ -178,13 +158,28 @@ template<typename ComponentType>
 void ActorManager::LateUpdateComponents(f32 dt)
 {
     ComponentList<ComponentType>* list = GetComponents<ComponentType>();
-    for (ComponentType* component = (ComponentType*)list->first;
-        component != nullptr;
-        component = (ComponentType*)component->next)
+    auto componentArray = list->allocator.GetBlockArray();
+    size_t size = list->allocator.GetBlockCount();
+    size_t used = list->allocator.GetBlockUsed();
+
+    size_t usedFound = 0;
+    for (int i = 0; i < size; ++i)
     {
-        if (component->initialized && component->enable)
+        if (!componentArray[i].header.occupied)
         {
-            component->OnLateUpdate(this, dt);
+            continue;
+        }
+        usedFound++;
+
+        ComponentType* component = (ComponentType*)&componentArray[i].data[0];
+            if (component->initialized && component->enable)
+            {
+                component->OnLateUpdate(this, dt);
+            }
+
+        if (usedFound == used)
+        {
+            break;
         }
     }
 }
@@ -193,13 +188,28 @@ template<typename ComponentType>
 void ActorManager::RenderComponents()
 {
     ComponentList<ComponentType>* list = GetComponents<ComponentType>();
-    for (ComponentType* component = (ComponentType*)list->first;
-        component != nullptr;
-        component = (ComponentType*)component->next)
+    auto componentArray = list->allocator.GetBlockArray();
+    size_t size = list->allocator.GetBlockCount();
+    size_t used = list->allocator.GetBlockUsed();
+
+    size_t usedFound = 0;
+    for (int i = 0; i < size; ++i)
     {
-        if (component->initialized && component->enable)
+        if (!componentArray[i].header.occupied)
         {
-            component->OnRender(this);
+            continue;
+        }
+        usedFound++;
+
+        ComponentType* component = (ComponentType*)&componentArray[i].data[0];
+            if (component->initialized && component->enable)
+            {
+                component->OnRender(this);
+            }
+
+        if (usedFound == used)
+        {
+            break;
         }
     }
 }
