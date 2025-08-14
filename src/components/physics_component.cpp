@@ -82,8 +82,7 @@ void PhysicsComponent::DebugDraw()
 
 void PhysicsComponent::OnInit(ActorManager *actorManager)
 {
-    Actor* actor = actorManager->GetActor(owner);
-    transform = actor->GetComponent<TransformComponent>();
+    transform = owner->GetComponent<TransformComponent>();
 
     // Initialize our collider
     Matrix4 rot = Matrix4::RotateY(0);

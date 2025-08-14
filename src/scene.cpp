@@ -29,7 +29,17 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     actorManager->CreateActorFromFile("data/xml/wizard.xml");
 
     /*
-    SlotmapKey<Actor> enemy[3] =
+    for (int i = 0; i < 999; i++)
+    {
+       auto key = actorManager->CreateActorFromFile("data/xml/wizard.xml");
+       Actor* actor = actorManager->GetActor(key);
+       TransformComponent* transform = actor->GetComponent<TransformComponent>();
+       transform->position.x += i;
+    }
+    */
+
+    
+    Actor *enemy[3] =
     {
          actorManager->CreateActorFromFile("data/xml/enemy.xml"),
          actorManager->CreateActorFromFile("data/xml/enemy.xml"),
@@ -39,18 +49,18 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     // Warrior Animation
     TransformComponent* transforms[3] =
     {
-         actorManager->GetComponent<TransformComponent>(enemy[0]),
-         actorManager->GetComponent<TransformComponent>(enemy[1]),
-         actorManager->GetComponent<TransformComponent>(enemy[2])
+         enemy[0]->GetComponent<TransformComponent>(),
+         enemy[1]->GetComponent<TransformComponent>(),
+         enemy[2]->GetComponent<TransformComponent>()
     };
     transforms[0]->position.x = 0.0f;
     transforms[1]->position.x = -2.0f;
     transforms[2]->position.x = -4.0f;
     RenderComponent* renders[3] =
     {
-         actorManager->GetComponent<RenderComponent>(enemy[0]),
-         actorManager->GetComponent<RenderComponent>(enemy[1]),
-         actorManager->GetComponent<RenderComponent>(enemy[2])
+         enemy[0]->GetComponent<RenderComponent>(),
+         enemy[1]->GetComponent<RenderComponent>(),
+         enemy[2]->GetComponent<RenderComponent>()
     };
     renders[0]->isAnimated = true;
     renders[1]->isAnimated = true;
@@ -62,7 +72,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     actorManager->AddComponent<AnimationComponent>(enemy[0], animation);
     actorManager->AddComponent<AnimationComponent>(enemy[1], animation);
     actorManager->AddComponent<AnimationComponent>(enemy[2], animation);
-    */
+    
 }
 
 void Scene::Unload()

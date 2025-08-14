@@ -63,7 +63,7 @@ LRESULT Wndproc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
      case WM_KEYUP:
      {
           DWORD keyCode = (DWORD)wParam;
-          bool isDown = ((lParam & (1 << 31)) == 0);
+          bool isDown = ((lParam & (1u << 31)) == 0);
           if (im)
           {
                im->SetKey(keyCode, isDown);
@@ -109,7 +109,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 #if ANT_CONSOLE
      HINSTANCE hInstance = GetModuleHandle(0);
 #endif
-     MemoryManager::Init(MB(100), 4ll);
+     MemoryManager::Init(MB(100), 4);
      InputManager::Init();
      NotificationManager::Init(STATIC_MEMORY);           
 

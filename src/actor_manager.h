@@ -12,8 +12,8 @@ private:
     i32 maxActorCount = 0;
     i32 maxComponentCount = 0;
 
-    Slotmap<Actor> actors;
-    Array<SlotmapKey<Actor>> toRemove;
+    BlockAllocator<sizeof(Actor)> allocator;
+    Array<Actor*> toRemove;
 
     HashMap<ComponentListBase*> componentListMap;
     Array<ComponentBase*> componentsToInit;
@@ -30,19 +30,17 @@ public:
     template <typename ComponentType>
     ComponentList<ComponentType> *GetComponents();
 
-    SlotmapKey<Actor> CreateActor(i32 componentCount);
-    SlotmapKey<Actor> CreateActorFromFile(const char* filepath);
-    SlotmapKey<Actor> CloneActor(SlotmapKey<Actor> actorKey);
-    void DestroyActor(SlotmapKey<Actor> actorKey);
-    Actor* GetActor(SlotmapKey<Actor> actorKey);
+    Actor *CreateActor(i32 componentCount);
+    Actor *CreateActorFromFile(const char* filepath);
+    Actor *CloneActor(Actor *srcActor);
+    void DestroyActor(Actor *actor);
+    
+    template <typename ComponentType>
+    void AddComponent(Actor *actor, ComponentType component);
+    void AddAndCloneComponentById(Actor *dstActor, Actor *srcActor, int id);
 
     template <typename ComponentType>
-    void AddComponent(SlotmapKey<Actor> actorKey, ComponentType component);
-    void AddAndCloneComponentById(SlotmapKey<Actor> dstActorKey, SlotmapKey<Actor> srcActorKey, int id);
-
-    template <typename ComponentType>
-    void RemoveComponent(SlotmapKey<Actor> actorKey);
-    void RemoveComponentById(SlotmapKey<Actor> actorKey, i32 id);
+    void RemoveComponent(Actor *ctor);
     void RemoveComponentById(Actor* actor, i32 id);
 
     void InitializeNewComponents();
@@ -80,26 +78,23 @@ ComponentList<ComponentType>* ActorManager::GetComponents()
 
 
 template <typename ComponentType>
-void ActorManager::AddComponent(SlotmapKey<Actor> actorKey, ComponentType value)
+void ActorManager::AddComponent(Actor *actor, ComponentType value)
 {
     ComponentList<ComponentType>* list = (ComponentList<ComponentType> *)(*componentListMap.Get(ComponentType::GetID()));
     void *buffer = list->allocator.Alloc();
     ComponentType* component = new (buffer) ComponentType();
     *component = value;
-    component->owner = actorKey;
+    component->owner = actor;
 
-    Actor* actor = GetActor(actorKey);
     actor->componentsMap.Add(ComponentType::GetID(), component);
     actor->componentsIds.Push(ComponentType::GetID());
     componentsToInit.Push(component);
 }
 
 template <typename ComponentType>
-void ActorManager::RemoveComponent(SlotmapKey<Actor> actorKey)
+void ActorManager::RemoveComponent(Actor *actor)
 {
     ComponentList<ComponentType>* list = (ComponentList<ComponentType> *)(*componentListMap.Get(ComponentType::GetID()));
-
-    Actor* actor = GetActor(actorKey);
 
     ComponentType* component = actor->GetComponent<ComponentType>();
     component->OnTerminate(this);

@@ -11,11 +11,11 @@ private:
     TransformComponent *transform;
     ActorManager* am = nullptr;
 
-    SlotmapKey<Actor> bulletPrefab;
+    Actor *bulletPrefab = nullptr;
 
     void OnShoot(ShootNotification* notification);
 public:
-    SlotmapKey<Actor> weapon;
+    Actor *weapon = nullptr;
 
     void OnInit(ActorManager *actorManager);
     void OnTerminate(ActorManager *actorManager) override;

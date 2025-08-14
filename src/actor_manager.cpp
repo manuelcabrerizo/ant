@@ -25,7 +25,7 @@ void ActorManager::BeingInitialization(i32 actorCount, i32 componentTypeCount_, 
     componentTypeCount = componentTypeCount_;
     maxActorCount = actorCount;
 
-    actors.Init(maxActorCount, memoryType);
+    allocator.Init(maxActorCount, memoryType);
     toRemove.Init(maxActorCount, memoryType);
 
     componentListMap.Init(componentTypeCount, memoryType);
@@ -43,99 +43,80 @@ void ActorManager::Terminate()
 
 void ActorManager::Clear()
 {
-    Array<Actor>* actorsArray = actors.GetArray();
-    for (i32 i = 0; i < actorsArray->size; ++i)
+    auto actorsArray = allocator.GetBlockArray();
+    size_t size = allocator.GetBlockCount();
+    size_t used = allocator.GetBlockUsed();
+
+    size_t usedFound = 0;
+    for (int i = 0; i < size; ++i)
     {
-        Actor* actor = &(*actorsArray)[i];
+        if (!actorsArray[i].header.occupied)
+        {
+            continue;
+        }
+        usedFound++;
+
+        Actor* actor = (Actor*)&actorsArray[i].data[0];
         for (i32 j = actor->componentsIds.size - 1; j >= 0; --j)
         {
             RemoveComponentById(actor, actor->componentsIds[j]);
         }
+
+        if (usedFound == used)
+        {
+            break;
+        }
     }
-    actors.Clear();
+
+    allocator.Clear();
 }
 
-SlotmapKey<Actor> ActorManager::CreateActor(i32 componentCount_)
+Actor *ActorManager::CreateActor(i32 componentCount_)
 {
-    Actor actor;
-    actor.componentsMap.Init(componentCount_, memoryType);
-    actor.componentsIds.Init(componentCount_, memoryType);
-    SlotmapKey<Actor> actorKey = actors.Add(actor);
-    return actorKey;
+    void* buffer = allocator.Alloc();
+    Actor* actor = new (buffer) Actor();
+    actor->componentsMap.Init(componentCount_, memoryType);
+    actor->componentsIds.Init(componentCount_, memoryType);
+    return actor;
 }
 
-void ActorManager::DestroyActor(SlotmapKey<Actor> actorKey)
+void ActorManager::DestroyActor(Actor *actor)
 {
-    toRemove.Push(actorKey);
+    toRemove.Push(actor);
 }
 
 void ActorManager::ProcessActorsToRemove()
 {
     for (int j = 0; j < toRemove.size; ++j)
     {
-        SlotmapKey<Actor> actorKey = toRemove[j];
-        Actor* actor = actors.Get(actorKey);
+        Actor* actor = toRemove[j];
         for (i32 i = actor->componentsIds.size - 1; i >= 0; --i)
         {
-            RemoveComponentById(actorKey, actor->componentsIds[i]);
+            RemoveComponentById(actor, actor->componentsIds[i]);
         }
         actor->componentsIds.Clear();
-        actors.Remove(actorKey);
+        allocator.Free(actor);
     }
     toRemove.Clear();
 }
 
-Actor* ActorManager::GetActor(SlotmapKey<Actor> actorKey)
+void ActorManager::AddAndCloneComponentById(Actor *dstActor, Actor *srcActor, int id)
 {
-    return actors.Get(actorKey);
-}
-
-void ActorManager::AddAndCloneComponentById(SlotmapKey<Actor> dstActorKey, SlotmapKey<Actor> srcActorKey, int id)
-{
-    /*
     ComponentListBase* list = *componentListMap.Get(id);
 
-    Actor* srcActor = GetActor(srcActorKey);
+    ComponentBase *dstComponentBase = list->AddComponent();
+    ComponentBase* srcComponentBase = srcActor->GetComponentById(id);
 
-    SlotmapKeyBase dstKeyBase = list->AddComponent();
-    SlotmapKeyBase srcKeyBase = *srcActor->componentsMap.Get(id);
-
-    Actor* dstActor = GetActor(dstActorKey);
-    dstActor->componentsMap.Add(id, dstKeyBase);
+    dstActor->componentsMap.Add(id, dstComponentBase);
     dstActor->componentsIds.Push(id);
 
-    ComponentBase* dstComponentBase = componentStorage->GetComponent(dstKeyBase);
-    ComponentBase* srcComponentBase = componentStorage->GetComponent(srcKeyBase);
-    componentStorage->CopyComponent(dstComponentBase, srcComponentBase);
+    list->CopyComponent(dstComponentBase, srcComponentBase);
 
     dstComponentBase->enable = true;
     dstComponentBase->initialized = false;
-    dstComponentBase->owner = dstActorKey;
+    dstComponentBase->owner = dstActor;
 
     componentsToInit.Push(dstComponentBase);
-    */
-}
-
-void ActorManager::RemoveComponentById(SlotmapKey<Actor> actorKey, i32 id)
-{
-    ComponentListBase* list = *componentListMap.Get(id);
-    Actor* actor = GetActor(actorKey);
-    list->RemoveComponent(this, *actor->componentsMap.Get(id));
-    actor->componentsMap.Remove(id);
-    i32 foundIndex = -1;
-    for (i32 i = 0; i < actor->componentsIds.size; ++i)
-    {
-        if (actor->componentsIds[i] == id)
-        {
-            foundIndex = i;
-        }
-    }
-    if (foundIndex >= 0)
-    {
-        actor->componentsIds[foundIndex] = actor->componentsIds[actor->componentsIds.size - 1];
-        actor->componentsIds[actor->componentsIds.size - 1] = -1;
-        actor->componentsIds.size--;
-    }
 }
 
 void ActorManager::RemoveComponentById(Actor* actor, i32 id)
@@ -170,18 +151,17 @@ static i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
     return count;
 }
 
-SlotmapKey<Actor> ActorManager::CloneActor(SlotmapKey<Actor> actorKey)
+Actor *ActorManager::CloneActor(Actor *srcActor)
 {
-    Actor* srcActor = actors.Get(actorKey);
-    SlotmapKey<Actor> dstActor = CreateActor(srcActor->componentsIds.capacity);
+    Actor *dstActor = CreateActor(srcActor->componentsIds.capacity);
     for (int i = 0; i < srcActor->componentsIds.size; ++i)
     {
-        AddAndCloneComponentById(dstActor, actorKey, srcActor->componentsIds[i]);
+        AddAndCloneComponentById(dstActor, srcActor, srcActor->componentsIds[i]);
     }
     return dstActor;
 }
 
-SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char* filepath)
+Actor *ActorManager::CreateActorFromFile(const char* filepath)
 {
     tinyxml2::XMLDocument doc;
     doc.LoadFile(filepath);
@@ -194,7 +174,7 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char* filepath)
         componentCount = Utils::NextPower2(componentCount);
     }
 
-    SlotmapKey<Actor> actor = CreateActor(componentCount);
+    Actor *actor = CreateActor(componentCount);
     tinyxml2::XMLElement* component = root->FirstChildElement();
     while (component)
     {
@@ -253,11 +233,9 @@ SlotmapKey<Actor> ActorManager::CreateActorFromFile(const char* filepath)
 
                 playerController.weapons[0] = CreateActorFromFile(weaponPath[0]);
                 playerController.weapons[1] = CreateActorFromFile(weaponPath[1]);
-                Actor* weaponActor = GetActor(playerController.weapons[1]);
-                RenderComponent* render = weaponActor->GetComponent<RenderComponent>();
+                RenderComponent* render = playerController.weapons[1]->GetComponent<RenderComponent>();
                 render->enable = false;
-                Actor* thisActor = GetActor(actor);
-                WeaponComponent* weapon = thisActor->GetComponent<WeaponComponent>();
+                WeaponComponent* weapon = actor->GetComponent<WeaponComponent>();
                 weapon->weapon = playerController.weapons[0];
             }
             AddComponent<PlayerControllerComponent>(actor, playerController);

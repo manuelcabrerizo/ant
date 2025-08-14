@@ -27,7 +27,7 @@ private:
     void ProcessKeyboardMovement();
     void ChangeWeapon(ActorManager *actorManager);
 public:
-    SlotmapKey<Actor> weapons[2];
+    Actor *weapons[2];
 
     void OnInit(ActorManager *actorManager);
     void OnTerminate(ActorManager *actorManager) override;

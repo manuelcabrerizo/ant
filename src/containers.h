@@ -331,7 +331,7 @@ void BlockAllocator<BlockSize>::Init(size_t blockCount_, int memoryType)
 {
     // Alloc memory for the block
     blockCount = blockCount_;
-    realBlockSize = sizeof(BlockHeader) + BlockSize;
+    realBlockSize = sizeof(Iterator);
     capacityInBytes = realBlockSize * blockCount;
     bytesUsed = 0;
     blockUsed = 0;

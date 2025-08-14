@@ -3,8 +3,7 @@
 void BulletComponent::OnInit(ActorManager* actorManager)
 {
     currentLifeTime = lifeTime;
-    Actor* actor = actorManager->GetActor(owner);
-    transform = actor->GetComponent<TransformComponent>();
+    transform = owner->GetComponent<TransformComponent>();
 }
 
 void BulletComponent::OnTerminate(ActorManager* actorManager)

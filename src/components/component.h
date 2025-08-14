@@ -7,7 +7,7 @@ struct ComponentBase
 {
     static int counter;
 
-    SlotmapKey<Actor> owner;
+    Actor *owner = nullptr;
     bool enable = true;
     bool initialized = false;
 

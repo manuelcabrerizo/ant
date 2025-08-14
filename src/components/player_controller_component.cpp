@@ -22,11 +22,10 @@ void PlayerControllerComponent::OnInit(ActorManager *actorManager)
     showMouse = false;
     PlatformShowMouse(showMouse);
     
-    Actor* actor = actorManager->GetActor(owner);
-    transform = actor->GetComponent<TransformComponent>();
-    camera = actor->GetComponent<CameraComponent>();
-    physics = actor->GetComponent<PhysicsComponent>();
-    weapon = actor->GetComponent<WeaponComponent>();
+    transform = owner->GetComponent<TransformComponent>();
+    camera = owner->GetComponent<CameraComponent>();
+    physics = owner->GetComponent<PhysicsComponent>();
+    weapon = owner->GetComponent<WeaponComponent>();
 }
 
 void PlayerControllerComponent::OnTerminate(ActorManager *actorManager)
@@ -44,8 +43,7 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
     if (InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
     {
         int currentWeapon = usingFirstWeapon ? 0 : 1;
-        Actor* actor = actorManager->GetActor(weapons[currentWeapon]);
-        AnchorComponent* weaponAnchor = actor->GetComponent<AnchorComponent>();
+        AnchorComponent* weaponAnchor = weapons[currentWeapon]->GetComponent<AnchorComponent>();
 
         ShootNotification notification;
         notification.shootPosition = weaponAnchor->position;
@@ -128,10 +126,8 @@ void PlayerControllerComponent::ChangeWeapon(ActorManager *actorManager)
 {
     RenderComponent *weaponRenderComponents[2];
 
-    Actor* actor0 = actorManager->GetActor(weapons[0]);
-    weaponRenderComponents[0] = actor0->GetComponent<RenderComponent>();
-    Actor* actor1 = actorManager->GetActor(weapons[1]);
-    weaponRenderComponents[1] = actor1->GetComponent<RenderComponent>();
+    weaponRenderComponents[0] = weapons[0]->GetComponent<RenderComponent>();
+    weaponRenderComponents[1] = weapons[1]->GetComponent<RenderComponent>();
 
     if(InputManager::Get()->KeyJustDown(KEY_1) && !usingFirstWeapon)
     {

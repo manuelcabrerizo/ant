@@ -6,13 +6,18 @@ struct ComponentBase;
 
 struct Actor
 {
-     HashMap<ComponentBase *> componentsMap;
-     Array<i32> componentsIds;
+    HashMap<ComponentBase *> componentsMap;
+    Array<i32> componentsIds;
 
-     template<typename ComponentType>
-     ComponentType* GetComponent()
-     {
-         ComponentType* component = (ComponentType *)*componentsMap.Get(ComponentType::GetID());
-         return component;
-     }
+    template<typename ComponentType>
+    ComponentType* GetComponent()
+    {
+        ComponentType* component = (ComponentType *)*componentsMap.Get(ComponentType::GetID());
+        return component;
+    }
+
+    ComponentBase* GetComponentById(int id)
+    {
+        return *componentsMap.Get(id);
+    }
 };

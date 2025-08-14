@@ -15,16 +15,13 @@ void WeaponComponent::OnInit(ActorManager *actorManager)
     NotificationManager::Get()->AddListener(this, NotificationType::Shoot);
 
     am = actorManager;
-    Actor* actor = actorManager->GetActor(owner);
-    transform = actor->GetComponent<TransformComponent>();
+    transform = owner->GetComponent<TransformComponent>();
 
-    /*
     bulletPrefab = am->CreateActorFromFile("data/xml/bullet.xml");
-    BulletComponent* bullet = actorManager->GetComponent<BulletComponent>(bulletPrefab);
+    BulletComponent* bullet = bulletPrefab->GetComponent<BulletComponent>();
     bullet->enable = false;
-    RenderComponent* render = actorManager->GetComponent<RenderComponent>(bulletPrefab);
+    RenderComponent* render = bulletPrefab->GetComponent<RenderComponent>();
     render->enable = false;
-    */
 }
 
 void WeaponComponent::OnTerminate(ActorManager *actorManager)
@@ -34,9 +31,8 @@ void WeaponComponent::OnTerminate(ActorManager *actorManager)
 
 void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
-    Actor* actor = actorManager->GetActor(weapon);
-    TransformComponent *weaponTransform = actor->GetComponent<TransformComponent>();
-    AnchorComponent *weaponAnchor = actor->GetComponent<AnchorComponent>();
+    TransformComponent *weaponTransform = weapon->GetComponent<TransformComponent>();
+    AnchorComponent *weaponAnchor = weapon->GetComponent<AnchorComponent>();
 
     Vector3 front = transform->direction.Normalized();
     Vector3 right = Vector3(0.0f, 1.0f, 0.0f).Cross(front).Normalized();
@@ -52,9 +48,8 @@ void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 
 void WeaponComponent::OnShoot(ShootNotification* notification)
 {
-    SlotmapKey<Actor> bullet = am->CreateActorFromFile("data/xml/bullet.xml");
-    Actor* actor = am->GetActor(bullet);
-    TransformComponent *bulletTransform = actor->GetComponent<TransformComponent>();
+    Actor *bullet = am->CloneActor(bulletPrefab);
+    TransformComponent *bulletTransform = bullet->GetComponent<TransformComponent>();
     bulletTransform->position = notification->shootPosition;
     bulletTransform->direction = notification->shootDirection;
     am->InitializeNewComponents();
