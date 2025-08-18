@@ -13,7 +13,7 @@ class Segment;
 
 enum class ColliderType
 {
-    AABB,
+    AABB = 0,
     OBB,
     SPHERE,
     CAPSULE,

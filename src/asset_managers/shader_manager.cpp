@@ -34,13 +34,16 @@ VertexShaderManager* VertexShaderManager::Get()
 
 void VertexShaderManager::Load(const char* name, const char* filePath)
 {
-    Frame frame = MemoryManager::Get()->GetFrame();
-    File file = PlatformReadFile(filePath, FRAME_MEMORY);
-    VertexShaderHandle shaderHandle;
-    shaderHandle.name = name;
-    shaderHandle.shader = GraphicsManager::Get()->VertexShaderAlloc(file);
-    MemoryManager::Get()->ReleaseFrame(frame);
-    nameIndex.Add(name, assets.Add(shaderHandle));
+    if (!nameIndex.Contains(name))
+    {
+        Frame frame = MemoryManager::Get()->GetFrame();
+        File file = PlatformReadFile(filePath, FRAME_MEMORY);
+        VertexShaderHandle shaderHandle;
+        shaderHandle.name = name;
+        shaderHandle.shader = GraphicsManager::Get()->VertexShaderAlloc(file);
+        MemoryManager::Get()->ReleaseFrame(frame);
+        nameIndex.Add(name, assets.Add(shaderHandle));
+    }
 }
 
 void VertexShaderManager::Unload(const char* name)

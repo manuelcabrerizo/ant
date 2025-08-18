@@ -1,35 +1,27 @@
 #pragma once
 
 #include "component.h"
-#include <collision.h>
+#include <math/vector3.h>
 
 class TransformComponent;
+class ColliderComponent;
 
 class PhysicsComponent : public Component<PhysicsComponent>
 {
 private:
-    static CollisionWorld collisionWorld;
-
-    void UpdateCollider();
     void ProcessPhysics(float dt);
     void ProcessCollisionDetectionAndResolution();
 
 public:
     TransformComponent *transform;
+    ColliderComponent* collider;
 
     Vector3 acceleration = Vector3();
     Vector3 velocity = Vector3();
     Vector3 forceAccumulator = Vector3();
-    Vector3 offset;
     bool grounded = false;
 
-    Collider *collider = nullptr;
-
-    static void Initialize();
-    static void Terminate();
-    static void DebugDraw();
-
     void OnInit(ActorManager *actorManager);
-    void OnTerminate(ActorManager *actorManager) override;
     void OnUpdate(ActorManager *actorManager, f32 dt);
+    void OnLateUpdate(ActorManager* actorManager, float dt);
 };

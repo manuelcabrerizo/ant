@@ -72,38 +72,36 @@ void Model::Init(const char *filepath, i32 memoryType)
                  aiString path;
                  if (material->GetTexture(aiTextureType_DIFFUSE, 0, &path, 0, 0, 0, 0, 0) == AI_SUCCESS)
                  {
-                     i32 prevIndex = Strings::FindPenultimateInstance(filepath, '/');
-                     i32 postIndex = Strings::FindFirstInstance(path.C_Str(), '\\');
+                    i32 prevIndex = Strings::FindPenultimateInstance(filepath, '/');
+                    i32 postIndex = Strings::FindFirstInstance(path.C_Str(), '\\');
 
-                     // ERROR: invalid model foulder structure, (we use source/textures standar)
-                     ASSERT(prevIndex != -1 && postIndex != -1);
+                    // ERROR: invalid model foulder structure, (we use source/textures standar)
+                    ASSERT(prevIndex != -1 && postIndex != -1);
 
-                     const char* texturePath = (const char*)MemoryManager::Get()->Alloc(_MAX_PATH, FRAME_MEMORY);
-                     const char* tempPath = (const char*)MemoryManager::Get()->Alloc(_MAX_PATH, FRAME_MEMORY);
-                     memset((void*)texturePath, 0, _MAX_PATH);
-                     memset((void*)tempPath, 0, _MAX_PATH);
+                    const char* texturePath = (const char*)MemoryManager::Get()->Alloc(_MAX_PATH, FRAME_MEMORY);
+                    const char* tempPath = (const char*)MemoryManager::Get()->Alloc(_MAX_PATH, FRAME_MEMORY);
+                    memset((void*)texturePath, 0, _MAX_PATH);
+                    memset((void*)tempPath, 0, _MAX_PATH);
                     
-                     memcpy((void*)texturePath, filepath, prevIndex);
-                     memcpy((void*)tempPath, path.C_Str() + postIndex, path.length - postIndex);
+                    memcpy((void*)texturePath, filepath, prevIndex);
+                    memcpy((void*)tempPath, path.C_Str() + postIndex, path.length - postIndex);
 
-                     Strings::ReplaceInstance((char *)tempPath, '\\', '/');
+                    Strings::ReplaceInstance((char *)tempPath, '\\', '/');
 
-                     memcpy((void *)(texturePath + strlen(texturePath)), tempPath, strlen(tempPath));
+                    memcpy((void *)(texturePath + strlen(texturePath)), tempPath, strlen(tempPath));
 
-                     i32 nameIndex = Strings::FindLastInstance(tempPath, '/');
-                     i32 extensionIndex = Strings::FindLastInstance(tempPath, '.');
+                    i32 nameIndex = Strings::FindLastInstance(tempPath, '/');
+                    i32 extensionIndex = Strings::FindLastInstance(tempPath, '.');
 
-                     // ERROR: invalid model foulder structure, (we use source/textures standar)
-                     ASSERT(nameIndex != -1 && extensionIndex != -1);
+                    // ERROR: invalid model foulder structure, (we use source/textures standar)
+                    ASSERT(nameIndex != -1 && extensionIndex != -1);
 
-                     memset((void*)(tempPath + extensionIndex), 0, strlen(tempPath) - extensionIndex);
+                    memset((void*)(tempPath + extensionIndex), 0, strlen(tempPath) - extensionIndex);
 
-                     diffuseTextureName = tempPath + (nameIndex + 1);
+                    diffuseTextureName = tempPath + (nameIndex + 1);
 
-                     if (TextureManager::Get()->Contains(diffuseTextureName) == false)
-                     {
-                         TextureManager::Get()->Load(diffuseTextureName, texturePath);
-                     }
+                    TextureManager::Get()->Load(diffuseTextureName, texturePath);
+                     
                  }
              }
 
@@ -118,16 +116,13 @@ void Model::Init(const char *filepath, i32 memoryType)
 
              if (isTextured)
              {
-                 if (MaterialManager::Get()->Contains(materialName) == false)
-                 {
-                     MaterialManager::Get()->LoadTexture(materialName, "default",
-                         diffuseTextureName, normalTextureName, specularTextureName, 64);
-                 }
+                MaterialManager::Get()->LoadTexture(materialName, "default",
+                    diffuseTextureName, normalTextureName, specularTextureName, 64);
              }
              else
              {
-                 MaterialManager::Get()->LoadSolidColor(materialName, "color", diffuseColor,
-                     diffuseColor, Vector3(1.0f, 1.0f, 1.0f), 64);
+                MaterialManager::Get()->LoadSolidColor(materialName, "color", diffuseColor,
+                    diffuseColor, Vector3(1.0f, 1.0f, 1.0f), 64);
              }
 
              MemoryManager::Get()->ReleaseFrame(stringFrame);

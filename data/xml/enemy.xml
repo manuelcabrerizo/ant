@@ -11,10 +11,14 @@
 		</materials>
 		<rotationOffset x="0" y="180" z="0"/>
     </RenderComponent>
+	<ColliderComponent>
+		<type colliderType="3"/>
+		<offset x="0" y="0.75" z="0"/>
+		<values halfHeight="0.5" radio="0.25"/>
+	</ColliderComponent>
     <PhysicsComponent>
         <acceleration x="0" y="0" z="0"/>
         <velocity x="0" y="0" z="0"/>
-        <offset x="0" y="0.75" z="0"/>
     </PhysicsComponent>
     <EnemyComponent>
     </EnemyComponent>

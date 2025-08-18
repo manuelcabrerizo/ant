@@ -5,7 +5,9 @@
 // when the player kills all enemies the game restart
 // when the player gets kill the game restart
 
-#include <game.h>
+#include <game_manager.h>
+
+#include <collision.h>
 
 #include <asset_managers/shader_manager.h>
 #include <asset_managers/texture_manager.h>
@@ -16,6 +18,7 @@
 #include <components/transform_component.h>
 #include <components/render_component.h>
 #include <components/physics_component.h>
+#include <components/collider_component.h>
 #include <components/camera_component.h>
 #include <components/weapon_component.h>
 #include <components/anchor_component.h>
@@ -24,14 +27,15 @@
 #include <components/animation_component.h>
 #include <components/bullet_component.h>
 
-void Game::Init()
+void GameManager::Init()
 {
     InitializeAssetsManagers();
+
     // TODO: remove this statics
     // all of this should be handle by systems not the component class
     CameraComponent::Initialize();
     RenderComponent::Initialize();
-    PhysicsComponent::Initialize();
+    CollisionWorld::Init(100);
 
     GraphicsManager::Get()->DebugInit();
 
@@ -39,26 +43,28 @@ void Game::Init()
     InitializeActorManager();
 
     scenes.Init(1, STATIC_MEMORY);
-    gameState.Init(&actorManager, &scenes[0]);
 
-    stateMachine.Push(&gameState);
+    // Initi state and start at the menu state
+    menuState.Init(this);
+    gameState.Init(this);
+    stateMachine.Push(&menuState);
 }
 
-void Game::Update(f32 dt)
+void GameManager::Update(f32 dt)
 {
-    PhysicsComponent::DebugDraw();
+    GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
+    CollisionWorld::Get()->DebugDraw();
     stateMachine.Update(dt);
 }
 
-void Game::Render(f32 dt)
+void GameManager::Render(f32 dt)
 {
-    GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
     stateMachine.Render();
     GraphicsManager::Get()->DebugPresent();
     GraphicsManager::Get()->EndFrame(1);
 }
 
-void Game::Terminate()
+void GameManager::Terminate()
 {
     stateMachine.Clear();
     actorManager.Terminate();
@@ -67,11 +73,31 @@ void Game::Terminate()
 
     CameraComponent::Terminate();
     RenderComponent::Terminate();
-    PhysicsComponent::Terminate();
+    CollisionWorld::Terminate();
     ShutdownAssetsManagers();
 }
 
-void Game::InitializeAssetsManagers()
+void GameManager::ChangeToMenuState()
+{
+    stateMachine.ChangeState(&menuState);
+}
+
+void GameManager::ChangeToGameState()
+{
+    stateMachine.ChangeState(&gameState);
+}
+
+ActorManager* GameManager::GetActorManager()
+{
+    return &actorManager;
+}
+
+Scene* GameManager::GetCurrentScene()
+{
+    return &scenes[0];
+}
+
+void GameManager::InitializeAssetsManagers()
 {
     VertexShaderManager::Initialize(4);
     FragmentShaderManager::Initialize(4);
@@ -80,7 +106,7 @@ void Game::InitializeAssetsManagers()
     ModelManager::Initialize(32);
 }
 
-void Game::ShutdownAssetsManagers()
+void GameManager::ShutdownAssetsManagers()
 {
     MaterialManager::Shutdown();
     TextureManager::Shutdown();
@@ -89,7 +115,7 @@ void Game::ShutdownAssetsManagers()
     FragmentShaderManager::Shutdown();
 }
 
-void Game::LoadDefaultAssets()
+void GameManager::LoadDefaultAssets()
 {
     // Load Vertex the shaders
     VertexShaderManager::Get()->Load("default", "data/shaders/vert.hlsl");
@@ -111,13 +137,13 @@ void Game::LoadDefaultAssets()
         "DefaultMaterial_Diffuse", "DefaultMaterial_Normal", "DefaultMaterial_Specular", 64);
 }
 
-void Game::InitializeActorManager()
+void GameManager::InitializeActorManager()
 {
-    // Initialize the Actor Manager
     actorManager.BeingInitialization(100, 64, STATIC_MEMORY);
     actorManager.AddComponentType<TransformComponent, 100>();
     actorManager.AddComponentType<RenderComponent, 100>();
     actorManager.AddComponentType<PhysicsComponent, 100>();
+    actorManager.AddComponentType<ColliderComponent, 100>();
     actorManager.AddComponentType<PlayerControllerComponent, 1>();
     actorManager.AddComponentType<WeaponComponent, 100>();
     actorManager.AddComponentType<CameraComponent, 1>();
@@ -125,6 +151,6 @@ void Game::InitializeActorManager()
     actorManager.AddComponentType<AnchorComponent, 10>();
     actorManager.AddComponentType<AnimationComponent, 10>();
     actorManager.AddComponentType<BulletComponent, 100>();
-    // TODO: add more component types ...
+    // NOTE: add more component types ...
     actorManager.EndInitialization();
 }

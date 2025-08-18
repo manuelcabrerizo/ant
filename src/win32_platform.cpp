@@ -9,7 +9,7 @@
 #include "notification_manager.h"
 #include "input_manager.h"
 #include "graphics_manager.h"
-#include "game.h"
+#include "game_manager.h"
 
 static bool running;
 static bool pause;
@@ -138,8 +138,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT, GraphicsManagerType::D3D11, STATIC_MEMORY);
                ShowWindow(window, SW_SHOW);
                
-               Game game;
-               game.Init();
+               GameManager gameManager;
+               gameManager.Init();
                
                running = true;
 
@@ -172,11 +172,11 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                     }
                     if(!pause)
                     {
-                         game.Update(dt);
-                         game.Render(dt);
+                        gameManager.Update(dt);
+                        gameManager.Render(dt);
                     }    
                }
-               game.Terminate();
+               gameManager.Terminate();
                GraphicsManager::Terminate();
           }
           else

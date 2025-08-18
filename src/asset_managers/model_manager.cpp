@@ -35,13 +35,16 @@ ModelManager* ModelManager::Get()
 
 void ModelManager::Load(const char* name, const char* path)
 {
-    Model* model = allocator.Alloc();
-    model->Init(path, STATIC_MEMORY);
+    if (!nameIndex.Contains(name))
+    {
+        Model* model = allocator.Alloc();
+        model->Init(path, STATIC_MEMORY);
 
-    ModelHandle modelHandle;
-    modelHandle.name = name;
-    modelHandle.model = model;
-    nameIndex.Add(name, assets.Add(modelHandle));
+        ModelHandle modelHandle;
+        modelHandle.name = name;
+        modelHandle.model = model;
+        nameIndex.Add(name, assets.Add(modelHandle));
+    }
 }
 
 void ModelManager::Unload(const char* name)

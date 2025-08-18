@@ -30,7 +30,7 @@
     <ClCompile Include="src\debug_renderer_d3d11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\game.cpp">
+    <ClCompile Include="src\game_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\graphics_manager.cpp">
@@ -183,10 +183,13 @@
     <ClCompile Include="src\states\menu_state.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\states\game_state.cpp">
+    <ClCompile Include="src\states\play_state.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\states\state_machine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\collider_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -212,7 +215,7 @@
     <ClInclude Include="src\debug_renderer_d3d11.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\game.h">
+    <ClInclude Include="src\game_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics_manager.h">
@@ -383,7 +386,10 @@
     <ClInclude Include="src\states\menu_state.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\states\game_state.h">
+    <ClInclude Include="src\states\play_state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\components\collider_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

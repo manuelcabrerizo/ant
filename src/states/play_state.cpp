@@ -1,32 +1,33 @@
-#include "game_state.h"
-#include <actor_manager.h>
-#include <scene.h>
-
+#include "play_state.h"
+#include <game_manager.h>
+#include <input_manager.h>
 #include <components/player_controller_component.h>
 #include <components/camera_component.h>
 #include <components/weapon_component.h>
 #include <components/enemy_component.h>
 #include <components/physics_component.h>
+#include <components/collider_component.h>
 #include <components/render_component.h>
 #include <components/bullet_component.h>
 
-void GameState::Init(ActorManager* actorManager, Scene* scene)
+void PlayState::Init(GameManager *gameManager)
 {
-    this->actorManager = actorManager;
-    this->scene = scene;
+    this->gameManager = gameManager;
+    this->actorManager = gameManager->GetActorManager();
+    this->scene = gameManager->GetCurrentScene();
 }
 
-void GameState::OnEnter()
+void PlayState::OnEnter()
 {
     scene->Load(actorManager, "");
 }
 
-void GameState::OnExit()
+void PlayState::OnExit()
 {
     scene->Unload();
 }
 
-void GameState::OnUpdate(float deltaTime)
+void PlayState::OnUpdate(float deltaTime)
 {
     // Initialize new components
     actorManager->InitializeNewComponents();
@@ -36,13 +37,21 @@ void GameState::OnUpdate(float deltaTime)
     actorManager->UpdateComponents<WeaponComponent>(deltaTime);
     actorManager->UpdateComponents<EnemyComponent>(deltaTime);
     actorManager->UpdateComponents<PhysicsComponent>(deltaTime);
+    actorManager->UpdateComponents<ColliderComponent>(deltaTime);
     actorManager->UpdateComponents<RenderComponent>(deltaTime);
     actorManager->UpdateComponents<BulletComponent>(deltaTime);
+    // Late Update
+    actorManager->LateUpdateComponents<PhysicsComponent>(deltaTime);
 
     actorManager->ProcessActorsToRemove();
+
+    if (InputManager::Get()->KeyJustDown(KEY_P))
+    {
+        gameManager->ChangeToMenuState();
+    }
 }
 
-void GameState::OnRender()
+void PlayState::OnRender()
 {
     actorManager->RenderComponents<RenderComponent>();
 }

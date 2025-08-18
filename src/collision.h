@@ -8,16 +8,21 @@
 
 class CollisionWorld
 {
+private:
+    CollisionWorld() {};
+    static CollisionWorld instance;
+    static bool isInitialized;
+
+    Array<Collider *> colliders;
 public:
-    void Initialize(int maxColllidersCount);
-    void DebugDraw();
+    static void Init(int maxColllidersCount);
+    static void Terminate();
+    static CollisionWorld* Get();
 
-    Collider *AddCollider(const Collider& collider);
-    void RemoveCollider(const Collider& collider);
-
+    void AddCollider(Collider *collider);
+    void RemoveCollider(Collider *collider);
     bool Intersect(const Ray& ray, float& t, unsigned int ignoreId = 0) const;
     bool Intersect(const Segment& segment, float& t, unsigned int ignoreId = 0) const;
     bool Intersect(const Collider& collider, Array<CollisionData>& collisionData) const;
-private:
-    Array<Collider> colliders;
+    void DebugDraw();
 };

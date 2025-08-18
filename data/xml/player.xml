@@ -15,9 +15,13 @@
         <weapon path="data/xml/pistol.xml"/>
         <weapon path="data/xml/sniper.xml"/>
     </PlayerControllerComponent>
+	<ColliderComponent>
+		<type colliderType="3"/>
+		<offset x="0" y="-0.5" z="0"/>
+		<values halfHeight="0.5" radio="0.25"/>
+	</ColliderComponent>
     <PhysicsComponent>
         <acceleration x="0" y="0" z="0"/>
         <velocity x="0" y="0" z="0"/>
-        <offset x="0" y="-0.5" z="0"/>
     </PhysicsComponent>
 </Actor>

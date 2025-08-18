@@ -3,20 +3,53 @@
 #include <float.h>
 #include <collisions/collision_utils.h>
 
-void CollisionWorld::Initialize(int maxColllidersCount)
+CollisionWorld CollisionWorld::instance;
+bool CollisionWorld::isInitialized = false;
+
+void CollisionWorld::Init(int maxColllidersCount)
 {
-    colliders.Init(maxColllidersCount, STATIC_MEMORY);
+    if (isInitialized)
+    {
+        ASSERT(!"Error: collision world already initialize");
+    }
+    instance.colliders.Init(maxColllidersCount, STATIC_MEMORY);
+    isInitialized = true;
 }
 
-Collider *CollisionWorld::AddCollider(const Collider& collider)
+void CollisionWorld::Terminate()
+{
+    if (!isInitialized)
+    {
+        ASSERT(!"Error: collision world has not been initialize");
+    }
+    isInitialized = false;
+}
+
+CollisionWorld* CollisionWorld::Get()
+{
+    if (!isInitialized)
+    {
+        ASSERT(!"Error: collision world has not been initialize");
+    }
+    return &instance;
+}
+
+void CollisionWorld::AddCollider(Collider *collider)
 {
     colliders.Push(collider);
-    return &colliders[colliders.size - 1];
 }
 
-void CollisionWorld::RemoveCollider(const Collider& collider)
+void CollisionWorld::RemoveCollider(Collider *collider)
 {
-    // TODO: ...
+    for (int i = colliders.size - 1; i >= 0; --i)
+    {
+        if (colliders[i] == collider)
+        {
+            colliders[i] = colliders[colliders.size - 1];
+            colliders[colliders.size - 1] = nullptr;
+            colliders.size--;
+        }
+    }
 }
 
 bool CollisionWorld::Intersect(const Ray& ray, float& t, unsigned int ignoreId) const
@@ -24,9 +57,9 @@ bool CollisionWorld::Intersect(const Ray& ray, float& t, unsigned int ignoreId) 
     bool isIntersecting = false;
     for (int i = 0; i < colliders.size; ++i)
     {
-        if (colliders[i].GetId() != ignoreId)
+        if (colliders[i]->GetId() != ignoreId)
         {
-            isIntersecting |= colliders[i].Intersect(ray, t);
+            isIntersecting |= colliders[i]->Intersect(ray, t);
         }
     }
     return isIntersecting;
@@ -37,9 +70,9 @@ bool CollisionWorld::Intersect(const Segment& segment, float& t, unsigned int ig
     bool isIntersecting = false;
     for (int i = 0; i < colliders.size; ++i)
     {
-        if (colliders[i].GetId() != ignoreId)
+        if (colliders[i]->GetId() != ignoreId)
         {
-            isIntersecting |= colliders[i].Intersect(segment, t);
+            isIntersecting |= colliders[i]->Intersect(segment, t);
         }
     }
     return isIntersecting;
@@ -50,9 +83,9 @@ bool CollisionWorld::Intersect(const Collider& collider, Array<CollisionData>& c
     bool isIntersecting = false;
     for (int i = 0; i < colliders.size; ++i)
     {
-        if (collider.GetId() != colliders[i].GetId())
+        if (collider.GetId() != colliders[i]->GetId())
         {
-            isIntersecting |= collider.Intersect(colliders[i], collisionData);
+            isIntersecting |= collider.Intersect(*colliders[i], collisionData);
         }
     }
     CollisionUtils::SortCollisionByPenetration(collisionData);
@@ -63,6 +96,6 @@ void CollisionWorld::DebugDraw()
 {
     for (int i = 0; i < colliders.size; ++i)
     {
-        colliders[i].DebugDraw();
+        colliders[i]->DebugDraw();
     }
 }

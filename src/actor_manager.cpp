@@ -4,6 +4,7 @@
 #include <components/transform_component.h>
 #include <components/render_component.h>
 #include <components/physics_component.h>
+#include <components/collider_component.h>
 #include <components/camera_component.h>
 #include <components/weapon_component.h>
 #include <components/anchor_component.h>
@@ -18,6 +19,8 @@
 #include <asset_managers/model_manager.h>
 #include <asset_managers/material_manager.h>
 #include <utils.h>
+
+#include <collisions/collider.h>
 
 void ActorManager::BeingInitialization(i32 actorCount, i32 componentTypeCount_, i32 memoryType_)
 {
@@ -301,18 +304,11 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
             attributes->QueryFloatAttribute("x", &velocity.x);
             attributes->QueryFloatAttribute("y", &velocity.y);
             attributes->QueryFloatAttribute("z", &velocity.z);
-            attributes = attributes->NextSiblingElement();
-            Vector3 offset;
-            attributes->QueryFloatAttribute("x", &offset.x);
-            attributes->QueryFloatAttribute("y", &offset.y);
-            attributes->QueryFloatAttribute("z", &offset.z);
 
             PhysicsComponent physics;
             physics.acceleration = acceleration;
             physics.velocity = velocity;
             physics.forceAccumulator = Vector3(0.0f);
-            //physics.lastFrameAcceleration = Vector3(0.0f);
-            physics.offset = offset;
             AddComponent(actor, physics);
         }
         else if (strcmp("WeaponComponent", componentType) == 0)
@@ -341,6 +337,59 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
         {
             BulletComponent bullet;
             AddComponent<BulletComponent>(actor, bullet);
+        }
+        else if (strcmp("ColliderComponent", componentType) == 0)
+        {
+            TransformComponent* transform = actor->GetComponent<TransformComponent>();
+
+            tinyxml2::XMLElement* attributes = component->FirstChildElement();
+
+            ColliderType colliderType;
+            attributes->QueryIntAttribute("colliderType", (int *)&colliderType);
+            attributes = attributes->NextSiblingElement();
+
+            Vector3 offset;
+            attributes->QueryFloatAttribute("x", &offset.x);
+            attributes->QueryFloatAttribute("y", &offset.y);
+            attributes->QueryFloatAttribute("z", &offset.z);
+            
+            Collider collider;
+            switch (colliderType)
+            {
+                case ColliderType::MESH_COLLIDER:
+                {
+                    attributes = attributes->NextSiblingElement();
+                    const char *filepath;
+                    attributes->QueryStringAttribute("filepath", &filepath);
+
+                    MeshCollider meshCollider;
+                    meshCollider.InitFromFile(filepath);
+                    collider = Collider(meshCollider);
+                } break;
+                case ColliderType::CAPSULE:
+                {
+                    attributes = attributes->NextSiblingElement();
+
+                    float halfHeight, radio;
+                    attributes->QueryFloatAttribute("halfHeight", &halfHeight);
+                    attributes->QueryFloatAttribute("radio", &radio);
+
+                    Vector3 halfHeightAxis = Vector3(0, halfHeight, 0);
+
+                    Capsule capsule;
+                    capsule.Init(
+                        (transform->position - halfHeightAxis) + offset,
+                        (transform->position + halfHeightAxis) + offset,
+                        radio);
+
+                    collider = Collider(capsule);
+                } break;
+            }
+
+            ColliderComponent colliderComponent;
+            colliderComponent.SetCollider(collider);
+            colliderComponent.SetOffset(offset);
+            AddComponent<ColliderComponent>(actor, colliderComponent);
         }
         else
         {

@@ -2,17 +2,18 @@
 
 #include "state.h"
 
+class GameManager;
 class ActorManager;
 class Scene;
 
-class GameState : public IState
+class PlayState : public IState
 {
 private:
-    ActorManager* actorManager;
-    Scene* scene;
+    GameManager* gameManager = nullptr;
+    ActorManager* actorManager = nullptr;
+    Scene* scene = nullptr;
 public:
-    void Init(ActorManager* actorManager, Scene* scene);
-
+    void Init(GameManager *gameManager);
     void OnEnter() override;
     void OnExit() override;
     void OnUpdate(float deltaTime) override;
