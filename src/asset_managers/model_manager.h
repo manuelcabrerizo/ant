@@ -7,7 +7,7 @@
 struct ModelHandle
 {
     const char* name;
-    Model model;
+    Model* model;
 };
 
 class ModelManager : public AssetManager<ModelHandle>
@@ -16,6 +16,9 @@ private:
     static ModelManager instance;
     static bool initialize;
     ModelManager() {}
+
+    ObjectAllocator<Model> allocator;
+
 public:
     static void Initialize(u32 assetsCapacity);
     static void Shutdown();

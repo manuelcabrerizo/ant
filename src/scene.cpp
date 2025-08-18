@@ -7,6 +7,9 @@
 #include <components/render_component.h>
 #include <components/animation_component.h>
 
+#include <strings.h>
+#include <windows.h>
+
 void Scene::Load(ActorManager* actorManager_, const char* filepath)
 {
     this->actorManager = actorManager_;
@@ -19,60 +22,63 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     ModelManager::Get()->Load("tower", "data/models/MagicStudio/source/MagicStudio.fbx");
     ModelManager::Get()->Load("wizard", "data/models/Wizard/source/Wizard.FBX");
     ModelManager::Get()->Load("bullet", "data/models/testBullet.fbx");
+    ModelManager::Get()->Load("level1", "data/models/Level1/source/Level.fbx");
 
     // TODO: load all entities from the scene file
     // Create Entities
     actorManager->CreateActorFromFile("data/xml/player.xml");
-    actorManager->CreateActorFromFile("data/xml/test-level.xml");
-    actorManager->CreateActorFromFile("data/xml/tower.xml");
-    actorManager->CreateActorFromFile("data/xml/house.xml");
-    actorManager->CreateActorFromFile("data/xml/wizard.xml");
+    //actorManager->CreateActorFromFile("data/xml/test-level.xml");
+    //actorManager->CreateActorFromFile("data/xml/tower.xml");
+    //actorManager->CreateActorFromFile("data/xml/house.xml");
+    //actorManager->CreateActorFromFile("data/xml/wizard.xml");
+    actorManager->CreateActorFromFile("data/xml/level1.xml");
 
-    /*
-    for (int i = 0; i < 999; i++)
-    {
-       auto key = actorManager->CreateActorFromFile("data/xml/wizard.xml");
-       Actor* actor = actorManager->GetActor(key);
-       TransformComponent* transform = actor->GetComponent<TransformComponent>();
-       transform->position.x += i;
-    }
-    */
+    // Spawn the enemies
 
-    
-    Actor *enemy[3] =
-    {
-         actorManager->CreateActorFromFile("data/xml/enemy.xml"),
-         actorManager->CreateActorFromFile("data/xml/enemy.xml"),
-         actorManager->CreateActorFromFile("data/xml/enemy.xml")
-    };
-
-    // Warrior Animation
-    TransformComponent* transforms[3] =
-    {
-         enemy[0]->GetComponent<TransformComponent>(),
-         enemy[1]->GetComponent<TransformComponent>(),
-         enemy[2]->GetComponent<TransformComponent>()
-    };
-    transforms[0]->position.x = 0.0f;
-    transforms[1]->position.x = -2.0f;
-    transforms[2]->position.x = -4.0f;
-    RenderComponent* renders[3] =
-    {
-         enemy[0]->GetComponent<RenderComponent>(),
-         enemy[1]->GetComponent<RenderComponent>(),
-         enemy[2]->GetComponent<RenderComponent>()
-    };
-    renders[0]->isAnimated = true;
-    renders[1]->isAnimated = true;
-    renders[2]->isAnimated = true;
-
+    // Create the animation for the enemies
     AnimationComponent animation;
     animation.skeleton.Init("data/models/warrior.dae", STATIC_MEMORY);
     animation.animation.Init("data/animations/walk_front.dae", ModelManager::Get()->Get("warrior"), STATIC_MEMORY);
-    actorManager->AddComponent<AnimationComponent>(enemy[0], animation);
-    actorManager->AddComponent<AnimationComponent>(enemy[1], animation);
-    actorManager->AddComponent<AnimationComponent>(enemy[2], animation);
+
+    Frame frame = MemoryManager::Get()->GetFrame();
+
+    File file = PlatformReadFile("data/entities/enemies.txt", FRAME_MEMORY);
+    char* text = (char*)file.data;
+    int endOfFilePos = strlen(text);
+    int currentPos = 0;
+
+    char name[256];
+    Vector3 position;
+    while (currentPos < endOfFilePos)
+    {
+        char* line = text + currentPos;
+        if (sscanf(line, "%s position: [%f, %f, %f]", name, &position.x, &position.y, &position.z) == 4)
+        {
+            // Create the enemy and position it
+            Actor* enemy = actorManager->CreateActorFromFile("data/xml/enemy.xml");
+            TransformComponent* transform = enemy->GetComponent<TransformComponent>();
+            transform->position = position;
+
+            // Set up the enemy animation component
+            actorManager->AddComponent<AnimationComponent>(enemy, animation);
+            RenderComponent* render = enemy->GetComponent<RenderComponent>();
+            render->isAnimated = true;
+        }
+        else
+        {
+            ASSERT(!"ERROR: invalid file format");
+        }
+
+        int distance = Strings::FindFirstInstance(line, '\n');
+        if (distance == -1)
+        {
+            break;
+        }
+        currentPos += distance + 1;
+    }
     
+    MemoryManager::Get()->ReleaseFrame(frame);
+
 }
 
 void Scene::Unload()
@@ -87,4 +93,6 @@ void Scene::Unload()
     ModelManager::Get()->Unload("anim-gun");
     ModelManager::Get()->Unload("tower");
     ModelManager::Get()->Unload("wizard");
+    ModelManager::Get()->Unload("bullet");
+    ModelManager::Get()->Unload("level1");
 }

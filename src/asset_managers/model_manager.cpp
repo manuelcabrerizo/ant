@@ -9,6 +9,7 @@ void ModelManager::Initialize(u32 assetsCapacity)
     {
         ASSERT(!"Error: model manager already initialize");
     }
+    instance.allocator.Init(STATIC_MEMORY);
     instance.Init(assetsCapacity);
     initialize = true;
 }
@@ -34,21 +35,24 @@ ModelManager* ModelManager::Get()
 
 void ModelManager::Load(const char* name, const char* path)
 {
+    Model* model = allocator.Alloc();
+    model->Init(path, STATIC_MEMORY);
+
     ModelHandle modelHandle;
     modelHandle.name = name;
-    modelHandle.model.Init(path, STATIC_MEMORY);
+    modelHandle.model = model;
     nameIndex.Add(name, assets.Add(modelHandle));
 }
 
 void ModelManager::Unload(const char* name)
 {
     auto handle = *nameIndex.Get(name);
-    assets.Get(handle)->model.Terminate();
+    assets.Get(handle)->model->Terminate();
     assets.Remove(handle);
     nameIndex.Remove(name);
 }
 
 Model* ModelManager::Get(const char* name)
 {
-    return &AssetManager::Get(name)->model;
+    return AssetManager::Get(name)->model;
 }

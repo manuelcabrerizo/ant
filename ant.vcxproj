@@ -127,6 +127,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\states\game_state.cpp" />
+    <ClCompile Include="src\states\menu_state.cpp" />
     <ClCompile Include="src\components\component.cpp" />
     <ClCompile Include="src\actor_manager.cpp" />
     <ClCompile Include="src\components\bullet_component.cpp" />
@@ -178,12 +180,15 @@
     <ClCompile Include="src\memory_manager.cpp" />
     <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\notification_manager.cpp" />
+    <ClCompile Include="src\states\state_machine.cpp" />
     <ClCompile Include="src\strings.cpp" />
     <ClCompile Include="src\tinyxml2.cpp" />
     <ClCompile Include="src\utils.cpp" />
     <ClCompile Include="src\win32_platform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\states\game_state.h" />
+    <ClInclude Include="src\states\menu_state.h" />
     <ClInclude Include="src\component_list.h" />
     <ClInclude Include="src\actor_manager.h" />
     <ClInclude Include="src\components\bullet_component.h" />
@@ -242,14 +247,17 @@
     <ClInclude Include="src\model.h" />
     <ClInclude Include="src\notification_manager.h" />
     <ClInclude Include="src\platform.h" />
+    <ClInclude Include="src\states\state.h" />
     <ClInclude Include="src\strings.h" />
     <ClInclude Include="src\tinyxml2.h" />
     <ClInclude Include="src\utils.h" />
+    <ClInclude Include="src\states\state_machine.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="data\xml\bullet.xml" />
     <Xml Include="data\xml\enemy.xml" />
     <Xml Include="data\xml\house.xml" />
+    <Xml Include="data\xml\level1.xml" />
     <Xml Include="data\xml\pistol.xml" />
     <Xml Include="data\xml\player.xml" />
     <Xml Include="data\xml\sniper.xml" />

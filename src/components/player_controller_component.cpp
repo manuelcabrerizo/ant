@@ -131,16 +131,16 @@ void PlayerControllerComponent::ChangeWeapon(ActorManager *actorManager)
 
     if(InputManager::Get()->KeyJustDown(KEY_1) && !usingFirstWeapon)
     {
-         weaponRenderComponents[1]->enable = false;
-         weaponRenderComponents[0]->enable = true;    
-         weapon->weapon = weapons[0];      
-         usingFirstWeapon = true;
+        weaponRenderComponents[1]->enable = false;
+        weaponRenderComponents[0]->enable = true;    
+        weapon->weapon = weapons[0];      
+        usingFirstWeapon = true;
     }
     if(InputManager::Get()->KeyJustDown(KEY_2) && usingFirstWeapon)
     {
-          weaponRenderComponents[0]->enable = false;   
-          weaponRenderComponents[1]->enable = true;
-          weapon->weapon = weapons[1];
-         usingFirstWeapon = false;
+        weaponRenderComponents[0]->enable = false;   
+        weaponRenderComponents[1]->enable = true;
+        weapon->weapon = weapons[1];
+        usingFirstWeapon = false;
     }
 }

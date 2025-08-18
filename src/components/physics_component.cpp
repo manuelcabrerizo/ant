@@ -30,9 +30,9 @@ void PhysicsComponent::Initialize()
 
     // Enviroment Colliders Creation
     MeshCollider meshCollider;
-    meshCollider.InitFromFile("data/collision/level-collision.obj");
+    meshCollider.InitFromFile("data/models/Level1/source/Level.fbx");
     collisionWorld.AddCollider(Collider(meshCollider));
-
+    /*
     OBB floor;
     floor.Init(Vector3(0, -0.5, 0), orientation2, Vector3(25, 0.5, 25));
     collisionWorld.AddCollider(Collider(floor));
@@ -68,6 +68,7 @@ void PhysicsComponent::Initialize()
     Capsule cap;
     cap.Init(Vector3(3, 1.5, 7.5), Vector3(3, 2.0f, 7.5), 0.25f);
     collisionWorld.AddCollider(Collider(cap));
+    */
 }
 
 void PhysicsComponent::Terminate()

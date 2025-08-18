@@ -13,7 +13,7 @@
 
 void MeshCollider::InitFromFile(const char* filepath)
 {
-    const aiScene* scene = Utils::importer.ReadFile(filepath, aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder);
+    const aiScene* scene = Utils::importer.ReadFile(filepath, aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_Triangulate);
     i32 totalTriangleCount = 0;
     for (i32 i = 0; i < scene->mNumMeshes; i++)
     {

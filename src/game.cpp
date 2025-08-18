@@ -26,110 +26,105 @@
 
 void Game::Init()
 {
-    // Move this initialization to the engine
-    VertexShaderManager::Initialize(4);
-    FragmentShaderManager::Initialize(4);
-    TextureManager::Initialize(64);
-    MaterialManager::Initialize(64);
-    ModelManager::Initialize(32);
+    InitializeAssetsManagers();
+    // TODO: remove this statics
+    // all of this should be handle by systems not the component class
+    CameraComponent::Initialize();
+    RenderComponent::Initialize();
+    PhysicsComponent::Initialize();
 
-     // Load Vertex the shaders
-     VertexShaderManager::Get()->Load("default", "data/shaders/vert.hlsl");
-     VertexShaderManager::Get()->Load("animation", "data/shaders/animation_vert.hlsl");
-     VertexShaderManager::Get()->Bind("default");
+    GraphicsManager::Get()->DebugInit();
 
-     // Load Fragment the shaders
-     FragmentShaderManager::Get()->Load("default", "data/shaders/frag.hlsl");
-     FragmentShaderManager::Get()->Load("color", "data/shaders/color.hlsl");
-     FragmentShaderManager::Get()->Bind("default");
-     
-     // Load textures
-     TextureManager::Get()->Load("DefaultMaterial_Diffuse", "data/textures/DefaultTextures/DefaultMaterial_Diffuse.png");
-     TextureManager::Get()->Load("DefaultMaterial_Normal", "data/textures/DefaultTextures/DefaultMaterial_Normal.png");
-     TextureManager::Get()->Load("DefaultMaterial_Specular", "data/textures/DefaultTextures/DefaultMaterial_Specular.png");
+    LoadDefaultAssets();
+    InitializeActorManager();
 
-     // Load Materials
-     MaterialManager::Get()->LoadTexture("DefaultMaterial", "default",
-         "DefaultMaterial_Diffuse", "DefaultMaterial_Normal", "DefaultMaterial_Specular", 64);
+    scenes.Init(1, STATIC_MEMORY);
+    gameState.Init(&actorManager, &scenes[0]);
 
-     // Initialize the Actor Manager
-     actorManager.BeingInitialization(100, 64, STATIC_MEMORY);
-     actorManager.AddComponentType<TransformComponent, 100>();
-     actorManager.AddComponentType<RenderComponent, 100>();
-     actorManager.AddComponentType<PhysicsComponent, 100>();
-     actorManager.AddComponentType<PlayerControllerComponent, 1>();
-     actorManager.AddComponentType<WeaponComponent, 100>();
-     actorManager.AddComponentType<CameraComponent, 1>();
-     actorManager.AddComponentType<EnemyComponent, 10>();
-     actorManager.AddComponentType<AnchorComponent, 10>();
-     actorManager.AddComponentType<AnimationComponent, 10>();
-     actorManager.AddComponentType<BulletComponent, 100>();
-     // TODO: add more component types ...
-     actorManager.EndInitialization();
-
-     CameraComponent::Initialize();
-     RenderComponent::Initialize();
-     PhysicsComponent::Initialize();
-
-     GraphicsManager::Get()->DebugInit();
-
-     scenes.Init(1, STATIC_MEMORY);
-     scenes[0].Load(&actorManager, "");
-
-     printf("Game Init!\n");
+    stateMachine.Push(&gameState);
 }
-
-#include <windows.h>
 
 void Game::Update(f32 dt)
 {
-    GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
     PhysicsComponent::DebugDraw();
-
-     // Initialize new components
-     actorManager.InitializeNewComponents();
-     // Update
-     actorManager.UpdateComponents<PlayerControllerComponent>(dt);
-     actorManager.UpdateComponents<CameraComponent>(dt);
-     actorManager.UpdateComponents<WeaponComponent>(dt);
-     actorManager.UpdateComponents<EnemyComponent>(dt);
-     actorManager.UpdateComponents<PhysicsComponent>(dt);
-     actorManager.UpdateComponents<RenderComponent>(dt);
-     actorManager.UpdateComponents<BulletComponent>(dt);
-
-     actorManager.ProcessActorsToRemove();
-
-     size_t freeMemory = MemoryManager::Get()->GetFreeMemoryCount();
-     char buffer[256];
-     sprintf(buffer, "free memory: %zu\n", freeMemory / MB(1));
-     OutputDebugString(buffer);
+    stateMachine.Update(dt);
 }
 
 void Game::Render(f32 dt)
 {
-    actorManager.RenderComponents<RenderComponent>();
-
+    GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
+    stateMachine.Render();
     GraphicsManager::Get()->DebugPresent();
     GraphicsManager::Get()->EndFrame(1);
 }
 
 void Game::Terminate()
 {
-    scenes[0].Unload();
+    stateMachine.Clear();
+    actorManager.Terminate();
 
     GraphicsManager::Get()->DebugTerminate();
 
     CameraComponent::Terminate();
     RenderComponent::Terminate();
     PhysicsComponent::Terminate();
-     
-    actorManager.Terminate();
-     
+    ShutdownAssetsManagers();
+}
+
+void Game::InitializeAssetsManagers()
+{
+    VertexShaderManager::Initialize(4);
+    FragmentShaderManager::Initialize(4);
+    TextureManager::Initialize(64);
+    MaterialManager::Initialize(64);
+    ModelManager::Initialize(32);
+}
+
+void Game::ShutdownAssetsManagers()
+{
     MaterialManager::Shutdown();
     TextureManager::Shutdown();
     ModelManager::Shutdown();
     VertexShaderManager::Shutdown();
     FragmentShaderManager::Shutdown();
+}
 
-    printf("Game Terminate!\n");
+void Game::LoadDefaultAssets()
+{
+    // Load Vertex the shaders
+    VertexShaderManager::Get()->Load("default", "data/shaders/vert.hlsl");
+    VertexShaderManager::Get()->Load("animation", "data/shaders/animation_vert.hlsl");
+    VertexShaderManager::Get()->Bind("default");
+
+    // Load Fragment the shaders
+    FragmentShaderManager::Get()->Load("default", "data/shaders/frag.hlsl");
+    FragmentShaderManager::Get()->Load("color", "data/shaders/color.hlsl");
+    FragmentShaderManager::Get()->Bind("default");
+
+    // Load textures
+    TextureManager::Get()->Load("DefaultMaterial_Diffuse", "data/textures/DefaultTextures/DefaultMaterial_Diffuse.png");
+    TextureManager::Get()->Load("DefaultMaterial_Normal", "data/textures/DefaultTextures/DefaultMaterial_Normal.png");
+    TextureManager::Get()->Load("DefaultMaterial_Specular", "data/textures/DefaultTextures/DefaultMaterial_Specular.png");
+
+    // Load Materials
+    MaterialManager::Get()->LoadTexture("DefaultMaterial", "default",
+        "DefaultMaterial_Diffuse", "DefaultMaterial_Normal", "DefaultMaterial_Specular", 64);
+}
+
+void Game::InitializeActorManager()
+{
+    // Initialize the Actor Manager
+    actorManager.BeingInitialization(100, 64, STATIC_MEMORY);
+    actorManager.AddComponentType<TransformComponent, 100>();
+    actorManager.AddComponentType<RenderComponent, 100>();
+    actorManager.AddComponentType<PhysicsComponent, 100>();
+    actorManager.AddComponentType<PlayerControllerComponent, 1>();
+    actorManager.AddComponentType<WeaponComponent, 100>();
+    actorManager.AddComponentType<CameraComponent, 1>();
+    actorManager.AddComponentType<EnemyComponent, 10>();
+    actorManager.AddComponentType<AnchorComponent, 10>();
+    actorManager.AddComponentType<AnimationComponent, 10>();
+    actorManager.AddComponentType<BulletComponent, 100>();
+    // TODO: add more component types ...
+    actorManager.EndInitialization();
 }

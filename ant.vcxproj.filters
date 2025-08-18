@@ -180,6 +180,15 @@
     <ClCompile Include="src\components\component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\states\menu_state.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\states\game_state.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\states\state_machine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\actor.h">
@@ -365,6 +374,18 @@
     <ClInclude Include="src\component_list.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\states\state_machine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\states\state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\states\menu_state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\states\game_state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="data\xml\bullet.xml" />
@@ -376,5 +397,6 @@
     <Xml Include="data\xml\test-level.xml" />
     <Xml Include="data\xml\tower.xml" />
     <Xml Include="data\xml\wizard.xml" />
+    <Xml Include="data\xml\level1.xml" />
   </ItemGroup>
 </Project>
