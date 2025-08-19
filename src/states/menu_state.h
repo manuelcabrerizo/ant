@@ -25,4 +25,5 @@ public:
 
     void OnPlayButtonClick();
     void OnExitButtonClick();
+    void DrawBackGround();
 };

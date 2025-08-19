@@ -10,7 +10,12 @@ void MenuState::Init(GameManager* gameManager)
 
     // Load menu assets
     TextureManager::Get()->Load("PlayButton", "data/textures/play_button.png");
+    TextureManager::Get()->Load("PlayButtonSelected", "data/textures/play_button_selected.png");
+    TextureManager::Get()->Load("PlayButtonClicked", "data/textures/play_button_clicked.png");
     TextureManager::Get()->Load("ExitButton", "data/textures/exit_button.png");
+    TextureManager::Get()->Load("ExitButtonSelected", "data/textures/exit_button_selected.png");
+    TextureManager::Get()->Load("ExitButtonClicked", "data/textures/exit_button_clicked.png");
+
     TextureManager::Get()->Load("BackGround", "data/textures/blood_1.png");
 
     // allocate memory for the buttons
@@ -21,12 +26,14 @@ void MenuState::Init(GameManager* gameManager)
 
     // Create the play button
     UIButton<MenuState> playButton;
-    playButton.Init(Vector2(width*0.5f - 150, (height*0.5f - 50) + 60), Vector2(300, 100), "PlayButton", this, &MenuState::OnPlayButtonClick);
+    const char* playButtonTextures[] = { "PlayButton", "PlayButtonSelected", "PlayButtonClicked" };
+    playButton.Init(Vector2(width * 0.5f - 150, (height * 0.5f - 50) + 60), Vector2(300, 100), playButtonTextures, this, &MenuState::OnPlayButtonClick);
     buttons.Push(playButton);
 
     // Create the exit button
     UIButton<MenuState> exitButton;
-    exitButton.Init(Vector2(width * 0.5f - 150, (height*0.5f - 50) - 60), Vector2(300, 100), "ExitButton", this, &MenuState::OnExitButtonClick);
+    const char* exitButtonTextures[] = { "ExitButton", "ExitButtonSelected", "ExitButtonClicked" };
+    exitButton.Init(Vector2(width * 0.5f - 150, (height * 0.5f - 50) - 60), Vector2(300, 100), exitButtonTextures, this, &MenuState::OnExitButtonClick);
     buttons.Push(exitButton);
 }
 
@@ -54,20 +61,7 @@ void MenuState::OnUpdate(float deltaTime)
 
 void MenuState::OnRender()
 {
-    // Render Background
-    for (int i = 0; i < 2; i++)
-    {
-        for (int j = 0; j < 3; j++)
-        {
-            int width = 512;
-            int height = 512;
-            Vector2 size = Vector2(width, height);
-            Vector2 position = Vector2(width * j, height * i) + size * 0.5f;
-            uiRenderer.DrawQuat(position, size, 99, "BackGround");
-        }
-    }
-
-    // Render Buttons
+    DrawBackGround();
     for (int i = 0; i < buttons.size; i++)
     {
         buttons[i].Render(uiRenderer, 0);
@@ -82,4 +76,19 @@ void MenuState::OnPlayButtonClick()
 void MenuState::OnExitButtonClick()
 {
     PlatformQuitApplication();
+}
+
+void MenuState::DrawBackGround()
+{
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            int width = 512;
+            int height = 512;
+            Vector2 size = Vector2(width, height);
+            Vector2 position = Vector2(width * j, height * i) + size * 0.5f;
+            uiRenderer.DrawQuat(position, size, 99, "BackGround");
+        }
+    }
 }

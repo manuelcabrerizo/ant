@@ -44,7 +44,7 @@ LRESULT Wndproc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
           }
           gWindowWidth = LOWORD(lParam);
           gWindowHeight = HIWORD(lParam);
-          if(GraphicsManager::Get())
+          if(GraphicsManager::Get() && gWindowWidth > 0 && gWindowHeight > 0)
           {
                GraphicsManager::Get()->OnResize(gWindowWidth, gWindowHeight);
           }
