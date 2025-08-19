@@ -32,7 +32,7 @@ private:
 public:
     void Init();
     void Terminate();
-    void DrawQuat(const char* textureName, const Vector2& position, const Vector2& size);
+    void DrawQuat(const Vector2& position, const Vector2& size, int zIndex, const char* textureName);
 };
 
 class MenuState : public IState

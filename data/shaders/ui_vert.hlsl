@@ -1,7 +1,7 @@
 struct VS_Input
 {
     float2 pos : POSITIONT;
-    float uv : TEXCOORD0;
+    float2 uv : TEXCOORD0;
 };
 
 struct PS_Input
@@ -22,7 +22,7 @@ PS_Input vs_main(VS_Input i)
     PS_Input o = (PS_Input) 0;
     float4 wPos = mul(float4(i.pos, 0.0f, 1.0f), model);
     wPos = mul(wPos, view);
-    //wPos = mul(wPos, proj);
+    wPos = mul(wPos, proj);
 
     o.pos = wPos;
     o.uv = i.uv;
