@@ -27,13 +27,15 @@ void MenuState::Init(GameManager* gameManager)
     // Create the play button
     UIButton<MenuState> playButton;
     const char* playButtonTextures[] = { "PlayButton", "PlayButtonSelected", "PlayButtonClicked" };
-    playButton.Init(Vector2(width * 0.5f - 150, (height * 0.5f - 50) + 60), Vector2(300, 100), playButtonTextures, this, &MenuState::OnPlayButtonClick);
+    playButton.Init(Vector2(width * 0.5f - 150, (height * 0.5f - 50) + 60), Vector2(300, 100), 
+        playButtonTextures, this, &MenuState::OnPlayButtonClick);
     buttons.Push(playButton);
 
     // Create the exit button
     UIButton<MenuState> exitButton;
     const char* exitButtonTextures[] = { "ExitButton", "ExitButtonSelected", "ExitButtonClicked" };
-    exitButton.Init(Vector2(width * 0.5f - 150, (height * 0.5f - 50) - 60), Vector2(300, 100), exitButtonTextures, this, &MenuState::OnExitButtonClick);
+    exitButton.Init(Vector2(width * 0.5f - 150, (height * 0.5f - 50) - 60), Vector2(300, 100),
+        exitButtonTextures, this, &MenuState::OnExitButtonClick);
     buttons.Push(exitButton);
 }
 

@@ -19,6 +19,7 @@ static i32 gWindowX;
 static i32 gWindowY;
 static i32 gWindowWidth;
 static i32 gWindowHeight;
+static int gDpi;
 
 LRESULT Wndproc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -34,6 +35,7 @@ LRESULT Wndproc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
      }break;
      case WM_SIZE:
      {
+         gDpi = GetDpiForWindow(gWindow);
           if(wParam == SIZE_MINIMIZED)
           {
                pause = true;
@@ -56,8 +58,9 @@ LRESULT Wndproc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
      } break;
      
      case WM_MOVE: {
-          gWindowX = (int)(short)LOWORD(lParam);
-          gWindowY = (int)(short)HIWORD(lParam);
+        gDpi = GetDpiForWindow(gWindow);
+        gWindowX = (int)(short)LOWORD(lParam);
+        gWindowY = (int)(short)HIWORD(lParam);
      } break;
      case WM_KEYDOWN:
      case WM_KEYUP:
@@ -259,4 +262,9 @@ File PlatformReadFile(const char *filepath, i32 stackNum)
 void PlatformQuitApplication()
 {
     running = false;
+}
+
+int PlatformGetWindowDPI()
+{
+    return gDpi;
 }

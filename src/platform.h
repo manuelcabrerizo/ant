@@ -15,3 +15,4 @@ void PlatformShowMouse(bool show);
 void PlatformClientDimensions(i32* width, i32* height);
 File PlatformReadFile(const char* filepath, i32 stackNum);
 void PlatformQuitApplication();
+int PlatformGetWindowDPI();

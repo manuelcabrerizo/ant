@@ -92,10 +92,19 @@ void UIButton<Type>::Render(UIRenderer& uiRenderer, int zIndex)
 template <typename Type>
 bool UIButton<Type>::IsActive()
 {
+    int dpi = PlatformGetWindowDPI();
     int width, height;
     PlatformClientDimensions(&width, &height);
+
     int mouseX = InputManager::Get()->MouseX();
     int mouseY = height - InputManager::Get()->MouseY();
-    return mouseX >= position.x && mouseX <= position.x + size.x &&
-           mouseY >= position.y && mouseY <= position.y + size.y;
+
+    int posX = (int)((position.x * (float)dpi) / 96.0f);
+    int posY = (int)((position.y * (float)dpi) / 96.0f);
+
+    int sizeX = (int)((size.x * (float)dpi) / 96.0f);
+    int sizeY = (int)((size.y * (float)dpi) / 96.0f);
+
+    return mouseX >= posX && mouseX <= posX + sizeX &&
+           mouseY >= posY && mouseY <= posY + sizeY;
 }
