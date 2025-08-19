@@ -13,11 +13,13 @@ void PhysicsComponent::OnInit(ActorManager *actorManager)
 void PhysicsComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
     ProcessPhysics(dt);
+    collider->GetCollider()->UpdatePosition(transform->position + collider->GetOffset());
+    ProcessCollisionDetectionAndResolution();
 }
 
 void PhysicsComponent::OnLateUpdate(ActorManager* actorManager, float dt)
 {
-    ProcessCollisionDetectionAndResolution();
+    // ProcessCollisionDetectionAndResolution();
 }
 
 void PhysicsComponent::ProcessPhysics(float dt)

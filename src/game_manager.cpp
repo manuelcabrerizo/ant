@@ -31,8 +31,6 @@ void GameManager::Init()
 {
     InitializeAssetsManagers();
 
-    // TODO: remove this statics
-    // all of this should be handle by systems not the component class
     CameraComponent::Initialize();
     RenderComponent::Initialize();
     CollisionWorld::Init(100);
@@ -44,7 +42,6 @@ void GameManager::Init()
 
     scenes.Init(1, STATIC_MEMORY);
 
-    // Initi state and start at the menu state
     menuState.Init(this);
     gameState.Init(this);
     stateMachine.Push(&menuState);
@@ -71,9 +68,10 @@ void GameManager::Terminate()
 
     GraphicsManager::Get()->DebugTerminate();
 
-    CameraComponent::Terminate();
-    RenderComponent::Terminate();
     CollisionWorld::Terminate();
+    RenderComponent::Terminate();
+    CameraComponent::Terminate();
+
     ShutdownAssetsManagers();
 }
 
@@ -120,11 +118,13 @@ void GameManager::LoadDefaultAssets()
     // Load Vertex the shaders
     VertexShaderManager::Get()->Load("default", "data/shaders/vert.hlsl");
     VertexShaderManager::Get()->Load("animation", "data/shaders/animation_vert.hlsl");
+    VertexShaderManager::Get()->Load("ui_vert", "data/shaders/ui_vert.hlsl");
     VertexShaderManager::Get()->Bind("default");
 
     // Load Fragment the shaders
     FragmentShaderManager::Get()->Load("default", "data/shaders/frag.hlsl");
     FragmentShaderManager::Get()->Load("color", "data/shaders/color.hlsl");
+    FragmentShaderManager::Get()->Load("ui_frag", "data/shaders/ui_frag.hlsl");
     FragmentShaderManager::Get()->Bind("default");
 
     // Load textures

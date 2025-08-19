@@ -19,7 +19,6 @@ class RenderComponent : public Component<RenderComponent>
 private:
     static UniformBuffer *uniformBuffer;
     static PerDrawUbo ubo;
-
     static UniformBuffer *matrixBuffer;
 
     AnimationComponent *animation = nullptr;

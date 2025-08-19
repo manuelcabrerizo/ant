@@ -26,7 +26,6 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
 
     // TODO: load all entities from the scene file
     // Create Entities
-    actorManager->CreateActorFromFile("data/xml/player.xml");
     //actorManager->CreateActorFromFile("data/xml/test-level.xml");
     //actorManager->CreateActorFromFile("data/xml/tower.xml");
     //actorManager->CreateActorFromFile("data/xml/house.xml");
@@ -78,6 +77,8 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     }
     
     MemoryManager::Get()->ReleaseFrame(frame);
+
+    actorManager->CreateActorFromFile("data/xml/player.xml");
 
 }
 

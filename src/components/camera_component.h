@@ -17,7 +17,6 @@ struct CameraUbo
 class CameraComponent : public Component<CameraComponent>, INotificable
 {
 private:
-     // TODO: see if this realy needs to be static
      static UniformBuffer *uniformBuffer;
      static CameraUbo ubo;
 
