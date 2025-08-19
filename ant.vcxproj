@@ -186,6 +186,7 @@
     <ClCompile Include="src\tinyxml2.cpp" />
     <ClCompile Include="src\utils.cpp" />
     <ClCompile Include="src\win32_platform.cpp" />
+    <ClCompile Include="src\ui_renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\components\collider_component.h" />
@@ -254,6 +255,8 @@
     <ClInclude Include="src\tinyxml2.h" />
     <ClInclude Include="src\utils.h" />
     <ClInclude Include="src\states\state_machine.h" />
+    <ClInclude Include="src\ui_renderer.h" />
+    <ClInclude Include="src\ui_button.h" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="data\xml\bullet.xml" />

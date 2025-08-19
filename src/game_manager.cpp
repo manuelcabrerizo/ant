@@ -64,6 +64,8 @@ void GameManager::Render(f32 dt)
 void GameManager::Terminate()
 {
     stateMachine.Clear();
+    menuState.Terminate();
+
     actorManager.Terminate();
 
     GraphicsManager::Get()->DebugTerminate();

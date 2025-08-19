@@ -255,3 +255,8 @@ File PlatformReadFile(const char *filepath, i32 stackNum)
 
      return file;
 }
+
+void PlatformQuitApplication()
+{
+    running = false;
+}
