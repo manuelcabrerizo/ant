@@ -76,7 +76,7 @@ void MenuState::OnRender()
 
 void MenuState::OnPlayButtonClick()
 {
-    gameManager->ChangeToGameState();
+    gameManager->ChangeToPlayState();
 }
 
 void MenuState::OnExitButtonClick()

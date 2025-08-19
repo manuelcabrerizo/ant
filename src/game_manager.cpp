@@ -43,7 +43,7 @@ void GameManager::Init()
     scenes.Init(1, STATIC_MEMORY);
 
     menuState.Init(this);
-    gameState.Init(this);
+    playState.Init(this);
     stateMachine.Push(&menuState);
 }
 
@@ -82,9 +82,9 @@ void GameManager::ChangeToMenuState()
     stateMachine.ChangeState(&menuState);
 }
 
-void GameManager::ChangeToGameState()
+void GameManager::ChangeToPlayState()
 {
-    stateMachine.ChangeState(&gameState);
+    stateMachine.ChangeState(&playState);
 }
 
 ActorManager* GameManager::GetActorManager()

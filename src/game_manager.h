@@ -12,7 +12,7 @@ private:
     ActorManager actorManager;
 
     MenuState menuState;
-    PlayState gameState;
+    PlayState playState;
     StateMachine stateMachine;
 
     void InitializeAssetsManagers();
@@ -27,7 +27,7 @@ public:
     void Render(f32 dt);
 
     void ChangeToMenuState();
-    void ChangeToGameState();
+    void ChangeToPlayState();
 
     ActorManager* GetActorManager();
     Scene* GetCurrentScene();
