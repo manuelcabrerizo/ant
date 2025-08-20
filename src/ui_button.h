@@ -37,6 +37,16 @@ public:
         void (Type::*OnClick)());
     void Update();
     void Render(UIRenderer& uiRenderer, int zIndex);
+
+    void SetPosition(const Vector2& position)
+    {
+        this->position = position;
+    }
+
+    void SetSize(const Vector2& size)
+    {
+        this->size = size;
+    }
 };
 
 template <typename Type>
@@ -85,7 +95,7 @@ void UIButton<Type>::Update()
 template <typename Type>
 void UIButton<Type>::Render(UIRenderer& uiRenderer, int zIndex)
 {
-    Vector2 renderPos = position + size * 0.5f;
+    Vector2 renderPos = position + (size * 0.5f);
     uiRenderer.DrawQuat(renderPos, size, zIndex, texture[(unsigned int)state]);
 }
 
@@ -99,11 +109,13 @@ bool UIButton<Type>::IsActive()
     int mouseX = InputManager::Get()->MouseX();
     int mouseY = height - InputManager::Get()->MouseY();
 
-    int posX = (int)((position.x * (float)dpi) / 96.0f);
-    int posY = (int)((position.y * (float)dpi) / 96.0f);
+    // TODO: check when this is necesary
+    float dpiFactor = 1.0f; // (float)dpi / 96.0f;
 
-    int sizeX = (int)((size.x * (float)dpi) / 96.0f);
-    int sizeY = (int)((size.y * (float)dpi) / 96.0f);
+    int posX = (int)(position.x * dpiFactor);
+    int posY = (int)(position.y * dpiFactor);
+    int sizeX = (int)(size.x * dpiFactor);
+    int sizeY = (int)(size.y * dpiFactor);
 
     return mouseX >= posX && mouseX <= posX + sizeX &&
            mouseY >= posY && mouseY <= posY + sizeY;

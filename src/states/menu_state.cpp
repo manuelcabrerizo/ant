@@ -2,6 +2,7 @@
 #include <game_manager.h>
 #include <input_manager.h>
 #include <asset_managers/texture_manager.h>
+#include <notification_manager.h>
 
 void MenuState::Init(GameManager* gameManager)
 {
@@ -21,21 +22,24 @@ void MenuState::Init(GameManager* gameManager)
     // allocate memory for the buttons
     buttons.Init(2, STATIC_MEMORY);
 
-    int width, height;
-    PlatformClientDimensions(&width, &height);
+    int windowWidth, windowHeight;
+    PlatformClientDimensions(&windowWidth, &windowHeight);
 
+    Vector2 extent = Vector2(windowWidth, windowHeight);
+    Vector2 size = Vector2(300, 100);
+    Vector2 position = (extent * 0.5f) - (size * 0.5f);
+    Vector2 offset = Vector2(0.0f, 60.0f);
+    
     // Create the play button
     UIButton<MenuState> playButton;
     const char* playButtonTextures[] = { "PlayButton", "PlayButtonSelected", "PlayButtonClicked" };
-    playButton.Init(Vector2(width * 0.5f - 150, (height * 0.5f - 50) + 60), Vector2(300, 100), 
-        playButtonTextures, this, &MenuState::OnPlayButtonClick);
+    playButton.Init(position + offset, size, playButtonTextures, this, &MenuState::OnPlayButtonClick);
     buttons.Push(playButton);
 
     // Create the exit button
     UIButton<MenuState> exitButton;
     const char* exitButtonTextures[] = { "ExitButton", "ExitButtonSelected", "ExitButtonClicked" };
-    exitButton.Init(Vector2(width * 0.5f - 150, (height * 0.5f - 50) - 60), Vector2(300, 100),
-        exitButtonTextures, this, &MenuState::OnExitButtonClick);
+    exitButton.Init(position - offset, size, exitButtonTextures, this, &MenuState::OnExitButtonClick);
     buttons.Push(exitButton);
 }
 
@@ -47,10 +51,18 @@ void MenuState::Terminate()
 
 void MenuState::OnEnter()
 {
+    NotificationManager::Get()->AddListener(this, NotificationType::OnResize);
+    int windowWidth, windowHeight;
+    PlatformClientDimensions(&windowWidth, &windowHeight);
+
+    OnResizeNotification notification;
+    notification.extent = Vector2(windowWidth, windowHeight);
+    OnResize(&notification);
 }
 
 void MenuState::OnExit()
 {
+    NotificationManager::Get()->RemoveListener(this, NotificationType::OnResize);
 }
 
 void MenuState::OnUpdate(float deltaTime)
@@ -68,6 +80,17 @@ void MenuState::OnRender()
     {
         buttons[i].Render(uiRenderer, 0);
     }
+}
+
+void MenuState::OnResize(OnResizeNotification* onResize)
+{
+    Vector2 extent = onResize->extent;
+    Vector2 size = Vector2(300, 100);
+    Vector2 position = (extent * 0.5f) - (size * 0.5f);
+    Vector2 offset = Vector2(0.0f, 60.0f);
+    buttons[0].SetPosition(position + offset);
+    buttons[1].SetPosition(position - offset);
+    uiRenderer.OnResize(extent);
 }
 
 void MenuState::OnPlayButtonClick()
@@ -92,5 +115,13 @@ void MenuState::DrawBackGround()
             Vector2 position = Vector2(width * j, height * i) + size * 0.5f;
             uiRenderer.DrawQuat(position, size, 99, "BackGround");
         }
+    }
+}
+
+void MenuState::OnNotify(NotificationType type, Notification* notification)
+{
+    switch (type)
+    {
+        case NotificationType::OnResize: OnResize((OnResizeNotification*)notification); break;
     }
 }

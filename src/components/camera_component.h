@@ -36,6 +36,7 @@ public:
      void OnInit(ActorManager *actorManager);
      void OnTerminate(ActorManager *actorManager) override;
      void OnUpdate(ActorManager *actorManager, f32 dt);
+     void OnResize(OnResizeNotification* onResize);
      void OnNotify(NotificationType type, Notification *notification) override;
 
      // Camera custom functions

@@ -28,6 +28,12 @@ void UIRenderer::Terminate()
     GraphicsManager::Get()->VertexBufferFree(quad);
 }
 
+void UIRenderer::OnResize(Vector2 extent)
+{
+    matrices.proj = Matrix4::Ortho(0, extent.x, 0, extent.y, 0, 100);
+    GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
+}
+
 void UIRenderer::DrawQuat(const Vector2& position, const Vector2& size, int zIndex, const char* textureName)
 {
     // Bind the ui shaders
