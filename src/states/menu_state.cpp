@@ -22,7 +22,6 @@ void MenuState::Init(GameManager* gameManager)
     // allocate memory for the buttons
     buttons.Init(2, STATIC_MEMORY);
 
-    int windowWidth, windowHeight;
     PlatformClientDimensions(&windowWidth, &windowHeight);
 
     Vector2 extent = Vector2(windowWidth, windowHeight);
@@ -47,7 +46,6 @@ void MenuState::Terminate()
 {
     uiRenderer.Terminate();
 }
-
 
 void MenuState::OnEnter()
 {
@@ -84,6 +82,8 @@ void MenuState::OnRender()
 
 void MenuState::OnResize(OnResizeNotification* onResize)
 {
+    windowWidth = onResize->extent.x;
+    windowHeight = onResize->extent.y;
     Vector2 extent = onResize->extent;
     Vector2 size = Vector2(300, 100);
     Vector2 position = (extent * 0.5f) - (size * 0.5f);
@@ -105,14 +105,16 @@ void MenuState::OnExitButtonClick()
 
 void MenuState::DrawBackGround()
 {
-    for (int i = 0; i < 2; i++)
+    int tileWidth = 512;
+    int tileHeight = 512;
+    int rowCount = (int)ceilf((float)windowHeight / (float)tileHeight);
+    int colCount = (int)ceilf((float)windowWidth / (float)tileWidth);
+    for (int i = 0; i < rowCount; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int j = 0; j < colCount; j++)
         {
-            int width = 512;
-            int height = 512;
-            Vector2 size = Vector2(width, height);
-            Vector2 position = Vector2(width * j, height * i) + size * 0.5f;
+            Vector2 size = Vector2(tileWidth, tileHeight);
+            Vector2 position = Vector2(tileWidth * j, tileHeight * i) + size * 0.5f;
             uiRenderer.DrawQuat(position, size, 99, "BackGround");
         }
     }

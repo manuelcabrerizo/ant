@@ -14,6 +14,8 @@ private:
     GameManager* gameManager = nullptr;
     UIRenderer uiRenderer;
     Array<UIButton<MenuState>> buttons;
+    int windowWidth;
+    int windowHeight;
 public:
     void Init(GameManager* gameManager);
     void Terminate();

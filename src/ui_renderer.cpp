@@ -28,7 +28,7 @@ void UIRenderer::Terminate()
     GraphicsManager::Get()->VertexBufferFree(quad);
 }
 
-void UIRenderer::OnResize(Vector2 extent)
+void UIRenderer::OnResize(const Vector2& extent)
 {
     matrices.proj = Matrix4::Ortho(0, extent.x, 0, extent.y, 0, 100);
     GraphicsManager::Get()->UniformBufferBind(uniformBuffer);

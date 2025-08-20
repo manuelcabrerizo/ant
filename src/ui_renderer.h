@@ -28,7 +28,7 @@ private:
 public:
     void Init();
     void Terminate();
-    void OnResize(Vector2 extent);
+    void OnResize(const Vector2& extent);
     void DrawQuat(const Vector2& position, const Vector2& size, int zIndex, const char* textureName);
 };
 
