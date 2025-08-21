@@ -52,6 +52,11 @@ void GameManager::Update(f32 dt)
     GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
     CollisionWorld::Get()->DebugDraw();
     stateMachine.Update(dt);
+
+    size_t freeMemory = MemoryManager::Get()->GetFreeMemoryCount();
+    char buffer[256];
+    sprintf(buffer, "free memory: %zu\n", freeMemory);
+    OutputDebugString(buffer);
 }
 
 void GameManager::Render(f32 dt)

@@ -50,9 +50,8 @@ void MenuState::Terminate()
 void MenuState::OnEnter()
 {
     NotificationManager::Get()->AddListener(this, NotificationType::OnResize);
-    int windowWidth, windowHeight;
-    PlatformClientDimensions(&windowWidth, &windowHeight);
 
+    PlatformClientDimensions(&windowWidth, &windowHeight);
     OnResizeNotification notification;
     notification.extent = Vector2(windowWidth, windowHeight);
     OnResize(&notification);

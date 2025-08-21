@@ -36,7 +36,7 @@ void ActorManager::BeingInitialization(i32 actorCount, i32 componentTypeCount_, 
 
 void ActorManager::EndInitialization()
 {
-    componentsToInit.Init(maxComponentCount, STATIC_MEMORY);
+    componentsToInit.Init(maxComponentCount, memoryType);
 }
 
 void ActorManager::Terminate()

@@ -7,7 +7,7 @@
 class ActorManager
 {
 private:
-    i32 memoryType = STATIC_MEMORY;
+    i32 memoryType;
     i32 componentTypeCount = 0;
     i32 maxActorCount = 0;
     i32 maxComponentCount = 0;
