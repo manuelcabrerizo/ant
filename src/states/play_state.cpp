@@ -76,7 +76,7 @@ void PlayState::OnRender()
 
 void PlayState::InitializeActorManager()
 {
-    actorManager.BeingInitialization(100, 64, FRAME_MEMORY);
+    actorManager.BeingInitialization(128, 64, FRAME_MEMORY);
     actorManager.AddComponentType<TransformComponent, 100>();
     actorManager.AddComponentType<RenderComponent, 100>();
     actorManager.AddComponentType<PhysicsComponent, 100>();

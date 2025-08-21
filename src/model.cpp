@@ -41,6 +41,7 @@ void Mesh::SetMaterial(Material* material)
 
 void Model::Init(const char *filepath, i32 memoryType)
 {
+    this->memoryType = memoryType;
      const aiScene *scene = Utils::importer.ReadFile(filepath,
             aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder |
             aiProcess_Triangulate | aiProcess_GenSmoothNormals |

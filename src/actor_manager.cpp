@@ -22,6 +22,8 @@
 
 #include <collisions/collider.h>
 
+int ActorManager::actorGeneration = 1;
+
 void ActorManager::BeingInitialization(i32 actorCount, i32 componentTypeCount_, i32 memoryType_)
 {
     memoryType = memoryType_;
@@ -31,7 +33,7 @@ void ActorManager::BeingInitialization(i32 actorCount, i32 componentTypeCount_, 
 
     allocator.Init(maxActorCount, memoryType);
     toRemove.Init(maxActorCount, memoryType);
-
+    actorsComponentsMap.Init(maxActorCount, memoryType);
     componentListMap.Init(componentTypeCount, memoryType);
 }
 
@@ -61,10 +63,13 @@ void ActorManager::Clear()
         usedFound++;
 
         Actor* actor = (Actor*)&actorsArray[i].data[0];
-        for (i32 j = actor->componentsIds.size - 1; j >= 0; --j)
+        auto& components = *actorsComponentsMap.Get(actor->id);
+        for (i32 i = components.size - 1; i >= 0; --i)
         {
-            RemoveComponentById(actor, actor->componentsIds[j]);
+            RemoveActorComponent(actor, components[i]);
         }
+        components.Clear();
+
 
         if (usedFound == used)
         {
@@ -75,12 +80,13 @@ void ActorManager::Clear()
     allocator.Clear();
 }
 
-Actor *ActorManager::CreateActor(i32 componentCount_)
+Actor *ActorManager::CreateActor()
 {
     void* buffer = allocator.Alloc();
     Actor* actor = new (buffer) Actor();
-    actor->componentsMap.Init(componentCount_, memoryType);
-    actor->componentsIds.Init(componentCount_, memoryType);
+    actor->actorManager = this;
+    actor->id = actorGeneration++;
+    actorsComponentsMap.Add(actor->id, {});
     return actor;
 }
 
@@ -94,27 +100,33 @@ void ActorManager::ProcessActorsToRemove()
     for (int j = 0; j < toRemove.size; ++j)
     {
         Actor* actor = toRemove[j];
-        for (i32 i = actor->componentsIds.size - 1; i >= 0; --i)
+        
+        auto& components = *actorsComponentsMap.Get(actor->id);
+        for (i32 i = components.size - 1; i >= 0; --i)
         {
-            RemoveComponentById(actor, actor->componentsIds[i]);
+            RemoveActorComponent(actor, components[i]);
+            components[i] = components[components.size - 1];
+            components[components.size - 1] = {};
+            components.size--;
         }
-        actor->componentsIds.Clear();
+
+        actorsComponentsMap.Remove(actor->id);
         allocator.Free(actor);
     }
     toRemove.Clear();
 }
 
-void ActorManager::AddAndCloneComponentById(Actor *dstActor, Actor *srcActor, int id)
+void ActorManager::AddAndCloneComponent(Actor *dstActor, Actor *srcActor, ActorComponent actorComponent)
 {
-    ComponentListBase* list = *componentListMap.Get(id);
+    ComponentListBase* list = *componentListMap.Get(actorComponent.id);
 
     ComponentBase *dstComponentBase = list->AddComponent();
-    ComponentBase* srcComponentBase = srcActor->GetComponentById(id);
-
-    dstActor->componentsMap.Add(id, dstComponentBase);
-    dstActor->componentsIds.Push(id);
+    ComponentBase* srcComponentBase = actorComponent.component;
 
     list->CopyComponent(dstComponentBase, srcComponentBase);
+
+    auto& components = *actorsComponentsMap.Get(dstActor->id);
+    components.Push({actorComponent.id, dstComponentBase});
 
     dstComponentBase->enable = true;
     dstComponentBase->initialized = false;
@@ -123,25 +135,11 @@ void ActorManager::AddAndCloneComponentById(Actor *dstActor, Actor *srcActor, in
     componentsToInit.Push(dstComponentBase);
 }
 
-void ActorManager::RemoveComponentById(Actor* actor, i32 id)
+void ActorManager::RemoveActorComponent(Actor* actor, ActorComponent actorComponent)
 {
-    ComponentListBase* list = *componentListMap.Get(id);
-    list->RemoveComponent(this, *actor->componentsMap.Get(id));
-    actor->componentsMap.Remove(id);
-    i32 foundIndex = -1;
-    for (i32 i = 0; i < actor->componentsIds.size; ++i)
-    {
-        if (actor->componentsIds[i] == id)
-        {
-            foundIndex = i;
-        }
-    }
-    if (foundIndex >= 0)
-    {
-        actor->componentsIds[foundIndex] = actor->componentsIds[actor->componentsIds.size - 1];
-        actor->componentsIds[actor->componentsIds.size - 1] = -1;
-        actor->componentsIds.size--;
-    }
+    // Remove the component from the componentList
+    ComponentListBase* list = *componentListMap.Get(actorComponent.id);
+    list->RemoveComponent(this, actorComponent.component);
 }
 
 static i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
@@ -157,10 +155,12 @@ static i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
 
 Actor *ActorManager::CloneActor(Actor *srcActor)
 {
-    Actor *dstActor = CreateActor(srcActor->componentsIds.capacity);
-    for (int i = 0; i < srcActor->componentsIds.size; ++i)
+    auto& components = *actorsComponentsMap.Get(srcActor->id);
+
+    Actor *dstActor = CreateActor();
+    for (int i = 0; i < components.size; ++i)
     {
-        AddAndCloneComponentById(dstActor, srcActor, srcActor->componentsIds[i]);
+        AddAndCloneComponent(dstActor, srcActor, components[i]);
     }
     return dstActor;
 }
@@ -178,7 +178,7 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
         componentCount = Utils::NextPower2(componentCount);
     }
 
-    Actor *actor = CreateActor(componentCount);
+    Actor *actor = CreateActor();
     tinyxml2::XMLElement* component = root->FirstChildElement();
     while (component)
     {

@@ -17,14 +17,15 @@ private:
     static bool initialize;
     ModelManager() {}
 
-    ObjectAllocator<Model> allocator;
+    ObjectAllocator<Model> staticAllocator;
+    ObjectAllocator<Model> frameAllocator;
 
 public:
     static void Initialize(u32 assetsCapacity);
     static void Shutdown();
     static ModelManager* Get();
 
-    void Load(const char* name, const char* path);
+    void Load(const char* name, const char* path, int memoryType);
     void Unload(const char* name) override;
     Model* Get(const char* name);
 };

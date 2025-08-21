@@ -1,24 +1,21 @@
 #pragma once
 
-#include "containers.h"
+#include <utils.h>
 
-struct ComponentBase;
+class ActorManager;
+class ComponentBase;
 
 class Actor
 {
+    friend ActorManager;
+private:
+    int id;
+    ActorManager* actorManager = nullptr;
 public:
-    HashMap<ComponentBase*> componentsMap;
-    Array<i32> componentsIds;
-
     template<typename ComponentType>
     ComponentType* GetComponent()
     {
-        ComponentType* component = (ComponentType*)*componentsMap.Get(ComponentType::GetID());
-        return component;
-    }
-
-    ComponentBase* GetComponentById(int id)
-    {
-        return *componentsMap.Get(id);
+        ASSERT(actorManager != nullptr);
+        return actorManager->GetComponent<ComponentType>(this);
     }
 };

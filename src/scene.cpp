@@ -13,6 +13,16 @@
 void Scene::Load(ActorManager* actorManager_, const char* filepath)
 {
     this->actorManager = actorManager_;
+
+    // Load the models
+    ModelManager::Get()->Load("house", "data/models/House/source/house.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("warrior", "data/models/Warrior/source/warrior.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("test-level", "data/models/Level/source/level.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("tower", "data/models/MagicStudio/source/MagicStudio.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("wizard", "data/models/Wizard/source/Wizard.FBX", FRAME_MEMORY);
+    ModelManager::Get()->Load("bullet", "data/models/testBullet.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("level1", "data/models/Level1/source/Level.fbx", FRAME_MEMORY);
     
     // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");
@@ -71,4 +81,14 @@ void Scene::Unload()
 {
     ASSERT(actorManager != nullptr);
     actorManager->Clear();
+
+    // Load the models
+    ModelManager::Get()->Unload("house");
+    ModelManager::Get()->Unload("warrior");
+    ModelManager::Get()->Unload("test-level");
+    ModelManager::Get()->Unload("anim-gun");
+    ModelManager::Get()->Unload("tower");
+    ModelManager::Get()->Unload("wizard");
+    ModelManager::Get()->Unload("bullet");
+    ModelManager::Get()->Unload("level1");
 }

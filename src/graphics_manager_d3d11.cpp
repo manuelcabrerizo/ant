@@ -7,6 +7,8 @@
 #include <math/algebra.h>
 #include <math/quaternion.h>
 
+#include <dxgidebug.h>
+
 void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32 stackNum)
 {    
      window = (HWND *)osWindow;
@@ -45,6 +47,9 @@ void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32
      SetRasterizerStateCullBack();
 }
 
+#define DXGI_GET_DEBUG_INTERFACE(name) HRESULT name(REFIID riid, void** ppDebug)
+typedef DXGI_GET_DEBUG_INTERFACE(DXGIGetDebugInterfacePtr);
+
 void GraphicsManagerD3D11::Shutdown()
 {
      deviceContext->Flush();
@@ -60,12 +65,41 @@ void GraphicsManagerD3D11::Shutdown()
      depthStencilView->Release();
      renderTargetView->Release();
 
+     IDXGIOutput* output = nullptr;
+     swapChain->GetContainingOutput(&output);
+     if (output)
+     {
+         output->Release();
+     }
+
+     IDXGIOutput* output1 = nullptr;
+     swapChain1->GetContainingOutput(&output1);
+     if (output1)
+     {
+         output1->Release();
+     }
+        
+       
      if(swapChain1) swapChain1->Release();
      swapChain->Release();
      if(deviceContext1) deviceContext1->Release();
      deviceContext->Release();
      if(device1) device1->Release();
      device->Release();
+
+     HMODULE DxgiDebugLibrary = LoadLibraryA("DXGIDebug.dll");
+     if (DxgiDebugLibrary)
+     {
+         DXGIGetDebugInterfacePtr* DXGIGetDebugInterface =
+             (DXGIGetDebugInterfacePtr*)GetProcAddress(DxgiDebugLibrary, "DXGIGetDebugInterface");
+
+         IDXGIDebug* debug = nullptr;
+         DXGIGetDebugInterface(__uuidof(IDXGIDebug), (void**)&debug);
+
+         debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+
+         debug->Release();
+     }
 
      printf("DirectX11 Terminated!\n");
 }

@@ -7,6 +7,56 @@
 
 #define INVALID_KEY ((u64)-1)
 
+template <typename Type, int Size>
+class StaticArray
+{
+public:
+    u32 size = 0;
+    Type data[Size];
+
+    void Clear();
+    Type* Push(Type value);
+
+    // TODO: this has to be const
+    // CHECK ME: !!!!!!!!!!!!!!!!
+    Type& operator[](u32 index) const
+    {
+        return data[index];
+    }
+
+    Type& operator[](u32 index)
+    {
+        return data[index];
+    }
+
+    Type& operator[](int index) const
+    {
+        return data[index];
+    }
+
+    Type& operator[](int index)
+    {
+        return data[index];
+    }
+};
+
+template <typename Type, int Size>
+void StaticArray<Type, Size>::Clear()
+{
+    size = 0;
+    memset(data, 0, Size * sizeof(Type));
+}
+
+template <typename Type, int Size>
+Type* StaticArray<Type, Size>::Push(Type value)
+{
+    ASSERT(size + 1 <= Size);
+    Type* element = new (data + size) Type;
+    *element = value;
+    ++size;
+    return element;
+}
+
 template <typename Type>
 class Array
 {

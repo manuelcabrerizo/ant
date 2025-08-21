@@ -50,6 +50,7 @@ private:
      Array<Mesh> meshes;
      HashMap<BoneInfo> bonesInfo;
      i32 boneCounter = 0;
+     int memoryType;
 public:
      void Init(const char *filepath, i32 memoryType);
      void Terminate();
@@ -63,6 +64,11 @@ public:
      i32 GetMeshCount()
      {
          return meshes.size;
+     }
+
+     int GetMemoryType()
+     {
+         return memoryType;
      }
 
      void SetDefaultMaterial(Material* material);

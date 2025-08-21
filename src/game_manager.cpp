@@ -24,16 +24,6 @@ void GameManager::Init()
 
     LoadDefaultAssets();
 
-    // Load the models
-    ModelManager::Get()->Load("house", "data/models/House/source/house.fbx");
-    ModelManager::Get()->Load("warrior", "data/models/Warrior/source/warrior.fbx");
-    ModelManager::Get()->Load("test-level", "data/models/Level/source/level.fbx");
-    ModelManager::Get()->Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx");
-    ModelManager::Get()->Load("tower", "data/models/MagicStudio/source/MagicStudio.fbx");
-    ModelManager::Get()->Load("wizard", "data/models/Wizard/source/Wizard.FBX");
-    ModelManager::Get()->Load("bullet", "data/models/testBullet.fbx");
-    ModelManager::Get()->Load("level1", "data/models/Level1/source/Level.fbx");
-
     scenes.Init(1, STATIC_MEMORY);
 
     menuState.Init(this);
@@ -47,10 +37,12 @@ void GameManager::Update(f32 dt)
     CollisionWorld::Get()->DebugDraw();
     stateMachine.Update(dt);
 
+    /*
     size_t freeMemory = MemoryManager::Get()->GetFreeMemoryCount(FRAME_MEMORY);
     char buffer[256];
     sprintf(buffer, "free memory: %zu\n", freeMemory);
     OutputDebugString(buffer);
+    */
 }
 
 void GameManager::Render(f32 dt)
@@ -68,16 +60,6 @@ void GameManager::Terminate()
     GraphicsManager::Get()->DebugTerminate();
 
     CollisionWorld::Terminate();
-
-    // Load the models
-    ModelManager::Get()->Unload("house");
-    ModelManager::Get()->Unload("warrior");
-    ModelManager::Get()->Unload("test-level");
-    ModelManager::Get()->Unload("anim-gun");
-    ModelManager::Get()->Unload("tower");
-    ModelManager::Get()->Unload("wizard");
-    ModelManager::Get()->Unload("bullet");
-    ModelManager::Get()->Unload("level1");
 
     ShutdownAssetsManagers();
 }

@@ -4,9 +4,19 @@
 #include <actor.h>
 #include <component_list.h>
 
+#define MAX_COMPONENTS_PER_ACTOR 32
+
+struct ActorComponent
+{
+    int id;
+    ComponentBase* component;
+};
+
 class ActorManager
 {
 private:
+    static int actorGeneration;
+
     i32 memoryType;
     i32 componentTypeCount = 0;
     i32 maxActorCount = 0;
@@ -15,7 +25,9 @@ private:
     BlockAllocator<sizeof(Actor)> allocator;
     Array<Actor*> toRemove;
 
+    HashMap<StaticArray<ActorComponent, MAX_COMPONENTS_PER_ACTOR>> actorsComponentsMap;
     HashMap<ComponentListBase*> componentListMap;
+
     Array<ComponentBase*> componentsToInit;
 
 public:
@@ -30,18 +42,21 @@ public:
     template <typename ComponentType>
     ComponentList<ComponentType> *GetComponents();
 
-    Actor *CreateActor(i32 componentCount);
+    Actor *CreateActor();
     Actor *CreateActorFromFile(const char* filepath);
     Actor *CloneActor(Actor *srcActor);
     void DestroyActor(Actor *actor);
     
     template <typename ComponentType>
     void AddComponent(Actor *actor, ComponentType component);
-    void AddAndCloneComponentById(Actor *dstActor, Actor *srcActor, int id);
+    void AddAndCloneComponent(Actor* dstActor, Actor* srcActor, ActorComponent actorComponent);
 
     template <typename ComponentType>
     void RemoveComponent(Actor *ctor);
-    void RemoveComponentById(Actor* actor, i32 id);
+    void RemoveActorComponent(Actor* actor, ActorComponent actorComponent);
+
+    template <typename ComponentType>
+    ComponentType* GetComponent(Actor* actor);
 
     void InitializeNewComponents();
     void ProcessActorsToRemove();
@@ -86,8 +101,9 @@ void ActorManager::AddComponent(Actor *actor, ComponentType value)
     *component = value;
     component->owner = actor;
 
-    actor->componentsMap.Add(ComponentType::GetID(), component);
-    actor->componentsIds.Push(ComponentType::GetID());
+    auto& components = *actorsComponentsMap.Get(actor->id);
+    components.Push({ ComponentType::GetID(), component });
+    
     componentsToInit.Push(component);
 }
 
@@ -99,25 +115,41 @@ void ActorManager::RemoveComponent(Actor *actor)
     ComponentType* component = actor->GetComponent<ComponentType>();
     component->OnTerminate(this);
 
-    actor->componentsMap.Remove(ComponentType::GetID());
+    auto& components = *actorsComponentsMap.Get(actor->id);
     i32 foundIndex = -1;
-    for (i32 i = 0; i < actor->componentsIds.size; ++i)
+    for (i32 i = components.size - 1; i >= 0; --i)
     {
-        if (actor->componentsIds[i] == ComponentType::GetID())
+        if (components[i].id == ComponentType::GetID())
         {
             foundIndex = i;
         }
     }
+
     if (foundIndex >= 0)
     {
-        actor->componentsIds[foundIndex] = actor->componentsIds[actor->componentsIds.size - 1];
-        actor->componentsIds[actor->componentsIds.size - 1] = -1;
-        actor->componentsIds.size--;
+        components[foundIndex] = components[components.size - 1];
+        components[components.size - 1] = {};
+        components.size--;
     }
 
     list->allocator.Free(component);
 }
 
+template <typename ComponentType>
+ComponentType* ActorManager::GetComponent(Actor* actor)
+{
+    // TODO: Linear search for now
+    ComponentType* component = nullptr;
+    auto& components = *actorsComponentsMap.Get(actor->id);
+    for (int i = 0; i < components.size; ++i)
+    {
+        if (ComponentType::GetID() == components[i].id)
+        {
+            component = (ComponentType *)components[i].component;
+        }
+    }
+    return component;
+}
 
 template<typename ComponentType>
 void ActorManager::UpdateComponents(f32 dt)
