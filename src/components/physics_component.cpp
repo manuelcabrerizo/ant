@@ -46,10 +46,10 @@ void PhysicsComponent::ProcessCollisionDetectionAndResolution()
     grounded = CollisionWorld::Get()->Intersect(groundSegment, tOut, collider->GetId());
 
     // Collision detection and resolution
-    Frame frame = MemoryManager::Get()->GetFrame();
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
 
     Array<CollisionData> collisionData;
-    collisionData.Init(MAX_COLLISION_COUNT, FRAME_MEMORY);
+    collisionData.Init(MAX_COLLISION_COUNT, SCRATCH_MEMORY);
 
     if(CollisionWorld::Get()->Intersect(*collider->GetCollider(), collisionData))
     {

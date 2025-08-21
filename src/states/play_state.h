@@ -1,17 +1,21 @@
 #pragma once
 
 #include "state.h"
+#include <actor_manager.h>
 
 class GameManager;
-class ActorManager;
 class Scene;
 
 class PlayState : public IState
 {
 private:
+    Frame memoryFrame;
+
+    ActorManager actorManager;
     GameManager* gameManager = nullptr;
-    ActorManager* actorManager = nullptr;
     Scene* scene = nullptr;
+
+    void InitializeActorManager();
 public:
     void Init(GameManager *gameManager);
     void OnEnter() override;

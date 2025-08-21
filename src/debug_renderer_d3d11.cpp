@@ -26,10 +26,10 @@ void DebugRendererD3D11::Init(ID3D11Device *device)
           ASSERT(!"Error create line renderer GPU buffer.");
      }
      
-     Frame frame = MemoryManager::Get()->GetFrame();
+     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
      // Load the shader
-     File vertFile = PlatformReadFile("data/shaders/line_vert.hlsl", FRAME_MEMORY);
-     File fragFile = PlatformReadFile("data/shaders/line_frag.hlsl", FRAME_MEMORY);
+     File vertFile = PlatformReadFile("data/shaders/line_vert.hlsl", SCRATCH_MEMORY);
+     File fragFile = PlatformReadFile("data/shaders/line_frag.hlsl", SCRATCH_MEMORY);
      vertexShader = GraphicsManager::Get()->VertexShaderAlloc(vertFile);
      fragmentShader = GraphicsManager::Get()->FragmentShaderAlloc(fragFile);
 

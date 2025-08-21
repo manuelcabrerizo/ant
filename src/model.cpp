@@ -46,11 +46,11 @@ void Model::Init(const char *filepath, i32 memoryType)
             aiProcess_Triangulate | aiProcess_GenSmoothNormals |
             aiProcess_CalcTangentSpace);
 
-     Frame materialsFrame = MemoryManager::Get()->GetFrame();
+     Frame materialsFrame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
      Array<aiString> materials;
      if (scene->mNumMaterials > 0)
      {
-         materials.Init(scene->mNumMaterials, FRAME_MEMORY);
+         materials.Init(scene->mNumMaterials, SCRATCH_MEMORY);
          for (int i = 0; i < scene->mNumMaterials; ++i)
          {
              aiMaterial* material = scene->mMaterials[i];
@@ -58,7 +58,7 @@ void Model::Init(const char *filepath, i32 memoryType)
              material->Get(AI_MATKEY_NAME, name);
              materials.Push(name);
 
-             Frame stringFrame = MemoryManager::Get()->GetFrame();
+             Frame stringFrame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
                 
              bool isTextured = false;
              const char* materialName = name.C_Str();
@@ -78,8 +78,8 @@ void Model::Init(const char *filepath, i32 memoryType)
                     // ERROR: invalid model foulder structure, (we use source/textures standar)
                     ASSERT(prevIndex != -1 && postIndex != -1);
 
-                    const char* texturePath = (const char*)MemoryManager::Get()->Alloc(_MAX_PATH, FRAME_MEMORY);
-                    const char* tempPath = (const char*)MemoryManager::Get()->Alloc(_MAX_PATH, FRAME_MEMORY);
+                    const char* texturePath = (const char*)MemoryManager::Get()->Alloc(_MAX_PATH, SCRATCH_MEMORY);
+                    const char* tempPath = (const char*)MemoryManager::Get()->Alloc(_MAX_PATH, SCRATCH_MEMORY);
                     memset((void*)texturePath, 0, _MAX_PATH);
                     memset((void*)tempPath, 0, _MAX_PATH);
                     
@@ -161,9 +161,9 @@ void Model::Init(const char *filepath, i32 memoryType)
      {
           aiMesh *mesh = scene->mMeshes[k]; 
 
-          Frame frame = MemoryManager::Get()->GetFrame();
-          Vertex *vertices = (Vertex *)MemoryManager::Get()->Alloc(mesh->mNumVertices * sizeof(Vertex), FRAME_MEMORY);
-          u32 *indices = (u32 *)MemoryManager::Get()->Alloc((mesh->mNumFaces * 3) * sizeof(u32), FRAME_MEMORY);
+          Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+          Vertex *vertices = (Vertex *)MemoryManager::Get()->Alloc(mesh->mNumVertices * sizeof(Vertex), SCRATCH_MEMORY);
+          u32 *indices = (u32 *)MemoryManager::Get()->Alloc((mesh->mNumFaces * 3) * sizeof(u32), SCRATCH_MEMORY);
 
           for(i32 i = 0; i < mesh->mNumVertices; i++)
           {

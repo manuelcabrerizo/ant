@@ -4,14 +4,15 @@
 MemoryManager MemoryManager::instance;
 bool MemoryManager::initialize = false;
 
-void MemoryManager::Init(u64 memorySize, size_t align)
+void MemoryManager::Init(u64 staticMemorySize, u64 frameMemorySize, u64 scratchMemorySize, size_t align)
 {
      if(initialize)
      {
           ASSERT(!"Error: memory manager already initialize");
      }
      memset(&instance, 0, sizeof(MemoryManager));
-     instance.allocator.Init(memorySize, align);
+     instance.allocator.Init(frameMemorySize + scratchMemorySize, align);
+     instance.staticAllocator.Init(staticMemorySize, align);
      initialize = true;
 }
 
@@ -22,6 +23,7 @@ void MemoryManager::Terminate()
           ASSERT(!"Error: memory manager has not been initialize");
      }
      instance.allocator.Terminate();
+     instance.staticAllocator.Terminate();
      initialize = false;
 }
 
@@ -34,18 +36,32 @@ MemoryManager *MemoryManager::Get()
      return &instance;
 }
 
-void *MemoryManager::Alloc(u64 size, i32 stackNum)
+void *MemoryManager::Alloc(u64 size, i32 memoryType)
 {
-     return allocator.Alloc(size, stackNum);
+    switch (memoryType)
+    {
+    case FRAME_MEMORY:
+    case SCRATCH_MEMORY:
+        return allocator.Alloc(size, memoryType);
+    case STATIC_MEMORY:
+        return staticAllocator.Alloc(size);
+    }
 }
 
-Frame MemoryManager::GetFrame()
+Frame MemoryManager::GetFrame(i32 memoryType)
 {
-     return allocator.GetFrame(FRAME_MEMORY);
+    switch (memoryType)
+    {
+    case FRAME_MEMORY:
+    case SCRATCH_MEMORY:
+        return allocator.GetFrame(memoryType);
+    case STATIC_MEMORY: 
+        ASSERT(!"ERROR: STATIC MEMORY CANT BY FRAMED");
+    }
 }
 
 void MemoryManager::ReleaseFrame(Frame frame)
 {
-     allocator.ReleaseFrame(frame);
+    allocator.ReleaseFrame(frame);
 }
 

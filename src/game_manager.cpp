@@ -14,31 +14,25 @@
 #include <asset_managers/material_manager.h>
 #include <asset_managers/model_manager.h>
 
-#include <components/component.h>
-#include <components/transform_component.h>
-#include <components/render_component.h>
-#include <components/physics_component.h>
-#include <components/collider_component.h>
-#include <components/camera_component.h>
-#include <components/weapon_component.h>
-#include <components/anchor_component.h>
-#include <components/player_controller_component.h>
-#include <components/enemy_component.h>
-#include <components/animation_component.h>
-#include <components/bullet_component.h>
-
 void GameManager::Init()
 {
     InitializeAssetsManagers();
 
-    CameraComponent::Initialize();
-    RenderComponent::Initialize();
     CollisionWorld::Init(100);
 
     GraphicsManager::Get()->DebugInit();
 
     LoadDefaultAssets();
-    InitializeActorManager();
+
+    // Load the models
+    ModelManager::Get()->Load("house", "data/models/House/source/house.fbx");
+    ModelManager::Get()->Load("warrior", "data/models/Warrior/source/warrior.fbx");
+    ModelManager::Get()->Load("test-level", "data/models/Level/source/level.fbx");
+    ModelManager::Get()->Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx");
+    ModelManager::Get()->Load("tower", "data/models/MagicStudio/source/MagicStudio.fbx");
+    ModelManager::Get()->Load("wizard", "data/models/Wizard/source/Wizard.FBX");
+    ModelManager::Get()->Load("bullet", "data/models/testBullet.fbx");
+    ModelManager::Get()->Load("level1", "data/models/Level1/source/Level.fbx");
 
     scenes.Init(1, STATIC_MEMORY);
 
@@ -53,7 +47,7 @@ void GameManager::Update(f32 dt)
     CollisionWorld::Get()->DebugDraw();
     stateMachine.Update(dt);
 
-    size_t freeMemory = MemoryManager::Get()->GetFreeMemoryCount();
+    size_t freeMemory = MemoryManager::Get()->GetFreeMemoryCount(FRAME_MEMORY);
     char buffer[256];
     sprintf(buffer, "free memory: %zu\n", freeMemory);
     OutputDebugString(buffer);
@@ -71,13 +65,19 @@ void GameManager::Terminate()
     stateMachine.Clear();
     menuState.Terminate();
 
-    actorManager.Terminate();
-
     GraphicsManager::Get()->DebugTerminate();
 
     CollisionWorld::Terminate();
-    RenderComponent::Terminate();
-    CameraComponent::Terminate();
+
+    // Load the models
+    ModelManager::Get()->Unload("house");
+    ModelManager::Get()->Unload("warrior");
+    ModelManager::Get()->Unload("test-level");
+    ModelManager::Get()->Unload("anim-gun");
+    ModelManager::Get()->Unload("tower");
+    ModelManager::Get()->Unload("wizard");
+    ModelManager::Get()->Unload("bullet");
+    ModelManager::Get()->Unload("level1");
 
     ShutdownAssetsManagers();
 }
@@ -90,11 +90,6 @@ void GameManager::ChangeToMenuState()
 void GameManager::ChangeToPlayState()
 {
     stateMachine.ChangeState(&playState);
-}
-
-ActorManager* GameManager::GetActorManager()
-{
-    return &actorManager;
 }
 
 Scene* GameManager::GetCurrentScene()
@@ -142,22 +137,4 @@ void GameManager::LoadDefaultAssets()
     // Load Materials
     MaterialManager::Get()->LoadTexture("DefaultMaterial", "default",
         "DefaultMaterial_Diffuse", "DefaultMaterial_Normal", "DefaultMaterial_Specular", 64);
-}
-
-void GameManager::InitializeActorManager()
-{
-    actorManager.BeingInitialization(100, 64, STATIC_MEMORY);
-    actorManager.AddComponentType<TransformComponent, 100>();
-    actorManager.AddComponentType<RenderComponent, 100>();
-    actorManager.AddComponentType<PhysicsComponent, 100>();
-    actorManager.AddComponentType<ColliderComponent, 100>();
-    actorManager.AddComponentType<PlayerControllerComponent, 1>();
-    actorManager.AddComponentType<WeaponComponent, 100>();
-    actorManager.AddComponentType<CameraComponent, 1>();
-    actorManager.AddComponentType<EnemyComponent, 10>();
-    actorManager.AddComponentType<AnchorComponent, 10>();
-    actorManager.AddComponentType<AnimationComponent, 10>();
-    actorManager.AddComponentType<BulletComponent, 100>();
-    // NOTE: add more component types ...
-    actorManager.EndInitialization();
 }

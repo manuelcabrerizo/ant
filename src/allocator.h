@@ -14,14 +14,40 @@ Type *AlignPointer(Type *ptr, size_t align)
      return (Type *)addrAlign;
 }
 
-struct Frame
+class StackAllocator;
+class DoubleStackAllocator;
+
+class Frame
 {
-     u8 *frame;
-     i32 stackNum;
+    friend StackAllocator;
+    friend DoubleStackAllocator;
+
+    u8* frame;
+    i32 stackNum;
 };
 
-#define FRAME_MEMORY 0
-#define STATIC_MEMORY 1
+class StackAllocator
+{
+private:
+    int byteAlignment;
+    u8* memoryBlock;
+    u8 *base;
+    u8* cap;
+    u8* head;
+public:
+    void Init(size_t size, size_t byteAligment);
+    void Terminate();
+
+    void* Alloc(u64 size);
+    Frame GetFrame();
+    void ReleaseFrame(Frame frame);
+
+    size_t GetFreeMemoryCount()
+    {
+        return cap - head;
+    }
+
+};
 
 class DoubleStackAllocator
 {

@@ -36,8 +36,8 @@ void VertexShaderManager::Load(const char* name, const char* filePath)
 {
     if (!nameIndex.Contains(name))
     {
-        Frame frame = MemoryManager::Get()->GetFrame();
-        File file = PlatformReadFile(filePath, FRAME_MEMORY);
+        Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+        File file = PlatformReadFile(filePath, SCRATCH_MEMORY);
         VertexShaderHandle shaderHandle;
         shaderHandle.name = name;
         shaderHandle.shader = GraphicsManager::Get()->VertexShaderAlloc(file);
@@ -98,8 +98,8 @@ FragmentShaderManager* FragmentShaderManager::Get()
 
 void FragmentShaderManager::Load(const char* name, const char* filePath)
 {
-    Frame frame = MemoryManager::Get()->GetFrame();
-    File file = PlatformReadFile(filePath, FRAME_MEMORY);
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    File file = PlatformReadFile(filePath, SCRATCH_MEMORY);
     FragmentShaderHandle shaderHandle;
     shaderHandle.name = name;
     shaderHandle.shader = GraphicsManager::Get()->FragmentShaderAlloc(file);

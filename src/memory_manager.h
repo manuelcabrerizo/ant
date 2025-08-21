@@ -2,6 +2,10 @@
 
 #include "allocator.h"
 
+#define FRAME_MEMORY 0
+#define SCRATCH_MEMORY 1
+#define STATIC_MEMORY 2
+
 class MemoryManager
 {
 private:
@@ -9,18 +13,28 @@ private:
      static MemoryManager instance;
      static bool initialize;
 
-     DoubleStackAllocator allocator {};
+     DoubleStackAllocator allocator{};
+     StackAllocator staticAllocator{};
+
 public:
-     static void Init(u64 memorySize, size_t align);
+     static void Init(u64 staticMemorySize, u64 frameMemorySize, u64 scratchMemorySize, size_t align);
      static void Terminate();
      static MemoryManager *Get();
 
-     void *Alloc(u64 size, i32 stackNum);
-     Frame GetFrame();
+     void *Alloc(u64 size, i32 memoryType);
+     
+     Frame GetFrame(i32 memoryType);
      void ReleaseFrame(Frame frame);
 
-     size_t GetFreeMemoryCount()
+     size_t GetFreeMemoryCount(i32 memoryType)
      {
-         return allocator.GetFreeMemoryCount();
+         switch (memoryType)
+         {
+         case FRAME_MEMORY:
+         case SCRATCH_MEMORY:
+             return allocator.GetFreeMemoryCount();
+         case STATIC_MEMORY:
+             return staticAllocator.GetFreeMemoryCount();
+         }
      }
 };

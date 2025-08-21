@@ -1,6 +1,5 @@
 #pragma once
 #include <scene.h>
-#include <actor_manager.h>
 #include <states/state_machine.h>
 #include <states/menu_state.h>
 #include <states/play_state.h>
@@ -9,7 +8,6 @@ class GameManager
 {
 private:
     Array<Scene> scenes;
-    ActorManager actorManager;
 
     MenuState menuState;
     PlayState playState;
@@ -18,7 +16,6 @@ private:
     void InitializeAssetsManagers();
     void ShutdownAssetsManagers();
 
-    void InitializeActorManager();
     void LoadDefaultAssets();
 public:     
     void Init();
@@ -29,6 +26,5 @@ public:
     void ChangeToMenuState();
     void ChangeToPlayState();
 
-    ActorManager* GetActorManager();
     Scene* GetCurrentScene();
 };

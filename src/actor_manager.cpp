@@ -27,6 +27,7 @@ void ActorManager::BeingInitialization(i32 actorCount, i32 componentTypeCount_, 
     memoryType = memoryType_;
     componentTypeCount = componentTypeCount_;
     maxActorCount = actorCount;
+    maxComponentCount = 0;
 
     allocator.Init(maxActorCount, memoryType);
     toRemove.Init(maxActorCount, memoryType);
@@ -252,12 +253,12 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
 
             attributes = attributes->NextSiblingElement();
 
-            Frame frame = MemoryManager::Get()->GetFrame();
+            Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
             Array<const char*> materialNames;
 
             if (attributes->ChildElementCount() > 0)
             {
-                materialNames.Init(attributes->ChildElementCount(), FRAME_MEMORY);
+                materialNames.Init(attributes->ChildElementCount(), SCRATCH_MEMORY);
 
                 tinyxml2::XMLElement* material = attributes->FirstChildElement();
                 while (material != nullptr)

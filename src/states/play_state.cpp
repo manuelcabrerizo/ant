@@ -1,49 +1,67 @@
 #include "play_state.h"
 #include <game_manager.h>
 #include <input_manager.h>
-#include <components/player_controller_component.h>
-#include <components/camera_component.h>
-#include <components/weapon_component.h>
-#include <components/enemy_component.h>
+
+#include <components/component.h>
+#include <components/transform_component.h>
+#include <components/render_component.h>
 #include <components/physics_component.h>
 #include <components/collider_component.h>
-#include <components/render_component.h>
+#include <components/camera_component.h>
+#include <components/weapon_component.h>
+#include <components/anchor_component.h>
+#include <components/player_controller_component.h>
+#include <components/enemy_component.h>
+#include <components/animation_component.h>
 #include <components/bullet_component.h>
 
 void PlayState::Init(GameManager *gameManager)
 {
     this->gameManager = gameManager;
-    this->actorManager = gameManager->GetActorManager();
     this->scene = gameManager->GetCurrentScene();
 }
 
 void PlayState::OnEnter()
 {
-    scene->Load(actorManager, "");
+    memoryFrame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
+
+    CameraComponent::Initialize();
+    RenderComponent::Initialize();
+
+    InitializeActorManager();
+
+    scene->Load(&actorManager, "");
 }
 
 void PlayState::OnExit()
 {
     scene->Unload();
+
+    actorManager.Terminate();
+
+    RenderComponent::Terminate();
+    CameraComponent::Terminate();
+
+    MemoryManager::Get()->ReleaseFrame(memoryFrame);
 }
 
 void PlayState::OnUpdate(float deltaTime)
 {
     // Initialize new components
-    actorManager->InitializeNewComponents();
+    actorManager.InitializeNewComponents();
     // Update
-    actorManager->UpdateComponents<PlayerControllerComponent>(deltaTime);
-    actorManager->UpdateComponents<CameraComponent>(deltaTime);
-    actorManager->UpdateComponents<WeaponComponent>(deltaTime);
-    actorManager->UpdateComponents<EnemyComponent>(deltaTime);
-    actorManager->UpdateComponents<PhysicsComponent>(deltaTime);
-    actorManager->UpdateComponents<ColliderComponent>(deltaTime);
-    actorManager->UpdateComponents<RenderComponent>(deltaTime);
-    actorManager->UpdateComponents<BulletComponent>(deltaTime);
+    actorManager.UpdateComponents<PlayerControllerComponent>(deltaTime);
+    actorManager.UpdateComponents<CameraComponent>(deltaTime);
+    actorManager.UpdateComponents<WeaponComponent>(deltaTime);
+    actorManager.UpdateComponents<EnemyComponent>(deltaTime);
+    actorManager.UpdateComponents<PhysicsComponent>(deltaTime);
+    actorManager.UpdateComponents<ColliderComponent>(deltaTime);
+    actorManager.UpdateComponents<RenderComponent>(deltaTime);
+    actorManager.UpdateComponents<BulletComponent>(deltaTime);
     // Late Update
-    actorManager->LateUpdateComponents<PhysicsComponent>(deltaTime);
+    actorManager.LateUpdateComponents<PhysicsComponent>(deltaTime);
 
-    actorManager->ProcessActorsToRemove();
+    actorManager.ProcessActorsToRemove();
 
     if (InputManager::Get()->KeyJustDown(KEY_P))
     {
@@ -53,5 +71,23 @@ void PlayState::OnUpdate(float deltaTime)
 
 void PlayState::OnRender()
 {
-    actorManager->RenderComponents<RenderComponent>();
+    actorManager.RenderComponents<RenderComponent>();
+}
+
+void PlayState::InitializeActorManager()
+{
+    actorManager.BeingInitialization(100, 64, FRAME_MEMORY);
+    actorManager.AddComponentType<TransformComponent, 100>();
+    actorManager.AddComponentType<RenderComponent, 100>();
+    actorManager.AddComponentType<PhysicsComponent, 100>();
+    actorManager.AddComponentType<ColliderComponent, 100>();
+    actorManager.AddComponentType<PlayerControllerComponent, 1>();
+    actorManager.AddComponentType<WeaponComponent, 100>();
+    actorManager.AddComponentType<CameraComponent, 1>();
+    actorManager.AddComponentType<EnemyComponent, 10>();
+    actorManager.AddComponentType<AnchorComponent, 10>();
+    actorManager.AddComponentType<AnimationComponent, 10>();
+    actorManager.AddComponentType<BulletComponent, 100>();
+    // NOTE: add more component types ...
+    actorManager.EndInitialization();
 }

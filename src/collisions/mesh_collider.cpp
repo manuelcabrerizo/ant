@@ -23,7 +23,7 @@ void MeshCollider::InitFromFile(const char* filepath)
 
     ASSERT(totalTriangleCount != 0);
 
-    triangles.Init(totalTriangleCount, STATIC_MEMORY);
+    triangles.Init(totalTriangleCount, FRAME_MEMORY);
 
     for (i32 k = 0; k < scene->mNumMeshes; k++)
     {

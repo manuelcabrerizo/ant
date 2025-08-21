@@ -13,35 +13,19 @@
 void Scene::Load(ActorManager* actorManager_, const char* filepath)
 {
     this->actorManager = actorManager_;
-
-    // Load the models
-    ModelManager::Get()->Load("house", "data/models/House/source/house.fbx");
-    ModelManager::Get()->Load("warrior", "data/models/Warrior/source/warrior.fbx");
-    ModelManager::Get()->Load("test-level", "data/models/Level/source/level.fbx");
-    ModelManager::Get()->Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx");
-    ModelManager::Get()->Load("tower", "data/models/MagicStudio/source/MagicStudio.fbx");
-    ModelManager::Get()->Load("wizard", "data/models/Wizard/source/Wizard.FBX");
-    ModelManager::Get()->Load("bullet", "data/models/testBullet.fbx");
-    ModelManager::Get()->Load("level1", "data/models/Level1/source/Level.fbx");
-
-    // TODO: load all entities from the scene file
-    // Create Entities
-    //actorManager->CreateActorFromFile("data/xml/test-level.xml");
-    //actorManager->CreateActorFromFile("data/xml/tower.xml");
-    //actorManager->CreateActorFromFile("data/xml/house.xml");
-    //actorManager->CreateActorFromFile("data/xml/wizard.xml");
+    
+    // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");
 
     // Spawn the enemies
-
     // Create the animation for the enemies
     AnimationComponent animation;
-    animation.skeleton.Init("data/models/warrior.dae", STATIC_MEMORY);
-    animation.animation.Init("data/animations/walk_front.dae", ModelManager::Get()->Get("warrior"), STATIC_MEMORY);
+    animation.skeleton.Init("data/models/warrior.dae", FRAME_MEMORY);
+    animation.animation.Init("data/animations/walk_front.dae", ModelManager::Get()->Get("warrior"), FRAME_MEMORY);
 
-    Frame frame = MemoryManager::Get()->GetFrame();
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
 
-    File file = PlatformReadFile("data/entities/enemies.txt", FRAME_MEMORY);
+    File file = PlatformReadFile("data/entities/enemies.txt", SCRATCH_MEMORY);
     char* text = (char*)file.data;
     int endOfFilePos = strlen(text);
     int currentPos = 0;
@@ -77,7 +61,8 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     }
     
     MemoryManager::Get()->ReleaseFrame(frame);
-
+    
+    // Create the player
     actorManager->CreateActorFromFile("data/xml/player.xml");
 
 }
@@ -86,14 +71,4 @@ void Scene::Unload()
 {
     ASSERT(actorManager != nullptr);
     actorManager->Clear();
-
-    // Load the models
-    ModelManager::Get()->Unload("house");
-    ModelManager::Get()->Unload("warrior");
-    ModelManager::Get()->Unload("test-level");
-    ModelManager::Get()->Unload("anim-gun");
-    ModelManager::Get()->Unload("tower");
-    ModelManager::Get()->Unload("wizard");
-    ModelManager::Get()->Unload("bullet");
-    ModelManager::Get()->Unload("level1");
 }
