@@ -1,12 +1,11 @@
 #include "weapon_component.h"
 #include "anchor_component.h"
 #include "transform_component.h"
+#include "collider_component.h"
 #include "bullet_component.h"
-
-#include <stdio.h>
 #include "render_component.h"
 
-#include <windows.h>
+#include <collision.h>
 
 static unsigned long long shootCounter = 0;
 
@@ -16,6 +15,7 @@ void WeaponComponent::OnInit(ActorManager *actorManager)
 
     am = actorManager;
     transform = owner->GetComponent<TransformComponent>();
+    collider = owner->GetComponent<ColliderComponent>();
 
     bulletPrefab = am->CreateActorFromFile("data/xml/bullet.xml");
     BulletComponent* bullet = bulletPrefab->GetComponent<BulletComponent>();
@@ -53,6 +53,28 @@ void WeaponComponent::OnShoot(ShootNotification* notification)
     bulletTransform->position = notification->shootPosition;
     bulletTransform->direction = notification->shootDirection;
     am->InitializeNewComponents();
+
+    // Scratch Buffer for collisionData results
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    Array<CollisionData> collisionData;
+    collisionData.Init(MAX_COLLISION_COUNT, SCRATCH_MEMORY);
+
+    // Raycast againts the CollisionWorld and hit the enemies
+    Ray shootRay;
+    shootRay.Init(notification->shootPosition, notification->shootDirection);
+    if (CollisionWorld::Get()->Intersect(shootRay, collisionData, collider->GetId()))
+    {
+        CollisionData& data = collisionData[0];
+        if (data.collider->owner->GetTag() == ActorTag::Enemy)
+        {
+            EnemyHitNotification notification;
+            notification.enemy = data.collider->owner;
+            NotificationManager::Get()->SendNotification(NotificationType::EnemyHit, &notification);
+        }
+    }
+
+    // Release the Scratch Buffer
+    MemoryManager::Get()->ReleaseFrame(frame);
 }
 
 void WeaponComponent::OnNotify(NotificationType type, Notification* notification)

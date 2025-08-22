@@ -4,11 +4,14 @@
 #include <notification_manager.h>
 
 class TransformComponent;
+class ColliderComponent;
 
 class WeaponComponent : public Component<WeaponComponent>, INotificable
 {
 private:
-    TransformComponent *transform;
+    TransformComponent* transform;
+    ColliderComponent* collider;
+
     ActorManager* am = nullptr;
 
     Actor *bulletPrefab = nullptr;

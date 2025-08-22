@@ -42,7 +42,7 @@ public:
     template <typename ComponentType>
     ComponentList<ComponentType> *GetComponents();
 
-    Actor *CreateActor();
+    Actor *CreateActor(ActorTag tag = ActorTag::Default);
     Actor *CreateActorFromFile(const char* filepath);
     Actor *CloneActor(Actor *srcActor);
     void DestroyActor(Actor *actor);

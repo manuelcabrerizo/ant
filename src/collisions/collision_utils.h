@@ -5,12 +5,15 @@
 
 #define MAX_COLLISION_COUNT 16
 
+class ColliderComponent;
+
 struct CollisionData
 {
     Vector3 point;
     Vector3 n;
     float penetration;
     float t;
+    ColliderComponent* collider;
 };
 
 class CollisionUtils

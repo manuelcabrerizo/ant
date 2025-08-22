@@ -2,6 +2,7 @@
 #include <math/algebra.h>
 #include <float.h>
 #include <collisions/collision_utils.h>
+#include <components/collider_component.h>
 
 CollisionWorld CollisionWorld::instance;
 bool CollisionWorld::isInitialized = false;
@@ -34,12 +35,12 @@ CollisionWorld* CollisionWorld::Get()
     return &instance;
 }
 
-void CollisionWorld::AddCollider(Collider *collider)
+void CollisionWorld::AddCollider(ColliderComponent*collider)
 {
     colliders.Push(collider);
 }
 
-void CollisionWorld::RemoveCollider(Collider *collider)
+void CollisionWorld::RemoveCollider(ColliderComponent *collider)
 {
     for (int i = colliders.size - 1; i >= 0; --i)
     {
@@ -48,44 +49,84 @@ void CollisionWorld::RemoveCollider(Collider *collider)
             colliders[i] = colliders[colliders.size - 1];
             colliders[colliders.size - 1] = nullptr;
             colliders.size--;
+
+            break;
         }
     }
 }
 
-bool CollisionWorld::Intersect(const Ray& ray, float& t, unsigned int ignoreId) const
+bool CollisionWorld::Intersect(const Ray& ray, Array<CollisionData>& collisionData, unsigned int ignoreId) const
 {
     bool isIntersecting = false;
     for (int i = 0; i < colliders.size; ++i)
     {
-        if (colliders[i]->GetId() != ignoreId)
+        Collider* collider = colliders[i]->GetCollider();
+        if (collider->GetId() != ignoreId)
         {
-            isIntersecting |= colliders[i]->Intersect(ray, t);
+            float t;
+            bool intersect = collider->Intersect(ray, t);
+            if (intersect && collisionData.size < MAX_COLLISION_COUNT)
+            {
+                CollisionData data;
+                data.collider = colliders[i];
+                data.t = t;
+                collisionData.Push(data);
+            }
+            isIntersecting |= intersect;
         }
     }
+
+    if (collisionData.size > 0)
+    {
+        CollisionUtils::SortCollisionByTime(collisionData);
+    }
+
     return isIntersecting;
 }
 
-bool CollisionWorld::Intersect(const Segment& segment, float& t, unsigned int ignoreId) const
+bool CollisionWorld::Intersect(const Segment& segment, Array<CollisionData>& collisionData, unsigned int ignoreId) const
 {
     bool isIntersecting = false;
     for (int i = 0; i < colliders.size; ++i)
     {
-        if (colliders[i]->GetId() != ignoreId)
+        Collider* collider = colliders[i]->GetCollider();
+        if (collider->GetId() != ignoreId)
         {
-            isIntersecting |= colliders[i]->Intersect(segment, t);
+            float t;
+            bool intersect = collider->Intersect(segment, t);
+            if (intersect && collisionData.size < MAX_COLLISION_COUNT)
+            {
+                CollisionData data;
+                data.collider = colliders[i];
+                data.t = t;
+                collisionData.Push(data);
+            }
+            isIntersecting |= intersect;
         }
     }
+
+    if (collisionData.size > 0)
+    {
+        CollisionUtils::SortCollisionByTime(collisionData);
+    }
+
     return isIntersecting;
 }
 
-bool CollisionWorld::Intersect(const Collider& collider, Array<CollisionData>& collisionData) const
+bool CollisionWorld::Intersect(ColliderComponent *collider, Array<CollisionData>& collisionData) const
 {
     bool isIntersecting = false;
     for (int i = 0; i < colliders.size; ++i)
     {
-        if (collider.GetId() != colliders[i]->GetId())
+        if (collider->GetId() != colliders[i]->GetId())
         {
-            isIntersecting |= collider.Intersect(*colliders[i], collisionData);
+            bool intersect = collider->GetCollider()->Intersect(*colliders[i]->GetCollider(), collisionData);
+            if (intersect)
+            {
+                CollisionData& data = collisionData[collisionData.size - 1];
+                data.collider = colliders[i];
+            }
+            isIntersecting |= intersect;
         }
     }
     CollisionUtils::SortCollisionByPenetration(collisionData);
@@ -96,6 +137,6 @@ void CollisionWorld::DebugDraw()
 {
     for (int i = 0; i < colliders.size; ++i)
     {
-        colliders[i]->DebugDraw();
+        colliders[i]->GetCollider()->DebugDraw();
     }
 }

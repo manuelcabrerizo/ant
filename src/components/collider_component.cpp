@@ -6,12 +6,12 @@
 void ColliderComponent::OnInit(ActorManager* actorManager)
 {
     transform = owner->GetComponent<TransformComponent>();
-    CollisionWorld::Get()->AddCollider(&collider);
+    CollisionWorld::Get()->AddCollider(this);
 }
 
 void ColliderComponent::OnTerminate(ActorManager* actorManager)
 {
-    CollisionWorld::Get()->RemoveCollider(&collider);
+    CollisionWorld::Get()->RemoveCollider(this);
 }
 
 void ColliderComponent::OnUpdate(ActorManager* actorManager, f32 dt)

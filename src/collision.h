@@ -13,16 +13,16 @@ private:
     static CollisionWorld instance;
     static bool isInitialized;
 
-    Array<Collider *> colliders;
+    Array<ColliderComponent *> colliders;
 public:
     static void Init(int maxColllidersCount);
     static void Terminate();
     static CollisionWorld* Get();
 
-    void AddCollider(Collider *collider);
-    void RemoveCollider(Collider *collider);
-    bool Intersect(const Ray& ray, float& t, unsigned int ignoreId = 0) const;
-    bool Intersect(const Segment& segment, float& t, unsigned int ignoreId = 0) const;
-    bool Intersect(const Collider& collider, Array<CollisionData>& collisionData) const;
+    void AddCollider(ColliderComponent *collider);
+    void RemoveCollider(ColliderComponent *collider);
+    bool Intersect(const Ray& ray, Array<CollisionData>& collisionData, unsigned int ignoreId = 0) const;
+    bool Intersect(const Segment& segment, Array<CollisionData>& collisionData, unsigned int ignoreId = 0) const;
+    bool Intersect(ColliderComponent *collider, Array<CollisionData>& collisionData) const;
     void DebugDraw();
 };

@@ -1,14 +1,18 @@
 #include "enemy_component.h"
 #include "transform_component.h"
 #include "physics_component.h"
+#include "render_component.h"
 
 #include <math.h>
 #include <math/algebra.h>
 
 void EnemyComponent::OnInit(ActorManager *actorManager)
 {
+    NotificationManager::Get()->AddListener(this, NotificationType::EnemyHit);
+
     transform = owner->GetComponent<TransformComponent>();
     physics = owner->GetComponent<PhysicsComponent>();
+    render = owner->GetComponent<RenderComponent>();
 
     //movement.SetCharacter(&character);
     //movement.SetTarget(&target);
@@ -43,6 +47,7 @@ void EnemyComponent::OnInit(ActorManager *actorManager)
 
 void EnemyComponent::OnTerminate(ActorManager *actorManager)
 {
+    NotificationManager::Get()->RemoveListener(this, NotificationType::EnemyHit);
 }
 
 void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
@@ -59,5 +64,21 @@ void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
         character.rotation *= powf(0.001f, dt); // angular drag
         character.orientation += character.rotation * dt;
         transform->direction = Vector3(-sinf(character.orientation), 0.0f, cosf(character.orientation)).Normalized();
+    }
+}
+
+void EnemyComponent::OnEnemyHit(EnemyHitNotification* enemyHit)
+{
+    if (enemyHit->enemy == owner)
+    {
+        render->enable = false;
+    }
+}
+
+void EnemyComponent::OnNotify(NotificationType type, Notification* notification)
+{
+    switch (type)
+    {
+    case NotificationType::EnemyHit: OnEnemyHit((EnemyHitNotification*)notification); break;
     }
 }

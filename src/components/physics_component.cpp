@@ -42,16 +42,18 @@ void PhysicsComponent::ProcessCollisionDetectionAndResolution()
     Segment groundSegment;
     Vector3 colliderPos = transform->position + collider->GetOffset();
     groundSegment.Init(colliderPos, colliderPos - Vector3(0.0f, colliderRadius + 0.80f, 0.0f));
-    float tOut;
-    grounded = CollisionWorld::Get()->Intersect(groundSegment, tOut, collider->GetId());
-
+    
     // Collision detection and resolution
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
 
     Array<CollisionData> collisionData;
     collisionData.Init(MAX_COLLISION_COUNT, SCRATCH_MEMORY);
 
-    if(CollisionWorld::Get()->Intersect(*collider->GetCollider(), collisionData))
+    grounded = CollisionWorld::Get()->Intersect(groundSegment, collisionData, collider->GetId());
+
+
+    collisionData.Clear();
+    if(CollisionWorld::Get()->Intersect(collider, collisionData))
     {
         int iterations = 0;
         while(collisionData.size > 0 && iterations < 10)
@@ -65,7 +67,7 @@ void PhysicsComponent::ProcessCollisionDetectionAndResolution()
 
             collisionData.Clear();
             collider->GetCollider()->UpdatePosition(transform->position + collider->GetOffset());
-            CollisionWorld::Get()->Intersect(*collider->GetCollider(), collisionData);
+            CollisionWorld::Get()->Intersect(collider, collisionData);
             iterations++;
         }    
     }

@@ -80,10 +80,11 @@ void ActorManager::Clear()
     allocator.Clear();
 }
 
-Actor *ActorManager::CreateActor()
+Actor *ActorManager::CreateActor(ActorTag tag)
 {
     void* buffer = allocator.Alloc();
     Actor* actor = new (buffer) Actor();
+    actor->tag = tag;
     actor->actorManager = this;
     actor->id = actorGeneration++;
     actorsComponentsMap.Add(actor->id, {});
@@ -170,7 +171,15 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
     tinyxml2::XMLDocument doc;
     doc.LoadFile(filepath);
 
+    ActorTag tag = ActorTag::Default;
+
     tinyxml2::XMLElement* root = doc.FirstChildElement("Actor");
+    const char* tagName = 0;
+    root->QueryStringAttribute("tag", &tagName);
+    if (tagName)
+    {
+        tag = Actor::TagNameToTag(tagName);
+    }
 
     i32 componentCount = GetChildElementCount(root) + 2; // TODO: handle this better
     if ((componentCount & (componentCount - 1)) != 0)
@@ -178,7 +187,7 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
         componentCount = Utils::NextPower2(componentCount);
     }
 
-    Actor *actor = CreateActor();
+    Actor *actor = CreateActor(tag);
     tinyxml2::XMLElement* component = root->FirstChildElement();
     while (component)
     {
