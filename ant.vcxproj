@@ -88,7 +88,7 @@
     <ClCompile>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;ANT_DEBUG=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <WarningLevel>Level4</WarningLevel>
-      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)libs\stb;$(SolutionDir)libs\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src;$(SolutionDir)libs\stb;$(SolutionDir)libs\tinyxml2;$(SolutionDir)libs\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
@@ -183,7 +183,7 @@
     <ClCompile Include="src\notification_manager.cpp" />
     <ClCompile Include="src\states\state_machine.cpp" />
     <ClCompile Include="src\strings.cpp" />
-    <ClCompile Include="src\tinyxml2.cpp" />
+    <ClCompile Include="libs\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="src\utils.cpp" />
     <ClCompile Include="src\win32_platform.cpp" />
     <ClCompile Include="src\ui_renderer.cpp" />
@@ -252,7 +252,7 @@
     <ClInclude Include="src\platform.h" />
     <ClInclude Include="src\states\state.h" />
     <ClInclude Include="src\strings.h" />
-    <ClInclude Include="src\tinyxml2.h" />
+    <ClInclude Include="libs\tinyxml2\tinyxml2.h" />
     <ClInclude Include="src\utils.h" />
     <ClInclude Include="src\states\state_machine.h" />
     <ClInclude Include="src\ui_renderer.h" />

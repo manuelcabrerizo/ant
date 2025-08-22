@@ -51,7 +51,7 @@
     <ClCompile Include="src\notification_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\tinyxml2.cpp">
+    <ClCompile Include="libs\tinyxml2\tinyxml2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\win32_platform.cpp">
@@ -242,7 +242,7 @@
     <ClInclude Include="src\platform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\tinyxml2.h">
+    <ClInclude Include="libs\tinyxml2\tinyxml2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\animation\animation.h">

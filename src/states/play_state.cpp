@@ -31,14 +31,17 @@ void PlayState::Terminate()
 
 void PlayState::OnEnter()
 {
-    NotificationManager::Get()->AddListener(this, NotificationType::OnResize);
-
     memoryFrame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
 
-    TextureManager::Get()->Load("Crosshair", "data/textures/Crosshair.png");
+    NotificationManager::Get()->AddListener(this, NotificationType::OnResize);
 
     PlatformClientDimensions(&windowWidth, &windowHeight);
     Vector2 extent = Vector2(windowWidth, windowHeight);
+    OnResizeNotification notification;
+    notification.extent = extent;
+    OnResize(&notification);
+
+    TextureManager::Get()->Load("Crosshair", "data/textures/Crosshair.png");
 
     crosshairSize = Vector2(32, 32);
     crosshairPosition = (extent * 0.5f);
@@ -62,9 +65,9 @@ void PlayState::OnExit()
 
     TextureManager::Get()->Unload("Crosshair");
 
-    MemoryManager::Get()->ReleaseFrame(memoryFrame);
-
     NotificationManager::Get()->RemoveListener(this, NotificationType::OnResize);
+
+    MemoryManager::Get()->ReleaseFrame(memoryFrame);
 }
 
 void PlayState::OnUpdate(float deltaTime)
