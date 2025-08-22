@@ -1,14 +1,5 @@
-// TODO:
-// - Implement a small demo with a full loop
-// the player has to have life and be able to shoot at least two weapons
-// the enemies have to move arrown the map and shoot the player
-// when the player kills all enemies the game restart
-// when the player gets kill the game restart
-
 #include <game_manager.h>
-
 #include <collision.h>
-
 #include <asset_managers/shader_manager.h>
 #include <asset_managers/texture_manager.h>
 #include <asset_managers/material_manager.h>
@@ -17,51 +8,37 @@
 void GameManager::Init()
 {
     InitializeAssetsManagers();
-
     CollisionWorld::Init(100);
-
     GraphicsManager::Get()->DebugInit();
-
     LoadDefaultAssets();
-
     scenes.Init(1, STATIC_MEMORY);
-
     menuState.Init(this);
     playState.Init(this);
     stateMachine.Push(&menuState);
-}
-
-void GameManager::Update(f32 dt)
-{
-    GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
-    CollisionWorld::Get()->DebugDraw();
-    stateMachine.Update(dt);
-
-    /*
-    size_t freeMemory = MemoryManager::Get()->GetFreeMemoryCount(FRAME_MEMORY);
-    char buffer[256];
-    sprintf(buffer, "free memory: %zu\n", freeMemory);
-    OutputDebugString(buffer);
-    */
-}
-
-void GameManager::Render(f32 dt)
-{
-    stateMachine.Render();
-    GraphicsManager::Get()->DebugPresent();
-    GraphicsManager::Get()->EndFrame(1);
 }
 
 void GameManager::Terminate()
 {
     stateMachine.Clear();
     menuState.Terminate();
-
     GraphicsManager::Get()->DebugTerminate();
-
     CollisionWorld::Terminate();
-
     ShutdownAssetsManagers();
+}
+
+void GameManager::Update(f32 dt)
+{
+    stateMachine.Update(dt);
+}
+
+void GameManager::Render(f32 dt)
+{
+    GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
+
+    stateMachine.Render();
+
+    GraphicsManager::Get()->DebugPresent();
+    GraphicsManager::Get()->EndFrame(1);
 }
 
 void GameManager::ChangeToMenuState()

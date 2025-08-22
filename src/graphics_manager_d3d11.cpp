@@ -53,7 +53,9 @@ typedef DXGI_GET_DEBUG_INTERFACE(DXGIGetDebugInterfacePtr);
 void GraphicsManagerD3D11::Shutdown()
 {
      deviceContext->Flush();
-     
+     deviceContext->ClearState();
+     swapChain->SetFullscreenState(FALSE, nullptr);
+
      wireFrameRasterizer->Release();
      fillRasterizerCullBack->Release();
      fillRasterizerCullFront->Release();
@@ -64,22 +66,7 @@ void GraphicsManagerD3D11::Shutdown()
      
      depthStencilView->Release();
      renderTargetView->Release();
-
-     IDXGIOutput* output = nullptr;
-     swapChain->GetContainingOutput(&output);
-     if (output)
-     {
-         output->Release();
-     }
-
-     IDXGIOutput* output1 = nullptr;
-     swapChain1->GetContainingOutput(&output1);
-     if (output1)
-     {
-         output1->Release();
-     }
-        
-       
+  
      if(swapChain1) swapChain1->Release();
      swapChain->Release();
      if(deviceContext1) deviceContext1->Release();
