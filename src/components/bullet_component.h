@@ -7,7 +7,7 @@ class BulletComponent : public Component<BulletComponent>
 private:
     float lifeTime = 5.0f;
     float currentLifeTime = 0.0f;
-    float speed = 20.0f;
+    float speed = 40.0f;
 
     TransformComponent* transform = nullptr;
 

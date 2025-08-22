@@ -8,20 +8,19 @@
 
 class TransformComponent;
 class PhysicsComponent;
-class RenderComponent;
 
 class EnemyComponent : public Component<EnemyComponent>, INotificable
 {
 private:
     TransformComponent* transform;
     PhysicsComponent* physics;
-    RenderComponent* render;
 
     Kinematic character;
     Kinematic target;
-    //SteeringPursue movement;
-    //SteeringLookWhereYoureGoing turn;
     SteeringWander wander;
+
+    int maxLife = 3;
+    int life = 3;
 
     void OnEnemyHit(EnemyHitNotification* enemyHit);
 public:

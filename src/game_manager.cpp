@@ -20,6 +20,7 @@ void GameManager::Init()
 void GameManager::Terminate()
 {
     stateMachine.Clear();
+    playState.Terminate();
     menuState.Terminate();
     GraphicsManager::Get()->DebugTerminate();
     CollisionWorld::Terminate();

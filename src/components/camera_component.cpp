@@ -44,6 +44,8 @@ void CameraComponent::OnUpdate(ActorManager *actorManager, f32 dt)
      SetDirection(transform->direction);
      ubo.view = GetView();
      GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
+     // TODO: try no to do this on the Update
+     GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
 }
 
 void CameraComponent::OnResize(OnResizeNotification* onResize)

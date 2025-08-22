@@ -2,6 +2,8 @@
 #include <game_manager.h>
 #include <input_manager.h>
 
+#include <asset_managers/texture_manager.h>
+
 #include <components/component.h>
 #include <components/transform_component.h>
 #include <components/render_component.h>
@@ -17,13 +19,29 @@
 
 void PlayState::Init(GameManager *gameManager)
 {
+    uiRenderer.Init();
     this->gameManager = gameManager;
     this->scene = gameManager->GetCurrentScene();
 }
 
+void PlayState::Terminate()
+{
+    uiRenderer.Terminate();
+}
+
 void PlayState::OnEnter()
 {
+    NotificationManager::Get()->AddListener(this, NotificationType::OnResize);
+
     memoryFrame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
+
+    TextureManager::Get()->Load("Crosshair", "data/textures/Crosshair.png");
+
+    PlatformClientDimensions(&windowWidth, &windowHeight);
+    Vector2 extent = Vector2(windowWidth, windowHeight);
+
+    crosshairSize = Vector2(32, 32);
+    crosshairPosition = (extent * 0.5f);
 
     CameraComponent::Initialize();
     RenderComponent::Initialize();
@@ -42,7 +60,11 @@ void PlayState::OnExit()
     RenderComponent::Terminate();
     CameraComponent::Terminate();
 
+    TextureManager::Get()->Unload("Crosshair");
+
     MemoryManager::Get()->ReleaseFrame(memoryFrame);
+
+    NotificationManager::Get()->RemoveListener(this, NotificationType::OnResize);
 }
 
 void PlayState::OnUpdate(float deltaTime)
@@ -72,6 +94,19 @@ void PlayState::OnUpdate(float deltaTime)
 void PlayState::OnRender()
 {
     actorManager.RenderComponents<RenderComponent>();
+
+    // Render the Crosshair
+
+    uiRenderer.DrawQuat(crosshairPosition, crosshairSize, 0, "Crosshair");
+}
+
+void PlayState::OnResize(OnResizeNotification* onResize)
+{
+    windowWidth = onResize->extent.x;
+    windowHeight = onResize->extent.y;
+    Vector2 extent = onResize->extent;
+    crosshairPosition = (extent * 0.5f);
+    uiRenderer.OnResize(extent);
 }
 
 void PlayState::InitializeActorManager()
@@ -90,4 +125,12 @@ void PlayState::InitializeActorManager()
     actorManager.AddComponentType<BulletComponent, 100>();
     // NOTE: add more component types ...
     actorManager.EndInitialization();
+}
+
+void PlayState::OnNotify(NotificationType type, Notification* notification)
+{
+    switch (type)
+    {
+    case NotificationType::OnResize: OnResize((OnResizeNotification*)notification); break;
+    }
 }

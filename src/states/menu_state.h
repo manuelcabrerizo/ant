@@ -16,6 +16,9 @@ private:
     Array<UIButton<MenuState>> buttons;
     int windowWidth;
     int windowHeight;
+
+    void OnResize(OnResizeNotification* onResize);
+
 public:
     void Init(GameManager* gameManager);
     void Terminate();
@@ -25,7 +28,6 @@ public:
     void OnExit() override;
     void OnUpdate(float deltaTime) override;
     void OnRender() override;
-    void OnResize(OnResizeNotification* onResize);
     void OnNotify(NotificationType type, Notification* notification) override;
 
     void OnPlayButtonClick();
