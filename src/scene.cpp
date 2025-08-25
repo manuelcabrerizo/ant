@@ -14,19 +14,13 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     this->actorManager = actorManager_;
 
     // Load the models
-    ModelManager::Get()->Load("house", "data/models/House/source/house.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("enemy", "data/models/bloodwraith/source/bloodwraith.fbx", FRAME_MEMORY);
-    ModelManager::Get()->Load("test-level", "data/models/Level/source/level.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx", FRAME_MEMORY);
-    ModelManager::Get()->Load("tower", "data/models/MagicStudio/source/MagicStudio.fbx", FRAME_MEMORY);
-    ModelManager::Get()->Load("wizard", "data/models/Wizard/source/Wizard.FBX", FRAME_MEMORY);
     ModelManager::Get()->Load("bullet", "data/models/testBullet.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("level1", "data/models/TestLevel/source/TestLevel.fbx", FRAME_MEMORY);
-    ModelManager::Get()->Load("mona", "data/models/Mona/source/Mona.fbx", FRAME_MEMORY);
 
     // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");
-
 
     // Spawn the enemies
     // Create the animation for the enemies
@@ -34,7 +28,6 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     animation.skeleton.Init("data/models/bloodwraith/source/bloodwraith.fbx", FRAME_MEMORY);
     animation.animation.Init("data/animations/Mutant Walking.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
 
-    
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
 
     File file = PlatformReadFile("data/entities/enemies1.txt", SCRATCH_MEMORY);
@@ -74,8 +67,6 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     
     MemoryManager::Get()->ReleaseFrame(frame);
     
-    
-
     // Create the player
     actorManager->CreateActorFromFile("data/xml/player.xml");
 
@@ -87,13 +78,8 @@ void Scene::Unload()
     actorManager->Clear();
 
     // Load the models
-    ModelManager::Get()->Unload("house");
     ModelManager::Get()->Unload("enemy");
-    ModelManager::Get()->Unload("test-level");
     ModelManager::Get()->Unload("anim-gun");
-    ModelManager::Get()->Unload("tower");
-    ModelManager::Get()->Unload("wizard");
     ModelManager::Get()->Unload("bullet");
     ModelManager::Get()->Unload("level1");
-    ModelManager::Get()->Unload("mona");
 }
