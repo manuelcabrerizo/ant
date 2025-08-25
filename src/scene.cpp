@@ -15,7 +15,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
 
     // Load the models
     ModelManager::Get()->Load("house", "data/models/House/source/house.fbx", FRAME_MEMORY);
-    ModelManager::Get()->Load("warrior", "data/models/Warrior/source/warrior.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("enemy", "data/models/bloodwraith/source/bloodwraith.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("test-level", "data/models/Level/source/level.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("tower", "data/models/MagicStudio/source/MagicStudio.fbx", FRAME_MEMORY);
@@ -26,14 +26,13 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
 
     // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");
-    actorManager->CreateActorFromFile("data/xml/mona.xml");
 
 
     // Spawn the enemies
     // Create the animation for the enemies
     AnimationComponent animation;
-    animation.skeleton.Init("data/models/warrior.dae", FRAME_MEMORY);
-    animation.animation.Init("data/animations/walk_front.dae", ModelManager::Get()->Get("warrior"), FRAME_MEMORY);
+    animation.skeleton.Init("data/models/bloodwraith/source/bloodwraith.fbx", FRAME_MEMORY);
+    animation.animation.Init("data/animations/Mutant Walking.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
 
     
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
@@ -89,7 +88,7 @@ void Scene::Unload()
 
     // Load the models
     ModelManager::Get()->Unload("house");
-    ModelManager::Get()->Unload("warrior");
+    ModelManager::Get()->Unload("enemy");
     ModelManager::Get()->Unload("test-level");
     ModelManager::Get()->Unload("anim-gun");
     ModelManager::Get()->Unload("tower");

@@ -18,7 +18,7 @@ void EnemyComponent::OnInit(ActorManager *actorManager)
     wander.SetWanderRadius(5.0f);
     wander.SetWanderRate(0.5f);
     wander.SetWanderOrientation(0.0f);
-    wander.SetMaxAcceleration(5.0f);
+    wander.SetMaxAcceleration(2.5f);
     wander.SetMaxAngularAcceleration(5.0f);
     wander.SetMaxRotation(10.0f);
     wander.SetTargetRadius(ANT_PI * 0.1f);
