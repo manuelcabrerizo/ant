@@ -140,6 +140,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                
                GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT, GraphicsManagerType::D3D11, STATIC_MEMORY);
                ShowWindow(window, SW_SHOW);
+
+               PlatformShowMouse(false);
                
                GameManager gameManager;
                gameManager.Init();

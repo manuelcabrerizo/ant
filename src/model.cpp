@@ -52,6 +52,12 @@ void Model::Init(const char *filepath, i32 memoryType)
      if (scene->mNumMaterials > 0)
      {
          materials.Init(scene->mNumMaterials, SCRATCH_MEMORY);
+         materialNames.Init(scene->mNumMaterials, memoryType);
+         if (scene->mNumTextures)
+         {
+             texturesNames.Init(scene->mNumTextures, memoryType);
+         }
+
          for (int i = 0; i < scene->mNumMaterials; ++i)
          {
              aiMaterial* material = scene->mMaterials[i];
@@ -101,6 +107,7 @@ void Model::Init(const char *filepath, i32 memoryType)
 
                     diffuseTextureName = tempPath + (nameIndex + 1);
 
+                    texturesNames.Push(std::string(diffuseTextureName));
                     TextureManager::Get()->Load(diffuseTextureName, texturePath);
                      
                  }
@@ -114,6 +121,8 @@ void Model::Init(const char *filepath, i32 memoryType)
                  diffuseColor.y = aiDiffuseColor.g;
                  diffuseColor.z = aiDiffuseColor.b;
              }
+
+             materialNames.Push(std::string(materialName));
 
              if (isTextured)
              {
@@ -237,11 +246,13 @@ void Model::Init(const char *filepath, i32 memoryType)
 
           if(MaterialManager::Get()->Contains(materials[mesh->mMaterialIndex].C_Str()))
           {
-              myMesh.SetMaterial(MaterialManager::Get()->Get(materials[mesh->mMaterialIndex].C_Str()));
+              const char* materialName = materials[mesh->mMaterialIndex].C_Str();
+              myMesh.SetMaterial(MaterialManager::Get()->Get(materialName));
           }
           else
           {
-              myMesh.SetMaterial(MaterialManager::Get()->Get("DefaultMaterial"));
+              const char* materialName = "DefaultMaterial";
+              myMesh.SetMaterial(MaterialManager::Get()->Get(materialName));
           }
           meshes.Push(myMesh);
 
@@ -253,10 +264,23 @@ void Model::Init(const char *filepath, i32 memoryType)
 
 void Model::Terminate()
 {
-     for(i32  i = 0; i < meshes.size; ++i)
-     {
-          meshes[i].Terminate();
-     }
+    // Unload the submeshes
+    for(i32  i = 0; i < meshes.size; ++i)
+    {
+        meshes[i].Terminate();
+    }
+
+    // Unload the materials loaded from the model
+    for (int i = 0; i < materialNames.size; ++i)
+    {
+        MaterialManager::Get()->Unload(materialNames[i].c_str());
+    }
+
+    // Unload the textures loaded from the model
+    for (int i = 0; i < texturesNames.size; ++i)
+    {
+        TextureManager::Get()->Unload(texturesNames[i].c_str());
+    }
 }
 
 void Model::Draw()
@@ -271,6 +295,7 @@ HashMap<BoneInfo>& Model::GetBonesInfo()
 {
      return bonesInfo;
 }
+
 
 void Model::SetDefaultMaterial(Material* material)
 {

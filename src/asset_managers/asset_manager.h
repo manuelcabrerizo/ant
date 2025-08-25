@@ -5,10 +5,17 @@
 template <typename Type>
 class AssetManager
 {
+public:
+    struct AssetRef
+    {
+        Type *asset = nullptr;
+        int refCount = 0;
+    };
+
 protected:
     // change slotmap for a BlockArray
-     Slotmap<Type> assets;
-     HashMap<SlotmapKey<Type>> nameIndex;
+     BlockAllocator<sizeof(Type)> assets;
+     HashMap<AssetRef> nameIndex;
 public:
      virtual ~AssetManager() {}
      
@@ -20,8 +27,9 @@ public:
      virtual void Unload(const char *name) = 0;
 protected:
      Type *Get(const char *name);
-     Type *Get(SlotmapKey<Type> handle);
-     SlotmapKey<Type> GetHandle(const char *name);
+     
+     bool ShouldLoad(const char* name);
+     bool ShouldUnload(const char* name);
 };
 
 template <typename Type>
@@ -40,33 +48,65 @@ void AssetManager<Type>::Terminate()
 template <typename Type>
 void AssetManager<Type>::Clear()
 {
-    for (i32 i = assets.GetArray()->size - 1; i >= 0; --i)
+    auto assetsArray = assets.GetBlockArray();
+    size_t size = assets.GetBlockCount();
+    size_t used = assets.GetBlockUsed();
+
+    size_t usedFound = 0;
+    for (int i = 0; i < size; ++i)
     {
-        Type* asset = &assets.GetArray()->data[i];
+        if (!assetsArray[i].header.occupied)
+        {
+            continue;
+        }
+        usedFound++;
+
+        Type* asset = (Type*)&assetsArray[i].data[0];
         Unload(asset->name);
+
+        if (usedFound == used)
+        {
+            break;
+        }
     }
 }
 
 template <typename Type>
 Type* AssetManager<Type>::Get(const char* name)
 {
-    return assets.Get(*nameIndex.Get(name));
-}
-
-template <typename Type>
-Type* AssetManager<Type>::Get(SlotmapKey<Type> handle)
-{
-    return assets.Get(handle);
-}
-
-template <typename Type>
-SlotmapKey<Type> AssetManager<Type>::GetHandle(const char* name)
-{
-    return *nameIndex.Get(name);
+    return nameIndex.Get(name)->asset;
 }
 
 template <typename Type>
 bool AssetManager<Type>::Contains(const char* name)
 {
     return nameIndex.Contains(name);
+}
+
+template <typename Type>
+bool AssetManager<Type>::ShouldLoad(const char* name)
+{
+    if (Contains(name))
+    {
+        // increment ref
+        auto assetRef = nameIndex.Get(name);
+        assetRef->refCount++;
+        return false;
+    }
+    return true;
+}
+
+// TODO: return the handle to the asset to not repear the call to
+// nameIndex.Get
+template <typename Type>
+bool AssetManager<Type>::ShouldUnload(const char* name)
+{
+    ASSERT(Contains(name));
+    auto assetRef = nameIndex.Get(name);
+    assetRef->refCount--;
+    if (assetRef->refCount == 0)
+    {
+        return true;
+    }
+    return false;
 }

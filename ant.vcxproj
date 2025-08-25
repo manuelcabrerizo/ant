@@ -263,6 +263,7 @@
     <Xml Include="data\xml\enemy.xml" />
     <Xml Include="data\xml\house.xml" />
     <Xml Include="data\xml\level1.xml" />
+    <Xml Include="data\xml\mona.xml" />
     <Xml Include="data\xml\pistol.xml" />
     <Xml Include="data\xml\player.xml" />
     <Xml Include="data\xml\sniper.xml" />

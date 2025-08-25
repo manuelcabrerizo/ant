@@ -45,15 +45,21 @@ void MaterialManager::LoadSolidColor(const char* name,
     const Vector3& specular,
     f32 shininess)
 {
-    if (!nameIndex.Contains(name))
+    if (ShouldLoad(name))
     {
-        MaterialHandle materialHandle = {};
-        memcpy((void*)materialHandle.name, (void*)name, strlen(name));
+        void* materialHandleBuffer = assets.Alloc();
+        MaterialHandle* materialHandle = new (materialHandleBuffer) MaterialHandle();
+        memcpy((void*)materialHandle->name, (void*)name, strlen(name));
         void* buffer = allocator.Alloc();
         SolidColorMaterial* material = new (buffer) SolidColorMaterial;
         material->Init(shaderName, ambient, diffuse, specular, shininess);
-        materialHandle.material = material;
-        nameIndex.Add(name, assets.Add(materialHandle));
+        materialHandle->material = material;
+
+        AssetManager::AssetRef assetRef;
+        assetRef.refCount = 1;
+        assetRef.asset = materialHandle;
+
+        nameIndex.Add(name, assetRef);
     }
 }
 
@@ -64,27 +70,37 @@ void MaterialManager::LoadTexture(const char* name,
     const char* specularName,
     f32 shininess)
 {
-    if (!nameIndex.Contains(name))
+    if (ShouldLoad(name))
     {
-        MaterialHandle materialHandle = {};
-        memcpy((void*)materialHandle.name, (void*)name, strlen(name));
+        void* materialHandleBuffer = assets.Alloc();
+        MaterialHandle* materialHandle = new (materialHandleBuffer) MaterialHandle();
+
+        memcpy((void*)materialHandle->name, (void*)name, strlen(name));
         void* buffer = allocator.Alloc();
         TextureMaterial* material = new (buffer) TextureMaterial;
         material->Init(shaderName, diffuseName, normalName, specularName, shininess);
-        materialHandle.material = material;
-        nameIndex.Add(name, assets.Add(materialHandle));
+        materialHandle->material = material;
+
+        AssetManager::AssetRef assetRef;
+        assetRef.refCount = 1;
+        assetRef.asset = materialHandle;
+
+        nameIndex.Add(name, assetRef);
     }
 }
 
 
 void MaterialManager::Unload(const char* name)
 {
-    auto handle = *nameIndex.Get(name);
-    Material* material = assets.Get(handle)->material;
-    material->Terminate();
-    allocator.Free(material);
-    assets.Remove(handle);
-    nameIndex.Remove(name);
+    if (ShouldUnload(name))
+    {
+        MaterialHandle* materialHandle = nameIndex.Get(name)->asset;
+        Material* material = materialHandle->material;
+        material->Terminate();
+        allocator.Free(material);
+        nameIndex.Remove(name);
+        assets.Free(materialHandle);
+    }
 }
 
 void MaterialManager::Bind(const char* name)

@@ -55,10 +55,13 @@ void MenuState::OnEnter()
     OnResizeNotification notification;
     notification.extent = Vector2(windowWidth, windowHeight);
     OnResize(&notification);
+    PlatformShowMouse(true);
 }
 
 void MenuState::OnExit()
 {
+    PlatformShowMouse(false);
+
     NotificationManager::Get()->RemoveListener(this, NotificationType::OnResize);
 }
 

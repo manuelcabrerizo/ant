@@ -36,7 +36,7 @@ ModelManager* ModelManager::Get()
 
 void ModelManager::Load(const char* name, const char* path, int memoryType)
 {
-    if (!nameIndex.Contains(name))
+    if (ShouldLoad(name))
     {
         Model* model = nullptr;
         switch (memoryType)
@@ -53,33 +53,42 @@ void ModelManager::Load(const char* name, const char* path, int memoryType)
 
         model->Init(path, memoryType);
 
-        ModelHandle modelHandle;
-        modelHandle.name = name;
-        modelHandle.model = model;
-        nameIndex.Add(name, assets.Add(modelHandle));
+        void* buffer = assets.Alloc();
+        ModelHandle* modelHandle = new (buffer) ModelHandle();
+        modelHandle->name = name;
+        modelHandle->model = model;
+
+        AssetManager::AssetRef assetRef;
+        assetRef.refCount = 1;
+        assetRef.asset = modelHandle;
+
+        nameIndex.Add(name, assetRef);
     }
 }
 
 void ModelManager::Unload(const char* name)
 {
-    auto handle = *nameIndex.Get(name);
-    Model* model = assets.Get(handle)->model;
-    model->Terminate();
+    if (ShouldUnload(name))
+    {
+        ModelHandle* modelHandle = nameIndex.Get(name)->asset;
+        Model* model = modelHandle->model;
+        model->Terminate();
 
-    switch (model->GetMemoryType())
-    {
-    case STATIC_MEMORY:
-    {
-        model = staticAllocator.Alloc();
-    } break;
-    case FRAME_MEMORY:
-    {
-        model = frameAllocator.Alloc();
-    } break;
+        switch (model->GetMemoryType())
+        {
+        case STATIC_MEMORY:
+        {
+            model = staticAllocator.Alloc();
+        } break;
+        case FRAME_MEMORY:
+        {
+            model = frameAllocator.Alloc();
+        } break;
+        }
+
+        nameIndex.Remove(name);
+        assets.Free(modelHandle);
     }
-
-    assets.Remove(handle);
-    nameIndex.Remove(name);
 }
 
 Model* ModelManager::Get(const char* name)

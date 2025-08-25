@@ -34,24 +34,31 @@ VertexShaderManager* VertexShaderManager::Get()
 
 void VertexShaderManager::Load(const char* name, const char* filePath)
 {
-    if (!nameIndex.Contains(name))
+    if (ShouldLoad(name))
     {
         Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
         File file = PlatformReadFile(filePath, SCRATCH_MEMORY);
-        VertexShaderHandle shaderHandle;
-        shaderHandle.name = name;
-        shaderHandle.shader = GraphicsManager::Get()->VertexShaderAlloc(file);
+        void* buffer = assets.Alloc();
+        VertexShaderHandle* shaderHandle = new (buffer) VertexShaderHandle();
+        shaderHandle->name = name;
+        shaderHandle->shader = GraphicsManager::Get()->VertexShaderAlloc(file);
         MemoryManager::Get()->ReleaseFrame(frame);
-        nameIndex.Add(name, assets.Add(shaderHandle));
+        AssetManager::AssetRef assetRef;
+        assetRef.refCount = 1;
+        assetRef.asset = shaderHandle;
+        nameIndex.Add(name, assetRef);
     }
 }
 
 void VertexShaderManager::Unload(const char* name)
 {
-    auto handle = *nameIndex.Get(name);
-    GraphicsManager::Get()->VertexShaderFree(assets.Get(handle)->shader);
-    assets.Remove(handle);
-    nameIndex.Remove(name);
+    if (ShouldUnload(name))
+    {
+        VertexShaderHandle* shaderHandle = nameIndex.Get(name)->asset;
+        GraphicsManager::Get()->VertexShaderFree(shaderHandle->shader);
+        nameIndex.Remove(name);
+        assets.Free(shaderHandle);
+    }
 }
 
 void VertexShaderManager::Bind(const char* name)
@@ -98,21 +105,31 @@ FragmentShaderManager* FragmentShaderManager::Get()
 
 void FragmentShaderManager::Load(const char* name, const char* filePath)
 {
-    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
-    File file = PlatformReadFile(filePath, SCRATCH_MEMORY);
-    FragmentShaderHandle shaderHandle;
-    shaderHandle.name = name;
-    shaderHandle.shader = GraphicsManager::Get()->FragmentShaderAlloc(file);
-    MemoryManager::Get()->ReleaseFrame(frame);
-    nameIndex.Add(name, assets.Add(shaderHandle));
+    if (ShouldLoad(name))
+    {
+        Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+        File file = PlatformReadFile(filePath, SCRATCH_MEMORY);
+        void* buffer = assets.Alloc();
+        FragmentShaderHandle* shaderHandle = new (buffer) FragmentShaderHandle();
+        shaderHandle->name = name;
+        shaderHandle->shader = GraphicsManager::Get()->FragmentShaderAlloc(file);
+        MemoryManager::Get()->ReleaseFrame(frame);
+        AssetManager::AssetRef assetRef;
+        assetRef.refCount = 1;
+        assetRef.asset = shaderHandle;
+        nameIndex.Add(name, assetRef);
+    }
 }
 
 void FragmentShaderManager::Unload(const char* name)
 {
-    auto handle = *nameIndex.Get(name);
-    GraphicsManager::Get()->FragmentShaderFree(assets.Get(handle)->shader);
-    assets.Remove(handle);
-    nameIndex.Remove(name);
+    if (ShouldUnload(name))
+    {
+        FragmentShaderHandle* shaderHandle = nameIndex.Get(name)->asset;
+        GraphicsManager::Get()->FragmentShaderFree(shaderHandle->shader);
+        nameIndex.Remove(name);
+        assets.Free(shaderHandle);
+    }
 }
 
 void FragmentShaderManager::Bind(const char* name)

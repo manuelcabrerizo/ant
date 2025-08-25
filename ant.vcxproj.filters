@@ -413,5 +413,6 @@
     <Xml Include="data\xml\tower.xml" />
     <Xml Include="data\xml\wizard.xml" />
     <Xml Include="data\xml\level1.xml" />
+    <Xml Include="data\xml\mona.xml" />
   </ItemGroup>
 </Project>

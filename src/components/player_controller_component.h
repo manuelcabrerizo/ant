@@ -13,7 +13,6 @@ private:
     f32 yaw = 0;
     f32 pitch = 0;
     float speed;
-    bool showMouse;
 
     i32 weaponCount = 0;
     bool usingFirstWeapon = true;

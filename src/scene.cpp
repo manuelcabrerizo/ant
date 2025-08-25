@@ -8,7 +8,6 @@
 #include <components/animation_component.h>
 
 #include <strings.h>
-#include <windows.h>
 
 void Scene::Load(ActorManager* actorManager_, const char* filepath)
 {
@@ -23,9 +22,14 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     ModelManager::Get()->Load("wizard", "data/models/Wizard/source/Wizard.FBX", FRAME_MEMORY);
     ModelManager::Get()->Load("bullet", "data/models/testBullet.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("level1", "data/models/Level1/source/Level.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("mona", "data/models/Mona/source/Mona.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("mona12", "data/models/Mona/source/Mona.fbx", FRAME_MEMORY);
+
     
     // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");
+    actorManager->CreateActorFromFile("data/xml/mona.xml");
+
 
     // Spawn the enemies
     // Create the animation for the enemies
@@ -72,6 +76,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     
     MemoryManager::Get()->ReleaseFrame(frame);
     
+
     // Create the player
     actorManager->CreateActorFromFile("data/xml/player.xml");
 
@@ -91,4 +96,7 @@ void Scene::Unload()
     ModelManager::Get()->Unload("wizard");
     ModelManager::Get()->Unload("bullet");
     ModelManager::Get()->Unload("level1");
+    ModelManager::Get()->Unload("mona");
+    ModelManager::Get()->Unload("mona12");
+
 }

@@ -26,7 +26,7 @@ void CameraComponent::OnInit(ActorManager *actorManager)
 
     int windowWidth, windowHeight;
     PlatformClientDimensions(&windowWidth, &windowHeight);
-    ubo.proj = Matrix4::Perspective(65.0f, (float)windowWidth / (float)windowHeight, 0.01f, 100.0f);
+    ubo.proj = Matrix4::Perspective(90.0f, (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
     GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
     GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
 
@@ -50,9 +50,8 @@ void CameraComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 
 void CameraComponent::OnResize(OnResizeNotification* onResize)
 {
-    ubo.proj = Matrix4::Perspective(65.0f, onResize->extent.x / onResize->extent.y, 0.01f, 100.0f);
+    ubo.proj = Matrix4::Perspective(90.0f, onResize->extent.x / onResize->extent.y, 0.1f, 100.0f);
 }
-
 
 void CameraComponent::OnNotify(NotificationType type, Notification *notification)
 {

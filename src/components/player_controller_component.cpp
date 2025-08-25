@@ -18,10 +18,7 @@
 
 void PlayerControllerComponent::OnInit(ActorManager *actorManager)
 {
-    speed = 20.0f;
-    showMouse = false;
-    PlatformShowMouse(showMouse);
-    
+    speed = 40.0f;    
     transform = owner->GetComponent<TransformComponent>();
     camera = owner->GetComponent<CameraComponent>();
     physics = owner->GetComponent<PhysicsComponent>();
@@ -30,8 +27,6 @@ void PlayerControllerComponent::OnInit(ActorManager *actorManager)
 
 void PlayerControllerComponent::OnTerminate(ActorManager *actorManager)
 {
-    showMouse = true;
-    PlatformShowMouse(showMouse);
 }
 
 void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
@@ -54,36 +49,28 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 
 void PlayerControllerComponent::ProcessMouseMovement()
 {
-    if(InputManager::Get()->KeyJustDown(KEY_ESCAPE))
+    yaw += InputManager::Get()->MouseXMovement() * 0.001f;
+    pitch += InputManager::Get()->MouseYMovement() * 0.001f;
+    f32 limit = Radians(89.0f);
+    if(pitch > limit)
     {
-         showMouse = !showMouse;
-         PlatformShowMouse(showMouse);
+        pitch = limit;
     }
-    if(showMouse == false)
+    if(pitch < -limit)
     {
-         yaw += InputManager::Get()->MouseXMovement() * 0.001f;
-         pitch += InputManager::Get()->MouseYMovement() * 0.001f;
-         f32 limit = Radians(89.0f);
-         if(pitch > limit)
-         {
-              pitch = limit;
-         }
-         if(pitch < -limit)
-         {
-             pitch = -limit;
-         }
+        pitch = -limit;
+    }
 
-         Vector3 dir = Vector3(0.0f, 0.0f, 1.0f);
-         transform->direction = Matrix4::TransformVector(Matrix4::RotateX(pitch), dir);
-         transform->direction = Matrix4::TransformVector(Matrix4::RotateY(yaw), transform->direction);
-         transform->direction.Normalize();
-         i32 windowX, windowY, windowW, windowH;
-         PlaformGetWindowPos(&windowX, &windowY);
-         PlatformClientDimensions(&windowW, &windowH);
-         PlaformSetCursorPos(windowX + windowW/2, windowY + windowH/2); 
-         InputManager::Get()->SetMousePosition(windowW/2, windowH/2);
-         InputManager::Get()->SetMouseLastPosition(windowW/2, windowH/2);
-    }
+    Vector3 dir = Vector3(0.0f, 0.0f, 1.0f);
+    transform->direction = Matrix4::TransformVector(Matrix4::RotateX(pitch), dir);
+    transform->direction = Matrix4::TransformVector(Matrix4::RotateY(yaw), transform->direction);
+    transform->direction.Normalize();
+    i32 windowX, windowY, windowW, windowH;
+    PlaformGetWindowPos(&windowX, &windowY);
+    PlatformClientDimensions(&windowW, &windowH);
+    PlaformSetCursorPos(windowX + windowW/2, windowY + windowH/2); 
+    InputManager::Get()->SetMousePosition(windowW/2, windowH/2);
+    InputManager::Get()->SetMouseLastPosition(windowW/2, windowH/2);
 }
 
 void PlayerControllerComponent::ProcessKeyboardMovement()

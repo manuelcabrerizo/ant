@@ -8,6 +8,8 @@
 
 #include "graphics_manager.h"
 
+#include <string>
+
 class Material;
 
 // TODO: separate static from animated vertex
@@ -48,6 +50,10 @@ class Model
 {
 private:
      Array<Mesh> meshes;
+     // TODO: create custom String class
+     Array<std::string> materialNames;
+     Array<std::string> texturesNames;
+
      HashMap<BoneInfo> bonesInfo;
      i32 boneCounter = 0;
      int memoryType;

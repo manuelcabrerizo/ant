@@ -68,9 +68,9 @@ void GameManager::InitializeAssetsManagers()
 
 void GameManager::ShutdownAssetsManagers()
 {
+    ModelManager::Shutdown();
     MaterialManager::Shutdown();
     TextureManager::Shutdown();
-    ModelManager::Shutdown();
     VertexShaderManager::Shutdown();
     FragmentShaderManager::Shutdown();
 }
