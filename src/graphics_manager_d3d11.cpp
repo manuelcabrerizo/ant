@@ -606,7 +606,6 @@ void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
      }
 
      // check for msaa
-     u32 msaaQuality4x;
      device->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, 4, &msaaQuality4x);
      if (msaaQuality4x <= 0)
      {
@@ -651,8 +650,8 @@ void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
         sd.Width = windowWidth;
         sd.Height = windowHeight;
         sd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        sd.SampleDesc.Count = 1;
-        sd.SampleDesc.Quality = 0;
+        sd.SampleDesc.Count = 4;
+        sd.SampleDesc.Quality = msaaQuality4x - 1;
         sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         sd.BufferCount = 2;
 
@@ -675,8 +674,8 @@ void GraphicsManagerD3D11::CreateDeviceAndSwapChain()
         sd.BufferDesc.RefreshRate.Denominator = 1;
         sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         sd.OutputWindow = *window;
-        sd.SampleDesc.Count = 1;
-        sd.SampleDesc.Quality = 0;
+        sd.SampleDesc.Count = 4;
+        sd.SampleDesc.Quality = msaaQuality4x - 1;
         sd.Windowed = TRUE;
 
         hr = dxgiFactory->CreateSwapChain( device, &sd, &swapChain );
@@ -708,8 +707,8 @@ void GraphicsManagerD3D11::CreateDepthStencilView(i32 width, i32 height)
      depthStencilTextureDesc.MipLevels = 1;
      depthStencilTextureDesc.ArraySize = 1;
      depthStencilTextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-     depthStencilTextureDesc.SampleDesc.Count = 1;
-     depthStencilTextureDesc.SampleDesc.Quality = 0;
+     depthStencilTextureDesc.SampleDesc.Count = 4;
+     depthStencilTextureDesc.SampleDesc.Quality = msaaQuality4x - 1;
      depthStencilTextureDesc.Usage = D3D11_USAGE_DEFAULT;
      depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
      depthStencilTextureDesc.CPUAccessFlags = 0;

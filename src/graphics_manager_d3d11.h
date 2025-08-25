@@ -71,6 +71,7 @@ private:
      i32 windowWidth;
      i32 windowHeight;
      DXGI_SWAP_CHAIN_DESC sd;
+     u32 msaaQuality4x;
      
      ID3D11Device *device;
      ID3D11Device1 *device1;
