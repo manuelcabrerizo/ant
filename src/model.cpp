@@ -39,6 +39,8 @@ void Mesh::SetMaterial(Material* material)
     this->material = material;
 }
 
+// TODO: Refactor .... this function can be break down
+// in many subfunctions
 void Model::Init(const char *filepath, i32 memoryType)
 {
     this->memoryType = memoryType;
