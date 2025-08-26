@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\bounding_volume_hierarchie.cpp" />
     <ClCompile Include="src\components\collider_component.cpp" />
     <ClCompile Include="src\states\play_state.cpp" />
     <ClCompile Include="src\states\menu_state.cpp" />
@@ -189,6 +190,7 @@
     <ClCompile Include="src\ui_renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\bounding_volume_hierarchie.h" />
     <ClInclude Include="src\components\collider_component.h" />
     <ClInclude Include="src\states\play_state.h" />
     <ClInclude Include="src\states\menu_state.h" />

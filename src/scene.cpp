@@ -15,7 +15,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
 
     // Load the models
     ModelManager::Get()->Load("enemy", "data/models/bloodwraith/source/bloodwraith.fbx", FRAME_MEMORY);
-    ModelManager::Get()->Load("anim-gun", "data/models/fps-animations-vsk/source/FPS_VSK1.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("anim-gun", "data/models/Revolver/source/Retribution.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("bullet", "data/models/testBullet.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("level1", "data/models/TestLevel/source/TestLevel.fbx", FRAME_MEMORY);
 
@@ -28,6 +28,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     animation.skeleton.Init("data/models/bloodwraith/source/bloodwraith.fbx", FRAME_MEMORY);
     animation.animation.Init("data/animations/Mutant Walking.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
 
+#if 1
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
 
     File file = PlatformReadFile("data/entities/enemies1.txt", SCRATCH_MEMORY);
@@ -66,7 +67,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     }
     
     MemoryManager::Get()->ReleaseFrame(frame);
-    
+#endif
     // Create the player
     actorManager->CreateActorFromFile("data/xml/player.xml");
 

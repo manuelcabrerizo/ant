@@ -188,7 +188,11 @@ void Collider::DebugDraw() const
         } break;
         case ColliderType::CAPSULE:
         {
-            capsule.DebugDraw(12, color);
+            capsule.DebugDraw(6, color);
+        } break;
+        case ColliderType::MESH_COLLIDER:
+        {
+            meshCollider.DebugDraw(color);
         } break;
     }
 }

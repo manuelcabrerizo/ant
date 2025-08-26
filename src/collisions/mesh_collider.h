@@ -2,6 +2,7 @@
 
 #include "collision_utils.h"
 #include "triangle.h"
+#include <bounding_volume_hierarchie.h>
 
 class AABB;
 class OBB;
@@ -13,6 +14,10 @@ class MeshCollider
 {
 private:
     Array<Triangle> triangles;
+    BVHNode* root = nullptr;
+
+    // this can be a temp array using SCRATCH_MEMORY
+    Array<AABB> boundingBoxes;
 public:
 
     void InitFromFile(const char* filepath);
@@ -23,5 +28,7 @@ public:
     bool Intersect(const Capsule& capsule, Array<CollisionData>* collisionData = nullptr) const;
 
     const Array<Triangle>& GetTriangles() const;
+
+    void DebugDraw(const Vector3& color) const;
 };
 

@@ -38,7 +38,6 @@ void GameManager::Render(f32 dt)
 
     stateMachine.Render();
 
-    GraphicsManager::Get()->DebugPresent();
     GraphicsManager::Get()->EndFrame(1);
 }
 

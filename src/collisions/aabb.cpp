@@ -11,6 +11,8 @@
 
 #include <graphics_manager.h>
 #include <cfloat>
+#include <cmath> 
+#include <algorithm>
 
 void AABB::Init(const Vector3& min, const Vector3& max)
 {
@@ -27,13 +29,24 @@ void AABB::Init(Array<Vector3>& points)
     int zIndexMin, zIndexMax;
     CollisionUtils::ExtremePointsAlongDirection(Vector3(0.0f, 0.0f, 1.0f), points, &zIndexMin, &zIndexMax);
 
-    this->min.x = points[xIndexMin].x;
-    this->min.y = points[yIndexMin].y;
-    this->min.z = points[zIndexMin].z;
+    float extraPad = 0.01f;
 
-    this->max.x = points[xIndexMax].x;
-    this->max.y = points[yIndexMax].y;
-    this->max.z = points[zIndexMax].z;
+    this->min.x = std::nextafterf(points[xIndexMin].x, -INFINITY) - extraPad;
+    this->min.y = std::nextafterf(points[yIndexMin].y, -INFINITY) - extraPad;
+    this->min.z = std::nextafterf(points[zIndexMin].z, -INFINITY) - extraPad;
+    this->max.x = std::nextafterf(points[xIndexMax].x, INFINITY) + extraPad;
+    this->max.y = std::nextafterf(points[yIndexMax].y, INFINITY) + extraPad;
+    this->max.z = std::nextafterf(points[zIndexMax].z, INFINITY) + extraPad;
+}
+
+void AABB::Init(const AABB& one, const AABB& two)
+{
+    this->min.x = std::min(one.min.x, two.min.x);
+    this->min.y = std::min(one.min.y, two.min.y);
+    this->min.z = std::min(one.min.z, two.min.z);
+    this->max.x = std::max(one.max.x, two.max.x);
+    this->max.y = std::max(one.max.y, two.max.y);
+    this->max.z = std::max(one.max.z, two.max.z);
 }
 
 void AABB::SetMin(const Vector3& min)
@@ -201,6 +214,20 @@ float AABB::SqDistPoint(const Vector3& point) const
     return sqDist;
 }
 
+float AABB::GetVolume() const
+{
+    float width = max.x - min.x;
+    float height = max.y - min.y;
+    float depth = max.z - min.z;
+    return width * height * depth;
+}
+
+float AABB::GetGrowth(const AABB& aabb) const
+{
+    AABB combine;
+    combine.Init(*this, aabb);
+    return combine.GetVolume() - GetVolume();
+}
 
 void AABB::DebugDraw(const Vector3& color) const
 {

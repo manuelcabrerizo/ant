@@ -121,7 +121,7 @@ bool Capsule::Intersect(const Plane& plane, Array<CollisionData>* collisionData)
 bool Capsule::Intersect(const AABB& aabb, Array<CollisionData>* collisionData) const
 {
     bool isIntersecting = aabb.Intersect(*this, collisionData);
-    if (isIntersecting)
+    if (isIntersecting && collisionData)
     {
         collisionData->data[collisionData->size - 1].n *= -1.0f;
     }
@@ -131,7 +131,7 @@ bool Capsule::Intersect(const AABB& aabb, Array<CollisionData>* collisionData) c
 bool Capsule::Intersect(const OBB& obb, Array<CollisionData>* collisionData) const
 {
     bool isIntersecting = obb.Intersect(*this, collisionData);
-    if (isIntersecting)
+    if (isIntersecting && collisionData)
     {
         collisionData->data[collisionData->size - 1].n *= -1.0f;
     }

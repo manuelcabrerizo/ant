@@ -37,7 +37,7 @@ void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)
     Vector3 front = transform->direction.Normalized();
     Vector3 right = Vector3(0.0f, 1.0f, 0.0f).Cross(front).Normalized();
     Vector3 up = front.Cross(right);
-    weaponTransform->position = transform->position + front * 0.005f + right * 0.0f + up * -0.3f;
+    weaponTransform->position = transform->position + front * 0.25f + right * 0.1f + up * -0.2f;
     weaponTransform->direction = transform->direction;
     
     weaponAnchor->position = weaponTransform->position +

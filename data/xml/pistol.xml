@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Actor>
     <TransformComponent>
-        <position x="0" y="0.0" z="0"/>
-        <scale x="0.01" y="0.01" z="0.01"/>
+        <position x="0" y="0" z="0"/>
+        <scale x="0.025" y="0.025" z="0.025"/>
         <direction x="0" y="0" z="1"/>
     </TransformComponent>
     <RenderComponent>
@@ -12,6 +12,6 @@
 		<rotationOffset x="0" y="0" z="0"/>
     </RenderComponent>
     <AnchorComponent>
-        <offset x="0.03" y="0.2" z="0.8"/>
+        <offset x="0.05" y="0.0" z="0.0"/>
     </AnchorComponent>
 </Actor>

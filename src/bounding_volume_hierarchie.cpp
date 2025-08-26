@@ -1,0 +1,95 @@
+#include "bounding_volume_hierarchie.h"
+#include <collisions/capsule.h>
+
+BVHNode::BVHNode(BVHNode* parent, const AABB& volume,
+    Triangle* triangle)
+    : parent(parent), volume(volume), triangle(triangle) 
+{
+    childern[0] = nullptr;
+    childern[1] = nullptr;
+}
+
+BVHNode::~BVHNode()
+{
+}
+
+bool BVHNode::IsLeaf() const
+{
+    return triangle != nullptr;
+}
+
+bool BVHNode::Overlap(BVHNode* other) const
+{
+    return volume.Intersect(other->volume);
+}
+
+void BVHNode::Insert(const AABB& newVolume, Triangle* newTriangle)
+{
+    // If we are a leaf, then the only option is to spawn two new childrens
+    // and place the new body in one
+    if (IsLeaf())
+    {
+        // Child one is a copy of us
+        void* buffer0 = MemoryManager::Get()->Alloc(sizeof(BVHNode), FRAME_MEMORY);
+        childern[0] = new (buffer0) BVHNode(this, volume, triangle);
+
+        // Child two holds the new triangle
+        void* buffer1 = MemoryManager::Get()->Alloc(sizeof(BVHNode), FRAME_MEMORY);
+        childern[1] = new (buffer1) BVHNode(this, newVolume, newTriangle);
+
+        // And we lose the triangle (no longer a leaf)
+        triangle = nullptr;
+
+        RecalculateVolume();
+    }
+    else
+    {
+        // Otherwise, we need to work out witch child gets to keep
+        // the inseted triangle, we give it to whoever would grow the
+        // least to incorporate it
+        if (childern[0]->volume.GetGrowth(newVolume) <
+            childern[1]->volume.GetGrowth(newVolume))
+        {
+            childern[0]->Insert(newVolume, newTriangle);
+        }
+        else
+        {
+            childern[1]->Insert(newVolume, newTriangle);
+        }
+    }
+}
+
+void BVHNode::RecalculateVolume(bool recursive)
+{
+    if (IsLeaf())
+    {
+        return;
+    }
+
+    volume.Init(childern[0]->volume, childern[1]->volume);
+
+    if (parent)
+    {
+        parent->RecalculateVolume(true);
+    }
+}
+
+bool BVHNode::Intersect(const Capsule& capsule, Array<CollisionData>* collisionData) const
+{
+    if (IsLeaf())
+    {
+        return capsule.Intersect(*triangle, collisionData);
+    }
+
+    bool isIntersecting = false;
+    if (capsule.Intersect(volume))
+    {
+        isIntersecting |= childern[0]->Intersect(capsule, collisionData);
+        isIntersecting |= childern[1]->Intersect(capsule, collisionData);
+    }
+    else
+    {
+        return false;
+    }
+    return isIntersecting;
+}

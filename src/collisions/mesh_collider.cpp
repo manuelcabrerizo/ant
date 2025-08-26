@@ -11,6 +11,8 @@
 #include <utils.h>
 #include <assimp/postprocess.h>
 
+#include <windows.h>
+
 void MeshCollider::InitFromFile(const char* filepath)
 {
     const aiScene* scene = Utils::importer.ReadFile(filepath, aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_Triangulate);
@@ -24,6 +26,7 @@ void MeshCollider::InitFromFile(const char* filepath)
     ASSERT(totalTriangleCount != 0);
 
     triangles.Init(totalTriangleCount, FRAME_MEMORY);
+    boundingBoxes.Init(totalTriangleCount, FRAME_MEMORY);
 
     for (i32 k = 0; k < scene->mNumMeshes; k++)
     {
@@ -45,6 +48,33 @@ void MeshCollider::InitFromFile(const char* filepath)
             triangle.Init(a, b, c);
             triangles.Push(triangle);
         }
+    }
+
+    // Compute the triangles AABBs
+    for (int i = 0; i < triangles.size; ++i)
+    {
+        Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+
+        Array<Vector3> points;
+
+        points.Init(3, SCRATCH_MEMORY);
+        points.Push(triangles[i].a);
+        points.Push(triangles[i].b);
+        points.Push(triangles[i].c);
+
+        AABB aabb;
+        aabb.Init(points);
+        boundingBoxes.Push(aabb);
+
+        MemoryManager::Get()->ReleaseFrame(frame);
+    }
+
+    // Create the BVH tree
+    void* rootBuffer = MemoryManager::Get()->Alloc(sizeof(BVHNode), FRAME_MEMORY);
+    root = new (rootBuffer) BVHNode(nullptr, boundingBoxes[0], &triangles[0]);
+    for (int i = 1; i < boundingBoxes.size; i++)
+    {
+        root->Insert(boundingBoxes[i], &triangles[i]);
     }
 }
 
@@ -82,17 +112,31 @@ bool MeshCollider::Intersect(const Sphere& sphere, Array<CollisionData>* collisi
 
 bool MeshCollider::Intersect(const Capsule& capsule, Array<CollisionData>* collisionData) const
 {
+#if 0
+    // 10 FPS on debug 70 FPS on release
     bool isIntersecting = false;
     for (int i = 0; i < triangles.size; ++i)
     {
         isIntersecting |= capsule.Intersect(triangles[i], collisionData);
-
     }
     return isIntersecting;
+#else 
+    // 140 FPS on debug 700 FPS on release
+    return root->Intersect(capsule, collisionData);
+#endif
 }
 
 const Array<Triangle>& MeshCollider::GetTriangles() const
 {
     return triangles;
 }
+
+void MeshCollider::DebugDraw(const Vector3& color) const
+{
+    for (int i = 0; i < boundingBoxes.size; i++)
+    {
+        boundingBoxes[i].DebugDraw(color);
+    }
+}
+
 

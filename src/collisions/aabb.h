@@ -17,6 +17,7 @@ private:
 public:
     void Init(const Vector3& min, const Vector3& max);
     void Init(Array<Vector3>& points);
+    void Init(const AABB& one, const AABB& two);
 
     void SetMin(const Vector3& min);
     void SetMax(const Vector3& max);
@@ -35,4 +36,7 @@ public:
     float SqDistPoint(const Vector3& point) const;
 
     void DebugDraw(const Vector3& color) const;
+
+    float GetVolume() const;
+    float GetGrowth(const AABB& aabb) const;
 };

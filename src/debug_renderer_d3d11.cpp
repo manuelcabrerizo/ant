@@ -52,6 +52,7 @@ void DebugRendererD3D11::Present(ID3D11DeviceContext *deviceContext)
      D3D11_MAPPED_SUBRESOURCE bufferData;
      ZeroMemory(&bufferData, sizeof(bufferData));
      deviceContext->Map(gpuBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
+     ASSERT(bufferUsed <= bufferSize);
      memcpy(bufferData.pData, cpuBuffer, sizeof(VertexLine)*bufferUsed);
      deviceContext->Unmap(gpuBuffer, 0);
 
@@ -61,6 +62,7 @@ void DebugRendererD3D11::Present(ID3D11DeviceContext *deviceContext)
      u32 stride = sizeof(VertexLine);
      u32 offset = 0;
      deviceContext->IASetVertexBuffers(0, 1, &gpuBuffer, &stride, &offset);
+     ASSERT(bufferUsed % 2 == 0);
      deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
      deviceContext->Draw(bufferUsed, 0);
      bufferUsed = 0;

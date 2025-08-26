@@ -16,6 +16,7 @@
 #include <components/enemy_component.h>
 #include <components/animation_component.h>
 #include <components/bullet_component.h>
+#include <collision.h>
 
 void PlayState::Init(GameManager *gameManager)
 {
@@ -97,9 +98,10 @@ void PlayState::OnUpdate(float deltaTime)
 void PlayState::OnRender()
 {
     actorManager.RenderComponents<RenderComponent>();
+    //CollisionWorld::Get()->DebugDraw();
+    GraphicsManager::Get()->DebugPresent();
 
     // Render the Crosshair
-
     uiRenderer.DrawQuat(crosshairPosition, crosshairSize, 0, "Crosshair");
 }
 
@@ -122,9 +124,9 @@ void PlayState::InitializeActorManager()
     actorManager.AddComponentType<PlayerControllerComponent, 1>();
     actorManager.AddComponentType<WeaponComponent, 100>();
     actorManager.AddComponentType<CameraComponent, 1>();
-    actorManager.AddComponentType<EnemyComponent, 10>();
+    actorManager.AddComponentType<EnemyComponent, 20>();
     actorManager.AddComponentType<AnchorComponent, 10>();
-    actorManager.AddComponentType<AnimationComponent, 10>();
+    actorManager.AddComponentType<AnimationComponent, 20>();
     actorManager.AddComponentType<BulletComponent, 100>();
     // NOTE: add more component types ...
     actorManager.EndInitialization();
