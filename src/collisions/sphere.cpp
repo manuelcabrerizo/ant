@@ -112,11 +112,6 @@ bool Sphere::Intersect(const Capsule& capsule, Array<CollisionData>* collisionDa
     return isIntersecting;
 }
 
-bool Sphere::Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData) const
-{
-    return meshCollider.Intersect(*this, collisionData);
-}
-
 bool Sphere::DynamicIntersect(const Plane& plane, const Vector3& movement, f32& t) const
 {
     Vector3 planeNormal = plane.GetNormal();

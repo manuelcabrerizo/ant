@@ -124,9 +124,9 @@ void PlayState::InitializeActorManager()
     actorManager.AddComponentType<PlayerControllerComponent, 1>();
     actorManager.AddComponentType<WeaponComponent, 100>();
     actorManager.AddComponentType<CameraComponent, 1>();
-    actorManager.AddComponentType<EnemyComponent, 20>();
+    actorManager.AddComponentType<EnemyComponent, 40>();
     actorManager.AddComponentType<AnchorComponent, 10>();
-    actorManager.AddComponentType<AnimationComponent, 20>();
+    actorManager.AddComponentType<AnimationComponent, 40>();
     actorManager.AddComponentType<BulletComponent, 100>();
     // NOTE: add more component types ...
     actorManager.EndInitialization();

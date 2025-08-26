@@ -18,6 +18,8 @@ public:
     void Init(const Vector3& min, const Vector3& max);
     void Init(Array<Vector3>& points);
     void Init(const AABB& one, const AABB& two);
+    void Init(const Capsule& capsule);
+    void Init(const Sphere& sphere);
 
     void SetMin(const Vector3& min);
     void SetMax(const Vector3& max);
@@ -30,7 +32,6 @@ public:
     bool Intersect(const Sphere& sphere, Array<CollisionData>* collisionData = nullptr) const;
     bool Intersect(const Capsule& capsule, Array<CollisionData>* collisionData = nullptr) const;
     bool Intersect(const Triangle& triangle, Array<CollisionData>* collisionData = nullptr) const;
-    bool Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData = nullptr) const;
 
     Vector3 ClosestPoint(const Vector3& point) const;
     float SqDistPoint(const Vector3& point) const;

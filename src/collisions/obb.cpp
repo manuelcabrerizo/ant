@@ -616,11 +616,6 @@ bool OBB::Intersect(const Triangle& triangle, Array<CollisionData>* collisionDat
     return isIntersecting;
 }
 
-bool OBB::Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData) const
-{
-    return meshCollider.Intersect(*this, collisionData);
-}
-
 Vector3 OBB::ClosestPoint(const Vector3& point) const
 {
     Vector3 d = point - c;

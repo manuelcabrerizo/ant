@@ -30,7 +30,6 @@ public:
     bool Intersect(const AABB& aabb, Array<CollisionData>* collisionData = nullptr) const;
     bool Intersect(const OBB& obb, Array<CollisionData>* collisionData = nullptr) const;
     bool Intersect(const Capsule& capsule, Array<CollisionData>* collisionData = nullptr) const;
-    bool Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData = nullptr) const;
 
     bool DynamicIntersect(const Plane& plane, const Vector3& movement, f32& t) const;
     bool DynamicIntersect(const Triangle& triangle, const Vector3& movement, f32& t, Vector3& n) const;

@@ -2,6 +2,9 @@
 
 #include <collisions/aabb.h>
 
+class AABB;
+class OBB; 
+class Sphere;
 class Capsule;
 
 class BVHNode
@@ -28,7 +31,10 @@ public:
     void Insert(const AABB& volume, Triangle* triangle);
     void RecalculateVolume(bool recursive = true);
 
-    bool Intersect(const Capsule& capsule, Array<CollisionData>* collisionData = nullptr) const;
+    bool Intersect(const AABB& volume, const AABB& aabb, Array<CollisionData>* collisionData) const;
+    bool Intersect(const AABB& volume, const OBB& obb, Array<CollisionData>* collisionData) const;
+    bool Intersect(const AABB& volume, const Sphere& shpere, Array<CollisionData>* collisionData) const;
+    bool Intersect(const AABB& volume, const Capsule& capsule, Array<CollisionData>* collisionData) const;
 };
 
 

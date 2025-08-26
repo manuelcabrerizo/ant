@@ -10,6 +10,7 @@
 
 class Ray;
 class Segment;
+class MeshCollider;
 
 enum class ColliderType
 {
@@ -22,6 +23,7 @@ enum class ColliderType
 
 class Collider
 {
+    friend MeshCollider;
 private:
     static unsigned int gen;
 
@@ -35,7 +37,10 @@ private:
         Capsule capsule;
         MeshCollider meshCollider;
     };
+    AABB volume;
+
 public:
+
     Collider() {}
     Collider(const AABB& aabb);
     Collider(const OBB& obb);

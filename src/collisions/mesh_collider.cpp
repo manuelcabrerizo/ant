@@ -3,10 +3,7 @@
 #include "collision_utils.h"
 #include <collision.h>
 
-#include "aabb.h"
-#include "obb.h"
-#include "sphere.h"
-#include "capsule.h"
+#include "collider.h"
 
 #include <utils.h>
 #include <assimp/postprocess.h>
@@ -78,52 +75,15 @@ void MeshCollider::InitFromFile(const char* filepath)
     }
 }
 
-bool MeshCollider::Intersect(const AABB& aabb, Array<CollisionData>* collisionData) const
+bool MeshCollider::Intersect(const Collider& collider, Array<CollisionData>* collisionData) const
 {
-    OBB obb;
-    obb.Init(aabb);
-    bool isIntersecting = false;
-    for (int i = 0; i < triangles.size; ++i)
+    switch (collider.type)
     {
-        isIntersecting |= obb.Intersect(triangles[i], collisionData);
+    case ColliderType::AABB: return root->Intersect(collider.volume, collider.aabb, collisionData);
+    case ColliderType::OBB: return root->Intersect(collider.volume, collider.obb, collisionData);
+    case ColliderType::SPHERE: return root->Intersect(collider.volume, collider.sphere, collisionData);
+    case ColliderType::CAPSULE: return root->Intersect(collider.volume, collider.capsule, collisionData);
     }
-    return isIntersecting;
-}
-
-bool MeshCollider::Intersect(const OBB& obb, Array<CollisionData>* collisionData) const
-{
-    bool isIntersecting = false;
-    for (int i = 0; i < triangles.size; ++i)
-    {
-        isIntersecting |= obb.Intersect(triangles[i], collisionData);
-    }
-    return isIntersecting;
-}
-
-bool MeshCollider::Intersect(const Sphere& sphere, Array<CollisionData>* collisionData) const
-{
-    bool isIntersecting = false;
-    for (int i = 0; i < triangles.size; ++i)
-    {
-        isIntersecting |= sphere.Intersect(triangles[i], collisionData);
-    }
-    return isIntersecting;
-}
-
-bool MeshCollider::Intersect(const Capsule& capsule, Array<CollisionData>* collisionData) const
-{
-#if 0
-    // 10 FPS on debug 70 FPS on release
-    bool isIntersecting = false;
-    for (int i = 0; i < triangles.size; ++i)
-    {
-        isIntersecting |= capsule.Intersect(triangles[i], collisionData);
-    }
-    return isIntersecting;
-#else 
-    // 140 FPS on debug 700 FPS on release
-    return root->Intersect(capsule, collisionData);
-#endif
 }
 
 const Array<Triangle>& MeshCollider::GetTriangles() const

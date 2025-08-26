@@ -138,11 +138,6 @@ bool Capsule::Intersect(const OBB& obb, Array<CollisionData>* collisionData) con
     return isIntersecting;
 }
 
-bool Capsule::Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData) const
-{
-    return meshCollider.Intersect(*this, collisionData);
-}
-
 Vector3 Capsule::ClosestPoint(const Vector3& point) const
 {
     Segment axis;

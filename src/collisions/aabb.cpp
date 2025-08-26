@@ -49,6 +49,28 @@ void AABB::Init(const AABB& one, const AABB& two)
     this->max.z = std::max(one.max.z, two.max.z);
 }
 
+void AABB::Init(const Sphere& sphere)
+{
+    Vector3 halfExtent = Vector3(sphere.GetRadio());
+    this->min = sphere.GetCenter() - halfExtent;
+    this->max = sphere.GetCenter() + halfExtent;
+}
+
+void AABB::Init(const Capsule& capsule)
+{
+    Sphere aSphere;
+    aSphere.Init(capsule.GetA(), capsule.GetRadio());
+    Sphere bSphere;
+    bSphere.Init(capsule.GetB(), capsule.GetRadio());
+
+    AABB a;
+    a.Init(aSphere);
+    AABB b;
+    b.Init(bSphere);
+
+    Init(a, b);
+}
+
 void AABB::SetMin(const Vector3& min)
 {
     this->min = min;
@@ -181,12 +203,6 @@ bool AABB::Intersect(const Triangle& triangle, Array<CollisionData>* collisionDa
     OBB obb;
     obb.Init(*this);
     return obb.Intersect(triangle, collisionData);
-}
-
-
-bool AABB::Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData) const
-{
-    return meshCollider.Intersect(*this, collisionData);
 }
 
 Vector3 AABB::ClosestPoint(const Vector3& point) const

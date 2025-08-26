@@ -32,7 +32,6 @@ public:
     bool Intersect(const Plane& plane, Array<CollisionData>* collisionData = nullptr) const;
     bool Intersect(const AABB& aabb, Array<CollisionData>* collisionData = nullptr) const;
     bool Intersect(const OBB& obb, Array<CollisionData>* collisionData = nullptr) const;
-    bool Intersect(const MeshCollider& meshCollider, Array<CollisionData>* collisionData = nullptr) const;
 
     Vector3 ClosestPoint(const Vector3& point) const;
     float SqDistPoint(const Vector3& point) const;

@@ -10,6 +10,7 @@ Collider::Collider(const AABB& aabb)
     this->id = gen++;
     this->type = ColliderType::AABB;
     this->aabb = aabb;
+    this->volume = aabb;
 }
 
 Collider::Collider(const OBB& obb)
@@ -17,6 +18,7 @@ Collider::Collider(const OBB& obb)
     this->id = gen++;
     this->type = ColliderType::OBB;
     this->obb = obb;
+    // TODO: this->volume.Init(obb);
 }
 
 Collider::Collider(const Sphere& sphere)
@@ -24,6 +26,7 @@ Collider::Collider(const Sphere& sphere)
     this->id = gen++;
     this->type = ColliderType::SPHERE;
     this->sphere = sphere;
+    this->volume.Init(sphere);
 }
 
 Collider::Collider(const Capsule& capsule)
@@ -31,6 +34,7 @@ Collider::Collider(const Capsule& capsule)
     this->id = gen++;
     this->type = ColliderType::CAPSULE;
     this->capsule = capsule;
+    this->volume.Init(capsule);
 }
 
 Collider::Collider(const MeshCollider& meshCollider)
@@ -38,6 +42,7 @@ Collider::Collider(const MeshCollider& meshCollider)
     this->id = gen++;
     this->type = ColliderType::MESH_COLLIDER;
     this->meshCollider = meshCollider;
+    // TODO: this->volume.Init(meshCollider);
 }
 
 bool Collider::Intersect(const Ray& ray, float& t) const
@@ -78,63 +83,60 @@ bool Collider::Intersect(const Segment& segment, float& t) const
 
 bool Collider::Intersect(const Collider& other, Array<CollisionData>& collisionData) const
 {
-    switch (type)
+    if (other.type == ColliderType::MESH_COLLIDER)
     {
-    case ColliderType::AABB:
-        switch (other.type)
-        {
-        case ColliderType::AABB:   return aabb.Intersect(other.aabb, &collisionData);
-        case ColliderType::OBB:    return aabb.Intersect(other.obb, &collisionData);
-        case ColliderType::SPHERE: return aabb.Intersect(other.sphere, &collisionData);
-        case ColliderType::CAPSULE:return aabb.Intersect(other.capsule, &collisionData);
-        case ColliderType::MESH_COLLIDER: return aabb.Intersect(other.meshCollider, &collisionData);
-        }
-        break;
-
-    case ColliderType::OBB:
-        switch (other.type)
-        {
-        case ColliderType::AABB:   return obb.Intersect(other.aabb, &collisionData);
-        case ColliderType::OBB:    return obb.Intersect(other.obb, &collisionData);
-        case ColliderType::SPHERE: return obb.Intersect(other.sphere, &collisionData);
-        case ColliderType::CAPSULE:return obb.Intersect(other.capsule, &collisionData);
-        case ColliderType::MESH_COLLIDER: return obb.Intersect(other.meshCollider, &collisionData);
-        }
-        break;
-
-    case ColliderType::SPHERE:
-        switch (other.type)
-        {
-        case ColliderType::AABB:   return sphere.Intersect(other.aabb, &collisionData);
-        case ColliderType::OBB:    return sphere.Intersect(other.obb, &collisionData);
-        case ColliderType::SPHERE: return sphere.Intersect(other.sphere, &collisionData);
-        case ColliderType::CAPSULE:return sphere.Intersect(other.capsule, &collisionData);
-        case ColliderType::MESH_COLLIDER: return sphere.Intersect(other.meshCollider, &collisionData);
-        }
-        break;
-
-    case ColliderType::CAPSULE:
-        switch (other.type)
-        {
-        case ColliderType::AABB:   return capsule.Intersect(other.aabb, &collisionData);
-        case ColliderType::OBB:    return capsule.Intersect(other.obb, &collisionData);
-        case ColliderType::SPHERE: return capsule.Intersect(other.sphere, &collisionData);
-        case ColliderType::CAPSULE:return capsule.Intersect(other.capsule, &collisionData);
-        case ColliderType::MESH_COLLIDER: return capsule.Intersect(other.meshCollider, &collisionData);
-        }
-        break;
-
-    case ColliderType::MESH_COLLIDER:
-        switch (other.type)
-        {
-        case ColliderType::AABB:   return meshCollider.Intersect(other.aabb, &collisionData);
-        case ColliderType::OBB:    return meshCollider.Intersect(other.obb, &collisionData);
-        case ColliderType::SPHERE: return meshCollider.Intersect(other.sphere, &collisionData);
-        case ColliderType::CAPSULE:return meshCollider.Intersect(other.capsule, &collisionData);
-        }
-        break;
+        return other.meshCollider.Intersect(*this, &collisionData);
     }
-    return false; // fallback, shouldn't be reached if all types are handled
+    else
+    {
+        switch (type)
+        {
+        case ColliderType::AABB:
+            switch (other.type)
+            {
+            case ColliderType::AABB:   return aabb.Intersect(other.aabb, &collisionData);
+            case ColliderType::OBB:    return aabb.Intersect(other.obb, &collisionData);
+            case ColliderType::SPHERE: return aabb.Intersect(other.sphere, &collisionData);
+            case ColliderType::CAPSULE:return aabb.Intersect(other.capsule, &collisionData);
+            }
+            break;
+
+        case ColliderType::OBB:
+            switch (other.type)
+            {
+            case ColliderType::AABB:   return obb.Intersect(other.aabb, &collisionData);
+            case ColliderType::OBB:    return obb.Intersect(other.obb, &collisionData);
+            case ColliderType::SPHERE: return obb.Intersect(other.sphere, &collisionData);
+            case ColliderType::CAPSULE:return obb.Intersect(other.capsule, &collisionData);
+            }
+            break;
+
+        case ColliderType::SPHERE:
+            switch (other.type)
+            {
+            case ColliderType::AABB:   return sphere.Intersect(other.aabb, &collisionData);
+            case ColliderType::OBB:    return sphere.Intersect(other.obb, &collisionData);
+            case ColliderType::SPHERE: return sphere.Intersect(other.sphere, &collisionData);
+            case ColliderType::CAPSULE:return sphere.Intersect(other.capsule, &collisionData);
+            }
+            break;
+
+        case ColliderType::CAPSULE:
+            switch (other.type)
+            {
+            case ColliderType::AABB:   return capsule.Intersect(other.aabb, &collisionData);
+            case ColliderType::OBB:    return capsule.Intersect(other.obb, &collisionData);
+            case ColliderType::SPHERE: return capsule.Intersect(other.sphere, &collisionData);
+            case ColliderType::CAPSULE:return capsule.Intersect(other.capsule, &collisionData);
+            }
+            break;
+
+        case ColliderType::MESH_COLLIDER:
+            return meshCollider.Intersect(other, &collisionData);
+            break;
+        }
+        return false; // fallback, shouldn't be reached if all types are handled
+    }
 }
 
 unsigned int Collider::GetId() const
@@ -153,18 +155,22 @@ void Collider::UpdatePosition(const Vector3& position)
             float depth = aabb.GetMax().z - aabb.GetMin().z;
 ;           aabb.SetMin(Vector3(position.x - width * 0.5f, position.y - height * 0.5f, position.z - depth * 0.5f));
 ;           aabb.SetMax(Vector3(position.x + width * 0.5f, position.y + height * 0.5f, position.z + depth * 0.5f));
+            volume = aabb;
         } break;
         case ColliderType::OBB:
         {
             obb.SetCenter(position);
+            // TODO: volume.Init(obb);
         } break;
         case ColliderType::SPHERE:
         {
             sphere.SetCenter(position);
+            volume.Init(sphere);
         } break;
         case ColliderType::CAPSULE:
         {
             capsule.SetPosition(position);
+            volume.Init(capsule);
         } break;
     }
 }
@@ -189,6 +195,7 @@ void Collider::DebugDraw() const
         case ColliderType::CAPSULE:
         {
             capsule.DebugDraw(6, color);
+            volume.DebugDraw(Vector3(0, 0, 1));
         } break;
         case ColliderType::MESH_COLLIDER:
         {

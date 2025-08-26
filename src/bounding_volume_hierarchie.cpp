@@ -1,4 +1,6 @@
 #include "bounding_volume_hierarchie.h"
+
+#include <collisions/collider.h>
 #include <collisions/capsule.h>
 
 BVHNode::BVHNode(BVHNode* parent, const AABB& volume,
@@ -74,7 +76,64 @@ void BVHNode::RecalculateVolume(bool recursive)
     }
 }
 
-bool BVHNode::Intersect(const Capsule& capsule, Array<CollisionData>* collisionData) const
+bool BVHNode::Intersect(const AABB& bVolume, const AABB& aabb, Array<CollisionData>* collisionData) const
+{
+    if (IsLeaf())
+    {
+        return aabb.Intersect(*triangle, collisionData);
+    }
+    bool isIntersecting = false;
+    if (bVolume.Intersect(volume))
+    {
+        isIntersecting |= childern[0]->Intersect(bVolume, aabb, collisionData);
+        isIntersecting |= childern[1]->Intersect(bVolume, aabb, collisionData);
+    }
+    else
+    {
+        return false;
+    }
+    return isIntersecting;
+}
+
+bool BVHNode::Intersect(const AABB& bVolume, const OBB& obb, Array<CollisionData>* collisionData) const
+{
+    if (IsLeaf())
+    {
+        return obb.Intersect(*triangle, collisionData);
+    }
+
+    bool isIntersecting = false;
+    if (bVolume.Intersect(volume))
+    {
+        isIntersecting |= childern[0]->Intersect(bVolume, obb, collisionData);
+        isIntersecting |= childern[1]->Intersect(bVolume, obb, collisionData);
+    }
+    else
+    {
+        return false;
+    }
+    return isIntersecting;
+}
+bool BVHNode::Intersect(const AABB& bVolume, const Sphere& sphere, Array<CollisionData>* collisionData) const
+{
+    if (IsLeaf())
+    {
+        return sphere.Intersect(*triangle, collisionData);
+    }
+
+    bool isIntersecting = false;
+    if (bVolume.Intersect(volume))
+    {
+        isIntersecting |= childern[0]->Intersect(bVolume, sphere, collisionData);
+        isIntersecting |= childern[1]->Intersect(bVolume, sphere, collisionData);
+    }
+    else
+    {
+        return false;
+    }
+    return isIntersecting;
+}
+bool BVHNode::Intersect(const AABB& bVolume, const Capsule& capsule, Array<CollisionData>* collisionData) const
 {
     if (IsLeaf())
     {
@@ -82,10 +141,10 @@ bool BVHNode::Intersect(const Capsule& capsule, Array<CollisionData>* collisionD
     }
 
     bool isIntersecting = false;
-    if (capsule.Intersect(volume))
+    if (bVolume.Intersect(volume))
     {
-        isIntersecting |= childern[0]->Intersect(capsule, collisionData);
-        isIntersecting |= childern[1]->Intersect(capsule, collisionData);
+        isIntersecting |= childern[0]->Intersect(bVolume, capsule, collisionData);
+        isIntersecting |= childern[1]->Intersect(bVolume, capsule, collisionData);
     }
     else
     {
