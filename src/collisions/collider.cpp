@@ -76,7 +76,7 @@ bool Collider::Intersect(const Segment& segment, float& t) const
     case ColliderType::CAPSULE:
         return segment.Intersect(capsule, t);
     case ColliderType::MESH_COLLIDER:
-        return segment.Intersect(meshCollider, t);
+        return meshCollider.Intersect(segment, t);
     }
     return false;
 }

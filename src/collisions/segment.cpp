@@ -291,24 +291,6 @@ bool Segment::Intersect(const OBB& obb, float& t) const
     return relSegment.Intersect(aabb, t);
 }
 
-bool Segment::Intersect(const MeshCollider& meshCollider, float& t) const
-{
-    const Array<Triangle>& triangles = meshCollider.GetTriangles();
-    t = FLT_MAX;
-    for (i32 i = 0; i < triangles.size; ++i)
-    {
-        f32 currentT;
-        if (Intersect(triangles[i], currentT))
-        {
-            if (currentT < t)
-            {
-                t = currentT;
-            }
-        }
-    }
-    return t != FLT_MAX;
-}
-
 Vector3 Segment::ClosestPoint(const Vector3& point, f32& t) const
 {
     Vector3 ab = b - a;

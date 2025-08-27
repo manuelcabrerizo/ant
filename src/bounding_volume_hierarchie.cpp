@@ -2,6 +2,7 @@
 
 #include <collisions/collider.h>
 #include <collisions/capsule.h>
+#include <collisions/segment.h>
 
 BVHNode::BVHNode(BVHNode* parent, const AABB& volume,
     Triangle* triangle)
@@ -75,6 +76,34 @@ void BVHNode::RecalculateVolume(bool recursive)
         parent->RecalculateVolume(true);
     }
 }
+
+bool BVHNode::Intersect(const Segment& segment, float& t) const
+{
+    if (IsLeaf())
+    {
+        float tOut;
+        bool result = segment.Intersect(*triangle, tOut);
+        if (tOut < t)
+        {
+            t = tOut;
+        }
+        return result;
+    }
+    bool isIntersecting = false;
+
+    float tempT;
+    if (segment.Intersect(volume, tempT))
+    {
+        isIntersecting |= childern[0]->Intersect(segment, t);
+        isIntersecting |= childern[1]->Intersect(segment, t);
+    }
+    else
+    {
+        return false;
+    }
+    return isIntersecting;
+}
+
 
 bool BVHNode::Intersect(const AABB& bVolume, const AABB& aabb, Array<CollisionData>* collisionData) const
 {

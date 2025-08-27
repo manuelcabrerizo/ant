@@ -6,6 +6,7 @@ class AABB;
 class OBB; 
 class Sphere;
 class Capsule;
+class Segment;
 
 class BVHNode
 {
@@ -31,6 +32,7 @@ public:
     void Insert(const AABB& volume, Triangle* triangle);
     void RecalculateVolume(bool recursive = true);
 
+    bool Intersect(const Segment& segment, float& t) const;
     bool Intersect(const AABB& volume, const AABB& aabb, Array<CollisionData>* collisionData) const;
     bool Intersect(const AABB& volume, const OBB& obb, Array<CollisionData>* collisionData) const;
     bool Intersect(const AABB& volume, const Sphere& shpere, Array<CollisionData>* collisionData) const;
