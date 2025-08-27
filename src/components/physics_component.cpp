@@ -49,8 +49,9 @@ void PhysicsComponent::ProcessCollisionDetectionAndResolution()
     Array<CollisionData> collisionData;
     collisionData.Init(MAX_COLLISION_COUNT, SCRATCH_MEMORY);
 
-    grounded = CollisionWorld::Get()->Intersect(groundSegment, collisionData, collider->GetId());
-
+    // TODO: this is Slow
+    //grounded = CollisionWorld::Get()->Intersect(groundSegment, collisionData, collider->GetId());
+    grounded = true;
 
     collisionData.Clear();
     if(CollisionWorld::Get()->Intersect(collider, collisionData))

@@ -95,9 +95,10 @@ bool Capsule::Intersect(const Triangle& triangle, Array<CollisionData>* collisio
     Plane plane;
     plane.Init(triangle);
     Vector3 planeNormal = plane.GetNormal();
-    float t = (plane.GetDistance() - Vector3::Dot(planeNormal, a)) / Vector3::Dot(planeNormal, (b - a));
+    Vector3 ab = b - a;
+    float t = (plane.GetDistance() - Vector3::Dot(planeNormal, a)) / Vector3::Dot(planeNormal, ab);
 
-    Vector3 closestOnPlane = a + (b - a) * t;
+    Vector3 closestOnPlane = a + ab * t;
     Vector3 closestOnTriangle = triangle.ClosestPoint(closestOnPlane);
 
     Segment axis;
