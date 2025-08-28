@@ -277,25 +277,6 @@ bool Ray::Intersect(const OBB& obb, float& t) const
     return relRay.Intersect(aabb, t);
 }
 
-bool Ray::Intersect(const MeshCollider& meshCollider, float &t) const
-{
-    const Array<Triangle>& triangles = meshCollider.GetTriangles();
-    t = FLT_MAX;
-    for (i32 i = 0; i < triangles.size; ++i)
-    {
-        f32 currentT;
-        if (Intersect(triangles[i], currentT))
-        {
-            if (currentT < t)
-            {
-                t = currentT;
-            }
-        }
-    }
-    return t != FLT_MAX;
-}
-
-
 Vector3 Ray::ClosestPoint(const Vector3& point, float& t) const
 {
     t = (point - o).Dot(d) / d.Dot(d);

@@ -75,6 +75,13 @@ void MeshCollider::InitFromFile(const char* filepath)
     }
 }
 
+bool MeshCollider::Intersect(const Ray& ray, float& t) const
+{
+    t = FLT_MAX;
+    return root->Intersect(ray, t);
+}
+
+
 bool MeshCollider::Intersect(const Segment& segment, float& t) const
 {
     t = FLT_MAX;

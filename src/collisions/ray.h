@@ -26,7 +26,6 @@ public:
     bool Intersect(const Plane& plane, float& t) const;
     bool Intersect(const AABB& aabb, float& t) const;
     bool Intersect(const OBB& obb, float& t) const;
-    bool Intersect(const MeshCollider& meshCollider, float& t) const;
 
     Vector3 ClosestPoint(const Vector3& point, float& t) const;
     float SqDistPoint(const Vector3& point) const;

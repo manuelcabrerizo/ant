@@ -17,6 +17,7 @@ private:
 public:
 
     void InitFromFile(const char* filepath);
+    bool Intersect(const Ray& ray, float& t) const;
     bool Intersect(const Segment& segment, float& t) const;
     bool Intersect(const Collider& collider, Array<CollisionData>* collisionData = nullptr) const;
     const Array<Triangle>& GetTriangles() const;

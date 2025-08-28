@@ -58,7 +58,7 @@ bool Collider::Intersect(const Ray& ray, float& t) const
     case ColliderType::CAPSULE:
         return ray.Intersect(capsule, t);
     case ColliderType::MESH_COLLIDER:
-        return ray.Intersect(meshCollider, t);
+        return meshCollider.Intersect(ray, t);
     }
     return false;
 }
