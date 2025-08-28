@@ -1,6 +1,7 @@
 #include "matrix4.h"
 #include <math.h>
 #include <common.h>
+#include "quaternion.h"
 
 float *Matrix4::operator[](int index)
 {
@@ -47,6 +48,33 @@ Vector4 Matrix4::operator*(const Vector4 &vec) const
         result.v[row] = v[row * 4 + 0] * vec.x + v[row * 4 + 1] * vec.y + v[row * 4 + 2] * vec.z + v[row * 4 + 3] * vec.w;
     }
     return result;
+}
+
+Vector3 Matrix4::GetTranslation()
+{
+    return Vector3(m14, m24, m34);
+}
+
+Quaternion Matrix4::GetRotation()
+{
+    Vector3 up = Vector3(m21, m22, m23).Normalized();
+    Vector3 forward = Vector3(m31, m32, m33).Normalized();
+    Vector3 right = Vector3::Cross(up, forward);
+    up = Vector3::Cross(forward, right);
+    return Quaternion::LookRotation(forward, up);
+}
+
+Vector3 Matrix4::GetScale()
+{
+    Matrix4 rotScaleMat(
+        v[0], v[1], v[2], 0,
+        v[4], v[5], v[6], 0,
+        v[8], v[9], v[10], 0,
+        0, 0, 0, 1
+    );
+    Matrix4 invRotMat = Quaternion::Inverse(GetRotation()).ToMatrix4();
+    Matrix4 scaleSkewMat = rotScaleMat * invRotMat;
+    return Vector3(scaleSkewMat.v[0], scaleSkewMat.v[5], scaleSkewMat.v[10]);
 }
 
 Vector3 Matrix4::TransformPoint(const Matrix4& mat, const Vector3 &vec)

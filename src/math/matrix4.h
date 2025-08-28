@@ -3,6 +3,8 @@
 #include "vector3.h"
 #include "vector4.h"
 
+class Quaternion;
+
 class Matrix4 
 {
 public:
@@ -44,6 +46,9 @@ public:
     Matrix4 operator*(const Matrix4 &m) const;
     Vector4 operator*(const Vector4 &vec) const;
 
+    Vector3 GetTranslation();
+    Quaternion GetRotation();
+    Vector3 GetScale();
 
     static Vector3 TransformPoint(const Matrix4& mat, const Vector3 &vec);
     static Vector3 TransformVector(const Matrix4& mat, const Vector3 &vec);

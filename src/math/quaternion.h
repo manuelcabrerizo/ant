@@ -33,7 +33,10 @@ public:
     void Normalize();
     Quaternion Normalized() const;
     Matrix4 ToMatrix4() const;
-
+    
     static Quaternion Slerp(const Quaternion& a, const Quaternion& b, float t);
     static Quaternion AngleAxis(float angle, const Vector3 &axis);
+    static Quaternion FromTo(const Vector3& from, const Vector3& to);
+    static Quaternion LookRotation(const Vector3& direcion, const Vector3& up);
+    static Quaternion Inverse(const Quaternion& q);
 };

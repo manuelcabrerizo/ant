@@ -127,6 +127,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\batch_renderer.cpp" />
+    <ClCompile Include="src\batch_renderer_d3d11.cpp" />
     <ClCompile Include="src\bounding_volume_hierarchie.cpp" />
     <ClCompile Include="src\components\collider_component.cpp" />
     <ClCompile Include="src\states\play_state.cpp" />
@@ -190,6 +192,8 @@
     <ClCompile Include="src\ui_renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\batch_renderer.h" />
+    <ClInclude Include="src\batch_renderer_d3d11.h" />
     <ClInclude Include="src\bounding_volume_hierarchie.h" />
     <ClInclude Include="src\components\collider_component.h" />
     <ClInclude Include="src\states\play_state.h" />

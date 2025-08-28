@@ -41,6 +41,7 @@ void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32
      vertexShaderAllocator.Init(stackNum);
      fragmentShaderAllocator.Init(stackNum);
      textureAllocator.Init(stackNum);
+     batchRendererAllocator.Init(stackNum);
 
      printf("DirectX11 Initialized!\n");
 
@@ -475,6 +476,22 @@ i32 GraphicsManagerD3D11::TextureHeight(Texture *texture)
      TextureD3D11 *tx = (TextureD3D11 *)texture;
      return tx->h;
 }
+
+BatchRenderer* GraphicsManagerD3D11::BatchRendererAlloc(
+    VertexShader* vertShader, FragmentShader* fragShader, Texture* texture)
+{
+    BatchRendererD3D11* batchRenderer = batchRendererAllocator.Alloc();
+    batchRenderer->Init(device, deviceContext, vertShader, fragShader, texture);
+    return static_cast<BatchRenderer *>(batchRenderer);
+}
+
+void GraphicsManagerD3D11::BatchRendererFree(BatchRenderer* batchRenderer)
+{
+    BatchRendererD3D11* batchRendererd3d11 = static_cast<BatchRendererD3D11*>(batchRenderer);
+    batchRenderer->Terminate();
+    batchRendererAllocator.Free(batchRendererd3d11);
+}
+
 
 // TODO: use macros for debug build
 void GraphicsManagerD3D11::DebugInit()

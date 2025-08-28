@@ -7,6 +7,7 @@
 #include <debug_renderer_d3d11.h>
 
 #include <graphics_manager.h>
+#include <batch_renderer_d3d11.h>
 
 struct VertexBufferD3D11 : public VertexBuffer
 {
@@ -107,6 +108,7 @@ private:
      ObjectAllocator<VertexShaderD3D11> vertexShaderAllocator;
      ObjectAllocator<FragmentShaderD3D11> fragmentShaderAllocator;
      ObjectAllocator<TextureD3D11> textureAllocator;
+     ObjectAllocator<BatchRendererD3D11> batchRendererAllocator;
 
 #if ANT_DEBUG
      DebugRendererD3D11 debugRenderer;
@@ -156,6 +158,9 @@ public:
      void TextureBind(Texture *texture, i32 slot) override;
      i32 TextureWidth(Texture *texture) override;
      i32 TextureHeight(Texture *texture) override;
+
+     BatchRenderer* BatchRendererAlloc(VertexShader* vertShader, FragmentShader* fragShader, Texture* texture) override;
+     void BatchRendererFree(BatchRenderer* batchRenderer) override;
 
      void DebugInit() override;
      void DebugTerminate() override;

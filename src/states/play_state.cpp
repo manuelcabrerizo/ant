@@ -17,17 +17,29 @@
 #include <components/animation_component.h>
 #include <components/bullet_component.h>
 #include <collision.h>
+#include <asset_managers/shader_manager.h>
+#include <math/algebra.h>
 
 void PlayState::Init(GameManager *gameManager)
 {
     uiRenderer.Init();
     this->gameManager = gameManager;
     this->scene = gameManager->GetCurrentScene();
+
+    TextureManager::Get()->Load("Blood", "data/textures/blood.png");
+    batchRenderer = GraphicsManager::Get()->BatchRendererAlloc(
+        VertexShaderManager::Get()->Get("particle_vert"),
+        FragmentShaderManager::Get()->Get("particle_frag"),
+        TextureManager::Get()->Get("Blood"));
 }
 
 void PlayState::Terminate()
 {
     uiRenderer.Terminate();
+    GraphicsManager::Get()->BatchRendererFree(batchRenderer);
+    TextureManager::Get()->Unload("Blood");
+
+    batchRenderer = nullptr;
 }
 
 void PlayState::OnEnter()
@@ -100,6 +112,18 @@ void PlayState::OnRender()
     actorManager.RenderComponents<RenderComponent>();
     //CollisionWorld::Get()->DebugDraw();
     GraphicsManager::Get()->DebugPresent();
+
+    // BatchRenderer Test
+    for (int y = 0; y < 100; y++)
+    {
+        for (int x = 0; x < 100; x++)
+        {
+            batchRenderer->DrawQuad(Vector3(x*0.2 - 3, y*0.2, 0),
+                Vector3(.2f, .2f, 1.0f), ANT_PI * 0.25f, Vector3(1, 1, 1));
+        }
+    }
+
+    batchRenderer->Present();
 
     // Render the Crosshair
     uiRenderer.DrawQuat(crosshairPosition, crosshairSize, 0, "Crosshair");

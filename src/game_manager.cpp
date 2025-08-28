@@ -58,8 +58,8 @@ Scene* GameManager::GetCurrentScene()
 
 void GameManager::InitializeAssetsManagers()
 {
-    VertexShaderManager::Initialize(4);
-    FragmentShaderManager::Initialize(4);
+    VertexShaderManager::Initialize(8);
+    FragmentShaderManager::Initialize(8);
     TextureManager::Initialize(64);
     MaterialManager::Initialize(64);
     ModelManager::Initialize(32);
@@ -80,12 +80,14 @@ void GameManager::LoadDefaultAssets()
     VertexShaderManager::Get()->Load("default", "data/shaders/vert.hlsl");
     VertexShaderManager::Get()->Load("animation", "data/shaders/animation_vert.hlsl");
     VertexShaderManager::Get()->Load("ui_vert", "data/shaders/ui_vert.hlsl");
+    VertexShaderManager::Get()->Load("particle_vert", "data/shaders/particle_vert.hlsl");
     VertexShaderManager::Get()->Bind("default");
 
     // Load Fragment the shaders
     FragmentShaderManager::Get()->Load("default", "data/shaders/frag.hlsl");
     FragmentShaderManager::Get()->Load("color", "data/shaders/color.hlsl");
     FragmentShaderManager::Get()->Load("ui_frag", "data/shaders/ui_frag.hlsl");
+    FragmentShaderManager::Get()->Load("particle_frag", "data/shaders/particle_frag.hlsl");
     FragmentShaderManager::Get()->Bind("default");
 
     // Load textures

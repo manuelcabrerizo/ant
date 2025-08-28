@@ -156,3 +156,70 @@ Quaternion Quaternion::AngleAxis(float angle, const Vector3 &axis)
                         norm.y * s,
                         norm.z * s);
 }
+
+Quaternion Quaternion::FromTo(const Vector3& from, const Vector3& to)
+{
+    Vector3 f = from.Normalized();
+    Vector3 t = to.Normalized();
+    // make sure they are not the same vector
+    float dot = Vector3::Dot(f, t);
+    if (dot > 0.9999f) 
+    {
+        return Quaternion();
+    }
+    // check whether the two vectors are oposites of each other.
+    // if they are the most orthogonal axis of the from can be used
+    // to create a pure quaternion
+    else if (dot < -0.9999f)
+    {
+        Vector3 ortho = Vector3(1.0f, 0.0f, 0.0f);
+        if (fabsf(f.y) < fabsf(f.x))
+        {
+            ortho = Vector3(0.0f, 1.0f, 0.0f);
+        }
+        if (fabsf(f.z) < fabsf(f.y) && fabsf(f.z) < fabsf(f.x)) 
+        {
+            ortho = Vector3(0.0f, 0.0f, 1.0f);
+        }
+        Vector3 axis = Vector3::Cross(f, ortho).Normalized();
+        return Quaternion(axis.x, axis.y, axis.z, 0.0f);
+    }
+    // create a half vector between the from and to vectors
+    // use the cross product of the half vector and the starting
+    // vector to calculate the axis of rotation and the dot product
+    // of the two to find the angle of rotation
+    Vector3 half = (f + t).Normalized();
+    Vector3 axis = Vector3::Cross(f, half);
+    return Quaternion(axis.x, axis.y, axis.z, Vector3::Dot(f, half));
+}
+
+Quaternion Quaternion::LookRotation(const Vector3& direcion, const Vector3& up)
+{
+    // Find orthonormal basis vectors
+    Vector3 f = direcion.Normalized();
+    Vector3 u = up.Normalized();
+    Vector3 r = Vector3::Cross(u, f);
+    u = Vector3::Cross(f, r);
+    // From world forward to object forward
+    Quaternion f2d = FromTo(Vector3(0, 0, 1), f);
+    // what direction is the new object up?
+    Vector3 objectUp = f2d * Vector3(0, 1, 0);
+    // From object up to desired up
+    Quaternion u2u = FromTo(objectUp, u);
+    // Rotate to forward direction first, then twist to correct up
+    Quaternion result = f2d * u2u;
+    // Don’t forget to normalize the result
+    return result.Normalized();
+}
+
+#define QUAT_EPSILON 0.000001f
+
+Quaternion Quaternion::Inverse(const Quaternion& q)
+{
+    float lenSq = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
+    if (lenSq < QUAT_EPSILON) {
+        return Quaternion();
+    }
+    float recip = 1.0f / lenSq;
+    return Quaternion(-q.x * recip, -q.y * recip, -q.z * recip, q.w * recip);
+}

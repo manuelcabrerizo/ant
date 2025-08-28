@@ -70,7 +70,6 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
 #endif
     // Create the player
     actorManager->CreateActorFromFile("data/xml/player.xml");
-
 }
 
 void Scene::Unload()
