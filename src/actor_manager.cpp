@@ -26,6 +26,7 @@ int ActorManager::actorGeneration = 1;
 
 void ActorManager::BeingInitialization(i32 actorCount, i32 componentTypeCount_, i32 memoryType_)
 {
+    actorGeneration = 1;
     memoryType = memoryType_;
     componentTypeCount = componentTypeCount_;
     maxActorCount = actorCount;

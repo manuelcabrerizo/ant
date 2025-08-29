@@ -163,24 +163,23 @@ bool Ray::Intersect(const Capsule& capsule, float& t) const
         {
             return false;
         }
-
         if (md < 0.0f)
         {
             Sphere sphere;
             sphere.Init(p, r);
-            Intersect(sphere, t);
+            return Intersect(sphere, t);
         }
         else if (md > dd)
         {
             Sphere sphere;
             sphere.Init(q, r);
-            Intersect(sphere, t);
+            return Intersect(sphere, t);
         }
         else
         {
             t = 0.0f;
+            return true;
         }
-        return true;
     }
 
     f32 b_ = dd * mn - nd * md;
@@ -205,8 +204,7 @@ bool Ray::Intersect(const Capsule& capsule, float& t) const
         sphere.Init(q, r);
         return Intersect(sphere, t);
     }
-
-    return true;
+    return t >= 0.0f;
 }
 
 bool Ray::Intersect(const Plane& plane, float& t) const

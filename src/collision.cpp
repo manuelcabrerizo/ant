@@ -67,6 +67,10 @@ bool CollisionWorld::Intersect(const Ray& ray, Array<CollisionData>& collisionDa
             bool intersect = collider->Intersect(ray, t);
             if (intersect && collisionData.size < MAX_COLLISION_COUNT)
             {
+                if (t < 0.0f)
+                {
+                    int StopHere = 0;
+                }
                 CollisionData data;
                 data.collider = colliders[i];
                 data.t = t;

@@ -26,6 +26,10 @@ public:
 
     void SetTag(ActorTag tag);
     ActorTag GetTag();
+    int GetID()
+    {
+        return id;
+    }
 
     template<typename ComponentType>
     ComponentType* GetComponent();

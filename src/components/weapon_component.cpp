@@ -76,6 +76,9 @@ void WeaponComponent::OnRender(ActorManager* actorManager)
     GraphicsManager::Get()->SetDepthStencilOn();
 }
 
+#include <windows.h>
+static int enemyHitCounter = 0;
+
 void WeaponComponent::OnShoot(ShootNotification* notification)
 {
     Actor *bullet = am->CloneActor(bulletPrefab);
@@ -97,6 +100,11 @@ void WeaponComponent::OnShoot(ShootNotification* notification)
         CollisionData& data = collisionData[0];
         if (data.collider->owner->GetTag() == ActorTag::Enemy)
         {
+            enemyHitCounter++;
+            char buffer[256];
+            sprintf(buffer, "Counter %d, EnemyID: %d\n", (enemyHitCounter % 11), data.collider->owner->GetID());
+            OutputDebugStringA(buffer);
+
             particleSystem.SetPosition(shootRay.GetOrigin() + shootRay.GetDirection() * data.t);
             particleSystem.Play();
             timeToSpawn = 0.15f;

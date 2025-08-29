@@ -216,7 +216,7 @@ bool Segment::Intersect(const Capsule& capsule, float& t) const
         return Intersect(sphere, t) && t <= 1.0f;
     }
 
-    return t <= 1.0f;
+    return t >= 0.0f && t <= 1.0f;
 }
 
 bool Segment::Intersect(const Plane& plane, float& t) const
