@@ -63,8 +63,8 @@ void BatchRendererD3D11::Present()
     bufferUsed = 0;
 }
 
-void BatchRendererD3D11::DrawQuad(const Vector3& position, const Vector3& scale, float angle,
-    const Vector3& color)
+void BatchRendererD3D11::DrawQuad(const Vector3& position, const Vector3& scale, 
+    const Quaternion& rotation, const Vector3& color)
 {    
     if (bufferUsed + 6 > bufferSize)
     {
@@ -73,7 +73,7 @@ void BatchRendererD3D11::DrawQuad(const Vector3& position, const Vector3& scale,
 
     ASSERT(bufferUsed + 6 <= bufferSize);
 
-    Matrix4 rotMat = Matrix4::RotateZ(angle);
+    Matrix4 rotMat = rotation.ToMatrix4();
 
     VertexQuad* vertex = cpuBuffer + bufferUsed;
     for (int i = 0; i < 6; i++)

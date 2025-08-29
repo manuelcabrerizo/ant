@@ -8,7 +8,6 @@
 
 class GameManager;
 class Scene;
-class BatchRenderer;
 
 class PlayState : public IState, INotificable
 {
@@ -25,8 +24,6 @@ private:
 
     Vector2 crosshairSize;
     Vector2 crosshairPosition;
-
-    BatchRenderer *batchRenderer = nullptr;
 
     void InitializeActorManager();
     void OnResize(OnResizeNotification* onResize);

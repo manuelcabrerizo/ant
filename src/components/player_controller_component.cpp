@@ -23,10 +23,11 @@ void PlayerControllerComponent::OnInit(ActorManager *actorManager)
     camera = owner->GetComponent<CameraComponent>();
     physics = owner->GetComponent<PhysicsComponent>();
     weapon = owner->GetComponent<WeaponComponent>();
-}
+}   
 
 void PlayerControllerComponent::OnTerminate(ActorManager *actorManager)
 {
+
 }
 
 void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)

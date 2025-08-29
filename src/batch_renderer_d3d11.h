@@ -30,6 +30,6 @@ public:
         VertexShader *vertShader, FragmentShader *fragShader, Texture *texture);
     void Terminate() override;
     void Present() override;
-    void DrawQuad(const Vector3& position, const Vector3& scale, float angle,
-        const Vector3& color) override;
+    void DrawQuad(const Vector3& position, const Vector3& scale,
+        const Quaternion& rotation, const Vector3& color) override;
 };

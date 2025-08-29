@@ -44,3 +44,9 @@ void Utils::Swap(float& a, float& b)
     a = b;
     b = temp;
 }
+
+float Utils::RandRange(float min, float max)
+{
+    float t = rand() / (float)RAND_MAX;
+    return (1.0f - t) * min + t * max;
+}

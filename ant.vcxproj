@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\particle_system.cpp" />
     <ClCompile Include="src\batch_renderer.cpp" />
     <ClCompile Include="src\batch_renderer_d3d11.cpp" />
     <ClCompile Include="src\bounding_volume_hierarchie.cpp" />
@@ -192,6 +193,7 @@
     <ClCompile Include="src\ui_renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\particle_system.h" />
     <ClInclude Include="src\batch_renderer.h" />
     <ClInclude Include="src\batch_renderer_d3d11.h" />
     <ClInclude Include="src\bounding_volume_hierarchie.h" />
