@@ -14,6 +14,8 @@ struct Particle
     Vector3 velocity;
     Vector3 size;
     Quaternion rotation;
+    Quaternion offsetRot;
+    Vector3 color;
 
     float lifeTime;
 };
@@ -42,7 +44,7 @@ class BloodParticleSystem : public ParticleSystem
 {
 private: 
     bool isPlaying = false;
-    float timeToSpawn = 0.01f;
+    float timeToSpawn = 0.005f;
     float timer = 0.0f;
 
     void SpawnParticle(const Vector3& viewPos);

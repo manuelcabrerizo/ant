@@ -20,6 +20,8 @@ void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32
      CreateDepthStencilView(windowWidth, windowHeight);
      CreateSamplerStates();
      CreateRasterizerStates();
+     CreateDepthStencilStates();
+     CreateBendingStates();
 
      //  Default renderer settings
      deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
@@ -166,6 +168,42 @@ void GraphicsManagerD3D11::SetRasterizerStateCullNone()
 void GraphicsManagerD3D11::SetRasterizerStateWireframe()
 {
      deviceContext->RSSetState(wireFrameRasterizer);
+}
+
+void GraphicsManagerD3D11::SetDepthStencilOn()
+{
+    deviceContext->OMSetDepthStencilState(depthStencilOn, 1);
+}
+
+void GraphicsManagerD3D11::SetDepthStencilOff()
+{
+    deviceContext->OMSetDepthStencilState(depthStencilOff, 1);
+}
+
+void GraphicsManagerD3D11::SetDepthStencilOnWriteMaskZero()
+{
+    deviceContext->OMSetDepthStencilState(depthStencilOnWriteMaskZero, 1);
+}
+
+void GraphicsManagerD3D11::SetAlphaBlending()
+{
+    deviceContext->OMSetBlendState(alphaBlendOn, 0, 0xffffffff);
+}
+
+void GraphicsManagerD3D11::SetAdditiveBlending()
+{
+    deviceContext->OMSetBlendState(additiveBlending, 0, 0xffffffff);
+
+}
+
+void GraphicsManagerD3D11::SetSubstractingBlending()
+{
+    deviceContext->OMSetBlendState(subtractiveBlending, 0, 0xffffffff);
+}
+
+void GraphicsManagerD3D11::SetBlendingOff()
+{
+    deviceContext->OMSetBlendState(alphaBlendOff, 0, 0xffffffff);
 }
 
 VertexBuffer *GraphicsManagerD3D11::VertexBufferAlloc(void *vertices, u32 count, u32 stride)
@@ -879,3 +917,75 @@ void GraphicsManagerD3D11::CreateRasterizerStates()
      device->CreateRasterizerState(&wireFrameRasterizerDesc, &wireFrameRasterizer);
 }
 
+void GraphicsManagerD3D11::CreateDepthStencilStates()
+{
+    // create depth stencil states
+    D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+    // Depth test parameters
+    depthStencilDesc.DepthEnable = true;
+    depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+    depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+    // Stencil test parameters
+    depthStencilDesc.StencilEnable = true;
+    depthStencilDesc.StencilReadMask = 0xFF;
+    depthStencilDesc.StencilWriteMask = 0xFF;
+    // Stencil operations if pixel is front-facing
+    depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+    depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+    // Stencil operations if pixel is back-facing
+    depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+    depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+    device->CreateDepthStencilState(&depthStencilDesc, &depthStencilOn);
+
+    depthStencilDesc.DepthEnable = false;
+    depthStencilDesc.StencilEnable = false;
+    depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+    device->CreateDepthStencilState(&depthStencilDesc, &depthStencilOff);
+
+    depthStencilDesc.DepthEnable = true;
+    depthStencilDesc.StencilEnable = true;
+    depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+    device->CreateDepthStencilState(&depthStencilDesc, &depthStencilOnWriteMaskZero);
+}
+
+void GraphicsManagerD3D11::CreateBendingStates()
+{
+    D3D11_BLEND_DESC blendStateDesc = {};
+    blendStateDesc.RenderTarget[0].BlendEnable = true;
+    blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+    blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+    blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    device->CreateBlendState(&blendStateDesc, &alphaBlendOn);
+
+    blendStateDesc.RenderTarget[0].BlendEnable = false;
+    blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    device->CreateBlendState(&blendStateDesc, &alphaBlendOff);
+
+    blendStateDesc.RenderTarget[0].BlendEnable = true;
+    blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+    blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+    blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    device->CreateBlendState(&blendStateDesc, &additiveBlending);
+
+    blendStateDesc.RenderTarget[0].BlendEnable = true;
+    blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+    blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+    blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_REV_SUBTRACT;
+    blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+    blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+    blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    device->CreateBlendState(&blendStateDesc, &subtractiveBlending);
+}

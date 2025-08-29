@@ -100,9 +100,11 @@ void PlayState::OnUpdate(float deltaTime)
 
 void PlayState::OnRender()
 {
-    actorManager.RenderComponents<WeaponComponent>();
     actorManager.RenderComponents<RenderComponent>();
-    CollisionWorld::Get()->DebugDraw();
+
+    actorManager.RenderComponents<WeaponComponent>();
+
+    //CollisionWorld::Get()->DebugDraw();
     GraphicsManager::Get()->DebugPresent();
 
     // Render the Crosshair

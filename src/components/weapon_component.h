@@ -20,7 +20,7 @@ private:
     Actor *bulletPrefab = nullptr;
 
     BloodParticleSystem particleSystem;
-    float timeToSpawn = 0.05f;
+    float timeToSpawn = 0.15f;
 
     void OnShoot(ShootNotification* notification);
 public:

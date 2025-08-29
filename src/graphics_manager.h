@@ -57,6 +57,15 @@ public:
      virtual void SetRasterizerStateCullFront() = 0;
      virtual void SetRasterizerStateCullNone() = 0;
      virtual void SetRasterizerStateWireframe() = 0;
+
+     virtual void SetDepthStencilOn() = 0;
+     virtual void SetDepthStencilOff() = 0;
+     virtual void SetDepthStencilOnWriteMaskZero() = 0;
+
+     virtual void SetAlphaBlending() = 0;
+     virtual void SetAdditiveBlending() = 0;
+     virtual void SetSubstractingBlending() = 0;
+     virtual void SetBlendingOff() = 0;
      
      virtual VertexBuffer *VertexBufferAlloc(void *vertices, u32 count, u32 stride) = 0;
      virtual void VertexBufferFree(VertexBuffer *vertexBuffer) = 0;

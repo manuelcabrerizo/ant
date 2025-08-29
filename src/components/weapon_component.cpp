@@ -28,7 +28,7 @@ void WeaponComponent::OnInit(ActorManager *actorManager)
     RenderComponent* render = bulletPrefab->GetComponent<RenderComponent>();
     render->enable = false;
 
-    TextureManager::Get()->Load("Blood", "data/textures/blood.png");
+    TextureManager::Get()->Load("Blood", "data/textures/blood2.png");
     particleSystem.Init(500, "Blood", FRAME_MEMORY);
     particleSystem.SetPosition(transform->position);
     particleSystem.Stop();
@@ -69,7 +69,11 @@ void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 
 void WeaponComponent::OnRender(ActorManager* actorManager)
 {
+    GraphicsManager::Get()->SetDepthStencilOnWriteMaskZero();
+    GraphicsManager::Get()->SetAlphaBlending();
     particleSystem.Render();
+    GraphicsManager::Get()->SetBlendingOff();
+    GraphicsManager::Get()->SetDepthStencilOn();
 }
 
 void WeaponComponent::OnShoot(ShootNotification* notification)
@@ -95,7 +99,7 @@ void WeaponComponent::OnShoot(ShootNotification* notification)
         {
             particleSystem.SetPosition(shootRay.GetOrigin() + shootRay.GetDirection() * data.t);
             particleSystem.Play();
-            timeToSpawn = 0.25f;
+            timeToSpawn = 0.15f;
 
             EnemyHitNotification notification;
             notification.enemy = data.collider->owner;

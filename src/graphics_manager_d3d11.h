@@ -92,7 +92,6 @@ private:
      ID3D11RasterizerState *fillRasterizerCullFront;
      ID3D11RasterizerState *fillRasterizerCullNone;
 
-     // TODO: ...
      ID3D11DepthStencilState *depthStencilOn;
      ID3D11DepthStencilState *depthStencilOff;
      ID3D11DepthStencilState *depthStencilOnWriteMaskZero;
@@ -100,6 +99,7 @@ private:
      ID3D11BlendState *alphaBlendOn;
      ID3D11BlendState *alphaBlendOff;
      ID3D11BlendState *additiveBlending;
+     ID3D11BlendState* subtractiveBlending;
      
      ObjectAllocator<VertexBufferD3D11> vertexBufferAllocator;
      ObjectAllocator<IndexBufferD3D11> indexBufferAllocator;
@@ -130,6 +130,15 @@ public:
      void SetRasterizerStateCullFront() override;
      void SetRasterizerStateCullNone() override;
      void SetRasterizerStateWireframe() override;
+
+     void SetDepthStencilOn() override;
+     void SetDepthStencilOff() override;
+     void SetDepthStencilOnWriteMaskZero() override;
+
+     void SetAlphaBlending() override;
+     void SetAdditiveBlending() override;
+     void SetSubstractingBlending() override;
+     void SetBlendingOff() override;
      
      VertexBuffer *VertexBufferAlloc(void *vertices, u32 count, u32 stride) override;
      void VertexBufferFree(VertexBuffer *vertexBuffer) override;
@@ -177,4 +186,6 @@ private:
                                                             ID3D11InputLayout** pInputLayout);
      void CreateSamplerStates();
      void CreateRasterizerStates();
+     void CreateDepthStencilStates();
+     void CreateBendingStates();
 };
