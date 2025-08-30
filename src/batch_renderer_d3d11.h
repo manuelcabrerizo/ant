@@ -5,6 +5,7 @@
 #include <common.h>
 #include <math/vector3.h>
 #include <math/vector2.h>
+#include <containers.h>
 
 struct ID3D11Buffer;
 struct ID3D11Device;
@@ -22,9 +23,7 @@ class BatchRendererD3D11 : public BatchRenderer
 private:
     ID3D11DeviceContext* deviceContext = nullptr;
     ID3D11Buffer* gpuBuffer = nullptr;
-    VertexQuad* cpuBuffer = nullptr;
-    u64 bufferSize;
-    u32 bufferUsed;
+    StaticArray<VertexQuad, 12000> cpuBuffer;
 public:
     void Init(ID3D11Device* device, ID3D11DeviceContext* deviceContext,
         VertexShader *vertShader, FragmentShader *fragShader, Texture *texture);

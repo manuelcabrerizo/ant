@@ -14,3 +14,8 @@ void BatchRenderer::BindResources()
     GraphicsManager::Get()->FragmentShaderBind(fragmentShader);
     GraphicsManager::Get()->TextureBind(texture, 0);
 }
+
+void BatchRenderer::SetTexture(Texture* texture)
+{
+    this->texture = texture;
+}

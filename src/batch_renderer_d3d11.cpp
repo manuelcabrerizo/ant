@@ -19,19 +19,14 @@ void BatchRendererD3D11::Init(ID3D11Device* device, ID3D11DeviceContext* deviceC
     VertexShader* vertShader, FragmentShader *fragShader, Texture* texture)
 {
     BatchRenderer::Init(vertShader, fragShader, texture);
-
-    bufferUsed = 0;
-    bufferSize = 12000;
     this->deviceContext = deviceContext;
-
-    cpuBuffer = (VertexQuad*)MemoryManager::Get()->Alloc(sizeof(VertexQuad) * bufferSize, STATIC_MEMORY);
 
     D3D11_BUFFER_DESC vertexDesc;
     ZeroMemory(&vertexDesc, sizeof(vertexDesc));
     vertexDesc.Usage = D3D11_USAGE_DYNAMIC;
     vertexDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
     vertexDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    vertexDesc.ByteWidth = sizeof(VertexQuad) * bufferSize;
+    vertexDesc.ByteWidth = sizeof(VertexQuad) * cpuBuffer.GetCapacity();
     if (FAILED(device->CreateBuffer(&vertexDesc, 0, &gpuBuffer)))
     {
         ASSERT(!"Error create batch renderer GPU buffer.");
@@ -40,6 +35,7 @@ void BatchRendererD3D11::Init(ID3D11Device* device, ID3D11DeviceContext* deviceC
 
 void BatchRendererD3D11::Terminate()
 {
+    cpuBuffer.Clear();
     gpuBuffer->Release();
 }
 
@@ -48,8 +44,8 @@ void BatchRendererD3D11::Present()
     D3D11_MAPPED_SUBRESOURCE bufferData;
     ZeroMemory(&bufferData, sizeof(bufferData));
     deviceContext->Map(gpuBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &bufferData);
-    ASSERT(bufferUsed <= bufferSize);
-    memcpy(bufferData.pData, cpuBuffer, sizeof(VertexQuad) * bufferUsed);
+    ASSERT(cpuBuffer.size <= cpuBuffer.GetCapacity());
+    memcpy(bufferData.pData, cpuBuffer.data, sizeof(VertexQuad) * cpuBuffer.size);
     deviceContext->Unmap(gpuBuffer, 0);
 
     BatchRenderer::BindResources();
@@ -57,25 +53,25 @@ void BatchRendererD3D11::Present()
     u32 stride = sizeof(VertexQuad);
     u32 offset = 0;
     deviceContext->IASetVertexBuffers(0, 1, &gpuBuffer, &stride, &offset);
-    ASSERT(bufferUsed % 6 == 0);
+    ASSERT(cpuBuffer.size % 6 == 0);
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    deviceContext->Draw(bufferUsed, 0);
-    bufferUsed = 0;
+    deviceContext->Draw(cpuBuffer.size, 0);
+    cpuBuffer.size = 0;
 }
 
 void BatchRendererD3D11::DrawQuad(const Vector3& position, const Vector3& scale, 
     const Quaternion& rotation, const Vector3& color)
 {    
-    if (bufferUsed + 6 > bufferSize)
+    if (cpuBuffer.size + 6 > cpuBuffer.GetCapacity())
     {
         Present();
     }
 
-    ASSERT(bufferUsed + 6 <= bufferSize);
+    ASSERT(cpuBuffer.size + 6 <= cpuBuffer.GetCapacity());
 
     Matrix4 rotMat = rotation.ToMatrix4();
 
-    VertexQuad* vertex = cpuBuffer + bufferUsed;
+    VertexQuad* vertex = cpuBuffer.data + cpuBuffer.size;
     for (int i = 0; i < 6; i++)
     {
         vertex->pos.x = vertices[i].pos.x * scale.x;
@@ -88,5 +84,5 @@ void BatchRendererD3D11::DrawQuad(const Vector3& position, const Vector3& scale,
         vertex++;
     }
 
-    bufferUsed += 6;
+    cpuBuffer.size += 6;
 }

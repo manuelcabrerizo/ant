@@ -17,6 +17,11 @@ public:
     void Clear();
     Type* Push(Type value);
 
+    int GetCapacity()
+    {
+        return Size;
+    }
+
     // TODO: this has to be const
     // CHECK ME: !!!!!!!!!!!!!!!!
     Type& operator[](u32 index) const
