@@ -1,6 +1,6 @@
 #include <game_manager.h>
 #include <collision.h>
-#include <particle_system.h>
+#include <particle_systems/particle_system.h>
 #include <asset_managers/shader_manager.h>
 #include <asset_managers/texture_manager.h>
 #include <asset_managers/material_manager.h>

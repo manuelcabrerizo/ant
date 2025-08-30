@@ -7,8 +7,6 @@
 class BatchRenderer;
 class Texture;
 
-// the particle system should not be deleted during gameplay
-// it should be reuse when posible
 struct Particle
 {
     Vector3 position;
@@ -47,11 +45,4 @@ public:
     void SetTexture(Texture* texture);
     virtual void OnParticleSpawn(Particle& particle, const Vector3& viewPos) = 0;
     virtual void OnParticleUpdate(Particle& particle, const Vector3& viewPos, float deltaTime) = 0;
-};
-
-class BloodParticleSystem : public ParticleSystem
-{
-private: 
-    void OnParticleSpawn(Particle& particle, const Vector3& viewPos) override;
-    void OnParticleUpdate(Particle& particle, const Vector3& viewPos, float deltaTime) override;
 };

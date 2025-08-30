@@ -204,7 +204,10 @@
     <ClCompile Include="src\batch_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\particle_system.cpp">
+    <ClCompile Include="src\particle_systems\particle_system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\particle_systems\blood_ps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -422,7 +425,10 @@
     <ClInclude Include="src\batch_renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\particle_system.h">
+    <ClInclude Include="src\particle_systems\particle_system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\particle_systems\blood_ps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

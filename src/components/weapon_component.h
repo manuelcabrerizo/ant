@@ -2,7 +2,7 @@
 
 #include "component.h"
 #include <notification_manager.h>
-#include <particle_system.h>
+#include <particle_systems/blood_ps.h>
 
 class TransformComponent;
 class ColliderComponent;
