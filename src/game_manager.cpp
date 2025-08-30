@@ -1,5 +1,6 @@
 #include <game_manager.h>
 #include <collision.h>
+#include <particle_system.h>
 #include <asset_managers/shader_manager.h>
 #include <asset_managers/texture_manager.h>
 #include <asset_managers/material_manager.h>
@@ -8,9 +9,10 @@
 void GameManager::Init()
 {
     InitializeAssetsManagers();
-    CollisionWorld::Init(100);
-    GraphicsManager::Get()->DebugInit();
     LoadDefaultAssets();
+    CollisionWorld::Init(100);
+    ParticleSystem::Init();
+    GraphicsManager::Get()->DebugInit();
     scenes.Init(1, STATIC_MEMORY);
     menuState.Init(this);
     playState.Init(this);
@@ -23,6 +25,7 @@ void GameManager::Terminate()
     playState.Terminate();
     menuState.Terminate();
     GraphicsManager::Get()->DebugTerminate();
+    ParticleSystem::Terminate();
     CollisionWorld::Terminate();
     ShutdownAssetsManagers();
 }

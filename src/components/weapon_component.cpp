@@ -29,14 +29,13 @@ void WeaponComponent::OnInit(ActorManager *actorManager)
     render->enable = false;
 
     TextureManager::Get()->Load("Blood", "data/textures/blood2.png");
-    particleSystem.Init(500, "Blood", FRAME_MEMORY);
     particleSystem.SetPosition(transform->position);
+    particleSystem.SetTexture(TextureManager::Get()->Get("Blood"));
     particleSystem.Stop();
 }
 
 void WeaponComponent::OnTerminate(ActorManager *actorManager)
 {
-    particleSystem.Terminate();
     TextureManager::Get()->Unload("Blood");
 
     NotificationManager::Get()->RemoveListener(this, NotificationType::Shoot);

@@ -5,6 +5,7 @@
 #include <math\quaternion.h>
 
 class BatchRenderer;
+class Texture;
 
 // the particle system should not be deleted during gameplay
 // it should be reuse when posible
@@ -23,34 +24,34 @@ struct Particle
 class ParticleSystem
 {
 private:
-    BatchRenderer* batch;
-protected:
+    static BatchRenderer* batch;
+public:
+    static void Init();
+    static void Terminate();
+
+private:
     Vector3 position;
-    Array<Particle> particles;
+    Texture* texture = nullptr;
+    StaticArray<Particle, 500> particles;
+    bool isPlaying = false;
+    float timeToSpawn = 0.005f;
+    float timer = 0.0f;
 public:
     virtual ~ParticleSystem() {};
-    void Init(int maxParticleCount, const char *texture, int memoryType);
-    void Terminate();
-    virtual void Update(const Vector3& viewPos, float  deltaTime);
+    void Update(const Vector3& viewPos, float  deltaTime);
     void Render();
-
-    void SetPosition(const Vector3& position)
-    {
-        this->position = position;
-    }
+    void Play();
+    void Stop();
+    Vector3 GetPosition();
+    void SetPosition(const Vector3& position);
+    void SetTexture(Texture* texture);
+    virtual void OnParticleSpawn(Particle& particle, const Vector3& viewPos) = 0;
+    virtual void OnParticleUpdate(Particle& particle, const Vector3& viewPos, float deltaTime) = 0;
 };
 
 class BloodParticleSystem : public ParticleSystem
 {
 private: 
-    bool isPlaying = false;
-    float timeToSpawn = 0.005f;
-    float timer = 0.0f;
-
-    void SpawnParticle(const Vector3& viewPos);
-    void ProcessParticle(Particle& particle, const Vector3& viewPos, float deltaTime);
-public:
-    void Play();
-    void Stop();
-    void Update(const Vector3& viewPos, float deltaTime) override;
+    void OnParticleSpawn(Particle& particle, const Vector3& viewPos) override;
+    void OnParticleUpdate(Particle& particle, const Vector3& viewPos, float deltaTime) override;
 };

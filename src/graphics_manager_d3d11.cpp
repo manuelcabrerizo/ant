@@ -68,6 +68,15 @@ void GraphicsManagerD3D11::Shutdown()
      
      samplerStateLinearClamp->Release();
      samplerStateLinearWrap->Release();
+
+     depthStencilOn->Release();
+     depthStencilOff->Release();
+     depthStencilOnWriteMaskZero->Release();
+
+     alphaBlendOn->Release();
+     alphaBlendOff->Release();
+     additiveBlending->Release();
+     subtractiveBlending->Release();
      
      depthStencilView->Release();
      renderTargetView->Release();
