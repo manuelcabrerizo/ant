@@ -32,15 +32,12 @@ void PlayerControllerComponent::OnTerminate(ActorManager *actorManager)
 
 void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
-    ChangeWeapon(actorManager);
     ProcessMouseMovement();
     ProcessKeyboardMovement();
 
     if (InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
     {
-        int currentWeapon = usingFirstWeapon ? 0 : 1;
-        AnchorComponent* weaponAnchor = weapons[currentWeapon]->GetComponent<AnchorComponent>();
-
+        AnchorComponent* weaponAnchor = weaponActor->GetComponent<AnchorComponent>();
         ShootNotification notification;
         notification.shootPosition = weaponAnchor->position;
         notification.shootDirection = camera->GetFront();
@@ -108,27 +105,4 @@ void PlayerControllerComponent::ProcessKeyboardMovement()
 
     Vector3 movement = (moveDirection * speed);
     physics->acceleration = movement;
-}
-
-void PlayerControllerComponent::ChangeWeapon(ActorManager *actorManager)
-{
-    RenderComponent *weaponRenderComponents[2];
-
-    weaponRenderComponents[0] = weapons[0]->GetComponent<RenderComponent>();
-    weaponRenderComponents[1] = weapons[1]->GetComponent<RenderComponent>();
-
-    if(InputManager::Get()->KeyJustDown(KEY_1) && !usingFirstWeapon)
-    {
-        weaponRenderComponents[1]->enable = false;
-        weaponRenderComponents[0]->enable = true;    
-        weapon->weapon = weapons[0];      
-        usingFirstWeapon = true;
-    }
-    if(InputManager::Get()->KeyJustDown(KEY_2) && usingFirstWeapon)
-    {
-        weaponRenderComponents[0]->enable = false;   
-        weaponRenderComponents[1]->enable = true;
-        weapon->weapon = weapons[1];
-        usingFirstWeapon = false;
-    }
 }

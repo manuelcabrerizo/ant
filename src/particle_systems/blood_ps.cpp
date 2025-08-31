@@ -4,7 +4,7 @@
 
 void BloodParticleSystem::OnParticleSpawn(Particle& particle, const Vector3& viewPos)
 {
-    Vector3 particlePos = GetPosition() + Vector3(Utils::RandRange(0.1, 0.25), Utils::RandRange(0.1, 0.25), Utils::RandRange(0.1, 0.25));
+    Vector3 particlePos = GetPosition();
     Vector3 front = (viewPos - particlePos);
     front.y = 0.0f;
     front.Normalize();

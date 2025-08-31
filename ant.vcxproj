@@ -133,6 +133,7 @@
     <ClCompile Include="src\batch_renderer_d3d11.cpp" />
     <ClCompile Include="src\bounding_volume_hierarchie.cpp" />
     <ClCompile Include="src\components\collider_component.cpp" />
+    <ClCompile Include="src\particle_systems\shoot_ps.cpp" />
     <ClCompile Include="src\states\play_state.cpp" />
     <ClCompile Include="src\states\menu_state.cpp" />
     <ClCompile Include="src\components\component.cpp" />
@@ -200,6 +201,7 @@
     <ClInclude Include="src\batch_renderer_d3d11.h" />
     <ClInclude Include="src\bounding_volume_hierarchie.h" />
     <ClInclude Include="src\components\collider_component.h" />
+    <ClInclude Include="src\particle_systems\shoot_ps.h" />
     <ClInclude Include="src\states\play_state.h" />
     <ClInclude Include="src\states\menu_state.h" />
     <ClInclude Include="src\component_list.h" />

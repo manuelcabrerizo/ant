@@ -210,6 +210,9 @@
     <ClCompile Include="src\particle_systems\blood_ps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\particle_systems\shoot_ps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\actor.h">
@@ -429,6 +432,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\particle_systems\blood_ps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\particle_systems\shoot_ps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

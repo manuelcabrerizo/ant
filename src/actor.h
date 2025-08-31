@@ -33,6 +33,11 @@ public:
 
     template<typename ComponentType>
     ComponentType* GetComponent();
+
+    ActorManager* GetActorManager()
+    {
+        return actorManager;
+    }
 };
 
 template<typename ComponentType>

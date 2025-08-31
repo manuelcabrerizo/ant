@@ -15,7 +15,6 @@ struct Particle
     Quaternion rotation;
     Quaternion offsetRot;
     Vector3 color;
-
     float lifeTime;
 };
 
@@ -34,6 +33,9 @@ private:
     bool isPlaying = false;
     float timeToSpawn = 0.005f;
     float timer = 0.0f;
+
+    virtual void OnParticleSpawn(Particle& particle, const Vector3& viewPos) = 0;
+    virtual void OnParticleUpdate(Particle& particle, const Vector3& viewPos, float deltaTime) = 0;
 public:
     virtual ~ParticleSystem() {};
     void Update(const Vector3& viewPos, float  deltaTime);
@@ -43,6 +45,4 @@ public:
     Vector3 GetPosition();
     void SetPosition(const Vector3& position);
     void SetTexture(Texture* texture);
-    virtual void OnParticleSpawn(Particle& particle, const Vector3& viewPos) = 0;
-    virtual void OnParticleUpdate(Particle& particle, const Vector3& viewPos, float deltaTime) = 0;
 };

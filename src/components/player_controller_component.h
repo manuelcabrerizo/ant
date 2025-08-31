@@ -19,14 +19,10 @@ private:
     f32 pitch = 0;
     float speed;
 
-    i32 weaponCount = 0;
-    bool usingFirstWeapon = true;
-
     void ProcessMouseMovement();
     void ProcessKeyboardMovement();
-    void ChangeWeapon(ActorManager *actorManager);
 public:
-    Actor *weapons[2];
+    Actor *weaponActor;
 
     void OnInit(ActorManager *actorManager);
     void OnTerminate(ActorManager *actorManager) override;

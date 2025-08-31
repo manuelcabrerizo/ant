@@ -13,7 +13,6 @@
     </WeaponComponent>
     <PlayerControllerComponent>
         <weapon path="data/xml/pistol.xml"/>
-        <weapon path="data/xml/sniper.xml"/>
     </PlayerControllerComponent>
 	<ColliderComponent>
 		<type colliderType="3"/>

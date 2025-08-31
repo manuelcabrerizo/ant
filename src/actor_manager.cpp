@@ -240,17 +240,11 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
             tinyxml2::XMLElement* attributes = component->FirstChildElement();
             if (attributes)
             {
-                const char* weaponPath[2];
-                attributes->QueryStringAttribute("path", &weaponPath[0]);
-                attributes = attributes->NextSiblingElement();
-                attributes->QueryStringAttribute("path", &weaponPath[1]);
-
-                playerController.weapons[0] = CreateActorFromFile(weaponPath[0]);
-                playerController.weapons[1] = CreateActorFromFile(weaponPath[1]);
-                RenderComponent* render = playerController.weapons[1]->GetComponent<RenderComponent>();
-                render->enable = false;
+                const char* weaponPath;
+                attributes->QueryStringAttribute("path", &weaponPath);
+                playerController.weaponActor = CreateActorFromFile(weaponPath);
                 WeaponComponent* weapon = actor->GetComponent<WeaponComponent>();
-                weapon->weapon = playerController.weapons[0];
+                weapon->weapon = playerController.weaponActor;
             }
             AddComponent<PlayerControllerComponent>(actor, playerController);
         }

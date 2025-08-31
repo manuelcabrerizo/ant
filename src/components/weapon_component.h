@@ -3,6 +3,7 @@
 #include "component.h"
 #include <notification_manager.h>
 #include <particle_systems/blood_ps.h>
+#include <particle_systems/shoot_ps.h>
 
 class TransformComponent;
 class ColliderComponent;
@@ -15,12 +16,14 @@ private:
     ColliderComponent* collider;
     CameraComponent* camera;
 
-    ActorManager* am = nullptr;
+    BloodParticleSystem bloodPs;
+    ShootParticleSystem shootPs;
 
-    Actor *bulletPrefab = nullptr;
+    float bloodDuration = 0.15f;
+    float bloodTimer = 0.0f;
 
-    BloodParticleSystem particleSystem;
-    float timeToSpawn = 0.15f;
+    float shootDuration = 0.05f;
+    float shootTimer = 0.0f;
 
     void OnShoot(ShootNotification* notification);
 public:
