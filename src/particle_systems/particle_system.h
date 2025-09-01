@@ -12,7 +12,7 @@ struct Particle
     Vector3 position;
     Vector3 velocity;
     Vector3 size;
-    Quaternion rotation;
+    Matrix4 rotation;
     Quaternion offsetRot;
     Vector3 color;
     float lifeTime;

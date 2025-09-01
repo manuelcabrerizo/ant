@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Actor tag="Enemy">
     <TransformComponent>
-        <position x="0" y="3" z="20"/>
+        <position x="0" y="0" z="0"/>
         <scale x="0.02" y="0.02" z="0.02"/>
         <direction x="0" y="0" z="1"/>
     </TransformComponent>

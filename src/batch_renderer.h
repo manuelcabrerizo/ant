@@ -1,7 +1,7 @@
 #pragma once
 
 #include <math/vector3.h>
-#include <math/quaternion.h>
+#include <math/matrix4.h>
 
 struct VertexShader;
 struct FragmentShader;
@@ -21,7 +21,7 @@ public:
     virtual void Terminate() = 0;
     virtual void Present() = 0;
     virtual void DrawQuad(const Vector3& position, const Vector3& scale,
-        const Quaternion& rotation, const Vector3& color) = 0;
+        const Matrix4& rotation, const Vector3& color) = 0;
     void SetTexture(Texture* texture);
 };
 

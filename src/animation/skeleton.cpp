@@ -58,13 +58,13 @@ void Skeleton::CalculateBoneTransform(Animation *animation, Node *node, Matrix4 
         bone->Update(currentTime[0]);
         nodeTransform = bone->GetLocalTransform();
     }
-    Matrix4 globalTransform = parentTransform * nodeTransform;
+    Matrix4 globalTransform = nodeTransform * parentTransform;
 
     HashMap<BoneInfo>& bonesInfo = animation->GetBonesInfo();
     if(bonesInfo.Contains(node->name))
     {
         BoneInfo *boneInfo = bonesInfo.Get(node->name);
-        finalBoneMatrices[boneInfo->id] = globalTransform * boneInfo->offset;
+        finalBoneMatrices[boneInfo->id] = boneInfo->offset * globalTransform;
     }
 
     for(i32 i = 0; i < node->childrens.size; ++i)

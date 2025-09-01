@@ -39,4 +39,5 @@ public:
     static Quaternion FromTo(const Vector3& from, const Vector3& to);
     static Quaternion LookRotation(const Vector3& direcion, const Vector3& up);
     static Quaternion Inverse(const Quaternion& q);
+    static Quaternion FromBasis(const Vector3& right, const Vector3& up, const Vector3& forward);
 };

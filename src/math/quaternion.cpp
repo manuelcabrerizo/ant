@@ -108,8 +108,9 @@ Matrix4 Quaternion::ToMatrix4() const
     result.v[14] = 0;
     result.v[15] = 1;
 
-    return result;
+    return Matrix4::Transposed( result );
 }
+
 
 Quaternion Quaternion::Slerp(const Quaternion& a, const Quaternion& b_, float t)
 {
@@ -210,6 +211,48 @@ Quaternion Quaternion::LookRotation(const Vector3& direcion, const Vector3& up)
     Quaternion result = f2d * u2u;
     // Don’t forget to normalize the result
     return result.Normalized();
+}
+
+Quaternion Quaternion::FromBasis(const Vector3& right, const Vector3& up, const Vector3& forward)
+{
+    // Rotation matrix transposed
+    float m00 = right.x, m01 = up.x, m02 = forward.x;
+    float m10 = right.y, m11 = up.y, m12 = forward.y;
+    float m20 = right.z, m21 = up.z, m22 = forward.z;
+
+    float trace = m00 + m11 + m22;
+    Quaternion q;
+
+    if (trace > 0.0f) {
+        float s = sqrt(trace + 1.0f) * 2.0f;
+        q.w = 0.25f * s;
+        q.x = (m21 - m12) / s;
+        q.y = (m02 - m20) / s;
+        q.z = (m10 - m01) / s;
+    }
+    else if ((m00 > m11) && (m00 > m22)) {
+        float s = sqrt(1.0f + m00 - m11 - m22) * 2.0f;
+        q.w = (m21 - m12) / s;
+        q.x = 0.25f * s;
+        q.y = (m01 + m10) / s;
+        q.z = (m02 + m20) / s;
+    }
+    else if (m11 > m22) {
+        float s = sqrt(1.0f + m11 - m00 - m22) * 2.0f;
+        q.w = (m02 - m20) / s;
+        q.x = (m01 + m10) / s;
+        q.y = 0.25f * s;
+        q.z = (m12 + m21) / s;
+    }
+    else {
+        float s = sqrt(1.0f + m22 - m00 - m11) * 2.0f;
+        q.w = (m10 - m01) / s;
+        q.x = (m02 + m20) / s;
+        q.y = (m12 + m21) / s;
+        q.z = 0.25f * s;
+    }
+
+    return q;
 }
 
 #define QUAT_EPSILON 0.000001f

@@ -41,27 +41,51 @@ Matrix4 Matrix4::operator*(const Matrix4 &m) const
     return result;
 }
 
-Vector4 Matrix4::operator*(const Vector4 &vec) const
+Vector4 Matrix4::operator*(const Vector4& vec) const
 {
     Vector4 result;
-    for(int row = 0; row < 4; ++row) {
-        result.v[row] = v[row * 4 + 0] * vec.x + v[row * 4 + 1] * vec.y + v[row * 4 + 2] * vec.z + v[row * 4 + 3] * vec.w;
+    for (int col = 0; col < 4; ++col) {
+        result.v[col] =
+            v[0 * 4 + col] * vec.x +
+            v[1 * 4 + col] * vec.y +
+            v[2 * 4 + col] * vec.z +
+            v[3 * 4 + col] * vec.w;
     }
     return result;
 }
 
 Vector3 Matrix4::GetTranslation()
 {
-    return Vector3(m14, m24, m34);
+    return Vector3(m41, m42, m43);
 }
 
 Quaternion Matrix4::GetRotation()
 {
-    Vector3 up = Vector3(m21, m22, m23).Normalized();
-    Vector3 forward = Vector3(m31, m32, m33).Normalized();
-    Vector3 right = Vector3::Cross(up, forward);
-    up = Vector3::Cross(forward, right);
-    return Quaternion::LookRotation(forward, up);
+    Quaternion q;
+    float t;
+    if (m22 < 0) {
+        if (m11 > m22) {
+            t = 1 + m11 - m22 - m33;
+            q = Quaternion(t, m12 + m21, m31 + m13, m23 - m32);
+        }
+        else {
+            t = 1 - m11 + m22 - m33;
+            q = Quaternion(m12 + m21, t, m23 + m32, m31 - m13);
+        }
+    }
+    else {
+        if (m11 < -m22) {
+            t = 1 - m11 - m22 + m33;
+            q = Quaternion(m31 + m13, m23 + m32, t, m12 - m21);
+        }
+        else {
+            t = 1 + m11 + m22 + m33;
+            q = Quaternion(m23 - m32, m31 - m13, m12 - m21, t);
+        }
+    }
+    q = q * (0.5f / sqrt(t));
+
+    return q;
 }
 
 Vector3 Matrix4::GetScale()
@@ -94,12 +118,15 @@ Matrix4 Matrix4::Frustum(float l, float r, float b, float t, float n, float f)
     if (l == r || t == b || n == f) {
         ASSERT(!"WARNING: Trying to create invalid frustum\n");
     }
-    return Matrix4(
+
+    Matrix4 mat = Matrix4(
         (2*n) /(r-l), 0, -(r+l)/(r-l), 0,
         0, (2*n)/(t-b), -(t+b)/(t-b), 0,
         0, 0, f/(f-n), -(f*n)/(f-n),
         0, 0, 1, 0
     );
+    return Matrix4::Transposed(mat);
+
 }
 
 Matrix4 Matrix4::Perspective(float fov, float aspect, float znear, float zfar)
@@ -114,13 +141,12 @@ Matrix4 Matrix4::Ortho(float l, float r, float b, float t, float n, float f)
     if (l == r || t == b || n == f) {
         ASSERT(!"INVALID_CODE_PATH");
     }
-    // TODO: check this function ...
-    return Matrix4(
+    Matrix4 mat =  Matrix4(
        2.0f / (r - l), 0, 0, -((r + l) / (r - l)),
        0, 2.0f / (t - b), 0, -(t + b) / (t - b),
        0, 0, 1.0f / (f - n), -(n / (f - n)),
        0, 0, 0, 1);
-
+    return Matrix4::Transposed(mat);
 }
 
 Matrix4 Matrix4::LookAt(const Vector3& position, const Vector3& target, const Vector3& up)
@@ -128,20 +154,21 @@ Matrix4 Matrix4::LookAt(const Vector3& position, const Vector3& target, const Ve
     Vector3 zaxis = (target - position).Normalized();
     Vector3 xaxis = up.Cross(zaxis).Normalized();
     Vector3 yaxis = zaxis.Cross(xaxis).Normalized();
-    return Matrix4(
+    Matrix4 mat =  Matrix4(
         xaxis.x, xaxis.y, xaxis.z, -xaxis.Dot(position), 
         yaxis.x, yaxis.y, yaxis.z, -yaxis.Dot(position), 
         zaxis.x, zaxis.y, zaxis.z, -zaxis.Dot(position),
         0,       0,       0,       1);
+    return Matrix4::Transposed(mat);
 }
 
 Matrix4 Matrix4::Translate(float x, float y, float z)
 {
     return Matrix4(
-        1, 0, 0, x,
-        0, 1, 0, y,
-        0, 0, 1, z,
-        0, 0, 0, 1);
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        x, y, z, 1);
 }
 
 Matrix4 Matrix4::Translate(const Vector3& pos)
@@ -166,37 +193,37 @@ Matrix4 Matrix4::Scale(const Vector3& scale)
 Matrix4 Matrix4::RotateX(float angle)
 {
     return Matrix4(
-        1,            0,           0,  0,
-        0,  cosf(angle),-sinf(angle),  0,
-        0,  sinf(angle), cosf(angle),  0,
-        0,            0,           0,  1);
+        1, 0, 0, 0,
+        0, cosf(angle), sinf(angle), 0,
+        0, -sinf(angle), cosf(angle), 0,
+        0, 0, 0, 1);
 }
 
 Matrix4 Matrix4::RotateY(float angle)
 {
     return Matrix4(
-        cosf(angle), 0,  sinf(angle), 0,
-                  0, 1,            0, 0,
-       -sinf(angle), 0,  cosf(angle), 0,
-                  0, 0,            0, 1);
+        cosf(angle), 0, -sinf(angle), 0,
+        0, 1, 0, 0,
+        sinf(angle), 0, cosf(angle), 0,
+        0, 0, 0, 1);
 }
 
 Matrix4 Matrix4::RotateZ(float angle)
 {
     return Matrix4(
-        cosf(angle),-sinf(angle), 0, 0,
-        sinf(angle), cosf(angle), 0, 0,
-                  0,           0, 1, 0,
-                  0,           0, 0, 1);
+        cosf(angle), sinf(angle), 0, 0,
+        -sinf(angle), cosf(angle), 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1);
 }
 
 Matrix4 Matrix4::TransformFromBasis(const Vector3& o, const Vector3& r, const Vector3& u, const Vector3& f)
-{
+{   
     return Matrix4(
-        r.x, u.x, f.x, o.x,
-        r.y, u.y, f.y, o.y,
-        r.z, u.z, f.z, o.z,
-        0, 0, 0, 1);
+        r.x, r.y, r.z, 0,
+        u.x, u.y, u.z, 0,
+        f.x, f.y, f.z, 0,
+        o.x, o.y, o.z, 1);
 }
 
 Matrix4 Matrix4::Transposed(const Matrix4 &m)

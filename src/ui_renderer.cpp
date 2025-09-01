@@ -39,7 +39,7 @@ void UIRenderer::DrawQuat(const Vector2& position, const Vector2& size, int zInd
     VertexShaderManager::Get()->Bind("ui_vert");
     FragmentShaderManager::Get()->Bind("ui_frag");
 
-    matrices.model = Matrix4::Translate(position.x, position.y, zIndex) * Matrix4::Scale(size.x, size.y, 1.0f);
+    matrices.model = Matrix4::Scale(size.x, size.y, 1.0f) * Matrix4::Translate(position.x, position.y, zIndex);
     GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &matrices);
     GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
 

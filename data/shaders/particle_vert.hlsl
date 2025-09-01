@@ -1,3 +1,5 @@
+#pragma pack_matrix(row_major) 
+
 struct VS_Input
 {
     float3 pos : POSITION;

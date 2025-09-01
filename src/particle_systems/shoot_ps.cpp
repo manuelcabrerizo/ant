@@ -4,16 +4,17 @@
 
 void ShootParticleSystem::OnParticleSpawn(Particle& particle, const Vector3& viewPos)
 {
-    // TODO: fix this, the aprticles shpuld always be facing the camera
     Vector3 particlePos = GetPosition();
-    Vector3 front = (viewPos - particlePos);
-    front.y = 0.0f;
-    front.Normalize();
+    
+    Vector3 front = (viewPos - particlePos).Normalized();
+    Vector3 right = Vector3::Cross(Vector3::up, front).Normalized();
+    Vector3 up = Vector3::Cross(front, right);
+    Matrix4 rotMat = Matrix4::TransformFromBasis(Vector3::zero, right, up, front);
 
     particle.position = particlePos;
     particle.size = Vector3(Utils::RandRange(0.05, 0.35), Utils::RandRange(0.05, 0.35), 1);
     particle.offsetRot = Quaternion::AngleAxis(Utils::RandRange(0, ANT_TAU), Vector3::forward);
-    particle.rotation = particle.offsetRot * Quaternion::LookRotation(front, Vector3::up);
+    particle.rotation = particle.offsetRot.ToMatrix4() * rotMat;
     particle.velocity = Vector3::zero;
     particle.lifeTime = 0.05f;
     particle.color = Vector3(1, 1, 1);

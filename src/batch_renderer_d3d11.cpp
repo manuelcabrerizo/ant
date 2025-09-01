@@ -8,11 +8,11 @@
 VertexQuad vertices[] =
 {
     VertexQuad{ Vector3(-0.5, -0.5, 0), Vector2(0, 0) },
+    VertexQuad{ Vector3(0.5,  0.5, 0), Vector2(1, 1) },
     VertexQuad{ Vector3(-0.5,  0.5, 0), Vector2(0, 1) },
     VertexQuad{ Vector3(0.5,  0.5, 0), Vector2(1, 1) },
-    VertexQuad{ Vector3(0.5,  0.5, 0), Vector2(1, 1) },
-    VertexQuad{ Vector3(0.5, -0.5, 0), Vector2(1, 0) },
-    VertexQuad{ Vector3(-0.5, -0.5, 0), Vector2(0, 0) }
+    VertexQuad{ Vector3(-0.5, -0.5, 0), Vector2(0, 0) },
+    VertexQuad{ Vector3(0.5, -0.5, 0), Vector2(1, 0) }
 };
 
 void BatchRendererD3D11::Init(ID3D11Device* device, ID3D11DeviceContext* deviceContext,
@@ -60,7 +60,7 @@ void BatchRendererD3D11::Present()
 }
 
 void BatchRendererD3D11::DrawQuad(const Vector3& position, const Vector3& scale, 
-    const Quaternion& rotation, const Vector3& color)
+    const Matrix4& rotation, const Vector3& color)
 {    
     if (cpuBuffer.size + 6 > cpuBuffer.GetCapacity())
     {
@@ -69,15 +69,13 @@ void BatchRendererD3D11::DrawQuad(const Vector3& position, const Vector3& scale,
 
     ASSERT(cpuBuffer.size + 6 <= cpuBuffer.GetCapacity());
 
-    Matrix4 rotMat = rotation.ToMatrix4();
-
     VertexQuad* vertex = cpuBuffer.data + cpuBuffer.size;
     for (int i = 0; i < 6; i++)
     {
         vertex->pos.x = vertices[i].pos.x * scale.x;
         vertex->pos.y = vertices[i].pos.y * scale.y;
         vertex->pos.z = 0;
-        vertex->pos = Matrix4::TransformPoint(rotMat, vertex->pos);
+        vertex->pos = Matrix4::TransformPoint(rotation, vertex->pos);
         vertex->pos += position;
         vertex->uv = vertices[i].uv;
         vertex->col = color;

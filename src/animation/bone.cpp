@@ -97,7 +97,7 @@ void Bone::Update(f32 animationTime)
     Matrix4 translation = Matrix4::Translate(Interpolate<Vector3>(positions, animationTime));
     Matrix4 rotation = Interpolate<Quaternion>(rotations, animationTime).ToMatrix4();
     Matrix4 sca = Matrix4::Scale(Interpolate<Vector3>(scales, animationTime));
-    localTransform = translation * rotation * sca; // TODO: change order of mul
+    localTransform = sca * rotation * translation;
 }
 
 Matrix4 Bone::GetLocalTransform()
