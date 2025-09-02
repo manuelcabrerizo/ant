@@ -30,14 +30,16 @@ public:
     Quaternion operator*(const Quaternion &q) const;
     Vector3 operator*(const Vector3 &v) const;
 
+    float Magnitude() const;
+    float MagnitudeSq() const;
+
     void Normalize();
     Quaternion Normalized() const;
     Matrix4 ToMatrix4() const;
     
     static Quaternion Slerp(const Quaternion& a, const Quaternion& b, float t);
     static Quaternion AngleAxis(float angle, const Vector3 &axis);
-    static Quaternion FromTo(const Vector3& from, const Vector3& to);
-    static Quaternion LookRotation(const Vector3& direcion, const Vector3& up);
     static Quaternion Inverse(const Quaternion& q);
-    static Quaternion FromBasis(const Vector3& right, const Vector3& up, const Vector3& forward);
+    static Quaternion FromMatrix(const Matrix4& m);
+    static Quaternion FromEuler(float x, float y, float z);
 };

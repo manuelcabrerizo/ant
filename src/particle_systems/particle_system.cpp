@@ -50,6 +50,8 @@ void ParticleSystem::Update(const Vector3& viewPos, float  deltaTime)
     // Update Particles
     for (int i = 0; i < particles.size; i++)
     {
+        // This is a virtual function, we should call it outside the loop
+        // and loop through the particles in the function
         OnParticleUpdate(particles[i], viewPos, deltaTime);
     }
 }
