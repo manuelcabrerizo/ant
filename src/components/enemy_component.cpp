@@ -66,7 +66,7 @@ void EnemyComponent::OnEnemyHit(EnemyHitNotification* enemyHit)
         life--;
         if (life <= 0)
         {
-            animation->Transition((int)EnemyAnimation::Dead, 0.5f);
+            animation->Transition((int)EnemyAnimation::Dead, 0.01f);
         }
     }
 }
