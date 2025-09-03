@@ -2,6 +2,7 @@
 #include "actor.h"
 
 #include <asset_managers/model_manager.h>
+#include <asset_managers/animation_manager.h>
 
 #include <components/transform_component.h>
 #include <components/render_component.h>
@@ -19,15 +20,14 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     ModelManager::Get()->Load("bullet", "data/models/testBullet.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("level1", "data/models/TestLevel/source/TestLevel.fbx", FRAME_MEMORY);
 
+    // Load animation data
+    SkeletonManager::Get()->Load("Bloodwraith", "data/models/bloodwraith/source/bloodwraith.fbx", FRAME_MEMORY);
+    AnimationManager::Get()->Load("Walking", "data/animations/Mutant Walking.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
+    AnimationManager::Get()->Load("Death", "data/animations/Zombie Death.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
+
     // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");
-
-    // Spawn the enemies
-    // Create the animation for the enemies
-    AnimationComponent animation;
-    animation.skeleton.Init("data/models/bloodwraith/source/bloodwraith.fbx", FRAME_MEMORY);
-    animation.animation.Init("data/animations/Mutant Walking.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
-
+    
 #if 1
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
 
@@ -49,7 +49,8 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
             transform->position = position;
 
             // Set up the enemy animation component
-            actorManager->AddComponent<AnimationComponent>(enemy, animation);
+            // TODO: load this component from a file
+            actorManager->AddComponent<AnimationComponent>(enemy, {});
             RenderComponent* render = enemy->GetComponent<RenderComponent>();
             render->isAnimated = true;
         }
@@ -77,7 +78,12 @@ void Scene::Unload()
     ASSERT(actorManager != nullptr);
     actorManager->Clear();
 
-    // Load the models
+    // Unload Animations
+    SkeletonManager::Get()->Unload("Bloodwraith");
+    AnimationManager::Get()->Unload("Death");
+    AnimationManager::Get()->Unload("Walking");
+
+    // Unload the models
     ModelManager::Get()->Unload("enemy");
     ModelManager::Get()->Unload("anim-gun");
     ModelManager::Get()->Unload("bullet");

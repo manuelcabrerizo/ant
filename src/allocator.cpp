@@ -1,32 +1,31 @@
 #include "allocator.h"
 #include <cstdlib>
+#include <memory>
 
+/*
 uintptr_t AlignAddress(uintptr_t addr, size_t align)
 {
     size_t mask = align - 1;
     ASSERT((align & mask) == 0); // align should be power of 2
     return  (addr + mask) & ~mask;
 }
+*/
 
 // StackAllocator
-void StackAllocator::Init(u64 size, size_t byteAlignment_)
+void StackAllocator::Init(u64 size)
 {
-    // first make sure size if a multiple of byteAligment
-    size = ALIGNUP(size, byteAlignment_);
-
     // First allocate our memory block
-    memoryBlock = (u8*)malloc(size + byteAlignment_);
+    memoryBlock = (u8*)malloc(size);
     if (!memoryBlock)
     {
         ASSERT(!"Error allocating memory");
     }
-
-    byteAlignment = byteAlignment_;
+    memset(memoryBlock, 0, size);
 
     // Set up base pointer
-    base = AlignPointer<u8>(memoryBlock, byteAlignment);
+    base = memoryBlock;
     // Set up cap pointer
-    cap = AlignPointer<u8>(memoryBlock + size, byteAlignment);
+    cap = memoryBlock + size;
     // Finaly initialize the lower and upper frame pointers
     head = base;
 }
@@ -39,9 +38,6 @@ void StackAllocator::Terminate()
 void* StackAllocator::Alloc(u64 size)
 {
     u8* mem = 0;
-
-    // first align the requested size
-    size = ALIGNUP(size, byteAlignment);
 
     // check for available memory
     if (head + size > cap)
@@ -57,10 +53,10 @@ void* StackAllocator::Alloc(u64 size)
     return mem;
 }
 
-Frame StackAllocator::GetFrame()
+Frame StackAllocator::GetFrame(int memoryType)
 {
     Frame frame;
-    frame.stackNum = 2;
+    frame.memoryType = memoryType;
     frame.frame = head;
     return frame;
 }
@@ -68,80 +64,4 @@ Frame StackAllocator::GetFrame()
 void StackAllocator::ReleaseFrame(Frame frame)
 {
     head = frame.frame;
-}
-
-
-// DoubleStackAllocator
-void DoubleStackAllocator::Init(u64 size, size_t byteAlignment_)
-{
-     // first make sure size if a multiple of byteAligment
-     size = ALIGNUP(size, byteAlignment_);
-
-     // First allocate our memory block
-     memoryBlock = (u8 *)malloc(size + byteAlignment_);
-     if(!memoryBlock)
-     {
-          ASSERT(!"Error allocating memory");
-     }
-     
-     byteAlignment = byteAlignment_;
-
-     // Set up base pointer
-     baseAndCap[0] = AlignPointer<u8>(memoryBlock, byteAlignment);
-     // Set up cap pointer
-     baseAndCap[1] = AlignPointer<u8>(memoryBlock + size, byteAlignment);
-
-     // Finaly initialize the lower and upper frame pointers
-     head[0] = baseAndCap[0];
-     head[1] = baseAndCap[1];
-}
-
-void DoubleStackAllocator::Terminate()
-{
-     free(memoryBlock);
-}
-
-void *DoubleStackAllocator::Alloc(u64 size, i32 stackNum)
-{
-     u8 *mem = 0;
-
-     // first align the requested size
-     size = ALIGNUP(size, byteAlignment);
-
-     // check for available memory
-     if(head[0] + size > head[1])
-     {
-          // insufficient memory
-          ASSERT(!"insufficient memory");
-          return 0;
-     }
-
-     // now perform the memory allocation
-     if(stackNum)
-     {
-          // Allocating from the upper stack, down
-          head[1] -= size;
-          mem = head[1];
-     }
-     else
-     {
-          // Allocating from the lower stack, up
-          mem = head[0];
-          head[0] += size;
-     }
-     
-     return (void *)mem;
-}
-
-Frame DoubleStackAllocator::GetFrame(i32 stackNum)
-{
-     Frame frame;
-     frame.frame = head[stackNum];
-     frame.stackNum = stackNum;
-     return frame;
-}
-
-void DoubleStackAllocator::ReleaseFrame(Frame frame)
-{
-     head[frame.stackNum] = frame.frame;
 }

@@ -16,7 +16,6 @@ inline f32 get_scale_factor(f32 last_time_stamp, f32 next_time_stamp, f32 animat
 void Bone::Init(i32 id, aiNodeAnim *channel, i32 memoryType)
 {
     this->id = id;
-    localTransform = Matrix4(1.0f);
     positions.Init(channel->mNumPositionKeys, memoryType);
     rotations.Init(channel->mNumRotationKeys, memoryType);
     scales.Init(channel->mNumScalingKeys, memoryType);
@@ -92,17 +91,12 @@ Quaternion Bone::Interpolate<Quaternion>(Array<Key<Quaternion>> &array, f32 anim
     return rot.Normalized();
 }
 
-void Bone::Update(f32 animationTime)
+Matrix4 Bone::Update(f32 animationTime)
 {
     Matrix4 translation = Matrix4::Translate(Interpolate<Vector3>(positions, animationTime));
     Matrix4 rotation = Interpolate<Quaternion>(rotations, animationTime).ToMatrix4();
     Matrix4 sca = Matrix4::Scale(Interpolate<Vector3>(scales, animationTime));
-    localTransform = sca * rotation * translation;
-}
-
-Matrix4 Bone::GetLocalTransform()
-{
-    return localTransform;
+    return sca * rotation * translation;
 }
 
 i32 Bone::GetId()

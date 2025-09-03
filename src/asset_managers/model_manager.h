@@ -24,6 +24,7 @@ public:
     static void Initialize(u32 assetsCapacity);
     static void Shutdown();
     static ModelManager* Get();
+    static void ResetFrameAllocator();
 
     void Load(const char* name, const char* path, int memoryType);
     void Unload(const char* name) override;

@@ -20,17 +20,21 @@ class  Skeleton
     };
 
 private:
-    Matrix4 finalBoneMatrices[100];
-    f32 currentTime[10];
-    f32 deltaTime = 0.0f;
     Node root;
-
-    void CalculateBoneTransform(Animation *animation, Node *node, Matrix4 parentTransform);
+    int memoryType;
 public:
     void Init(const char *filepath, i32 memoryType);
-    void Animate(Animation *animation, f32 dt);
-    Matrix4 *GetMatrices()
+
+    void CalculateBoneTransform(Animation* animation, Node* node, Matrix4 parentTransform,
+        Matrix4 finalBoneMatrices[], float currentTime);
+
+    Node* GetRoot()
     {
-        return finalBoneMatrices;
+        return &root;
+    }
+
+    int GetMemoryType()
+    {
+        return memoryType;
     }
 };

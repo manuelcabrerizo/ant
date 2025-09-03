@@ -5,6 +5,7 @@
 #include <asset_managers/texture_manager.h>
 #include <asset_managers/material_manager.h>
 #include <asset_managers/model_manager.h>
+#include <asset_managers/animation_manager.h>
 
 void GameManager::Init()
 {
@@ -66,10 +67,14 @@ void GameManager::InitializeAssetsManagers()
     TextureManager::Initialize(64);
     MaterialManager::Initialize(64);
     ModelManager::Initialize(32);
+    SkeletonManager::Initialize(32);
+    AnimationManager::Initialize(64);
 }
 
 void GameManager::ShutdownAssetsManagers()
 {
+    AnimationManager::Shutdown();
+    SkeletonManager::Shutdown();
     ModelManager::Shutdown();
     MaterialManager::Shutdown();
     TextureManager::Shutdown();

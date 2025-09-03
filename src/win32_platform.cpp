@@ -112,7 +112,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 #if ANT_CONSOLE
      HINSTANCE hInstance = GetModuleHandle(0);
 #endif
-     MemoryManager::Init(MB(64), MB(32), MB(32), 4);
+     MemoryManager::Init(MB(64), MB(32), MB(32));
      InputManager::Init();
      NotificationManager::Init(STATIC_MEMORY);           
 

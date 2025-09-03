@@ -20,6 +20,8 @@
 #include <collision.h>
 #include <asset_managers/shader_manager.h>
 #include <math/algebra.h>
+#include <asset_managers/model_manager.h>
+#include <asset_managers/animation_manager.h>
 
 void PlayState::Init(GameManager *gameManager)
 {
@@ -71,6 +73,9 @@ void PlayState::OnExit()
 
     NotificationManager::Get()->RemoveListener(this, NotificationType::OnResize);
 
+    ModelManager::Get()->ResetFrameAllocator();
+    SkeletonManager::Get()->ResetFrameAllocator();
+    AnimationManager::Get()->ResetFrameAllocator();
     MemoryManager::Get()->ReleaseFrame(memoryFrame);
 }
 
@@ -85,8 +90,8 @@ void PlayState::OnUpdate(float deltaTime)
     actorManager.UpdateComponents<EnemyComponent>(deltaTime);
     actorManager.UpdateComponents<PhysicsComponent>(deltaTime);
     actorManager.UpdateComponents<ColliderComponent>(deltaTime);
-    actorManager.UpdateComponents<RenderComponent>(deltaTime);
     actorManager.UpdateComponents<BulletComponent>(deltaTime);
+    actorManager.UpdateComponents<AnimationComponent>(deltaTime);
     // Late Update
     actorManager.LateUpdateComponents<PhysicsComponent>(deltaTime);
 

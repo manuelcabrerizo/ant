@@ -8,12 +8,22 @@
 
 class TransformComponent;
 class PhysicsComponent;
+class AnimationComponent;
+
+enum class EnemyAnimation
+{
+    Walk,
+    Dead,
+
+    Count
+};
 
 class EnemyComponent : public Component<EnemyComponent>, INotificable
 {
 private:
     TransformComponent* transform;
     PhysicsComponent* physics;
+    AnimationComponent* animation;
 
     Kinematic character;
     Kinematic target;

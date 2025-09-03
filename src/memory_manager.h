@@ -12,12 +12,13 @@ private:
      MemoryManager() {}
      static MemoryManager instance;
      static bool initialize;
-
-     DoubleStackAllocator allocator{};
-     StackAllocator staticAllocator{};
+    
+    StackAllocator staticAllocator{};
+    StackAllocator frameAllocator{};
+    StackAllocator scratchAllocator{};
 
 public:
-     static void Init(u64 staticMemorySize, u64 frameMemorySize, u64 scratchMemorySize, size_t align);
+     static void Init(u64 staticMemorySize, u64 frameMemorySize, u64 scratchMemorySize);
      static void Terminate();
      static MemoryManager *Get();
 
@@ -31,8 +32,9 @@ public:
          switch (memoryType)
          {
          case FRAME_MEMORY:
+             return frameAllocator.GetFreeMemoryCount();
          case SCRATCH_MEMORY:
-             return allocator.GetFreeMemoryCount();
+             return scratchAllocator.GetFreeMemoryCount();
          case STATIC_MEMORY:
              return staticAllocator.GetFreeMemoryCount();
          }

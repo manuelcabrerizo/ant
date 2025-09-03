@@ -41,14 +41,6 @@ void RenderComponent::OnTerminate(ActorManager *actorManager)
 {
 }
 
-void RenderComponent::OnUpdate(ActorManager *actorManager, f32 dt)
-{
-    if(isAnimated && animation)
-    {
-        animation->skeleton.Animate(&animation->animation, dt*0.54f);
-    }
-}
-
 void RenderComponent::OnRender(ActorManager *actorManager)
 {
     TransformComponent* transform = owner->GetComponent<TransformComponent>();
@@ -79,7 +71,7 @@ void RenderComponent::OnRender(ActorManager *actorManager)
     }
     else
     {
-        GraphicsManager::Get()->UniformBufferUpdate(matrixBuffer, animation->skeleton.GetMatrices());
+        GraphicsManager::Get()->UniformBufferUpdate(matrixBuffer, animation->GetMatrices());
         VertexShaderManager::Get()->Bind("animation");
     }
     GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);    

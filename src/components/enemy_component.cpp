@@ -1,6 +1,9 @@
 #include "enemy_component.h"
 #include "transform_component.h"
 #include "physics_component.h"
+#include "animation_component.h"
+
+#include <asset_managers/animation_manager.h>
 
 #include <math.h>
 #include <math/algebra.h>
@@ -11,6 +14,13 @@ void EnemyComponent::OnInit(ActorManager *actorManager)
 
     transform = owner->GetComponent<TransformComponent>();
     physics = owner->GetComponent<PhysicsComponent>();
+    animation = owner->GetComponent<AnimationComponent>();
+
+    // Initialize animation component
+    animation->SetSkeleton(SkeletonManager::Get()->Get("Bloodwraith"));
+    animation->AddAnimation((int)EnemyAnimation::Walk, AnimationManager::Get()->Get("Walking"));
+    animation->AddAnimation((int)EnemyAnimation::Dead, AnimationManager::Get()->Get("Death"));
+    animation->SetAnimation((int)EnemyAnimation::Dead);
 
     wander.SetCharacter(&character);
     wander.SetTarget(&target);
@@ -35,6 +45,7 @@ void EnemyComponent::OnTerminate(ActorManager *actorManager)
 
 void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
+    /*
     if(physics->grounded)
     {
         character.position = transform->position;
@@ -47,6 +58,7 @@ void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
         character.orientation += character.rotation * dt;
         transform->direction = Vector3(-sinf(character.orientation), 0.0f, cosf(character.orientation)).Normalized();
     }
+    */
 
     if (life <= 0)
     {

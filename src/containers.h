@@ -104,7 +104,9 @@ void Array<Type>::Init(u32 capacity_, i32 stackNum)
     capacity = capacity_;
     size = 0;
     data = (Type*)MemoryManager::Get()->Alloc(capacity * sizeof(Type), stackNum);
-    memset(data, 0, capacity * sizeof(Type));
+    //memset(data, 0, capacity * sizeof(Type));
+
+    int StopHere = 0;
 }
 
 template <typename Type>

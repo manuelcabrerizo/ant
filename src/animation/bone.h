@@ -22,7 +22,7 @@ private:
     Array<Key<Quaternion>> rotations;
     Array<Key<Vector3>> scales;
 
-    Matrix4 localTransform = Matrix4(1.0f);
+    //Matrix4 localTransform = Matrix4(1.0f);
     i32 id = 0;
     void Init(i32 id, aiNodeAnim *channel, i32 memoryType);
     template <typename Type>
@@ -31,8 +31,7 @@ private:
     static Type Interpolate(Array<Key<Type>> &array, f32 animationTime);
     
 public:
-    void Update(f32 animationTime);
-    Matrix4 GetLocalTransform();
+    Matrix4 Update(f32 animationTime);
     i32 GetId();
 };
 

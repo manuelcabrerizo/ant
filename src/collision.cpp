@@ -60,6 +60,11 @@ bool CollisionWorld::Intersect(const Ray& ray, Array<CollisionData>& collisionDa
     bool isIntersecting = false;
     for (int i = 0; i < colliders.size; ++i)
     {
+        if (!colliders[i]->enable)
+        {
+            continue;
+        }
+
         Collider* collider = colliders[i]->GetCollider();
         if (collider->GetId() != ignoreId)
         {
@@ -93,6 +98,11 @@ bool CollisionWorld::Intersect(const Segment& segment, Array<CollisionData>& col
     bool isIntersecting = false;
     for (int i = 0; i < colliders.size; ++i)
     {
+        if (!colliders[i]->enable)
+        {
+            continue;
+        }
+
         Collider* collider = colliders[i]->GetCollider();
         if (collider->GetId() != ignoreId)
         {
@@ -119,9 +129,19 @@ bool CollisionWorld::Intersect(const Segment& segment, Array<CollisionData>& col
 
 bool CollisionWorld::Intersect(ColliderComponent *collider, Array<CollisionData>& collisionData) const
 {
+    if (!collider->enable)
+    {
+        return false;
+    }
+
     bool isIntersecting = false;
     for (int i = 0; i < colliders.size; ++i)
     {
+        if (!colliders[i]->enable)
+        {
+            continue;
+        }
+
         if (collider->GetId() != colliders[i]->GetId())
         {
             bool intersect = collider->GetCollider()->Intersect(*colliders[i]->GetCollider(), collisionData);

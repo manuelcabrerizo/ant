@@ -34,6 +34,11 @@ ModelManager* ModelManager::Get()
     return &instance;
 }
 
+void ModelManager::ResetFrameAllocator()
+{
+    instance.frameAllocator.Init(FRAME_MEMORY);
+}
+
 void ModelManager::Load(const char* name, const char* path, int memoryType)
 {
     if (ShouldLoad(name))
@@ -78,11 +83,11 @@ void ModelManager::Unload(const char* name)
         {
         case STATIC_MEMORY:
         {
-            model = staticAllocator.Alloc();
+            staticAllocator.Free(model);
         } break;
         case FRAME_MEMORY:
         {
-            model = frameAllocator.Alloc();
+            frameAllocator.Free(model);
         } break;
         }
 

@@ -7,6 +7,7 @@
 // TODO: remove model from this function
 void Animation::Init(const char *filepath, Model *model, i32 memoryType)
 {
+    this->memoryType = memoryType;
     const aiScene *scene = Utils::importer.ReadFile(filepath, 
         aiProcess_MakeLeftHanded | aiProcess_FlipWindingOrder | aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
     ASSERT(scene);

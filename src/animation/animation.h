@@ -12,10 +12,15 @@ private:
     i32 ticksPerSeconds = 0;
     HashMap<Bone> bones;
     HashMap<BoneInfo> bonesInfo;
+    int memoryType;
 public:
     void Init(const char *filepath, Model *model, i32 memoryType);
     f32 GetDuration() { return duration; }
     i32 GetTicksPerSeconds();
     HashMap<Bone>& GetBones();
     HashMap<BoneInfo>& GetBonesInfo();
+    int GetMemoryType()
+    {
+        return memoryType;
+    }
 };
