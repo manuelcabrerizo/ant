@@ -11,6 +11,8 @@ struct AnimationNode
 {
     Animation* animation = nullptr;
     int id;
+    float time = 0.0f;
+    float speed = 1.0f;
     bool isLooping;
 };
 
@@ -30,7 +32,6 @@ private:
     bool isTransitioning = false;
 
     Matrix4 finalBoneMatrices[100];
-    f32 currentTime = 0.0f;
     f32 deltaTime = 0.0f;
 
 public:
@@ -39,18 +40,18 @@ public:
 
     void SetSkeleton(Skeleton* skeleton);
     void SetAnimation(int animationID);
-    void AddAnimation(int animationID, Animation* animation);
+    void AddAnimation(int animationID, Animation* animation, bool isLooping);
 
     void Animate(f32 dt);
-    void AnimateTransition(int current, int next, float dt);
+    void AnimateTransition(float dt);
 
     void Play();
     void Stop();
     bool IsPlaying(); 
     void Transition(int to, float timeToTarget);
 
-    Animation* GetCurrentAnimation();
-    Animation* GetNextAnimation();
+    AnimationNode* GetCurrentAnimation();
+    AnimationNode* GetNextAnimation();
 
     Matrix4* GetMatrices()
     {

@@ -99,6 +99,26 @@ Matrix4 Bone::Update(f32 animationTime)
     return sca * rotation * translation;
 }
 
+Matrix4 Bone::Update(Bone* bone, float t, float aTime, float bTime)
+{
+    Vector3 aPos = Interpolate<Vector3>(positions, aTime);
+    Quaternion aRot = Interpolate<Quaternion>(rotations, aTime);
+    Vector3 aSca = Interpolate<Vector3>(scales, aTime);
+    
+    Vector3 bPos = Interpolate<Vector3>(bone->positions, bTime);
+    Quaternion bRot = Interpolate<Quaternion>(bone->rotations, bTime);
+    Vector3 bSca = Interpolate<Vector3>(bone->scales, bTime);
+
+    Vector3 pos = aPos.Lerp(bPos, t);
+    Quaternion rot = Quaternion::Slerp(aRot, bRot, t);
+    Vector3 sca = aSca.Lerp(bSca, t);
+
+    Matrix4 translation = Matrix4::Translate(pos);
+    Matrix4 rotation = rot.ToMatrix4();
+    Matrix4 scale = Matrix4::Scale(sca);
+    return scale * rotation * translation;
+}
+
 i32 Bone::GetId()
 {
     return id;

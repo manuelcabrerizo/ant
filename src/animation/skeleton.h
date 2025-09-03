@@ -28,6 +28,10 @@ public:
     void CalculateBoneTransform(Animation* animation, Node* node, Matrix4 parentTransform,
         Matrix4 finalBoneMatrices[], float currentTime);
 
+    void CalculateBoneTransform(Animation* a, Animation* b,
+        Node* node, Matrix4 parentTransform, Matrix4 finalBoneMatrices[],
+        float currentTime, float nextTime, float t);
+
     Node* GetRoot()
     {
         return &root;

@@ -32,6 +32,7 @@ private:
     
 public:
     Matrix4 Update(f32 animationTime);
+    Matrix4 Update(Bone* bone, float t, float aTime, float bTime);
     i32 GetId();
 };
 

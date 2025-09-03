@@ -6,14 +6,13 @@ void AnimationComponent::OnInit(ActorManager* actorManager)
         finalBoneMatrices[i] = Matrix4(1.0f);
     }
     deltaTime = 0.0f;
-    currentTime = 0.0f;
 }
 
 void AnimationComponent::OnUpdate(ActorManager* actorManager, f32 dt)
 {
     if (isTransitioning)
     {
-        AnimateTransition(current, next, dt);
+        AnimateTransition(dt);
 
         t = timer / timeToTarget;
         if (timer > timeToTarget)
@@ -41,34 +40,75 @@ void AnimationComponent::SetAnimation(int animationID)
     this->current = animationID;
 }
 
-void AnimationComponent::AddAnimation(int animationID, Animation* animation)
+void AnimationComponent::AddAnimation(int animationID, Animation* animation, bool isLooping)
 {
     ASSERT(animationID < MAX_ANIMATION_STATE_COUNT);
     AnimationNode handle;
     handle.id = animationID;
     handle.animation = animation;
+    handle.isLooping = isLooping;
     animations.Push(handle);
 }
 
 void AnimationComponent::Animate(f32 dt)
 {
-    if (Animation* current = GetCurrentAnimation())
+    if (AnimationNode* current = GetCurrentAnimation())
     {
         deltaTime = dt;
-        currentTime += current->GetTicksPerSeconds() * dt;
-        currentTime = fmod(currentTime, current->GetDuration());
-        skeleton->CalculateBoneTransform(current, skeleton->GetRoot(), Matrix4(1.0f),
-            finalBoneMatrices, currentTime);
+        current->time += current->animation->GetTicksPerSeconds() * dt;
+        if (current->isLooping)
+        {
+            current->time = fmod(current->time, current->animation->GetDuration());
+        }
+        else
+        {
+            current->time = std::min(current->time, current->animation->GetDuration());
+        }
+        skeleton->CalculateBoneTransform(current->animation, skeleton->GetRoot(), Matrix4(1.0f),
+            finalBoneMatrices, current->time);
     }
 }
 
-void AnimationComponent::AnimateTransition(int current, int next, float dt)
+void AnimationComponent::AnimateTransition(float dt)
 {
+    AnimationNode* current = GetCurrentAnimation();
+    AnimationNode* next = GetNextAnimation();
+    if (current && next)
+    {
+        deltaTime = dt;
+        current->time += current->animation->GetTicksPerSeconds() * dt;
+        if (current->isLooping)
+        {
+            current->time = fmod(current->time, current->animation->GetDuration());
+        }
+        else
+        {
+            current->time = std::min(current->time, current->animation->GetDuration());
+        }
+
+        next->time += next->animation->GetTicksPerSeconds() * dt;
+        if (current->isLooping)
+        {
+            next->time = fmod(next->time, next->animation->GetDuration());
+        }
+        else
+        {
+            next->time = std::min(next->time, next->animation->GetDuration());
+        }
+
+
+        skeleton->CalculateBoneTransform(current->animation, next->animation, skeleton->GetRoot(), Matrix4(1.0f),
+            finalBoneMatrices, current->time, next->time, t);
+    }
 }
 
 void AnimationComponent::Play()
 {
-    isPlaying = true;
+    if (AnimationNode* current = GetCurrentAnimation())
+    {
+        isPlaying = true;
+        current->time = 0.0f;
+    }
 }
 
 void AnimationComponent::Stop()
@@ -87,19 +127,23 @@ void AnimationComponent::Transition(int to, float timeToTarget)
     timer = 0.0f;
     t = 0.0f;
     next = to;
+    if (AnimationNode* nextNode = GetNextAnimation())
+    {
+        nextNode->time = 0.0f;
+    }
     this->timeToTarget = timeToTarget;
 }
 
-Animation* AnimationComponent::GetCurrentAnimation()
+AnimationNode* AnimationComponent::GetCurrentAnimation()
 {
-    Animation* anim = nullptr;
+    AnimationNode* anim = nullptr;
     if (current >= 0)
     {
         for (int i = 0; i < animations.size; i++)
         {
             if (current == i)
             {
-                anim = animations[i].animation;
+                anim = &animations[i];
                 break;
             }
         }
@@ -107,16 +151,16 @@ Animation* AnimationComponent::GetCurrentAnimation()
     return anim;
 }
 
-Animation* AnimationComponent::GetNextAnimation()
+AnimationNode* AnimationComponent::GetNextAnimation()
 {
-    Animation* anim = nullptr;
+    AnimationNode* anim = nullptr;
     if (next >= 0)
     {
         for (int i = 0; i < animations.size; i++)
         {
             if (next == i)
             {
-                anim = animations[i].animation;
+                anim = &animations[i];
                 break;
             }
         }

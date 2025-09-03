@@ -18,8 +18,8 @@ void EnemyComponent::OnInit(ActorManager *actorManager)
 
     // Initialize animation component
     animation->SetSkeleton(SkeletonManager::Get()->Get("Bloodwraith"));
-    animation->AddAnimation((int)EnemyAnimation::Walk, AnimationManager::Get()->Get("Walking"));
-    animation->AddAnimation((int)EnemyAnimation::Dead, AnimationManager::Get()->Get("Death"));
+    animation->AddAnimation((int)EnemyAnimation::Walk, AnimationManager::Get()->Get("Walking"), true);
+    animation->AddAnimation((int)EnemyAnimation::Dead, AnimationManager::Get()->Get("Death"), false);
     animation->SetAnimation((int)EnemyAnimation::Walk);
 
     wander.SetCharacter(&character);
@@ -63,11 +63,11 @@ void EnemyComponent::OnEnemyHit(EnemyHitNotification* enemyHit)
 {
     if (enemyHit->enemy == owner)
     {
-        life--;
-        if (life <= 0)
+        if ((life - 1) == 0)
         {
-            animation->Transition((int)EnemyAnimation::Dead, 0.01f);
+            animation->Transition((int)EnemyAnimation::Dead, 0.25f);
         }
+        life--;
     }
 }
 

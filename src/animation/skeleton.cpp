@@ -61,3 +61,33 @@ void Skeleton::CalculateBoneTransform(Animation *animation, Node *node, Matrix4 
             finalBoneMatrices, currentTime);
     }  
 }
+
+void Skeleton::CalculateBoneTransform(Animation* a, Animation* b,
+    Node* node, Matrix4 parentTransform, Matrix4 finalBoneMatrices[],
+    float currentTime, float nextTime, float t)
+{
+    Matrix4 nodeTransform = node->transformation;
+    HashMap<Bone>& aBones = a->GetBones();
+    HashMap<Bone>& bBones = b->GetBones();
+    Bone* aBone = aBones.Contains(node->name) ? aBones.Get(node->name) : nullptr;
+    Bone* bBone = bBones.Contains(node->name) ? bBones.Get(node->name) : nullptr;
+    if (aBone && bBone)
+    {
+        nodeTransform = aBone->Update(bBone, t, currentTime, nextTime);
+    }
+    Matrix4 globalTransform = nodeTransform * parentTransform;
+
+    // TODO: find a better way of doing this
+    HashMap<BoneInfo>& bonesInfo = a->GetBonesInfo();
+    if (bonesInfo.Contains(node->name))
+    {
+        BoneInfo* boneInfo = bonesInfo.Get(node->name);
+        finalBoneMatrices[boneInfo->id] = boneInfo->offset * globalTransform;
+    }
+
+    for (i32 i = 0; i < node->childrens.size; ++i)
+    {
+        CalculateBoneTransform(a, b, &node->childrens[i], globalTransform,
+            finalBoneMatrices, currentTime, nextTime, t);
+    }
+}
