@@ -13,12 +13,17 @@ void AnimationComponent::OnUpdate(ActorManager* actorManager, f32 dt)
 {
     if (isTransitioning)
     {
+        AnimateTransition(current, next, dt);
+
         t = timer / timeToTarget;
         if (timer > timeToTarget)
         {
+            current = next;
+            next = -1;
             isTransitioning = false;
         }
         timer += dt;
+
     }
     else
     {
@@ -57,6 +62,10 @@ void AnimationComponent::Animate(f32 dt)
     }
 }
 
+void AnimationComponent::AnimateTransition(int current, int next, float dt)
+{
+}
+
 void AnimationComponent::Play()
 {
     isPlaying = true;
@@ -77,6 +86,8 @@ void AnimationComponent::Transition(int to, float timeToTarget)
     isTransitioning = true;
     timer = 0.0f;
     t = 0.0f;
+    next = to;
+    this->timeToTarget = timeToTarget;
 }
 
 Animation* AnimationComponent::GetCurrentAnimation()

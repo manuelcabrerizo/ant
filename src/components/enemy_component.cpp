@@ -20,7 +20,7 @@ void EnemyComponent::OnInit(ActorManager *actorManager)
     animation->SetSkeleton(SkeletonManager::Get()->Get("Bloodwraith"));
     animation->AddAnimation((int)EnemyAnimation::Walk, AnimationManager::Get()->Get("Walking"));
     animation->AddAnimation((int)EnemyAnimation::Dead, AnimationManager::Get()->Get("Death"));
-    animation->SetAnimation((int)EnemyAnimation::Dead);
+    animation->SetAnimation((int)EnemyAnimation::Walk);
 
     wander.SetCharacter(&character);
     wander.SetTarget(&target);
@@ -45,8 +45,7 @@ void EnemyComponent::OnTerminate(ActorManager *actorManager)
 
 void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
-    /*
-    if(physics->grounded)
+    if(physics->grounded && life > 0)
     {
         character.position = transform->position;
         character.velocity = physics->velocity;
@@ -58,12 +57,6 @@ void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
         character.orientation += character.rotation * dt;
         transform->direction = Vector3(-sinf(character.orientation), 0.0f, cosf(character.orientation)).Normalized();
     }
-    */
-
-    if (life <= 0)
-    {
-        actorManager->DestroyActor(owner);
-    }
 }
 
 void EnemyComponent::OnEnemyHit(EnemyHitNotification* enemyHit)
@@ -71,6 +64,10 @@ void EnemyComponent::OnEnemyHit(EnemyHitNotification* enemyHit)
     if (enemyHit->enemy == owner)
     {
         life--;
+        if (life <= 0)
+        {
+            animation->Transition((int)EnemyAnimation::Dead, 0.5f);
+        }
     }
 }
 

@@ -42,6 +42,7 @@ public:
     void AddAnimation(int animationID, Animation* animation);
 
     void Animate(f32 dt);
+    void AnimateTransition(int current, int next, float dt);
 
     void Play();
     void Stop();

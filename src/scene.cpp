@@ -53,6 +53,8 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
             actorManager->AddComponent<AnimationComponent>(enemy, {});
             RenderComponent* render = enemy->GetComponent<RenderComponent>();
             render->isAnimated = true;
+
+            break;
         }
         else
         {
