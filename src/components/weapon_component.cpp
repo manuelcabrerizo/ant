@@ -34,6 +34,7 @@ void WeaponComponent::OnInit(ActorManager *actorManager)
 
 void WeaponComponent::OnTerminate(ActorManager *actorManager)
 {
+    TextureManager::Get()->Unload("Shoot");
     TextureManager::Get()->Unload("Blood");
 
     NotificationManager::Get()->RemoveListener(this, NotificationType::Shoot);

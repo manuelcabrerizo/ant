@@ -40,13 +40,15 @@ void AnimationComponent::SetAnimation(int animationID)
     this->current = animationID;
 }
 
-void AnimationComponent::AddAnimation(int animationID, Animation* animation, bool isLooping)
+void AnimationComponent::AddAnimation(int animationID, Animation* animation,
+    bool isLooping, float speed)
 {
     ASSERT(animationID < MAX_ANIMATION_STATE_COUNT);
     AnimationNode handle;
     handle.id = animationID;
     handle.animation = animation;
     handle.isLooping = isLooping;
+    handle.speed = speed;
     animations.Push(handle);
 }
 
@@ -55,7 +57,7 @@ void AnimationComponent::Animate(f32 dt)
     if (AnimationNode* current = GetCurrentAnimation())
     {
         deltaTime = dt;
-        current->time += current->animation->GetTicksPerSeconds() * dt;
+        current->time += current->animation->GetTicksPerSeconds() * current->speed * dt;
         if (current->isLooping)
         {
             current->time = fmod(current->time, current->animation->GetDuration());
@@ -76,7 +78,7 @@ void AnimationComponent::AnimateTransition(float dt)
     if (current && next)
     {
         deltaTime = dt;
-        current->time += current->animation->GetTicksPerSeconds() * dt;
+        current->time += current->animation->GetTicksPerSeconds() * current->speed * dt;
         if (current->isLooping)
         {
             current->time = fmod(current->time, current->animation->GetDuration());
@@ -86,7 +88,7 @@ void AnimationComponent::AnimateTransition(float dt)
             current->time = std::min(current->time, current->animation->GetDuration());
         }
 
-        next->time += next->animation->GetTicksPerSeconds() * dt;
+        next->time += next->animation->GetTicksPerSeconds() * next->speed * dt;
         if (current->isLooping)
         {
             next->time = fmod(next->time, next->animation->GetDuration());

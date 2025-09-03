@@ -34,13 +34,16 @@ private:
     Matrix4 finalBoneMatrices[100];
     f32 deltaTime = 0.0f;
 
+    AnimationNode* GetCurrentAnimation();
+    AnimationNode* GetNextAnimation();
+
 public:
     void OnInit(ActorManager* actorManager) override;
     void OnUpdate(ActorManager* actorManager, f32 dt);
 
     void SetSkeleton(Skeleton* skeleton);
     void SetAnimation(int animationID);
-    void AddAnimation(int animationID, Animation* animation, bool isLooping);
+    void AddAnimation(int animationID, Animation* animation, bool isLooping, float speed = 1.0f);
 
     void Animate(f32 dt);
     void AnimateTransition(float dt);
@@ -49,9 +52,6 @@ public:
     void Stop();
     bool IsPlaying(); 
     void Transition(int to, float timeToTarget);
-
-    AnimationNode* GetCurrentAnimation();
-    AnimationNode* GetNextAnimation();
 
     Matrix4* GetMatrices()
     {

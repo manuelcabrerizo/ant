@@ -109,7 +109,7 @@ void PlayState::OnRender()
 
     actorManager.RenderComponents<WeaponComponent>();
 
-    //CollisionWorld::Get()->DebugDraw();
+    CollisionWorld::Get()->DebugDraw();
     GraphicsManager::Get()->DebugPresent();
 
     // Render the Crosshair

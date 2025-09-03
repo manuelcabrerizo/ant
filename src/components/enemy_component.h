@@ -9,6 +9,7 @@
 class TransformComponent;
 class PhysicsComponent;
 class AnimationComponent;
+class ColliderComponent;
 
 enum class EnemyAnimation
 {
@@ -24,6 +25,7 @@ private:
     TransformComponent* transform;
     PhysicsComponent* physics;
     AnimationComponent* animation;
+    ColliderComponent* collider;
 
     Kinematic character;
     Kinematic target;
