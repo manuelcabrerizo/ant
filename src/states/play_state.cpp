@@ -2,8 +2,6 @@
 #include <game_manager.h>
 #include <input_manager.h>
 
-#include <asset_managers/texture_manager.h>
-
 #include <components/component.h>
 #include <components/transform_component.h>
 #include <components/render_component.h>
@@ -18,11 +16,13 @@
 #include <components/bullet_component.h>
 
 #include <collision.h>
-#include <asset_managers/shader_manager.h>
 #include <math/algebra.h>
+
+#include <asset_managers/shader_manager.h>
 #include <asset_managers/model_manager.h>
 #include <asset_managers/animation_manager.h>
 #include <asset_managers/material_manager.h>
+#include <asset_managers/texture_manager.h>
 
 void PlayState::Init(GameManager *gameManager)
 {
@@ -73,6 +73,7 @@ void PlayState::OnExit()
 
     NotificationManager::Get()->RemoveListener(this, NotificationType::OnResize);
 
+    // Remove all assets loaded for the level
     AnimationManager::Get()->Clear(FRAME_MEMORY);
     SkeletonManager::Get()->Clear(FRAME_MEMORY);
     MaterialManager::Get()->Clear(FRAME_MEMORY);
@@ -80,6 +81,7 @@ void PlayState::OnExit()
     VertexShaderManager::Get()->Clear(FRAME_MEMORY);
     FragmentShaderManager::Get()->Clear(FRAME_MEMORY);
     TextureManager::Get()->Clear(FRAME_MEMORY);
+
     MemoryManager::Get()->ReleaseFrame(memoryFrame);
 }
 
@@ -113,7 +115,7 @@ void PlayState::OnRender()
 
     actorManager.RenderComponents<WeaponComponent>();
 
-    CollisionWorld::Get()->DebugDraw();
+    //CollisionWorld::Get()->DebugDraw();
     GraphicsManager::Get()->DebugPresent();
 
     // Render the Crosshair
