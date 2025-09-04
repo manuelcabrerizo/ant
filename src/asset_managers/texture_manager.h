@@ -15,12 +15,13 @@ private:
     static TextureManager instance;
     static bool initialize;
     TextureManager() {}
+
+    void Unload(TextureHandle* handle) override;
 public:
     static void Initialize(u32 assetsCapacity);
     static void Shutdown();
     static TextureManager* Get();
 
-    void Load(const char* name, const char* path);
-    void Unload(const char* name) override;
+    void Load(const char* name, const char* path, int memoryType);
     Texture* Get(const char* name);
 };

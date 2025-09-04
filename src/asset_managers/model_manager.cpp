@@ -1,4 +1,5 @@
 #include "model_manager.h"
+#include <memory_manager.h>
 
 ModelManager ModelManager::instance;
 bool ModelManager::initialize = false;
@@ -9,8 +10,6 @@ void ModelManager::Initialize(u32 assetsCapacity)
     {
         ASSERT(!"Error: model manager already initialize");
     }
-    instance.staticAllocator.Init(STATIC_MEMORY);
-    instance.frameAllocator.Init(FRAME_MEMORY);
     instance.Init(assetsCapacity);
     initialize = true;
 }
@@ -34,66 +33,26 @@ ModelManager* ModelManager::Get()
     return &instance;
 }
 
-void ModelManager::ResetFrameAllocator()
-{
-    instance.frameAllocator.Init(FRAME_MEMORY);
-}
 
 void ModelManager::Load(const char* name, const char* path, int memoryType)
 {
-    if (ShouldLoad(name))
+    if (!Contains(name))
     {
-        Model* model = nullptr;
-        switch (memoryType)
-        {
-        case STATIC_MEMORY:
-        {
-            model = staticAllocator.Alloc();
-        } break;
-        case FRAME_MEMORY:
-        {
-            model = frameAllocator.Alloc();
-        } break;
-        }
-
+        void* buffer = MemoryManager::Get()->Alloc(sizeof(Model), memoryType);
+        Model* model = new (buffer) Model();
         model->Init(path, memoryType);
 
-        void* buffer = assets.Alloc();
-        ModelHandle* modelHandle = new (buffer) ModelHandle();
-        modelHandle->name = name;
-        modelHandle->model = model;
+        ModelHandle modelHandle{};
+        modelHandle.name = name;
+        modelHandle.model = model;
 
-        AssetManager::AssetRef assetRef;
-        assetRef.refCount = 1;
-        assetRef.asset = modelHandle;
-
-        nameIndex.Add(name, assetRef);
+        AssetManager::Add(modelHandle, memoryType);
     }
 }
 
-void ModelManager::Unload(const char* name)
+void ModelManager::Unload(ModelHandle* handle)
 {
-    if (ShouldUnload(name))
-    {
-        ModelHandle* modelHandle = nameIndex.Get(name)->asset;
-        Model* model = modelHandle->model;
-        model->Terminate();
-
-        switch (model->GetMemoryType())
-        {
-        case STATIC_MEMORY:
-        {
-            staticAllocator.Free(model);
-        } break;
-        case FRAME_MEMORY:
-        {
-            frameAllocator.Free(model);
-        } break;
-        }
-
-        nameIndex.Remove(name);
-        assets.Free(modelHandle);
-    }
+    handle->model->Terminate();
 }
 
 Model* ModelManager::Get(const char* name)

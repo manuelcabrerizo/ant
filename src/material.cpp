@@ -6,15 +6,9 @@
 #include <string.h>
 
 
-void Material::Init(const char* shaderName)
+void Material::Init(FragmentShader* shader)
 {
-    size_t shaderNameLen = strlen(shaderName);
-    ASSERT(shaderNameLen <= _MAX_PATH);
-    memset(this->shaderName, 0, _MAX_PATH);
-    memcpy(this->shaderName, shaderName, shaderNameLen);
-
-    ASSERT(FragmentShaderManager::Get()->Contains(shaderName));
-    this->shader = FragmentShaderManager::Get()->Get(shaderName);
+    this->shader = shader;
 }
 
 void Material::Terminate()
@@ -25,10 +19,10 @@ void Material::Terminate()
 i32 SolidColorMaterial::instanceCount = 0;
 UniformBuffer* SolidColorMaterial::uniformBuffer = nullptr;
 
-void SolidColorMaterial::Init(const char* shaderName, const Vector3& ambient, 
+void SolidColorMaterial::Init(FragmentShader* shader, const Vector3& ambient,
     const Vector3& diffuse, const Vector3& specular, f32 shininess)
 {
-    Material::Init(shaderName);
+    Material::Init(shader);
     this->ambient = ambient;
     this->diffuse = diffuse;
     this->specular = specular;
@@ -72,47 +66,33 @@ void SolidColorMaterial::Bind()
 i32 TextureMaterial::instanceCount = 0;
 UniformBuffer* TextureMaterial::uniformBuffer = nullptr;
 
-void TextureMaterial::Init(const char* shaderName, const char* diffuseName,
-    const char* normalName, const char* specularName, f32 shininess)
+void TextureMaterial::Init(FragmentShader* shader, Texture* diffuse,
+    Texture* normal, Texture* specular, f32 shininess)
 {
-    Material::Init(shaderName);
+    Material::Init(shader);
 
-    size_t diffuseNameLen = strlen(diffuseName);
-    ASSERT(diffuseNameLen <= _MAX_PATH);
-    memset(this->diffuseName, 0, _MAX_PATH);
-    memcpy(this->diffuseName, diffuseName, diffuseNameLen);
 
-    size_t normalNameLen = strlen(normalName);
-    ASSERT(normalNameLen <= _MAX_PATH);
-    memset(this->normalName, 0, _MAX_PATH);
-    memcpy(this->normalName, normalName, normalNameLen);
-
-    size_t specularNameLen = strlen(specularName);
-    ASSERT(specularNameLen <= _MAX_PATH);
-    memset(this->specularName, 0, _MAX_PATH);
-    memcpy(this->specularName, specularName, specularNameLen);
-
-    if (TextureManager::Get()->Contains(diffuseName))
+    if (diffuse)
     {
-        this->diffuse = TextureManager::Get()->Get(diffuseName);
+        this->diffuse = diffuse;
     }
     else
     {
         this->diffuse = TextureManager::Get()->Get("DefaultMaterial_Diffuse");
     }
 
-    if (TextureManager::Get()->Contains(normalName))
+    if (normal)
     {
-        this->normal = TextureManager::Get()->Get(normalName);
+        this->normal = normal;
     }
     else
     {
         this->normal = TextureManager::Get()->Get("DefaultMaterial_Normal");
     }
 
-    if (TextureManager::Get()->Contains(specularName))
+    if (specular)
     {
-        this->specular = TextureManager::Get()->Get(specularName);
+        this->specular = specular;
     }
     else
     {

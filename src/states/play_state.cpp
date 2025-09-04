@@ -22,6 +22,7 @@
 #include <math/algebra.h>
 #include <asset_managers/model_manager.h>
 #include <asset_managers/animation_manager.h>
+#include <asset_managers/material_manager.h>
 
 void PlayState::Init(GameManager *gameManager)
 {
@@ -47,7 +48,7 @@ void PlayState::OnEnter()
     notification.extent = extent;
     OnResize(&notification);
 
-    TextureManager::Get()->Load("Crosshair", "data/textures/Crosshair.png");
+    TextureManager::Get()->Load("Crosshair", "data/textures/Crosshair.png", FRAME_MEMORY);
 
     crosshairSize = Vector2(32, 32);
     crosshairPosition = (extent * 0.5f);
@@ -69,13 +70,16 @@ void PlayState::OnExit()
     RenderComponent::Terminate();
     CameraComponent::Terminate();
 
-    TextureManager::Get()->Unload("Crosshair");
 
     NotificationManager::Get()->RemoveListener(this, NotificationType::OnResize);
 
-    ModelManager::Get()->ResetFrameAllocator();
-    SkeletonManager::Get()->ResetFrameAllocator();
-    AnimationManager::Get()->ResetFrameAllocator();
+    AnimationManager::Get()->Clear(FRAME_MEMORY);
+    SkeletonManager::Get()->Clear(FRAME_MEMORY);
+    MaterialManager::Get()->Clear(FRAME_MEMORY);
+    ModelManager::Get()->Clear(FRAME_MEMORY);
+    VertexShaderManager::Get()->Clear(FRAME_MEMORY);
+    FragmentShaderManager::Get()->Clear(FRAME_MEMORY);
+    TextureManager::Get()->Clear(FRAME_MEMORY);
     MemoryManager::Get()->ReleaseFrame(memoryFrame);
 }
 

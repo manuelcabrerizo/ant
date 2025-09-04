@@ -15,13 +15,14 @@ private:
     static VertexShaderManager instance;
     static bool initialize;
     VertexShaderManager() {}
+
+    void Unload(VertexShaderHandle* handle) override;
 public:
     static void Initialize(u32 assetsCapacity);
     static void Shutdown();
     static VertexShaderManager* Get();
 
-    void Load(const char* name, const char* filePath);
-    void Unload(const char* name) override;
+    void Load(const char* name, const char* filePath, int memoryType);
     void Bind(const char* name);
     VertexShader* Get(const char* name);
 };
@@ -38,13 +39,14 @@ private:
     static FragmentShaderManager instance;
     static bool initialize;
     FragmentShaderManager() {}
+
+    void Unload(FragmentShaderHandle* handle) override;
 public:
     static void Initialize(u32 assetsCapacity);
     static void Shutdown();
     static FragmentShaderManager* Get();
 
-    void Load(const char* name, const char* filePath);
-    void Unload(const char* name) override;
+    void Load(const char* name, const char* filePath, int memoryType);
     void Bind(const char* name);
     FragmentShader* Get(const char* name);
 };

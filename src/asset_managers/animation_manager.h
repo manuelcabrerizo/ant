@@ -19,17 +19,13 @@ private:
     static bool initialize;
     SkeletonManager() {}
 
-    ObjectAllocator<Skeleton> staticAllocator;
-    ObjectAllocator<Skeleton> frameAllocator;
-
+    void Unload(SkeletonHandle* handle) override;
 public:
     static void Initialize(u32 assetsCapacity);
     static void Shutdown();
-    static void ResetFrameAllocator();
     static SkeletonManager* Get();
 
     void Load(const char* name, const char* path, int memoryType);
-    void Unload(const char* name) override;
     Skeleton* Get(const char* name);
 };
 
@@ -46,16 +42,12 @@ private:
     static bool initialize;
     AnimationManager() {}
 
-    ObjectAllocator<Animation> staticAllocator;
-    ObjectAllocator<Animation> frameAllocator;
-
+    void Unload(AnimationHandle* handle) override;
 public:
     static void Initialize(u32 assetsCapacity);
     static void Shutdown();
-    static void ResetFrameAllocator();
     static AnimationManager* Get();
 
     void Load(const char* name, const char* path, Model* model, int memoryType);
-    void Unload(const char* name) override;
     Animation* Get(const char* name);
 };

@@ -34,6 +34,17 @@ void GameManager::Terminate()
 void GameManager::Update(f32 dt)
 {
     stateMachine.Update(dt);
+
+    /*
+    size_t freeMemory = MemoryManager::Get()->GetFreeMemoryCount(STATIC_MEMORY);
+    char buffer[256] = {};
+    sprintf(buffer, "STATIC: free memory: %zu\n", freeMemory);
+    OutputDebugString(buffer);
+
+    freeMemory = MemoryManager::Get()->GetFreeMemoryCount(FRAME_MEMORY);
+    sprintf(buffer, "FRAME: free memory: %zu\n", freeMemory);
+    OutputDebugString(buffer);
+    */
 }
 
 void GameManager::Render(f32 dt)
@@ -85,25 +96,28 @@ void GameManager::ShutdownAssetsManagers()
 void GameManager::LoadDefaultAssets()
 {
     // Load Vertex the shaders
-    VertexShaderManager::Get()->Load("default", "data/shaders/vert.hlsl");
-    VertexShaderManager::Get()->Load("animation", "data/shaders/animation_vert.hlsl");
-    VertexShaderManager::Get()->Load("ui_vert", "data/shaders/ui_vert.hlsl");
-    VertexShaderManager::Get()->Load("particle_vert", "data/shaders/particle_vert.hlsl");
+    VertexShaderManager::Get()->Load("default", "data/shaders/vert.hlsl", STATIC_MEMORY);
+    VertexShaderManager::Get()->Load("animation", "data/shaders/animation_vert.hlsl", STATIC_MEMORY);
+    VertexShaderManager::Get()->Load("ui_vert", "data/shaders/ui_vert.hlsl", STATIC_MEMORY);
+    VertexShaderManager::Get()->Load("particle_vert", "data/shaders/particle_vert.hlsl", STATIC_MEMORY);
     VertexShaderManager::Get()->Bind("default");
 
     // Load Fragment the shaders
-    FragmentShaderManager::Get()->Load("default", "data/shaders/frag.hlsl");
-    FragmentShaderManager::Get()->Load("color", "data/shaders/color.hlsl");
-    FragmentShaderManager::Get()->Load("ui_frag", "data/shaders/ui_frag.hlsl");
-    FragmentShaderManager::Get()->Load("particle_frag", "data/shaders/particle_frag.hlsl");
+    FragmentShaderManager::Get()->Load("default", "data/shaders/frag.hlsl", STATIC_MEMORY);
+    FragmentShaderManager::Get()->Load("color", "data/shaders/color.hlsl", STATIC_MEMORY);
+    FragmentShaderManager::Get()->Load("ui_frag", "data/shaders/ui_frag.hlsl", STATIC_MEMORY);
+    FragmentShaderManager::Get()->Load("particle_frag", "data/shaders/particle_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Bind("default");
 
     // Load textures
-    TextureManager::Get()->Load("DefaultMaterial_Diffuse", "data/textures/DefaultTextures/DefaultMaterial_Diffuse.png");
-    TextureManager::Get()->Load("DefaultMaterial_Normal", "data/textures/DefaultTextures/DefaultMaterial_Normal.png");
-    TextureManager::Get()->Load("DefaultMaterial_Specular", "data/textures/DefaultTextures/DefaultMaterial_Specular.png");
+    TextureManager::Get()->Load("DefaultMaterial_Diffuse", "data/textures/DefaultTextures/DefaultMaterial_Diffuse.png", STATIC_MEMORY);
+    TextureManager::Get()->Load("DefaultMaterial_Normal", "data/textures/DefaultTextures/DefaultMaterial_Normal.png", STATIC_MEMORY);
+    TextureManager::Get()->Load("DefaultMaterial_Specular", "data/textures/DefaultTextures/DefaultMaterial_Specular.png", STATIC_MEMORY);
 
     // Load Materials
-    MaterialManager::Get()->LoadTexture("DefaultMaterial", "default",
-        "DefaultMaterial_Diffuse", "DefaultMaterial_Normal", "DefaultMaterial_Specular", 64);
+    MaterialManager::Get()->LoadTexture("DefaultMaterial", FragmentShaderManager::Get()->Get("default"),
+        TextureManager::Get()->Get("DefaultMaterial_Diffuse"),
+        TextureManager::Get()->Get("DefaultMaterial_Normal"),
+        TextureManager::Get()->Get("DefaultMaterial_Specular"),
+        64, STATIC_MEMORY);
 }

@@ -10,14 +10,13 @@ void MenuState::Init(GameManager* gameManager)
     uiRenderer.Init();
 
     // Load menu assets
-    TextureManager::Get()->Load("PlayButton", "data/textures/play_button.png");
-    TextureManager::Get()->Load("PlayButtonSelected", "data/textures/play_button_selected.png");
-    TextureManager::Get()->Load("PlayButtonClicked", "data/textures/play_button_clicked.png");
-    TextureManager::Get()->Load("ExitButton", "data/textures/exit_button.png");
-    TextureManager::Get()->Load("ExitButtonSelected", "data/textures/exit_button_selected.png");
-    TextureManager::Get()->Load("ExitButtonClicked", "data/textures/exit_button_clicked.png");
-
-    TextureManager::Get()->Load("BackGround", "data/textures/blood_1.png");
+    TextureManager::Get()->Load("PlayButton", "data/textures/play_button.png", STATIC_MEMORY);
+    TextureManager::Get()->Load("PlayButtonSelected", "data/textures/play_button_selected.png", STATIC_MEMORY);
+    TextureManager::Get()->Load("PlayButtonClicked", "data/textures/play_button_clicked.png", STATIC_MEMORY);
+    TextureManager::Get()->Load("ExitButton", "data/textures/exit_button.png", STATIC_MEMORY);
+    TextureManager::Get()->Load("ExitButtonSelected", "data/textures/exit_button_selected.png", STATIC_MEMORY);
+    TextureManager::Get()->Load("ExitButtonClicked", "data/textures/exit_button_clicked.png", STATIC_MEMORY);
+    TextureManager::Get()->Load("BackGround", "data/textures/blood_1.png", STATIC_MEMORY);
 
     // allocate memory for the buttons
     buttons.Init(2, STATIC_MEMORY);

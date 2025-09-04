@@ -32,30 +32,21 @@ TextureManager* TextureManager::Get()
     return &instance;
 }
 
-void TextureManager::Load(const char* name, const char* path)
+void TextureManager::Load(const char* name, const char* path, int memoryType)
 {
-    if (ShouldLoad(name))
+    if (!Contains(name))
     {
-        void *buffer = assets.Alloc();
-        TextureHandle* textureHandle = new (buffer) TextureHandle();
-        memcpy((void*)textureHandle->name, (void*)name, strlen(name));
-        textureHandle->texture = GraphicsManager::Get()->TextureAlloc(path);
-        AssetManager::AssetRef assetRef;
-        assetRef.refCount = 1;
-        assetRef.asset = textureHandle;
-        nameIndex.Add(textureHandle->name, assetRef);
+        TextureHandle textureHandle{};
+        memcpy((void*)textureHandle.name, (void*)name, strlen(name));
+        textureHandle.texture = GraphicsManager::Get()->TextureAlloc(path);
+
+        AssetManager::Add(textureHandle, memoryType);
     }
 }
 
-void TextureManager::Unload(const char* name)
+void TextureManager::Unload(TextureHandle* handle)
 {
-    if (ShouldUnload(name))
-    {
-        TextureHandle* textureHandle = nameIndex.Get(name)->asset;
-        GraphicsManager::Get()->TextureFree(textureHandle->texture);
-        nameIndex.Remove(name);
-        assets.Free(textureHandle);
-    }
+    GraphicsManager::Get()->TextureFree(handle->texture);   
 }
 
 Texture* TextureManager::Get(const char* name)

@@ -21,12 +21,12 @@ void WeaponComponent::OnInit(ActorManager *actorManager)
     collider = owner->GetComponent<ColliderComponent>();
     camera = owner->GetComponent<CameraComponent>();
 
-    TextureManager::Get()->Load("Blood", "data/textures/blood2.png");
+    TextureManager::Get()->Load("Blood", "data/textures/blood2.png", FRAME_MEMORY);
     bloodPs.SetPosition(transform->position);
     bloodPs.SetTexture(TextureManager::Get()->Get("Blood"));
     bloodPs.Stop();
 
-    TextureManager::Get()->Load("Shoot", "data/textures/shoot.png");
+    TextureManager::Get()->Load("Shoot", "data/textures/shoot.png", FRAME_MEMORY);
     shootPs.SetPosition(transform->position);
     shootPs.SetTexture(TextureManager::Get()->Get("Shoot"));
     shootPs.Stop();
@@ -34,9 +34,6 @@ void WeaponComponent::OnInit(ActorManager *actorManager)
 
 void WeaponComponent::OnTerminate(ActorManager *actorManager)
 {
-    TextureManager::Get()->Unload("Shoot");
-    TextureManager::Get()->Unload("Blood");
-
     NotificationManager::Get()->RemoveListener(this, NotificationType::Shoot);
 }
 

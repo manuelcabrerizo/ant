@@ -5,108 +5,91 @@
 template <typename Type>
 class AssetManager
 {
-public:
-    struct AssetRef
-    {
-        Type *asset = nullptr;
-        int refCount = 0;
-    };
-
 protected:
-    // change slotmap for a BlockArray
-     BlockAllocator<sizeof(Type)> assets;
-     HashMap<AssetRef> nameIndex;
+     HashMap<Type> assetsMap;
+     Array<Type*> staticAssetsList;
+     Array<Type*> frameAssetsList;
 public:
      virtual ~AssetManager() {}
      
-     virtual void Init(u32 assetsCapacity);
+     void Init(u32 assetsCapacity);
      void Terminate();
-     void Clear();
-     bool Contains(const char* name);
 
-     virtual void Unload(const char *name) = 0;
+     void Clear(int memoryType);
+     bool Contains(const char* name);
+     Type* Get(const char* name);
+
 protected:
-     Type *Get(const char *name);
-     
-     bool ShouldLoad(const char* name);
-     bool ShouldUnload(const char* name);
+    void Add(Type asset, int memoryType);
+     virtual void Unload(Type* handle) = 0;
 };
 
 template <typename Type>
 void AssetManager<Type>::Init(u32 assetsCapacity)
 {
-    nameIndex.Init(assetsCapacity, STATIC_MEMORY);
-    assets.Init(assetsCapacity, STATIC_MEMORY);
+    assetsMap.Init(assetsCapacity, STATIC_MEMORY);
+    staticAssetsList.Init(assetsCapacity, STATIC_MEMORY);
+    frameAssetsList.Init(assetsCapacity, STATIC_MEMORY);
 }
 
 template <typename Type>
 void AssetManager<Type>::Terminate()
 {
-    Clear();
+    Clear(FRAME_MEMORY);
+    Clear(STATIC_MEMORY);
 }
 
 template <typename Type>
-void AssetManager<Type>::Clear()
+void AssetManager<Type>::Clear(int memoryType)
 {
-    auto assetsArray = assets.GetBlockArray();
-    size_t size = assets.GetBlockCount();
-    size_t used = assets.GetBlockUsed();
-
-    size_t usedFound = 0;
-    for (int i = 0; i < size; ++i)
+    switch (memoryType)
     {
-        if (!assetsArray[i].header.occupied)
+    case FRAME_MEMORY:
+    {
+        for (int i = 0; i < frameAssetsList.size; i++)
         {
-            continue;
+            Unload(frameAssetsList[i]);
+            assetsMap.Remove(frameAssetsList[i]->name);
         }
-        usedFound++;
-
-        Type* asset = (Type*)&assetsArray[i].data[0];
-        Unload(asset->name);
-
-        if (usedFound == used)
+        frameAssetsList.Clear();
+    } break;
+    case STATIC_MEMORY:
+    {
+        for (int i = 0; i < staticAssetsList.size; i++)
         {
-            break;
+            Unload(staticAssetsList[i]);
+            assetsMap.Remove(staticAssetsList[i]->name);
         }
+        staticAssetsList.Clear();
+    } break;
     }
 }
 
 template <typename Type>
 Type* AssetManager<Type>::Get(const char* name)
 {
-    return nameIndex.Get(name)->asset;
+    return assetsMap.Get(name);
 }
 
 template <typename Type>
 bool AssetManager<Type>::Contains(const char* name)
 {
-    return nameIndex.Contains(name);
+    return assetsMap.Contains(name);
 }
 
 template <typename Type>
-bool AssetManager<Type>::ShouldLoad(const char* name)
+void AssetManager<Type>::Add(Type asset, int memoryType)
 {
-    if (Contains(name))
+    assetsMap.Add(asset.name, asset);
+    switch (memoryType)
     {
-        // increment ref
-        auto assetRef = nameIndex.Get(name);
-        assetRef->refCount++;
-        return false;
-    }
-    return true;
-}
-
-// TODO: return the handle to the asset to not repear the call to
-// nameIndex.Get
-template <typename Type>
-bool AssetManager<Type>::ShouldUnload(const char* name)
-{
-    ASSERT(Contains(name));
-    auto assetRef = nameIndex.Get(name);
-    assetRef->refCount--;
-    if (assetRef->refCount == 0)
+    case FRAME_MEMORY:
     {
-        return true;
+        frameAssetsList.Push(assetsMap.Get(asset.name));
+    } break;
+    case STATIC_MEMORY:
+    {
+        staticAssetsList.Push(assetsMap.Get(asset.name));
+    } break;
     }
-    return false;
 }

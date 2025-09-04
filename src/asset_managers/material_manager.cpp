@@ -32,80 +32,58 @@ MaterialManager* MaterialManager::Get()
     return &instance;
 }
 
-void MaterialManager::Init(u32 assetsCapacity)
-{
-    AssetManager::Init(assetsCapacity);
-    allocator.Init(100, STATIC_MEMORY);
-}
-
 void MaterialManager::LoadSolidColor(const char* name,
-    const char* shaderName,
+    FragmentShader* shader,
     const Vector3& ambient,
     const Vector3& diffuse,
     const Vector3& specular,
-    f32 shininess)
+    f32 shininess, int memoryType)
 {
-    if (ShouldLoad(name))
+    if (!Contains(name))
     {
-        void* materialHandleBuffer = assets.Alloc();
-        MaterialHandle* materialHandle = new (materialHandleBuffer) MaterialHandle();
-        memcpy((void*)materialHandle->name, (void*)name, strlen(name));
-        void* buffer = allocator.Alloc();
+        void* buffer = MemoryManager::Get()->Alloc(sizeof(SolidColorMaterial), memoryType);
         SolidColorMaterial* material = new (buffer) SolidColorMaterial;
-        material->Init(shaderName, ambient, diffuse, specular, shininess);
-        materialHandle->material = material;
+        material->Init(shader, ambient, diffuse, specular, shininess);
 
-        AssetManager::AssetRef assetRef;
-        assetRef.refCount = 1;
-        assetRef.asset = materialHandle;
+        MaterialHandle materialHandle{};
+        memcpy((void*)materialHandle.name, (void*)name, strlen(name));
+        materialHandle.material = material;
 
-        nameIndex.Add(name, assetRef);
+        AssetManager::Add(materialHandle, memoryType);
     }
 }
 
 void MaterialManager::LoadTexture(const char* name,
-    const char* shaderName,
-    const char* diffuseName,
-    const char* normalName,
-    const char* specularName,
-    f32 shininess)
+    FragmentShader* shader,
+    Texture* diffuse,
+    Texture* normal,
+    Texture* specular,
+    f32 shininess, int memoryType)
 {
-    if (ShouldLoad(name))
+    if (!Contains(name))
     {
-        void* materialHandleBuffer = assets.Alloc();
-        MaterialHandle* materialHandle = new (materialHandleBuffer) MaterialHandle();
-
-        memcpy((void*)materialHandle->name, (void*)name, strlen(name));
-        void* buffer = allocator.Alloc();
+        void* buffer = MemoryManager::Get()->Alloc(sizeof(TextureMaterial), memoryType);
         TextureMaterial* material = new (buffer) TextureMaterial;
-        material->Init(shaderName, diffuseName, normalName, specularName, shininess);
-        materialHandle->material = material;
+        material->Init(shader, diffuse, normal, specular, shininess);
 
-        AssetManager::AssetRef assetRef;
-        assetRef.refCount = 1;
-        assetRef.asset = materialHandle;
+        MaterialHandle materialHandle{};
+        memcpy((void*)materialHandle.name, (void*)name, strlen(name));
+        materialHandle.material = material;
 
-        nameIndex.Add(name, assetRef);
+        AssetManager::Add(materialHandle, memoryType);
     }
 }
 
 
-void MaterialManager::Unload(const char* name)
+void MaterialManager::Unload(MaterialHandle* handle)
 {
-    if (ShouldUnload(name))
-    {
-        MaterialHandle* materialHandle = nameIndex.Get(name)->asset;
-        Material* material = materialHandle->material;
-        material->Terminate();
-        allocator.Free(material);
-        nameIndex.Remove(name);
-        assets.Free(materialHandle);
-    }
+    handle->material->Terminate();
 }
 
 void MaterialManager::Bind(const char* name)
 {
-    AssetManager::Get(name)->material->Bind();
+    MaterialHandle* handle = AssetManager::Get(name);
+    handle->material->Bind();
 }
 
 Material* MaterialManager::Get(const char* name)

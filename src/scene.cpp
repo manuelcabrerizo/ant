@@ -77,15 +77,4 @@ void Scene::Unload()
 {
     ASSERT(actorManager != nullptr);
     actorManager->Clear();
-
-    // Unload Animations
-    SkeletonManager::Get()->Unload("Bloodwraith");
-    AnimationManager::Get()->Unload("Death");
-    AnimationManager::Get()->Unload("Walking");
-
-    // Unload the models
-    ModelManager::Get()->Unload("enemy");
-    ModelManager::Get()->Unload("anim-gun");
-    ModelManager::Get()->Unload("bullet");
-    ModelManager::Get()->Unload("level1");
 }

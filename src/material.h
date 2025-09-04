@@ -7,11 +7,10 @@
 class Material
 {
 protected:
-    char shaderName[_MAX_PATH + 1] = {};
     FragmentShader* shader = nullptr;
 
     Material() {}
-    void Init(const char* shaderName);
+    void Init(FragmentShader* shader);
 public:
     virtual ~Material() {}
     virtual void Bind() = 0;
@@ -31,7 +30,7 @@ struct SolidColorUbo
 class SolidColorMaterial : public Material
 {
 public:
-    void Init(const char* shaderName, const Vector3& ambient,
+    void Init(FragmentShader* shader, const Vector3& ambient,
         const Vector3& diffuse, const Vector3& specular, f32 shininess);
     void Terminate() override;
     void Bind() override;
@@ -56,17 +55,13 @@ struct TextureUbo
 class TextureMaterial : public Material
 {
 public:
-    void Init(const char* shaderName, const char* diffuseName, 
-        const char* normalName, const char* specularName, f32 shininess);
+    void Init(FragmentShader* shader, Texture* diffuse, 
+        Texture* normal, Texture* specular, f32 shininess);
     void Terminate() override;
     void Bind() override;
 private:
     static i32 instanceCount;
     static UniformBuffer* uniformBuffer;
-
-    char diffuseName[_MAX_PATH + 1] = {};
-    char normalName[_MAX_PATH + 1] = {};
-    char specularName[_MAX_PATH + 1] = {};
 
     Texture* diffuse = nullptr;
     Texture* specular = nullptr;

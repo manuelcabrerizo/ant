@@ -9,6 +9,7 @@
 #include <strings.h>
 #include <asset_managers/texture_manager.h>
 #include <asset_managers/material_manager.h>
+#include <asset_managers/shader_manager.h>
 
 void Mesh::Init(Vertex *vertices, u32 verticesCount,
                 u32 *indices, u32 indicesCount)
@@ -110,7 +111,7 @@ void Model::Init(const char *filepath, i32 memoryType)
                     diffuseTextureName = tempPath + (nameIndex + 1);
 
                     texturesNames.Push(std::string(diffuseTextureName));
-                    TextureManager::Get()->Load(diffuseTextureName, texturePath);
+                    TextureManager::Get()->Load(diffuseTextureName, texturePath, memoryType);
                      
                  }
              }
@@ -128,13 +129,19 @@ void Model::Init(const char *filepath, i32 memoryType)
 
              if (isTextured)
              {
-                MaterialManager::Get()->LoadTexture(materialName, "default",
-                    diffuseTextureName, normalTextureName, specularTextureName, 64);
+                MaterialManager::Get()->LoadTexture(materialName,
+                    FragmentShaderManager::Get()->Get("default"),
+                    TextureManager::Get()->Get(diffuseTextureName),
+                    TextureManager::Get()->Get(normalTextureName),
+                    TextureManager::Get()->Get(specularTextureName),
+                    64, memoryType);
              }
              else
              {
-                MaterialManager::Get()->LoadSolidColor(materialName, "color", diffuseColor,
-                    diffuseColor, Vector3(1.0f, 1.0f, 1.0f), 64);
+                MaterialManager::Get()->LoadSolidColor(materialName,
+                    FragmentShaderManager::Get()->Get("color"),
+                    diffuseColor, diffuseColor, Vector3(1.0f, 1.0f, 1.0f),
+                    64, memoryType);
              }
 
              MemoryManager::Get()->ReleaseFrame(stringFrame);
@@ -270,18 +277,6 @@ void Model::Terminate()
     for(i32  i = 0; i < meshes.size; ++i)
     {
         meshes[i].Terminate();
-    }
-
-    // Unload the materials loaded from the model
-    for (int i = 0; i < materialNames.size; ++i)
-    {
-        MaterialManager::Get()->Unload(materialNames[i].c_str());
-    }
-
-    // Unload the textures loaded from the model
-    for (int i = 0; i < texturesNames.size; ++i)
-    {
-        TextureManager::Get()->Unload(texturesNames[i].c_str());
     }
 }
 
