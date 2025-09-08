@@ -35,7 +35,7 @@ private:
     float timer = 0.0f;
 
     virtual void OnParticleSpawn(Particle& particle, const Vector3& viewPos) = 0;
-    virtual void OnParticleUpdate(Particle& particle, const Vector3& viewPos, float deltaTime) = 0;
+    virtual void OnParticlesUpdate(StaticArray<Particle, 500>& particles, const Vector3& viewPos, float deltaTime) = 0;
 public:
     virtual ~ParticleSystem() {};
     void Update(const Vector3& viewPos, float  deltaTime);

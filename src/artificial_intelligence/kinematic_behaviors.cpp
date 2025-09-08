@@ -1,19 +1,11 @@
-#include <random>
-
 #include "kinematic_behaviors.h"
 #include <math/algebra.h>
+#include <utils.h>
 
-f32 RandomFloat() 
-{
-    static std::random_device rd;   // Seed for random number engine
-    static std::mt19937 gen(rd());  // Mersenne Twister engine
-    static std::uniform_real_distribution<f32> dist(0.0f, 1.0f);
-    return dist(gen);
-}
 
 f32 RandomBinomial()
 {
-    return RandomFloat() - RandomFloat();
+    return Utils::RandRange(0.0f, 1.0f) - Utils::RandRange(0.0f, 1.0f);
 }
 
 void AdjustAngle(f32& angle)

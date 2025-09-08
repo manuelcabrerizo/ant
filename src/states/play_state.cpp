@@ -49,7 +49,6 @@ void PlayState::OnEnter()
     OnResize(&notification);
 
     TextureManager::Get()->Load("Crosshair", "data/textures/Crosshair.png", FRAME_MEMORY);
-
     crosshairSize = Vector2(32, 32);
     crosshairPosition = (extent * 0.5f);
 
@@ -81,7 +80,7 @@ void PlayState::OnExit()
     VertexShaderManager::Get()->Clear(FRAME_MEMORY);
     FragmentShaderManager::Get()->Clear(FRAME_MEMORY);
     TextureManager::Get()->Clear(FRAME_MEMORY);
-
+    
     MemoryManager::Get()->ReleaseFrame(memoryFrame);
 }
 

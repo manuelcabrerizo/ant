@@ -6,5 +6,5 @@ class BloodParticleSystem : public ParticleSystem
 {
 private:
     void OnParticleSpawn(Particle& particle, const Vector3& viewPos) override;
-    void OnParticleUpdate(Particle& particle, const Vector3& viewPos, float deltaTime) override;
+    void OnParticlesUpdate(StaticArray<Particle, 500>& particles, const Vector3& viewPos, float deltaTime) override;
 };

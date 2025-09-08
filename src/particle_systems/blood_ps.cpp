@@ -19,16 +19,20 @@ void BloodParticleSystem::OnParticleSpawn(Particle& particle, const Vector3& vie
     particle.color = Vector3(Utils::RandRange(0.1, 1), 1, 1);
 }
 
-void BloodParticleSystem::OnParticleUpdate(Particle& particle, const Vector3& viewPos, float deltaTime)
+void BloodParticleSystem::OnParticlesUpdate(StaticArray<Particle, 500>& particles, const Vector3& viewPos, float deltaTime)
 {
     Vector3 gravityForce = Vector3(0.0f, -9.8f * 1.5f, 0.0f);
-    particle.velocity += gravityForce * deltaTime;
-    particle.position += particle.velocity * deltaTime;
-    particle.size.x += deltaTime * 0.5f;
-    particle.size.y += deltaTime * 0.5f;
-    Vector3 front = (viewPos - particle.position).Normalized();
-    Vector3 right = Vector3::Cross(Vector3::up, front).Normalized();
-    Vector3 up = Vector3::Cross(front, right);
-    Matrix4 rotMat = Matrix4::TransformFromBasis(Vector3::zero, right, up, front);
-    particle.rotation = particle.offsetRot.ToMatrix4() * rotMat;
+    for (int i = 0; i < particles.size; i++)
+    {
+        Particle& particle = particles[i];
+        particle.velocity += gravityForce * deltaTime;
+        particle.position += particle.velocity * deltaTime;
+        particle.size.x += deltaTime * 0.5f;
+        particle.size.y += deltaTime * 0.5f;
+        Vector3 front = (viewPos - particle.position).Normalized();
+        Vector3 right = Vector3::Cross(Vector3::up, front).Normalized();
+        Vector3 up = Vector3::Cross(front, right);
+        Matrix4 rotMat = Matrix4::TransformFromBasis(Vector3::zero, right, up, front);
+        particle.rotation = particle.offsetRot.ToMatrix4() * rotMat;
+    }
 }

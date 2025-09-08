@@ -20,9 +20,13 @@ void ShootParticleSystem::OnParticleSpawn(Particle& particle, const Vector3& vie
     particle.color = Vector3(1, 1, 1);
 }
 
-void ShootParticleSystem::OnParticleUpdate(Particle& particle, const Vector3& viewPos, float deltaTime)
+void ShootParticleSystem::OnParticlesUpdate(StaticArray<Particle, 500>& particles, const Vector3& viewPos, float deltaTime)
 {
-    particle.position = GetPosition();
-    particle.size.x += deltaTime * 0.25f;
-    particle.size.y += deltaTime * 0.25f;
+    for (int i = 0; i < particles.size; i++)
+    {
+        Particle& particle = particles[i];
+        particle.position = GetPosition();
+        particle.size.x += deltaTime * 0.25f;
+        particle.size.y += deltaTime * 0.25f;
+    }
 }

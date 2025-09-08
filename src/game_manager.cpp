@@ -115,7 +115,8 @@ void GameManager::LoadDefaultAssets()
     TextureManager::Get()->Load("DefaultMaterial_Specular", "data/textures/DefaultTextures/DefaultMaterial_Specular.png", STATIC_MEMORY);
 
     // Load Materials
-    MaterialManager::Get()->LoadTexture("DefaultMaterial", FragmentShaderManager::Get()->Get("default"),
+    MaterialManager::Get()->LoadTexture("DefaultMaterial",
+        FragmentShaderManager::Get()->Get("default"),
         TextureManager::Get()->Get("DefaultMaterial_Diffuse"),
         TextureManager::Get()->Get("DefaultMaterial_Normal"),
         TextureManager::Get()->Get("DefaultMaterial_Specular"),

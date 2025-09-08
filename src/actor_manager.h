@@ -39,6 +39,7 @@ public:
 
     template <typename ComponentType, size_t Count>
     void AddComponentType();
+
     template <typename ComponentType>
     ComponentList<ComponentType> *GetComponents();
 
