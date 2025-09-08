@@ -23,6 +23,8 @@ void PlayerControllerComponent::OnInit(ActorManager *actorManager)
     camera = owner->GetComponent<CameraComponent>();
     physics = owner->GetComponent<PhysicsComponent>();
     weapon = owner->GetComponent<WeaponComponent>();
+
+    lastPosition = transform->position;
 }   
 
 void PlayerControllerComponent::OnTerminate(ActorManager *actorManager)
@@ -34,6 +36,16 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
     ProcessMouseMovement();
     ProcessKeyboardMovement();
+
+    //if ((transform->position - lastPosition).MagnitudeSq() < 0.0001f)
+    {
+        PlayerMoveNotification playerNoti;
+        playerNoti.position = transform->position;
+        playerNoti.velocity = physics->velocity;
+        NotificationManager::Get()->SendNotification(NotificationType::PlayerMove, &playerNoti);
+    }
+
+    lastPosition = transform->position;
 
     if (InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
     {

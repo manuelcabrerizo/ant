@@ -18,6 +18,7 @@ private:
     f32 yaw = 0;
     f32 pitch = 0;
     float speed;
+    Vector3 lastPosition;
 
     void ProcessMouseMovement();
     void ProcessKeyboardMovement();

@@ -12,6 +12,7 @@
 void EnemyComponent::OnInit(ActorManager *actorManager)
 {
     NotificationManager::Get()->AddListener(this, NotificationType::EnemyHit);
+    NotificationManager::Get()->AddListener(this, NotificationType::PlayerMove);
 
     transform = owner->GetComponent<TransformComponent>();
     physics = owner->GetComponent<PhysicsComponent>();
@@ -20,28 +21,33 @@ void EnemyComponent::OnInit(ActorManager *actorManager)
 
     // Initialize animation component
     animation->SetSkeleton(SkeletonManager::Get()->Get("Bloodwraith"));
-    animation->AddAnimation((int)EnemyAnimation::Walk, AnimationManager::Get()->Get("Walking"), true, 0.5f);
+    animation->AddAnimation((int)EnemyAnimation::Walk, AnimationManager::Get()->Get("Walking"), true);
     animation->AddAnimation((int)EnemyAnimation::Dead, AnimationManager::Get()->Get("Death"), false);
     animation->SetAnimation((int)EnemyAnimation::Walk);
 
-    wander.SetCharacter(&character);
-    wander.SetTarget(&target);
-    wander.SetWanderOffset(1.0f);
-    wander.SetWanderRadius(5.0f);
-    wander.SetWanderRate(0.5f);
-    wander.SetWanderOrientation(0.0f);
-    wander.SetMaxAcceleration(2.5f);
-    wander.SetMaxAngularAcceleration(5.0f);
-    wander.SetMaxRotation(10.0f);
-    wander.SetTargetRadius(ANT_PI * 0.1f);
-    wander.SetSlowRadius(ANT_PI * 0.5f);
-    wander.SetTimeToTarget(0.001f);
+    pursue.SetCharacter(&character);
+    pursue.SetTarget(&target);
+    pursue.SetMaxAcceleration(7.5f);
+    pursue.SetMaxSpeed(10.0f);
+    pursue.SetTargetRadius(ANT_PI * 0.1f);
+    pursue.SetSlowRadius(ANT_PI * 0.5f);
+    pursue.SetTimeToTarget(0.5f);
+    pursue.SetMaxPrediction(0.1f);
+
+    face.SetCharacter(&character);
+    face.SetTarget(&target);
+    face.SetMaxAngularAcceleration(25.0f);
+    face.SetMaxRotation(40.0f);
+    face.SetTargetRadius(ANT_PI * 0.1f);
+    face.SetSlowRadius(ANT_PI * 0.5f);
+    face.SetTimeToTarget(0.01f);
 
     life = maxLife;
 }
 
 void EnemyComponent::OnTerminate(ActorManager *actorManager)
 {
+    NotificationManager::Get()->RemoveListener(this, NotificationType::PlayerMove);
     NotificationManager::Get()->RemoveListener(this, NotificationType::EnemyHit);
 }
 
@@ -49,15 +55,19 @@ void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
     if(physics->grounded && life > 0)
     {
+
+        SteeringOutput lookSeering = face.GetSteering();
+        character.rotation += lookSeering.angular * dt;
+        character.rotation *= powf(0.001f, dt); // angular drag
+        character.orientation += character.rotation * dt;
+        Vector3 moveDir = Vector3(-sinf(character.orientation), 0.0f, cosf(character.orientation)).Normalized();
+        transform->direction = moveDir;
+
+        SteeringOutput pursueSteering = pursue.GetSteering();
+        physics->acceleration = moveDir * pursueSteering.linear.Magnitude();
         character.position = transform->position;
         character.velocity = physics->velocity;
         character.velocity.y = 0.0f;
-        SteeringOutput steering = wander.GetSteering();
-        physics->acceleration = steering.linear;
-        character.rotation += steering.angular * dt;
-        character.rotation *= powf(0.001f, dt); // angular drag
-        character.orientation += character.rotation * dt;
-        transform->direction = Vector3(-sinf(character.orientation), 0.0f, cosf(character.orientation)).Normalized();
     }
 }
 
@@ -75,10 +85,17 @@ void EnemyComponent::OnEnemyHit(EnemyHitNotification* enemyHit)
     }
 }
 
+void EnemyComponent::OnPlayerMove(PlayerMoveNotification* playerMove)
+{
+    target.position = playerMove->position;
+    target.velocity = playerMove->velocity;
+}
+
 void EnemyComponent::OnNotify(NotificationType type, Notification* notification)
 {
     switch (type)
     {
     case NotificationType::EnemyHit: OnEnemyHit((EnemyHitNotification*)notification); break;
+    case NotificationType::PlayerMove: OnPlayerMove((PlayerMoveNotification*)notification); break;
     }
 }

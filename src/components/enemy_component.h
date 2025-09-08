@@ -29,12 +29,15 @@ private:
 
     Kinematic character;
     Kinematic target;
-    SteeringWander wander;
+    //SteeringWander wander;
+    SteeringPursue pursue;
+    SteeringFace face;
 
     int maxLife = 3;
     int life = 3;
 
     void OnEnemyHit(EnemyHitNotification* enemyHit);
+    void OnPlayerMove(PlayerMoveNotification* playerMove);
 public:
     void OnInit(ActorManager *actorManager);
     void OnTerminate(ActorManager *actorManager) override;

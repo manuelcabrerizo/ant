@@ -8,6 +8,7 @@ enum class NotificationType
     Shoot = 0,
     OnResize,
     EnemyHit,
+    PlayerMove,
 
     // last item
     Count
@@ -31,4 +32,10 @@ class Actor;
 struct EnemyHitNotification : public Notification
 {
     Actor* enemy;
+};
+
+struct PlayerMoveNotification : public Notification
+{
+    Vector3 position;
+    Vector3 velocity;
 };
