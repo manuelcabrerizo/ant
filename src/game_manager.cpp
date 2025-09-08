@@ -121,4 +121,7 @@ void GameManager::LoadDefaultAssets()
         TextureManager::Get()->Get("DefaultMaterial_Normal"),
         TextureManager::Get()->Get("DefaultMaterial_Specular"),
         64, STATIC_MEMORY);
+
+    // Load Models
+    ModelManager::Get()->Load("box", "data/models/cube.fbx", STATIC_MEMORY);
 }

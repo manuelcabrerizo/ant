@@ -9,6 +9,7 @@
 #include <components/animation_component.h>
 
 #include <strings.h>
+#include <components/collider_component.h>
 
 void Scene::Load(ActorManager* actorManager_, const char* filepath)
 {
@@ -27,6 +28,13 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
 
     // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");
+
+    Actor* portal0 = actorManager->CreateActorFromFile("data/xml/portal.xml");
+    Actor* portal1 = actorManager->CreateActorFromFile("data/xml/portal.xml");
+    TransformComponent* pTransform0 = portal0->GetComponent<TransformComponent>();
+    TransformComponent* pTransform1 = portal1->GetComponent<TransformComponent>();
+    pTransform0->position.x += 1.0f;
+    pTransform1->position.x -= 1.0f;
     
 #if 1
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);

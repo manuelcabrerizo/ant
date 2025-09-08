@@ -38,7 +38,6 @@ private:
         MeshCollider meshCollider;
     };
     AABB volume;
-
 public:
 
     Collider() {}

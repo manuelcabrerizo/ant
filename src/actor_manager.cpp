@@ -11,6 +11,7 @@
 #include <components/player_controller_component.h>
 #include <components/enemy_component.h>
 #include <components/bullet_component.h>
+#include <components/portal_component.h>
 
 #include <math/algebra.h>
 #include <math/vector3.h>
@@ -389,12 +390,31 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
 
                     collider = Collider(capsule);
                 } break;
+                case ColliderType::AABB:
+                {
+                    attributes = attributes->NextSiblingElement();
+                    float scaleX, scaleY, scaleZ;
+                    attributes->QueryFloatAttribute("x", &scaleX);
+                    attributes->QueryFloatAttribute("y", &scaleY);
+                    attributes->QueryFloatAttribute("z", &scaleZ);
+                    Vector3 scale = Vector3(scaleX, scaleY, scaleZ);
+                    AABB aabb;
+                    aabb.Init(
+                        scale * -0.5f + offset,
+                        scale *  0.5f + offset);
+                    collider = Collider(aabb);
+                }
             }
 
             ColliderComponent colliderComponent;
             colliderComponent.SetCollider(collider);
             colliderComponent.SetOffset(offset);
             AddComponent<ColliderComponent>(actor, colliderComponent);
+        }
+        else if (strcmp("PortalComponent", componentType) == 0)
+        {
+            PortalComponent portalComponent;
+            AddComponent<PortalComponent>(actor, portalComponent);
         }
         else
         {

@@ -40,4 +40,5 @@ public:
     static Vector3 right;
     static Vector3 up;
     static Vector3 forward;
+    static Vector3 one;
 };

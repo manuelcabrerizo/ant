@@ -194,8 +194,8 @@ void Collider::DebugDraw() const
         } break;
         case ColliderType::CAPSULE:
         {
-            capsule.DebugDraw(6, color);
-            volume.DebugDraw(Vector3(0, 0, 1));
+            //capsule.DebugDraw(6, color);
+            //volume.DebugDraw(Vector3(0, 0, 1));
         } break;
         case ColliderType::MESH_COLLIDER:
         {

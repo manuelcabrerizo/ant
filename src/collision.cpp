@@ -127,6 +127,37 @@ bool CollisionWorld::Intersect(const Segment& segment, Array<CollisionData>& col
     return isIntersecting;
 }
 
+bool CollisionWorld::Intersect(const Collider& collider, Array<CollisionData>& collisionData) const
+{
+    bool isIntersecting = false;
+    for (int i = 0; i < colliders.size; ++i)
+    {
+        if (!colliders[i]->enable)
+        {
+            continue;
+        }
+
+        if (collider.GetId() != colliders[i]->GetId())
+        {
+            int collisionCount = collisionData.size;
+            bool intersect = collider.Intersect(*colliders[i]->GetCollider(), collisionData);
+            if (intersect)
+            {
+                int newCollision = collisionData.size - collisionCount;
+                for (int j = 0; j < newCollision; j++)
+                {
+                    CollisionData& data = collisionData[collisionCount + j];
+                    data.collider = colliders[i];
+                }
+            }
+            isIntersecting |= intersect;
+        }
+    }
+    CollisionUtils::SortCollisionByPenetration(collisionData);
+    return isIntersecting;
+}
+
+
 bool CollisionWorld::Intersect(ColliderComponent *collider, Array<CollisionData>& collisionData) const
 {
     if (!collider->enable)
@@ -144,11 +175,16 @@ bool CollisionWorld::Intersect(ColliderComponent *collider, Array<CollisionData>
 
         if (collider->GetId() != colliders[i]->GetId())
         {
+            int collisionCount = collisionData.size;
             bool intersect = collider->GetCollider()->Intersect(*colliders[i]->GetCollider(), collisionData);
             if (intersect)
             {
-                CollisionData& data = collisionData[collisionData.size - 1];
-                data.collider = colliders[i];
+                int newCollision = collisionData.size - collisionCount;
+                for (int j = 0; j < newCollision; j++)
+                {
+                    CollisionData& data = collisionData[collisionCount + j];
+                    data.collider = colliders[i];
+                }
             }
             isIntersecting |= intersect;
         }

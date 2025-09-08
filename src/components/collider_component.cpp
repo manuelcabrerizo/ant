@@ -16,7 +16,7 @@ void ColliderComponent::OnTerminate(ActorManager* actorManager)
 
 void ColliderComponent::OnUpdate(ActorManager* actorManager, f32 dt)
 {
-    //collider.UpdatePosition(transform->position + offset);
+    collider.UpdatePosition(transform->position + offset);
 }
 
 Collider* ColliderComponent::GetCollider()

@@ -216,6 +216,9 @@
     <ClCompile Include="src\asset_managers\animation_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\components\portal_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\actor.h">
@@ -443,6 +446,9 @@
     <ClInclude Include="src\asset_managers\animation_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\components\portal_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="data\xml\bullet.xml" />
@@ -456,5 +462,6 @@
     <Xml Include="data\xml\wizard.xml" />
     <Xml Include="data\xml\level1.xml" />
     <Xml Include="data\xml\mona.xml" />
+    <Xml Include="data\xml\portal.xml" />
   </ItemGroup>
 </Project>

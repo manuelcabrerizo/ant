@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\components\portal_component.cpp" />
     <ClCompile Include="src\asset_managers\animation_manager.cpp" />
     <ClCompile Include="src\particle_systems\blood_ps.cpp" />
     <ClCompile Include="src\particle_systems\particle_system.cpp" />
@@ -196,6 +197,7 @@
     <ClCompile Include="src\ui_renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\components\portal_component.h" />
     <ClInclude Include="src\asset_managers\animation_manager.h" />
     <ClInclude Include="src\particle_systems\blood_ps.h" />
     <ClInclude Include="src\particle_systems\particle_system.h" />
@@ -280,6 +282,7 @@
     <Xml Include="data\xml\mona.xml" />
     <Xml Include="data\xml\pistol.xml" />
     <Xml Include="data\xml\player.xml" />
+    <Xml Include="data\xml\portal.xml" />
     <Xml Include="data\xml\sniper.xml" />
     <Xml Include="data\xml\test-level.xml" />
     <Xml Include="data\xml\tower.xml" />
