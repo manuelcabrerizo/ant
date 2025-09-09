@@ -29,4 +29,10 @@ public:
     void OnTerminate(ActorManager *actorManager) override;
     void OnUpdate(ActorManager *actorManager, f32 dt);
     void OnRender(ActorManager* actorManager);
+
+    void SetRotation(float angle)
+    {
+        yaw = angle;
+        pitch = 0;
+    }
 };

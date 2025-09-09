@@ -1,6 +1,8 @@
 #include "portal_component.h"
 #include "transform_component.h"
 #include "collider_component.h"
+#include "player_controller_component.h"
+#include "physics_component.h"
 #include <collision.h>
 
 void PortalComponent::OnInit(ActorManager* actorManager)
@@ -46,18 +48,23 @@ void PortalComponent::OnUpdate(ActorManager* actorManager, f32 dt)
     wasOnPortal = isOnPortal;
 }
 
-
 void PortalComponent::OnPortalEnter(Actor* actor)
 {
     TransformComponent* actorTransform = actor->GetComponent<TransformComponent>();
-    actorTransform->position = destination;
+    PlayerControllerComponent* playerController = actor->GetComponent<PlayerControllerComponent>();
+    PhysicsComponent* physics = actor->GetComponent<PhysicsComponent>();
+    actorTransform->position = dstPos;
+    playerController->SetRotation(dstRot);
+    physics->velocity = Vector3::zero;
+    physics->acceleration = Vector3::zero;
 }
 
 void PortalComponent::OnPortalExit()
 {
 }
 
-void PortalComponent::SetDestination(const Vector3& destination)
+void PortalComponent::SetDestination(const Vector3& dstPos, float dstRot)
 {
-    this->destination = destination;
+    this->dstPos = dstPos;
+    this->dstRot = dstRot;
 }

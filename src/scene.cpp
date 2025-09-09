@@ -11,6 +11,7 @@
 #include <components/portal_component.h>
 
 #include <strings.h>
+#include <math/algebra.h>
 
 void Scene::Load(ActorManager* actorManager_, const char* filepath)
 {
@@ -40,18 +41,18 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         TransformComponent* pTransform = portal->GetComponent<TransformComponent>();
         PortalComponent* portalCmp = portal->GetComponent<PortalComponent>();
         Vector3 pPos, pDst;
+        float rPos, rDst;
         char portalBuffer[256];
-        if (sscanf(line, "position: [%f, %f, %f] dst: [%f, %f, %f]",
-            &pPos.x, &pPos.y, &pPos.z, &pDst.x, &pDst.y, &pDst.z) == 6)
+        if (sscanf(line, "portal: [[%f, %f, %f], %f] dst: [[%f, %f, %f], %f]",
+            &pPos.x, &pPos.y, &pPos.z, &rPos, &pDst.x, &pDst.y, &pDst.z, &rDst) == 8)
         {
             pTransform->position = pPos;
-            portalCmp->SetDestination(pDst);
+            portalCmp->SetDestination(pDst, (rDst/180.0f) * ANT_PI);
         }
         else
         {
             ASSERT(!"ERROR: invalid file format");
         }
-
     }
     MemoryManager::Get()->ReleaseFrame(frame);
     

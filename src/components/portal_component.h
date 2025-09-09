@@ -14,7 +14,8 @@ private:
 
     bool isOnPortal = false;
     bool wasOnPortal = false;
-    Vector3 destination;
+    Vector3 dstPos;
+    float dstRot;
 
     void OnPortalEnter(Actor* actor);
     void OnPortalExit();
@@ -22,5 +23,5 @@ public:
     void OnInit(ActorManager* actorManager);
     void OnUpdate(ActorManager* actorManager, f32 dt);
 
-    void SetDestination(const Vector3& destination);
+    void SetDestination(const Vector3& dstPos, float dstRot);
 };
