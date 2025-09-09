@@ -42,6 +42,7 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
         PlayerMoveNotification playerNoti;
         playerNoti.position = transform->position;
         playerNoti.velocity = physics->velocity;
+        playerNoti.transform = transform;
         NotificationManager::Get()->SendNotification(NotificationType::PlayerMove, &playerNoti);
     }
 

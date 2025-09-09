@@ -95,3 +95,8 @@ void ParticleSystem::SetTexture(Texture* texture)
 {
     this->texture = texture;
 }
+
+void ParticleSystem::SetTimeToSpawn(float timeToSpawn)
+{
+    this->timeToSpawn = timeToSpawn;
+}

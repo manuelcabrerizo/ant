@@ -45,4 +45,5 @@ public:
     Vector3 GetPosition();
     void SetPosition(const Vector3& position);
     void SetTexture(Texture* texture);
+    void SetTimeToSpawn(float timeToSpawn);
 };

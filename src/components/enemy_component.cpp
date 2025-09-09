@@ -36,8 +36,8 @@ void EnemyComponent::OnInit(ActorManager *actorManager)
 
     face.SetCharacter(&character);
     face.SetTarget(&target);
-    face.SetMaxAngularAcceleration(25.0f);
-    face.SetMaxRotation(40.0f);
+    face.SetMaxAngularAcceleration(8.0f);
+    face.SetMaxRotation(4.0f);
     face.SetTargetRadius(ANT_PI * 0.1f);
     face.SetSlowRadius(ANT_PI * 0.5f);
     face.SetTimeToTarget(0.01f);

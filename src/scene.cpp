@@ -9,6 +9,7 @@
 #include <components/animation_component.h>
 #include <components/collider_component.h>
 #include <components/portal_component.h>
+#include <components/effect_component.h>
 
 #include <strings.h>
 #include <math/algebra.h>
@@ -31,6 +32,30 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
 
     // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");
+
+    
+
+    // Temp fix, EffectComponent is to big to be created on the stack
+    // TODO: use the scratch memory for this
+    {
+        Actor* box = actorManager->CreateActorFromFile("data/xml/default.xml");
+        TransformComponent* boxTrans = box->GetComponent<TransformComponent>();
+        boxTrans->position = Vector3(0, -2.5f, 9.5f);
+        EffectComponent* effect = new EffectComponent();
+        effect->SetSpawnArea(Vector3(-4, 0, -2), Vector3(4, 0, 2));
+        actorManager->AddComponent<EffectComponent>(box, *effect);
+        delete effect;
+    }
+    {
+        Actor* box = actorManager->CreateActorFromFile("data/xml/default.xml");
+        TransformComponent* boxTrans = box->GetComponent<TransformComponent>();
+        boxTrans->position = Vector3(22.5f, -2, 34.75f);
+        EffectComponent* effect = new EffectComponent();
+        effect->SetSpawnArea(Vector3(-2.5, 0, -2.5), Vector3(2.5, 0, 2.5));
+        actorManager->AddComponent<EffectComponent>(box, *effect);
+        delete effect;
+    }
+
 
     // Create the portals
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);

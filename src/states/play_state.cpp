@@ -15,6 +15,7 @@
 #include <components/animation_component.h>
 #include <components/bullet_component.h>
 #include <components/portal_component.h>
+#include <components/effect_component.h>
 
 #include <collision.h>
 #include <math/algebra.h>
@@ -99,6 +100,7 @@ void PlayState::OnUpdate(float deltaTime)
     actorManager.UpdateComponents<BulletComponent>(deltaTime);
     actorManager.UpdateComponents<AnimationComponent>(deltaTime);
     actorManager.UpdateComponents<PortalComponent>(deltaTime);
+    actorManager.UpdateComponents<EffectComponent>(deltaTime);
     // Late Update
     actorManager.LateUpdateComponents<PhysicsComponent>(deltaTime);
 
@@ -115,6 +117,7 @@ void PlayState::OnRender()
     actorManager.RenderComponents<RenderComponent>();
 
     actorManager.RenderComponents<WeaponComponent>();
+    actorManager.RenderComponents<EffectComponent>();
 
     CollisionWorld::Get()->DebugDraw();
     GraphicsManager::Get()->DebugPresent();
@@ -147,6 +150,7 @@ void PlayState::InitializeActorManager()
     actorManager.AddComponentType<AnimationComponent, 40>();
     actorManager.AddComponentType<BulletComponent, 100>();
     actorManager.AddComponentType<PortalComponent, 10>();
+    actorManager.AddComponentType<EffectComponent, 10>();
     // NOTE: add more component types ...
     actorManager.EndInitialization();
 }

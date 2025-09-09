@@ -319,8 +319,10 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
         }
         else if (strcmp("WeaponComponent", componentType) == 0)
         {
-            WeaponComponent weapon;
-            AddComponent<WeaponComponent>(actor, weapon);
+            // TODO use scratch memory for this
+            WeaponComponent* weapon = new WeaponComponent();
+            AddComponent<WeaponComponent>(actor, *weapon);
+            delete weapon;
         }
         else if (strcmp("EnemyComponent", componentType) == 0)
         {

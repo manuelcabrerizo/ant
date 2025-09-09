@@ -19,13 +19,12 @@ struct PS_Input
 float4 fs_main(PS_Input i) : SV_TARGET
 {
     float2 noiseUv = i.uv;
-    float4 noise = noiseMap.Sample(samplerState, noiseUv*0.125f);
+    float4 noise = noiseMap.Sample(samplerState, noiseUv*0.1f);
 
-    float2 textureUv = i.uv + noise.xy;
-    textureUv.y += time * 0.1f;
+    float2 textureUv = i.uv + noise.xy * 0.2f;
+    textureUv.x += time * 0.1f;
     float4 color = diffuseMap.Sample(samplerState, textureUv);
-    
     color *= 4.0f;
-    
+        
     return color;
 }

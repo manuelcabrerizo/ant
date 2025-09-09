@@ -127,9 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\components\effect_component.cpp" />
     <ClCompile Include="src\components\portal_component.cpp" />
     <ClCompile Include="src\asset_managers\animation_manager.cpp" />
     <ClCompile Include="src\particle_systems\blood_ps.cpp" />
+    <ClCompile Include="src\particle_systems\fire_ps.cpp" />
     <ClCompile Include="src\particle_systems\particle_system.cpp" />
     <ClCompile Include="src\batch_renderer.cpp" />
     <ClCompile Include="src\batch_renderer_d3d11.cpp" />
@@ -197,9 +199,11 @@
     <ClCompile Include="src\ui_renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\components\effect_component.h" />
     <ClInclude Include="src\components\portal_component.h" />
     <ClInclude Include="src\asset_managers\animation_manager.h" />
     <ClInclude Include="src\particle_systems\blood_ps.h" />
+    <ClInclude Include="src\particle_systems\fire_ps.h" />
     <ClInclude Include="src\particle_systems\particle_system.h" />
     <ClInclude Include="src\batch_renderer.h" />
     <ClInclude Include="src\batch_renderer_d3d11.h" />
@@ -275,6 +279,7 @@
     <ClInclude Include="src\ui_button.h" />
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="data\xml\default.xml" />
     <Xml Include="data\xml\bullet.xml" />
     <Xml Include="data\xml\enemy.xml" />
     <Xml Include="data\xml\house.xml" />

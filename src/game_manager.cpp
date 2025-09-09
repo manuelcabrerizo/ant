@@ -34,6 +34,7 @@ void GameManager::Terminate()
 void GameManager::Update(f32 dt)
 {
     MaterialManager::Get()->Get("AlienPortalMaterial")->Update(dt);
+    MaterialManager::Get()->Get("Level1MagmaMaterial")->Update(dt);
 
     stateMachine.Update(dt);
 
@@ -110,6 +111,7 @@ void GameManager::LoadDefaultAssets()
     FragmentShaderManager::Get()->Load("ui_frag", "data/shaders/ui_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("particle_frag", "data/shaders/particle_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("portal_frag", "data/shaders/portal_frag.hlsl", STATIC_MEMORY);
+    FragmentShaderManager::Get()->Load("magma_frag", "data/shaders/magma_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Bind("default");
 
     // Load textures
@@ -118,6 +120,7 @@ void GameManager::LoadDefaultAssets()
     TextureManager::Get()->Load("DefaultMaterial_Specular", "data/textures/DefaultTextures/DefaultMaterial_Specular.png", STATIC_MEMORY);
     TextureManager::Get()->Load("DefaultMaterial_Noise", "data/textures/DefaultTextures/DefaultMaterial_Noise.png", STATIC_MEMORY);
     TextureManager::Get()->Load("portal", "data/textures/PSX Textures/256/Color/liquid_alien_1.png", STATIC_MEMORY);
+    TextureManager::Get()->Load("magma", "data/textures/PSX Textures/256/Color/stone_hell_10.png", STATIC_MEMORY);
 
     // Load Materials
     MaterialManager::Get()->LoadTexture("DefaultMaterial",
@@ -130,6 +133,11 @@ void GameManager::LoadDefaultAssets()
     MaterialManager::Get()->LoadPortal("AlienPortalMaterial",
         FragmentShaderManager::Get()->Get("portal_frag"),
         TextureManager::Get()->Get("portal"),
+        TextureManager::Get()->Get("DefaultMaterial_Noise"), STATIC_MEMORY);
+
+    MaterialManager::Get()->LoadPortal("Level1MagmaMaterial",
+        FragmentShaderManager::Get()->Get("magma_frag"),
+        TextureManager::Get()->Get("magma"),
         TextureManager::Get()->Get("DefaultMaterial_Noise"), STATIC_MEMORY);
 
     // Load Models

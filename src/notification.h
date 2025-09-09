@@ -34,8 +34,11 @@ struct EnemyHitNotification : public Notification
     Actor* enemy;
 };
 
+class TransformComponent;
+
 struct PlayerMoveNotification : public Notification
 {
+    TransformComponent* transform;
     Vector3 position;
     Vector3 velocity;
 };
