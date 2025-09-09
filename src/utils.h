@@ -21,3 +21,17 @@ public:
     static void Swap(float& a, float& b);
     static float RandRange(float min, float max);
 };
+
+class File;
+
+class FileReader
+{
+private:
+    File* file = nullptr;
+    char* text;
+    int pos;
+    int eof;
+public:
+    FileReader(File* file);
+    const char* GetNextLine();
+};

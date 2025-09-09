@@ -7,9 +7,10 @@
 #include <components/transform_component.h>
 #include <components/render_component.h>
 #include <components/animation_component.h>
+#include <components/collider_component.h>
+#include <components/portal_component.h>
 
 #include <strings.h>
-#include <components/collider_component.h>
 
 void Scene::Load(ActorManager* actorManager_, const char* filepath)
 {
@@ -29,26 +30,39 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");
 
-    Actor* portal0 = actorManager->CreateActorFromFile("data/xml/portal.xml");
-    Actor* portal1 = actorManager->CreateActorFromFile("data/xml/portal.xml");
-    TransformComponent* pTransform0 = portal0->GetComponent<TransformComponent>();
-    TransformComponent* pTransform1 = portal1->GetComponent<TransformComponent>();
-    pTransform0->position.x += 1.0f;
-    pTransform1->position.x -= 1.0f;
-    
-#if 1
+    // Create the portals
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
-
-    File file = PlatformReadFile("data/entities/enemies1.txt", SCRATCH_MEMORY);
-    char* text = (char*)file.data;
-    int endOfFilePos = strlen(text);
-    int currentPos = 0;
-
-    char name[256];
-    Vector3 position;
-    while (currentPos < endOfFilePos)
+    File portalsFile = PlatformReadFile("data/entities/portals.txt", SCRATCH_MEMORY);
+    FileReader reader = FileReader(&portalsFile);
+    while (const char* line = reader.GetNextLine())
     {
-        char* line = text + currentPos;
+        Actor* portal = actorManager->CreateActorFromFile("data/xml/portal.xml");
+        TransformComponent* pTransform = portal->GetComponent<TransformComponent>();
+        PortalComponent* portalCmp = portal->GetComponent<PortalComponent>();
+        Vector3 pPos, pDst;
+        char portalBuffer[256];
+        if (sscanf(line, "position: [%f, %f, %f] dst: [%f, %f, %f]",
+            &pPos.x, &pPos.y, &pPos.z, &pDst.x, &pDst.y, &pDst.z) == 6)
+        {
+            pTransform->position = pPos;
+            portalCmp->SetDestination(pDst);
+        }
+        else
+        {
+            ASSERT(!"ERROR: invalid file format");
+        }
+
+    }
+    MemoryManager::Get()->ReleaseFrame(frame);
+    
+    // Create the Enemies
+    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    File file = PlatformReadFile("data/entities/enemies1.txt", SCRATCH_MEMORY);
+    reader = FileReader(&file);
+    while (const char* line = reader.GetNextLine())
+    {
+        char name[256];
+        Vector3 position;
         if (sscanf(line, "%s position: [%f, %f, %f]", name, &position.x, &position.y, &position.z) == 4)
         {
             // Create the enemy and position it
@@ -66,17 +80,10 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         {
             ASSERT(!"ERROR: invalid file format");
         }
-
-        int distance = Strings::FindFirstInstance(line, '\n');
-        if (distance == -1)
-        {
-            break;
-        }
-        currentPos += distance + 1;
     }
-    
     MemoryManager::Get()->ReleaseFrame(frame);
-#endif
+
+
     // Create the player
     actorManager->CreateActorFromFile("data/xml/player.xml");
 }

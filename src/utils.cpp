@@ -1,4 +1,6 @@
 #include "utils.h"
+#include "platform.h"
+#include <strings.h>
 
 Assimp::Importer Utils::importer;
 
@@ -49,4 +51,32 @@ float Utils::RandRange(float min, float max)
 {
     float t = rand() / (float)RAND_MAX;
     return (1.0f - t) * min + t * max;
+}
+
+
+FileReader::FileReader(File* file)
+{
+    this->file = file;
+    this->text = (char*)file->data;
+    this->eof = strlen(text);
+    this->pos = 0;
+}
+
+const char* FileReader::GetNextLine()
+{
+    if (pos >= eof)
+    {
+        return nullptr;
+    }
+    const char* line = text + pos;
+    int distance = Strings::FindFirstInstance(line, '\n');
+    if (distance >= 0)
+    {
+        pos += distance + 1;
+    }
+    else
+    {
+        pos = eof;
+    }
+    return line;
 }

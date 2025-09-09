@@ -15,11 +15,6 @@ void PortalComponent::OnInit(ActorManager* actorManager)
     collider = Collider(aabb);
 }
 
-void PortalComponent::OnTerminate(ActorManager* actorManager)
-{
-    
-}
-
 void PortalComponent::OnUpdate(ActorManager* actorManager, f32 dt)
 {
     isOnPortal = false;
@@ -33,16 +28,17 @@ void PortalComponent::OnUpdate(ActorManager* actorManager, f32 dt)
         if (collisionData[i].collider->owner->GetTag() == ActorTag::Player)
         {
             isOnPortal = true;
+            if (isOnPortal && !wasOnPortal)
+            {
+                OnPortalEnter(collisionData[i].collider->owner);
+            }
             break;
         }
     }
     MemoryManager::Get()->ReleaseFrame(frame);
 
-    if (isOnPortal && !wasOnPortal)
-    {
-        OnPortalEnter();
-    }
-    else if (!isOnPortal && wasOnPortal)
+    
+    if (!isOnPortal && wasOnPortal)
     {
         OnPortalExit();
     }
@@ -50,14 +46,18 @@ void PortalComponent::OnUpdate(ActorManager* actorManager, f32 dt)
     wasOnPortal = isOnPortal;
 }
 
-#include <windows.h>
 
-void PortalComponent::OnPortalEnter()
+void PortalComponent::OnPortalEnter(Actor* actor)
 {
-    OutputDebugStringA("OnPortalEnter\n");
+    TransformComponent* actorTransform = actor->GetComponent<TransformComponent>();
+    actorTransform->position = destination;
 }
 
 void PortalComponent::OnPortalExit()
 {
-    OutputDebugStringA("OnPortalExit\n");
+}
+
+void PortalComponent::SetDestination(const Vector3& destination)
+{
+    this->destination = destination;
 }
