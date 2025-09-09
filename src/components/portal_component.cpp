@@ -50,6 +50,8 @@ void PortalComponent::OnUpdate(ActorManager* actorManager, f32 dt)
 
 void PortalComponent::OnPortalEnter(Actor* actor)
 {
+    // TODO: mabye cache the player components the first time its enter the portal
+    // or set all the values from a setter of the player controller component
     TransformComponent* actorTransform = actor->GetComponent<TransformComponent>();
     PlayerControllerComponent* playerController = actor->GetComponent<PlayerControllerComponent>();
     PhysicsComponent* physics = actor->GetComponent<PhysicsComponent>();

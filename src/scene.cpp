@@ -22,6 +22,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     ModelManager::Get()->Load("anim-gun", "data/models/Revolver/source/Retribution.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("bullet", "data/models/testBullet.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("level1", "data/models/TestLevel/source/TestLevel.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("portal", "data/models/Portal/source/Portal.fbx", FRAME_MEMORY);
 
     // Load animation data
     SkeletonManager::Get()->Load("Bloodwraith", "data/models/bloodwraith/source/bloodwraith.fbx", FRAME_MEMORY);
@@ -46,7 +47,12 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         if (sscanf(line, "portal: [[%f, %f, %f], %f] dst: [[%f, %f, %f], %f]",
             &pPos.x, &pPos.y, &pPos.z, &rPos, &pDst.x, &pDst.y, &pDst.z, &rDst) == 8)
         {
+
+            rDst += 180.0;
+
+
             pTransform->position = pPos;
+            pTransform->direction = Matrix4::TransformVector(Matrix4::RotateY((rPos/180.0f)*ANT_PI), Vector3::forward);
             portalCmp->SetDestination(pDst, (rDst/180.0f) * ANT_PI);
         }
         else

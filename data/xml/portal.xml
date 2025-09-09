@@ -6,7 +6,7 @@
 		<direction x="0" y="0" z="1"/>
 	</TransformComponent>
 	<RenderComponent>
-		<model name="box"/>
+		<model name="portal"/>
 		<materials>
 		</materials>
 		<rotationOffset x="0" y="0" z="0"/>
