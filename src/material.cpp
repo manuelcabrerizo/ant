@@ -137,3 +137,63 @@ void TextureMaterial::Bind()
     GraphicsManager::Get()->TextureBind(specular, 2);
     GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
 }
+
+i32 PortalMaterial::instanceCount = 0;
+UniformBuffer* PortalMaterial::uniformBuffer = nullptr;
+
+void PortalMaterial::Init(FragmentShader* shader, Texture* diffuse, Texture* noise)
+{
+    Material::Init(shader);
+    if (diffuse)
+    {
+        this->diffuse = diffuse;
+    }
+    else
+    {
+        this->diffuse = TextureManager::Get()->Get("DefaultMaterial_Diffuse");
+    }
+
+    if (noise)
+    {
+        this->noise = noise;
+    }
+    else
+    {
+        this->noise = TextureManager::Get()->Get("DefaultMaterial_Noise");
+    }
+
+    ubo.time = 0;
+    if (instanceCount == 0)
+    {
+        uniformBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_PS, &ubo, sizeof(ubo), 0);
+    }
+    instanceCount++;
+}
+
+void PortalMaterial::Terminate()
+{
+    Material::Terminate();
+    this->diffuse = nullptr;
+    this->noise = nullptr;
+
+    instanceCount--;
+    ASSERT(instanceCount >= 0);
+    if (instanceCount == 0)
+    {
+        GraphicsManager::Get()->UniformBufferFree(uniformBuffer);
+    }
+}
+
+void PortalMaterial::Update(float deltaTime)
+{
+    ubo.time += deltaTime;
+}
+
+void PortalMaterial::Bind() 
+{
+    GraphicsManager::Get()->FragmentShaderBind(shader);
+    GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
+    GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
+    GraphicsManager::Get()->TextureBind(diffuse, 0);
+    GraphicsManager::Get()->TextureBind(noise, 1);
+}

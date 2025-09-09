@@ -74,6 +74,25 @@ void MaterialManager::LoadTexture(const char* name,
     }
 }
 
+void MaterialManager::LoadPortal(const char* name,
+    FragmentShader* shader,
+    Texture* diffuse,
+    Texture* noise,
+    int memoryType)
+{
+    if (!Contains(name))
+    {
+        void* buffer = MemoryManager::Get()->Alloc(sizeof(PortalMaterial), memoryType);
+        PortalMaterial* material = new (buffer) PortalMaterial;
+        material->Init(shader, diffuse, noise);
+
+        MaterialHandle materialHandle{};
+        memcpy((void*)materialHandle.name, (void*)name, strlen(name));
+        materialHandle.material = material;
+
+        AssetManager::Add(materialHandle, memoryType);
+    }
+}
 
 void MaterialManager::Unload(MaterialHandle* handle)
 {

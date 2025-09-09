@@ -33,6 +33,8 @@ void GameManager::Terminate()
 
 void GameManager::Update(f32 dt)
 {
+    MaterialManager::Get()->Get("AlienPortalMaterial")->Update(dt);
+
     stateMachine.Update(dt);
 
     /*
@@ -107,12 +109,15 @@ void GameManager::LoadDefaultAssets()
     FragmentShaderManager::Get()->Load("color", "data/shaders/color.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("ui_frag", "data/shaders/ui_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("particle_frag", "data/shaders/particle_frag.hlsl", STATIC_MEMORY);
+    FragmentShaderManager::Get()->Load("portal_frag", "data/shaders/portal_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Bind("default");
 
     // Load textures
     TextureManager::Get()->Load("DefaultMaterial_Diffuse", "data/textures/DefaultTextures/DefaultMaterial_Diffuse.png", STATIC_MEMORY);
     TextureManager::Get()->Load("DefaultMaterial_Normal", "data/textures/DefaultTextures/DefaultMaterial_Normal.png", STATIC_MEMORY);
     TextureManager::Get()->Load("DefaultMaterial_Specular", "data/textures/DefaultTextures/DefaultMaterial_Specular.png", STATIC_MEMORY);
+    TextureManager::Get()->Load("DefaultMaterial_Noise", "data/textures/DefaultTextures/DefaultMaterial_Noise.png", STATIC_MEMORY);
+    TextureManager::Get()->Load("portal", "data/textures/PSX Textures/256/Color/liquid_alien_1.png", STATIC_MEMORY);
 
     // Load Materials
     MaterialManager::Get()->LoadTexture("DefaultMaterial",
@@ -121,6 +126,11 @@ void GameManager::LoadDefaultAssets()
         TextureManager::Get()->Get("DefaultMaterial_Normal"),
         TextureManager::Get()->Get("DefaultMaterial_Specular"),
         64, STATIC_MEMORY);
+
+    MaterialManager::Get()->LoadPortal("AlienPortalMaterial",
+        FragmentShaderManager::Get()->Get("portal_frag"),
+        TextureManager::Get()->Get("portal"),
+        TextureManager::Get()->Get("DefaultMaterial_Noise"), STATIC_MEMORY);
 
     // Load Models
     ModelManager::Get()->Load("box", "data/models/cube.fbx", STATIC_MEMORY);

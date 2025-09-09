@@ -47,10 +47,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         if (sscanf(line, "portal: [[%f, %f, %f], %f] dst: [[%f, %f, %f], %f]",
             &pPos.x, &pPos.y, &pPos.z, &rPos, &pDst.x, &pDst.y, &pDst.z, &rDst) == 8)
         {
-
             rDst += 180.0;
-
-
             pTransform->position = pPos;
             pTransform->direction = Matrix4::TransformVector(Matrix4::RotateY((rPos/180.0f)*ANT_PI), Vector3::forward);
             portalCmp->SetDestination(pDst, (rDst/180.0f) * ANT_PI);

@@ -14,6 +14,7 @@ protected:
 public:
     virtual ~Material() {}
     virtual void Bind() = 0;
+    virtual void Update(float dt) {};
     virtual void Terminate();
 };
 
@@ -68,4 +69,27 @@ private:
     Texture* normal = nullptr;
     f32 shininess = 0.0f;
     TextureUbo ubo;
+};
+
+struct PortalUbo
+{
+    float time;
+    Vector3 pad;
+};
+
+class PortalMaterial : public Material
+{
+public:
+    void Init(FragmentShader* shader, Texture* diffuse, Texture* noise);
+    void Terminate() override;
+    void Bind() override;
+    void Update(float deltaTime) override;
+private:
+    static i32 instanceCount;
+    static UniformBuffer* uniformBuffer;
+
+    Texture* diffuse = nullptr;
+    Texture* noise = nullptr;
+
+    PortalUbo ubo;
 };

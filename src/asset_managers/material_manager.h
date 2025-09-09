@@ -37,6 +37,12 @@ public:
         Texture* specular,
         f32 shininess, int memoryType);
 
+    void LoadPortal(const char* name,
+        FragmentShader* shader,
+        Texture* diffuse,
+        Texture* noise,
+        int memoryType);
+
     void Bind(const char* name);
     Material* Get(const char* name);
 };
