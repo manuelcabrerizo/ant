@@ -23,7 +23,6 @@ void FireParticleSystem::OnParticlesUpdate(StaticArray<Particle, 500>& particles
     for (int i = 0; i < particles.size; i++)
     {
         Particle& particle = particles[i];
-        //particle.velocity += gravityForce * deltaTime;
         particle.position += particle.velocity * deltaTime;
         particle.size.x += deltaTime * 0.5f;
         particle.size.y += deltaTime * 0.5f;
