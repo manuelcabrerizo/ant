@@ -55,7 +55,7 @@ void CollisionWorld::RemoveCollider(ColliderComponent *collider)
     }
 }
 
-bool CollisionWorld::Intersect(const Ray& ray, Array<CollisionData>& collisionData, unsigned int ignoreId) const
+bool CollisionWorld::Intersect(const Ray& ray, Array<CollisionData>& collisionData, Actor* ignoreActor) const
 {
     bool isIntersecting = false;
     for (int i = 0; i < colliders.size; ++i)
@@ -65,24 +65,29 @@ bool CollisionWorld::Intersect(const Ray& ray, Array<CollisionData>& collisionDa
             continue;
         }
 
-        Collider* collider = colliders[i]->GetCollider();
-        if (collider->GetId() != ignoreId)
+        Array<Collider>& subColliders = colliders[i]->GetColliders();
+        for (int j = 0; j < subColliders.size; j++)
         {
-            float t;
-            bool intersect = collider->Intersect(ray, t);
-            if (intersect && collisionData.size < MAX_COLLISION_COUNT)
+            Collider* collider = &subColliders[j];
+            if (collider->GetOwner() != ignoreActor)
             {
-                if (t < 0.0f)
+                float t;
+                bool intersect = collider->Intersect(ray, t);
+                if (intersect && collisionData.size < MAX_COLLISION_COUNT)
                 {
-                    int StopHere = 0;
+                    if (t < 0.0f)
+                    {
+                        int StopHere = 0;
+                    }
+                    CollisionData data;
+                    data.collider = colliders[i];
+                    data.t = t;
+                    collisionData.Push(data);
                 }
-                CollisionData data;
-                data.collider = colliders[i];
-                data.t = t;
-                collisionData.Push(data);
+                isIntersecting |= intersect;
             }
-            isIntersecting |= intersect;
         }
+
     }
 
     if (collisionData.size > 0)
@@ -93,7 +98,7 @@ bool CollisionWorld::Intersect(const Ray& ray, Array<CollisionData>& collisionDa
     return isIntersecting;
 }
 
-bool CollisionWorld::Intersect(const Segment& segment, Array<CollisionData>& collisionData, unsigned int ignoreId) const
+bool CollisionWorld::Intersect(const Segment& segment, Array<CollisionData>& collisionData, Actor* ignoreActor) const
 {
     bool isIntersecting = false;
     for (int i = 0; i < colliders.size; ++i)
@@ -103,19 +108,23 @@ bool CollisionWorld::Intersect(const Segment& segment, Array<CollisionData>& col
             continue;
         }
 
-        Collider* collider = colliders[i]->GetCollider();
-        if (collider->GetId() != ignoreId)
+        Array<Collider>& subColliders = colliders[i]->GetColliders();
+        for (int j = 0; j < subColliders.size; j++)
         {
-            float t;
-            bool intersect = collider->Intersect(segment, t);
-            if (intersect && collisionData.size < MAX_COLLISION_COUNT)
+            Collider* collider = &subColliders[j];
+            if (collider->GetOwner() != ignoreActor)
             {
-                CollisionData data;
-                data.collider = colliders[i];
-                data.t = t;
-                collisionData.Push(data);
+                float t;
+                bool intersect = collider->Intersect(segment, t);
+                if (intersect && collisionData.size < MAX_COLLISION_COUNT)
+                {
+                    CollisionData data;
+                    data.collider = colliders[i];
+                    data.t = t;
+                    collisionData.Push(data);
+                }
+                isIntersecting |= intersect;
             }
-            isIntersecting |= intersect;
         }
     }
 
@@ -136,21 +145,26 @@ bool CollisionWorld::Intersect(const Collider& collider, Array<CollisionData>& c
         {
             continue;
         }
-
-        if (collider.GetId() != colliders[i]->GetId())
+        
+        Array<Collider>& subColliders = colliders[i]->GetColliders();
+        for (int j = 0; j < subColliders.size; j++)
         {
-            int collisionCount = collisionData.size;
-            bool intersect = collider.Intersect(*colliders[i]->GetCollider(), collisionData);
-            if (intersect)
+            Collider* other = &subColliders[j];
+            if (collider.GetOwner() != other->GetOwner())
             {
-                int newCollision = collisionData.size - collisionCount;
-                for (int j = 0; j < newCollision; j++)
+                int collisionCount = collisionData.size;
+                bool intersect = collider.Intersect(*other, collisionData);
+                if (intersect)
                 {
-                    CollisionData& data = collisionData[collisionCount + j];
-                    data.collider = colliders[i];
+                    int newCollision = collisionData.size - collisionCount;
+                    for (int j = 0; j < newCollision; j++)
+                    {
+                        CollisionData& data = collisionData[collisionCount + j];
+                        data.collider = colliders[i];
+                    }
                 }
+                isIntersecting |= intersect;
             }
-            isIntersecting |= intersect;
         }
     }
     CollisionUtils::SortCollisionByPenetration(collisionData);
@@ -173,20 +187,33 @@ bool CollisionWorld::Intersect(ColliderComponent *collider, Array<CollisionData>
             continue;
         }
 
-        if (collider->GetId() != colliders[i]->GetId())
+        Array<Collider>& subColliders = collider->GetColliders();
+        for (int j = 0; j < subColliders.size; j++)
         {
-            int collisionCount = collisionData.size;
-            bool intersect = collider->GetCollider()->Intersect(*colliders[i]->GetCollider(), collisionData);
-            if (intersect)
+            Collider* subCollider = &subColliders[j];
+
+            Array<Collider>& otherSubColliders = colliders[i]->GetColliders();
+            for (int k = 0; k < otherSubColliders.size; k++)
             {
-                int newCollision = collisionData.size - collisionCount;
-                for (int j = 0; j < newCollision; j++)
+                Collider* otherSubCollider = &otherSubColliders[k];
+
+                if (subCollider->GetOwner() != otherSubCollider->GetOwner())
                 {
-                    CollisionData& data = collisionData[collisionCount + j];
-                    data.collider = colliders[i];
+                    int collisionCount = collisionData.size;
+                    bool intersect = subCollider->Intersect(*otherSubCollider, collisionData);
+                    if (intersect)
+                    {
+                        int newCollision = collisionData.size - collisionCount;
+                        for (int j = 0; j < newCollision; j++)
+                        {
+                            CollisionData& data = collisionData[collisionCount + j];
+                            data.collider = colliders[i];
+                        }
+                    }
+                    isIntersecting |= intersect;
                 }
+
             }
-            isIntersecting |= intersect;
         }
     }
     CollisionUtils::SortCollisionByPenetration(collisionData);
@@ -197,6 +224,11 @@ void CollisionWorld::DebugDraw()
 {
     for (int i = 0; i < colliders.size; ++i)
     {
-        colliders[i]->GetCollider()->DebugDraw();
+        Array<Collider>& subColliders = colliders[i]->GetColliders();
+        for (int j = 0; j < subColliders.size; j++)
+        {
+            Collider* subCollider = &subColliders[j];
+            subCollider->DebugDraw();
+        }
     }
 }

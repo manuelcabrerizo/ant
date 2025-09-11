@@ -14,11 +14,13 @@
     <PlayerControllerComponent>
         <weapon path="data/xml/pistol.xml"/>
     </PlayerControllerComponent>
-	<ColliderComponent>
-		<type colliderType="3"/>
+	<ColliderComponents>
 		<offset x="0" y="-0.5" z="0"/>
-		<values halfHeight="0.5" radio="0.25"/>
-	</ColliderComponent>
+		<ColliderComponent>
+			<type colliderType="3"/>
+			<values halfHeight="0.5" radio="0.25"/>
+		</ColliderComponent>
+	</ColliderComponents>
     <PhysicsComponent>
         <acceleration x="0" y="0" z="0"/>
         <velocity x="0" y="0" z="0"/>

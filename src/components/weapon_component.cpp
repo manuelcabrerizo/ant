@@ -99,7 +99,7 @@ void WeaponComponent::OnShoot(ShootNotification* notification)
     // Raycast againts the CollisionWorld and hit the enemies
     Ray shootRay;
     shootRay.Init(notification->shootPosition, notification->shootDirection);
-    if (CollisionWorld::Get()->Intersect(shootRay, collisionData, collider->GetId()))
+    if (CollisionWorld::Get()->Intersect(shootRay, collisionData, owner))
     {
         CollisionData& data = collisionData[0];
         if (data.collider->owner->GetTag() == ActorTag::Enemy)

@@ -13,7 +13,11 @@ void PhysicsComponent::OnInit(ActorManager *actorManager)
 void PhysicsComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
     ProcessPhysics(dt);
-    collider->GetCollider()->UpdatePosition(transform->position + collider->GetOffset());
+    Array<Collider>& colliders = collider->GetColliders();
+    for (int i = 0; i < colliders.size; i++)
+    {
+        colliders[i].UpdatePosition(transform->position + collider->GetOffset());
+    }
     ProcessCollisionDetectionAndResolution();
 }
 
@@ -49,8 +53,8 @@ void PhysicsComponent::ProcessCollisionDetectionAndResolution()
     Array<CollisionData> collisionData;
     collisionData.Init(MAX_COLLISION_COUNT, SCRATCH_MEMORY);
 
-    // TODO: this is Slow
-    grounded = CollisionWorld::Get()->Intersect(groundSegment, collisionData, collider->GetId());
+    // TODO: remove colliders ids and use the owner instread
+    grounded = CollisionWorld::Get()->Intersect(groundSegment, collisionData, owner);
 
     collisionData.Clear();
     if(CollisionWorld::Get()->Intersect(collider, collisionData))
@@ -66,8 +70,14 @@ void PhysicsComponent::ProcessCollisionDetectionAndResolution()
             velocity -= n * velocity.Dot(n);
 
             collisionData.Clear();
-            collider->GetCollider()->UpdatePosition(transform->position + collider->GetOffset());
+
+            Array<Collider>& colliders = collider->GetColliders();
+            for (int i = 0; i < colliders.size; i++)
+            {
+                colliders[i].UpdatePosition(transform->position + collider->GetOffset());
+            }
             CollisionWorld::Get()->Intersect(collider, collisionData);
+
             iterations++;
         }    
     }

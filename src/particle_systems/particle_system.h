@@ -29,7 +29,10 @@ public:
 private:
     Vector3 position;
     Texture* texture = nullptr;
+
+    // TODO: use an Array here
     StaticArray<Particle, 500> particles;
+    
     bool isPlaying = false;
     float timeToSpawn = 0.005f;
     float timer = 0.0f;

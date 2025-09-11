@@ -3,43 +3,42 @@
 #include "ray.h"
 #include "segment.h"
 
-unsigned int Collider::gen = 1;
 
-Collider::Collider(const AABB& aabb)
+Collider::Collider(const AABB& aabb, Actor* actor)
 {
-    this->id = gen++;
+    this->owner = actor;
     this->type = ColliderType::AABB;
     this->aabb = aabb;
     this->volume = aabb;
 }
 
-Collider::Collider(const OBB& obb)
+Collider::Collider(const OBB& obb, Actor* actor)
 {
-    this->id = gen++;
+    this->owner = actor;
     this->type = ColliderType::OBB;
     this->obb = obb;
     // TODO: this->volume.Init(obb);
 }
 
-Collider::Collider(const Sphere& sphere)
+Collider::Collider(const Sphere& sphere, Actor* actor)
 {
-    this->id = gen++;
+    this->owner = actor;
     this->type = ColliderType::SPHERE;
     this->sphere = sphere;
     this->volume.Init(sphere);
 }
 
-Collider::Collider(const Capsule& capsule)
+Collider::Collider(const Capsule& capsule, Actor* actor)
 {
-    this->id = gen++;
+    this->owner = actor;
     this->type = ColliderType::CAPSULE;
     this->capsule = capsule;
     this->volume.Init(capsule);
 }
 
-Collider::Collider(const MeshCollider& meshCollider)
+Collider::Collider(const MeshCollider& meshCollider, Actor* actor)
 {
-    this->id = gen++;
+    this->owner = actor;
     this->type = ColliderType::MESH_COLLIDER;
     this->meshCollider = meshCollider;
     // TODO: this->volume.Init(meshCollider);
@@ -139,9 +138,9 @@ bool Collider::Intersect(const Collider& other, Array<CollisionData>& collisionD
     }
 }
 
-unsigned int Collider::GetId() const
+Actor* Collider::GetOwner() const
 {
-    return id;
+    return owner;
 }
 
 void Collider::UpdatePosition(const Vector3& position)
@@ -153,23 +152,27 @@ void Collider::UpdatePosition(const Vector3& position)
             float width = aabb.GetMax().x - aabb.GetMin().x;
             float height = aabb.GetMax().y - aabb.GetMin().y;
             float depth = aabb.GetMax().z - aabb.GetMin().z;
-;           aabb.SetMin(Vector3(position.x - width * 0.5f, position.y - height * 0.5f, position.z - depth * 0.5f));
-;           aabb.SetMax(Vector3(position.x + width * 0.5f, position.y + height * 0.5f, position.z + depth * 0.5f));
+            Vector3 absPos = position + offset;
+;           aabb.SetMin(Vector3(absPos.x - width * 0.5f, absPos.y - height * 0.5f, absPos.z - depth * 0.5f));
+;           aabb.SetMax(Vector3(absPos.x + width * 0.5f, absPos.y + height * 0.5f, absPos.z + depth * 0.5f));
             volume = aabb;
         } break;
         case ColliderType::OBB:
         {
-            obb.SetCenter(position);
+            Vector3 absPos = position + offset;
+            obb.SetCenter(absPos);
             // TODO: volume.Init(obb);
         } break;
         case ColliderType::SPHERE:
         {
-            sphere.SetCenter(position);
+            Vector3 absPos = position + offset;
+            sphere.SetCenter(absPos);
             volume.Init(sphere);
         } break;
         case ColliderType::CAPSULE:
         {
-            capsule.SetPosition(position);
+            Vector3 absPos = position + offset;
+            capsule.SetPosition(absPos);
             volume.Init(capsule);
         } break;
     }
@@ -202,4 +205,9 @@ void Collider::DebugDraw() const
             meshCollider.DebugDraw(color);
         } break;
     }
+}
+
+void Collider::SetOffset(const Vector3& offset)
+{
+    this->offset = offset;
 }

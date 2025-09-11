@@ -249,41 +249,49 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
             anchor.offset = offset;
             AddComponent<AnchorComponent>(actor, anchor);
         }
-        else if (strcmp("ColliderComponent", componentType) == 0)
+        else if (strcmp("ColliderComponents", componentType) == 0)
         {
             TransformComponent* transform = actor->GetComponent<TransformComponent>();
 
+            i32 colliderCount = GetChildElementCount(component) - 1;
+
             tinyxml2::XMLElement* attributes = component->FirstChildElement();
-
-            ColliderType colliderType;
-            attributes->QueryIntAttribute("colliderType", (int *)&colliderType);
-            attributes = attributes->NextSiblingElement();
-
             Vector3 offset;
             attributes->QueryFloatAttribute("x", &offset.x);
             attributes->QueryFloatAttribute("y", &offset.y);
             attributes->QueryFloatAttribute("z", &offset.z);
-            
-            Collider collider;
-            switch (colliderType)
+
+            ColliderComponent colliderComponent;
+            colliderComponent.Init(colliderCount, memoryType);
+            colliderComponent.SetOffset(offset);
+
+            tinyxml2::XMLElement* colliders = attributes->NextSiblingElement();
+            while(colliders)
             {
+
+                tinyxml2::XMLElement* collidersAttrib = colliders->FirstChildElement();
+
+                ColliderType colliderType;
+                collidersAttrib->QueryIntAttribute("colliderType", (int*)&colliderType);
+                collidersAttrib = collidersAttrib->NextSiblingElement();
+
+                Collider collider;
+                switch (colliderType)
+                {
                 case ColliderType::MESH_COLLIDER:
                 {
-                    attributes = attributes->NextSiblingElement();
-                    const char *filepath;
-                    attributes->QueryStringAttribute("filepath", &filepath);
+                    const char* filepath;
+                    collidersAttrib->QueryStringAttribute("filepath", &filepath);
 
                     MeshCollider meshCollider;
                     meshCollider.InitFromFile(filepath);
-                    collider = Collider(meshCollider);
+                    collider = Collider(meshCollider, actor);
                 } break;
                 case ColliderType::CAPSULE:
                 {
-                    attributes = attributes->NextSiblingElement();
-
                     float halfHeight, radio;
-                    attributes->QueryFloatAttribute("halfHeight", &halfHeight);
-                    attributes->QueryFloatAttribute("radio", &radio);
+                    collidersAttrib->QueryFloatAttribute("halfHeight", &halfHeight);
+                    collidersAttrib->QueryFloatAttribute("radio", &radio);
 
                     Vector3 halfHeightAxis = Vector3(0, halfHeight, 0);
 
@@ -293,27 +301,27 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
                         (transform->position + halfHeightAxis) + offset,
                         radio);
 
-                    collider = Collider(capsule);
+                    collider = Collider(capsule, actor);
                 } break;
                 case ColliderType::AABB:
                 {
-                    attributes = attributes->NextSiblingElement();
                     float scaleX, scaleY, scaleZ;
-                    attributes->QueryFloatAttribute("x", &scaleX);
-                    attributes->QueryFloatAttribute("y", &scaleY);
-                    attributes->QueryFloatAttribute("z", &scaleZ);
+                    collidersAttrib->QueryFloatAttribute("x", &scaleX);
+                    collidersAttrib->QueryFloatAttribute("y", &scaleY);
+                    collidersAttrib->QueryFloatAttribute("z", &scaleZ);
                     Vector3 scale = Vector3(scaleX, scaleY, scaleZ);
                     AABB aabb;
                     aabb.Init(
                         scale * -0.5f + offset,
-                        scale *  0.5f + offset);
-                    collider = Collider(aabb);
+                        scale * 0.5f + offset);
+                    collider = Collider(aabb, actor);
                 }
+                }
+                colliderComponent.AddSubCollider(collider);
+
+                colliders = colliders->NextSiblingElement();
             }
 
-            ColliderComponent colliderComponent;
-            colliderComponent.SetCollider(collider);
-            colliderComponent.SetOffset(offset);
             AddComponent<ColliderComponent>(actor, colliderComponent);
         }
         else if (strcmp("PortalComponent", componentType) == 0)

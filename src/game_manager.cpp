@@ -57,7 +57,7 @@ void GameManager::Render(f32 dt)
 
     stateMachine.Render();
 
-    GraphicsManager::Get()->EndFrame(0);
+    GraphicsManager::Get()->EndFrame(1);
 }
 
 void GameManager::ChangeToMenuState()

@@ -11,6 +11,7 @@
 class Ray;
 class Segment;
 class MeshCollider;
+class Actor;
 
 enum class ColliderType
 {
@@ -25,10 +26,7 @@ class Collider
 {
     friend MeshCollider;
 private:
-    static unsigned int gen;
-
     ColliderType type;
-    unsigned int id;
     union
     {
         AABB aabb;
@@ -38,16 +36,19 @@ private:
         MeshCollider meshCollider;
     };
     AABB volume;
+    Actor* owner = nullptr;
+    Vector3 offset = Vector3::zero;
 public:
 
     Collider() {}
-    Collider(const AABB& aabb);
-    Collider(const OBB& obb);
-    Collider(const Sphere& sphere);
-    Collider(const Capsule& capsule);
-    Collider(const MeshCollider& meshCollider);
+    Collider(const AABB& aabb, Actor* actor);
+    Collider(const OBB& obb, Actor* actor);
+    Collider(const Sphere& sphere, Actor* actor);
+    Collider(const Capsule& capsule, Actor* actor);
+    Collider(const MeshCollider& meshCollider, Actor* actor);
 
-    unsigned int GetId() const;
+    Actor* GetOwner() const;
+
     void DebugDraw() const;
 
     bool Intersect(const Ray& ray, float& t) const;
@@ -55,4 +56,5 @@ public:
     bool Intersect(const Collider& other, Array<CollisionData>& collisionData) const;
 
     void UpdatePosition(const Vector3& position);
+    void SetOffset(const Vector3& offset);
 };

@@ -44,7 +44,7 @@ public:
     Actor *CreateActorFromFile(const char* filepath);
     
     template <typename ComponentType>
-    void AddComponent(Actor *actor, ComponentType component);
+    void AddComponent(Actor *actor, const ComponentType& component);
 
     template <typename ComponentType>
     void Clear();
@@ -86,7 +86,7 @@ ComponentList<ComponentType>* ActorManager::GetComponents()
 }
 
 template <typename ComponentType>
-void ActorManager::AddComponent(Actor *actor, ComponentType value)
+void ActorManager::AddComponent(Actor *actor, const ComponentType& value)
 {
     ComponentList<ComponentType>* list = (ComponentList<ComponentType> *)(*componentListMap.Get(ComponentType::GetID()));
     ComponentType* component = list->AddComponent(actor, value);

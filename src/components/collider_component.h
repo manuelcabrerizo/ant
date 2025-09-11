@@ -8,7 +8,7 @@ class TransformComponent;
 class ColliderComponent : public Component<ColliderComponent>
 {
 private:
-    Collider collider;
+    Array<Collider> colliders;
     Vector3 offset;
 private:
     TransformComponent* transform = nullptr;
@@ -18,11 +18,11 @@ public:
     void OnTerminate(ActorManager* actorManager) override;
     void OnUpdate(ActorManager* actorManager, f32 dt);
 
-    Collider* GetCollider();
+    void Init(int size, int memoryType);
+    void AddSubCollider(const Collider& collider);
+    Array<Collider>& GetColliders();
     Vector3 GetOffset();
-    unsigned int GetId();
-
-    void SetCollider(const Collider& collider);
+    
     void SetOffset(const Vector3& offset);
 };
 

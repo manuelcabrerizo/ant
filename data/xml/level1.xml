@@ -11,9 +11,11 @@
 		</materials>
 		<rotationOffset x="0" y="0" z="0"/>
 	</RenderComponent>
-	<ColliderComponent>
-		<type colliderType="4"/>
+	<ColliderComponents>
 		<offset x="0" y="0" z="0"/>
-		<file filepath="data/models/TestLevel/source/TestLevel.fbx"/>
-	</ColliderComponent>
+		<ColliderComponent>
+			<type colliderType="4"/>
+			<file filepath="data/models/TestLevel/source/TestLevel.fbx"/>
+		</ColliderComponent>
+	</ColliderComponents>
 </Actor>

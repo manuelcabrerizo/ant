@@ -33,8 +33,6 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");
 
-    
-
     // Temp fix, EffectComponent is to big to be created on the stack
     // TODO: use the scratch memory for this
     {
@@ -55,7 +53,6 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         actorManager->AddComponent<EffectComponent>(box, *effect);
         delete effect;
     }
-
 
     // Create the portals
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);

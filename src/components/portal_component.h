@@ -5,12 +5,14 @@
 #include <collisions/collider.h>
 
 class TransformComponent;
+class ColliderComponent;
 
 class PortalComponent : public Component<PortalComponent>
 {
 private:
-    Collider collider;
+    Collider trigger;
     TransformComponent* transform = nullptr;
+    ColliderComponent* collider = nullptr;
 
     bool isOnPortal = false;
     bool wasOnPortal = false;

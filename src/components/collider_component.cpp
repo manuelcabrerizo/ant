@@ -16,12 +16,25 @@ void ColliderComponent::OnTerminate(ActorManager* actorManager)
 
 void ColliderComponent::OnUpdate(ActorManager* actorManager, f32 dt)
 {
-    collider.UpdatePosition(transform->position + offset);
+    for (int i = 0; i < colliders.size; i++)
+    {
+        colliders[i].UpdatePosition(transform->position + offset);
+    }
 }
 
-Collider* ColliderComponent::GetCollider()
+void ColliderComponent::Init(int size, int memoryType)
 {
-    return &collider;
+    colliders.Init(size, memoryType);
+}
+
+void ColliderComponent::AddSubCollider(const Collider& collider)
+{
+    colliders.Push(collider);
+}
+
+Array<Collider>& ColliderComponent::GetColliders()
+{
+    return colliders;
 }
 
 Vector3 ColliderComponent::GetOffset()
@@ -29,15 +42,6 @@ Vector3 ColliderComponent::GetOffset()
     return offset;
 }
 
-unsigned int ColliderComponent::GetId()
-{
-    return collider.GetId();
-}
-
-void ColliderComponent::SetCollider(const Collider& collider)
-{
-    this->collider = collider;
-}
 void ColliderComponent::SetOffset(const Vector3& offset)
 {
     this->offset = offset;
