@@ -9,7 +9,6 @@ void PortalComponent::OnInit(ActorManager* actorManager)
 {
     transform = owner->GetComponent<TransformComponent>();
 
-    // TODO: data driven this Collider Creation
     ColliderComponent colliderComponent;
     colliderComponent.Init(3, FRAME_MEMORY);
     colliderComponent.SetOffset(Vector3(0, 1, 0));
@@ -49,15 +48,12 @@ void PortalComponent::OnInit(ActorManager* actorManager)
 
     actorManager->AddComponent(owner, colliderComponent);
 
-    collider = owner->GetComponent<ColliderComponent>();
-
-    Vector3 size = Vector3::one;
     Vector3 offset = Vector3(0, 0.5f, 0);
     Vector3 position = transform->position + offset;
     OBB obb;
     obb.Init(transform->position, rotation, Vector3(1.5, 2, 0.25));
     trigger = Collider(obb, owner);
-    trigger.SetOffset(up * 1.5f + front*0.5);
+    trigger.SetOffset(up * 1.5f + front*0.3);
     trigger.UpdatePosition(transform->position);
 }
 

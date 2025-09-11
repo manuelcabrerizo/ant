@@ -222,6 +222,9 @@
     <ClCompile Include="src\particle_systems\fire_ps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\components\key_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\actor.h">
@@ -455,9 +458,12 @@
     <ClInclude Include="src\particle_systems\fire_ps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\components\key_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="data\xml\bullet.xml" />
+    <Xml Include="data\xml\key.xml" />
     <Xml Include="data\xml\enemy.xml" />
     <Xml Include="data\xml\house.xml" />
     <Xml Include="data\xml\pistol.xml" />
@@ -470,5 +476,6 @@
     <Xml Include="data\xml\mona.xml" />
     <Xml Include="data\xml\portal.xml" />
     <Xml Include="data\xml\default.xml" />
+    <Xml Include="data\xml\fence.xml" />
   </ItemGroup>
 </Project>

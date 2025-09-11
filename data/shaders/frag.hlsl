@@ -37,8 +37,14 @@ float4 fs_main(PS_Input i) : SV_TARGET
     float3 ligthDir3 = normalize(ligthPos3 - i.fragPos);
     float3 lightColor3 = float3(0.8f, 0.4f, 0.4f);
 
-    float3 color = diffuseMap.Sample(samplerState, i.uv).rgb;
-
+    float4 colorA = diffuseMap.SampleLevel(samplerState, i.uv, 0);
+    if (colorA.a < 0.5f)
+    {
+        discard;
+    }
+    
+    float3 color = colorA.xyz;
+   
     float3 n = normalize(i.nor);
     float diffuse0 = max(dot(ligthDir0, n), 0.1f);
     float diffuse1 = max(dot(ligthDir1, n), 0.1f);

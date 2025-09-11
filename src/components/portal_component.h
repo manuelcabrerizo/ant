@@ -12,7 +12,6 @@ class PortalComponent : public Component<PortalComponent>
 private:
     Collider trigger;
     TransformComponent* transform = nullptr;
-    ColliderComponent* collider = nullptr;
 
     bool isOnPortal = false;
     bool wasOnPortal = false;

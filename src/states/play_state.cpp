@@ -15,6 +15,7 @@
 #include <components/animation_component.h>
 #include <components/portal_component.h>
 #include <components/effect_component.h>
+#include <components/key_component.h>
 
 #include <collision.h>
 #include <math/algebra.h>
@@ -70,7 +71,6 @@ void PlayState::OnExit()
     RenderComponent::Terminate();
     CameraComponent::Terminate();
 
-
     NotificationManager::Get()->RemoveListener(this, NotificationType::OnResize);
 
     // Remove all assets loaded for the level
@@ -99,6 +99,7 @@ void PlayState::OnUpdate(float deltaTime)
     actorManager.UpdateComponents<AnimationComponent>(deltaTime);
     actorManager.UpdateComponents<PortalComponent>(deltaTime);
     actorManager.UpdateComponents<EffectComponent>(deltaTime);
+    actorManager.UpdateComponents<KeyComponent>(deltaTime);
     // Late Update
     actorManager.LateUpdateComponents<PhysicsComponent>(deltaTime);
 
@@ -146,6 +147,7 @@ void PlayState::InitializeActorManager()
     actorManager.AddComponentType<AnimationComponent, 40>();
     actorManager.AddComponentType<PortalComponent, 10>();
     actorManager.AddComponentType<EffectComponent, 10>();
+    actorManager.AddComponentType<KeyComponent, 2>();
     // NOTE: add more component types ...
     actorManager.EndInitialization();
 }

@@ -10,6 +10,7 @@
 #include <components/collider_component.h>
 #include <components/portal_component.h>
 #include <components/effect_component.h>
+#include <components/key_component.h>
 
 #include <strings.h>
 #include <math/algebra.h>
@@ -24,6 +25,8 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     ModelManager::Get()->Load("bullet", "data/models/testBullet.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("level1", "data/models/TestLevel/source/TestLevel.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("portal", "data/models/Portal/source/Portal.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("key", "data/models/Key/source/Key.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("fence", "data/models/Fence/source/Fence.fbx", FRAME_MEMORY);
 
     // Load animation data
     SkeletonManager::Get()->Load("Bloodwraith", "data/models/bloodwraith/source/bloodwraith.fbx", FRAME_MEMORY);
@@ -32,6 +35,22 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
 
     // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");
+
+    // Create the key
+    Actor* key = actorManager->CreateActorFromFile("data/xml/key.xml");
+    KeyComponent keyComponent;
+    actorManager->AddComponent<KeyComponent>(key, keyComponent);
+    TransformComponent* keyTransform = key->GetComponent<TransformComponent>();
+    keyTransform->position = Vector3(59, -29.5, 32);
+
+    // Create the fence
+    Actor* fence = actorManager->CreateActorFromFile("data/xml/fence.xml");
+    TransformComponent* fenceTransform = fence->GetComponent<TransformComponent>();
+    fenceTransform->position = Vector3(42, 4, 35.5);
+    fenceTransform->direction = Vector3::right;
+    RenderComponent* fenceRender = fence->GetComponent<RenderComponent>();
+    fenceRender->SetBackCulling(false);
+
 
     // Temp fix, EffectComponent is to big to be created on the stack
     // TODO: use the scratch memory for this

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Actor>
+	<TransformComponent>
+		<position x="0" y="0" z="0"/>
+		<scale x="1.0" y="1.0" z="1.0"/>
+		<direction x="0" y="0" z="1"/>
+	</TransformComponent>
+	<RenderComponent>
+		<model name="fence"/>
+		<materials>
+		</materials>
+		<rotationOffset x="0" y="0" z="0"/>
+	</RenderComponent>
+	<ColliderComponents>
+		<offset x="0" y="0" z="0"/>
+		<ColliderComponent>
+			<type colliderType="0"/>
+			<values x="0.5" y="30" z="50"/>
+		</ColliderComponent>
+	</ColliderComponents>
+</Actor>

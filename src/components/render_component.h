@@ -26,6 +26,7 @@ public:
     Model *model;
     Vector3 rotationOffset;
     bool isAnimated = false;
+    bool isBackCull = true;
 
      // use to init static variables, must be called by the user at init time
      static void Initialize();
@@ -36,4 +37,9 @@ public:
      void OnTerminate(ActorManager *actorManager) override;
      void OnUpdate(ActorManager *actorManager, f32 dt);
      void OnRender(ActorManager *actorManager);
+
+     void SetBackCulling(bool value)
+     {
+         isBackCull = value;
+     }
 };

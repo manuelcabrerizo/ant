@@ -64,6 +64,17 @@ void RenderComponent::OnRender(ActorManager *actorManager)
 
     ubo.model = rotOffset * ubo.model;
 
+    // Create diferent render components for diferent types of rendering states
+    if (isBackCull)
+    {
+        GraphicsManager::Get()->SetRasterizerStateCullBack();
+    }
+    else
+    {
+        GraphicsManager::Get()->SetRasterizerStateCullNone();
+    }
+
+
     // bind the vertex shader
     if(!isAnimated)
     {
