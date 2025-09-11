@@ -10,7 +10,6 @@
 #include <components/anchor_component.h>
 #include <components/player_controller_component.h>
 #include <components/enemy_component.h>
-#include <components/bullet_component.h>
 #include <components/portal_component.h>
 
 #include <math/algebra.h>
@@ -33,10 +32,10 @@ void ActorManager::BeingInitialization(i32 actorCount, i32 componentTypeCount_, 
     maxActorCount = actorCount;
     maxComponentCount = 0;
 
-    allocator.Init(maxActorCount, memoryType);
-    toRemove.Init(maxActorCount, memoryType);
+    actors.Init(maxActorCount, memoryType);
     actorsComponentsMap.Init(maxActorCount, memoryType);
     componentListMap.Init(componentTypeCount, memoryType);
+    componentListToRemove.Init(componentTypeCount, memoryType);
 }
 
 void ActorManager::EndInitialization()
@@ -46,103 +45,24 @@ void ActorManager::EndInitialization()
 
 void ActorManager::Terminate()
 {
-    Clear();
-}
-
-void ActorManager::Clear()
-{
-    auto actorsArray = allocator.GetBlockArray();
-    size_t size = allocator.GetBlockCount();
-    size_t used = allocator.GetBlockUsed();
-
-    size_t usedFound = 0;
-    for (int i = 0; i < size; ++i)
+    for (int i = 0; i < componentListToRemove.size; i++)
     {
-        if (!actorsArray[i].header.occupied)
-        {
-            continue;
-        }
-        usedFound++;
-
-        Actor* actor = (Actor*)&actorsArray[i].data[0];
-        auto& components = *actorsComponentsMap.Get(actor->id);
-        for (i32 i = components.size - 1; i >= 0; --i)
-        {
-            RemoveActorComponent(actor, components[i]);
-        }
-        components.Clear();
-
-
-        if (usedFound == used)
-        {
-            break;
-        }
+        componentListToRemove[i]->Clear(this);
     }
-
-    allocator.Clear();
+    actors.Clear();
+    componentsToInit.Clear();
+    componentListToRemove.Clear();
 }
 
 Actor *ActorManager::CreateActor(ActorTag tag)
 {
-    void* buffer = allocator.Alloc();
-    Actor* actor = new (buffer) Actor();
+    actors.Push(Actor());
+    Actor* actor = &actors[actors.size - 1];
     actor->tag = tag;
     actor->actorManager = this;
     actor->id = actorGeneration++;
     actorsComponentsMap.Add(actor->id, {});
     return actor;
-}
-
-void ActorManager::DestroyActor(Actor *actor)
-{
-    toRemove.Push(actor);
-}
-
-void ActorManager::ProcessActorsToRemove()
-{
-    for (int j = 0; j < toRemove.size; ++j)
-    {
-        Actor* actor = toRemove[j];
-        
-        auto& components = *actorsComponentsMap.Get(actor->id);
-        for (i32 i = components.size - 1; i >= 0; --i)
-        {
-            RemoveActorComponent(actor, components[i]);
-            components[i] = components[components.size - 1];
-            components[components.size - 1] = {};
-            components.size--;
-        }
-
-        actorsComponentsMap.Remove(actor->id);
-        allocator.Free(actor);
-    }
-    toRemove.Clear();
-}
-
-void ActorManager::AddAndCloneComponent(Actor *dstActor, Actor *srcActor, ActorComponent actorComponent)
-{
-    ComponentListBase* list = *componentListMap.Get(actorComponent.id);
-
-    ComponentBase *dstComponentBase = list->AddComponent();
-    ComponentBase* srcComponentBase = actorComponent.component;
-
-    list->CopyComponent(dstComponentBase, srcComponentBase);
-
-    auto& components = *actorsComponentsMap.Get(dstActor->id);
-    components.Push({actorComponent.id, dstComponentBase});
-
-    dstComponentBase->enable = true;
-    dstComponentBase->initialized = false;
-    dstComponentBase->owner = dstActor;
-
-    componentsToInit.Push(dstComponentBase);
-}
-
-void ActorManager::RemoveActorComponent(Actor* actor, ActorComponent actorComponent)
-{
-    // Remove the component from the componentList
-    ComponentListBase* list = *componentListMap.Get(actorComponent.id);
-    list->RemoveComponent(this, actorComponent.component);
 }
 
 static i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
@@ -154,18 +74,6 @@ static i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
         ++count;
     }
     return count;
-}
-
-Actor *ActorManager::CloneActor(Actor *srcActor)
-{
-    auto& components = *actorsComponentsMap.Get(srcActor->id);
-
-    Actor *dstActor = CreateActor();
-    for (int i = 0; i < components.size; ++i)
-    {
-        AddAndCloneComponent(dstActor, srcActor, components[i]);
-    }
-    return dstActor;
 }
 
 Actor *ActorManager::CreateActorFromFile(const char* filepath)
@@ -340,11 +248,6 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
             AnchorComponent anchor;
             anchor.offset = offset;
             AddComponent<AnchorComponent>(actor, anchor);
-        }
-        else if (strcmp("BulletComponent", componentType) == 0)
-        {
-            BulletComponent bullet;
-            AddComponent<BulletComponent>(actor, bullet);
         }
         else if (strcmp("ColliderComponent", componentType) == 0)
         {

@@ -171,9 +171,6 @@
     <ClCompile Include="src\scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\bullet_component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\actor_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -399,9 +396,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\notification.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\components\bullet_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\actor_manager.h">

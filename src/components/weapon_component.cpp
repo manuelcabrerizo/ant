@@ -2,7 +2,6 @@
 #include "anchor_component.h"
 #include "transform_component.h"
 #include "collider_component.h"
-#include "bullet_component.h"
 #include "render_component.h"
 #include "camera_component.h"
 

@@ -13,7 +13,6 @@
 #include <components/player_controller_component.h>
 #include <components/enemy_component.h>
 #include <components/animation_component.h>
-#include <components/bullet_component.h>
 #include <components/portal_component.h>
 #include <components/effect_component.h>
 
@@ -97,14 +96,11 @@ void PlayState::OnUpdate(float deltaTime)
     actorManager.UpdateComponents<EnemyComponent>(deltaTime);
     actorManager.UpdateComponents<PhysicsComponent>(deltaTime);
     actorManager.UpdateComponents<ColliderComponent>(deltaTime);
-    actorManager.UpdateComponents<BulletComponent>(deltaTime);
     actorManager.UpdateComponents<AnimationComponent>(deltaTime);
     actorManager.UpdateComponents<PortalComponent>(deltaTime);
     actorManager.UpdateComponents<EffectComponent>(deltaTime);
     // Late Update
     actorManager.LateUpdateComponents<PhysicsComponent>(deltaTime);
-
-    actorManager.ProcessActorsToRemove();
 
     if (InputManager::Get()->KeyJustDown(KEY_P))
     {
@@ -148,7 +144,6 @@ void PlayState::InitializeActorManager()
     actorManager.AddComponentType<EnemyComponent, 40>();
     actorManager.AddComponentType<AnchorComponent, 10>();
     actorManager.AddComponentType<AnimationComponent, 40>();
-    actorManager.AddComponentType<BulletComponent, 100>();
     actorManager.AddComponentType<PortalComponent, 10>();
     actorManager.AddComponentType<EffectComponent, 10>();
     // NOTE: add more component types ...

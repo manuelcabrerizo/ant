@@ -119,6 +119,4 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
 
 void Scene::Unload()
 {
-    ASSERT(actorManager != nullptr);
-    actorManager->Clear();
 }

@@ -142,7 +142,6 @@
     <ClCompile Include="src\states\menu_state.cpp" />
     <ClCompile Include="src\components\component.cpp" />
     <ClCompile Include="src\actor_manager.cpp" />
-    <ClCompile Include="src\components\bullet_component.cpp" />
     <ClCompile Include="src\scene.cpp" />
     <ClCompile Include="src\collisions\mesh_collider.cpp" />
     <ClCompile Include="src\collisions\collider.cpp" />
@@ -214,7 +213,6 @@
     <ClInclude Include="src\states\menu_state.h" />
     <ClInclude Include="src\component_list.h" />
     <ClInclude Include="src\actor_manager.h" />
-    <ClInclude Include="src\components\bullet_component.h" />
     <ClInclude Include="src\notification.h" />
     <ClInclude Include="src\scene.h" />
     <ClInclude Include="src\collisions\mesh_collider.h" />
