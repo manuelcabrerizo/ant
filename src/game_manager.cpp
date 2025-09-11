@@ -33,6 +33,7 @@ void GameManager::Terminate()
 
 void GameManager::Update(f32 dt)
 {
+    // TODO: automate this calls
     MaterialManager::Get()->Get("AlienPortalMaterial")->Update(dt);
     MaterialManager::Get()->Get("Level1MagmaMaterial")->Update(dt);
 
