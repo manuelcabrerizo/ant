@@ -33,5 +33,7 @@ public:
     void OnTerminate(ActorManager *actorManager) override;
     void OnUpdate(ActorManager *actorManager, f32 dt);
     void OnNotify(NotificationType type, Notification *notification) override;
+    
+    static void OnSetRenderState();
     void OnRender(ActorManager* actorManager);
 };

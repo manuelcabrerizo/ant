@@ -29,13 +29,16 @@ void EffectComponent::OnUpdate(ActorManager* actorManager, f32 dt)
     }
 }
 
-void EffectComponent::OnRender(ActorManager* actorManager)
+void EffectComponent::OnSetRenderState()
 {
+    GraphicsManager::Get()->SetRasterizerStateCullBack();
     GraphicsManager::Get()->SetDepthStencilOnWriteMaskZero();
     GraphicsManager::Get()->SetAdditiveBlending();
+}
+
+void EffectComponent::OnRender(ActorManager* actorManager)
+{
     firePs.Render();
-    GraphicsManager::Get()->SetBlendingOff();
-    GraphicsManager::Get()->SetDepthStencilOn();
 }
 
 

@@ -131,6 +131,7 @@
     <ClCompile Include="src\components\key_component.cpp" />
     <ClCompile Include="src\components\portal_component.cpp" />
     <ClCompile Include="src\asset_managers\animation_manager.cpp" />
+    <ClCompile Include="src\components\tiled_render_component.cpp" />
     <ClCompile Include="src\particle_systems\blood_ps.cpp" />
     <ClCompile Include="src\particle_systems\fire_ps.cpp" />
     <ClCompile Include="src\particle_systems\particle_system.cpp" />
@@ -203,6 +204,7 @@
     <ClInclude Include="src\components\key_component.h" />
     <ClInclude Include="src\components\portal_component.h" />
     <ClInclude Include="src\asset_managers\animation_manager.h" />
+    <ClInclude Include="src\components\tiled_render_component.h" />
     <ClInclude Include="src\particle_systems\blood_ps.h" />
     <ClInclude Include="src\particle_systems\fire_ps.h" />
     <ClInclude Include="src\particle_systems\particle_system.h" />

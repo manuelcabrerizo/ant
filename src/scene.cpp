@@ -44,12 +44,20 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     keyTransform->position = Vector3(59, -29.5, 32);
 
     // Create the fence
-    Actor* fence = actorManager->CreateActorFromFile("data/xml/fence.xml");
-    TransformComponent* fenceTransform = fence->GetComponent<TransformComponent>();
-    fenceTransform->position = Vector3(42, 4, 35.5);
-    fenceTransform->direction = Vector3::right;
-    RenderComponent* fenceRender = fence->GetComponent<RenderComponent>();
-    fenceRender->SetBackCulling(false);
+    {
+        Actor* fence = actorManager->CreateActorFromFile("data/xml/fence.xml");
+        TransformComponent* fenceTransform = fence->GetComponent<TransformComponent>();
+        fenceTransform->position = Vector3(42, 4, 35.5);
+        fenceTransform->scale = Vector3(12, 12, 0);
+        fenceTransform->direction = Vector3::right;
+    }
+    {
+        Actor* fence = actorManager->CreateActorFromFile("data/xml/fence.xml");
+        TransformComponent* fenceTransform = fence->GetComponent<TransformComponent>();
+        fenceTransform->position = Vector3(22.5, 4, 23.4);
+        fenceTransform->scale = Vector3(8, 12, 0);
+        fenceTransform->direction = Vector3::forward;
+    }
 
 
     // Temp fix, EffectComponent is to big to be created on the stack

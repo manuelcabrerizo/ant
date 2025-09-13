@@ -9,14 +9,14 @@ class TransformComponent;
 class AnimationComponent;
 class Model;
 
-struct PerDrawUbo
-{
-    Matrix4 model;
-};
-
 class RenderComponent : public Component<RenderComponent>
 {
 private:
+    struct PerDrawUbo
+    {
+        Matrix4 model;
+    };
+
     static UniformBuffer *uniformBuffer;
     static PerDrawUbo ubo;
     static UniformBuffer *matrixBuffer;
@@ -26,20 +26,15 @@ public:
     Model *model;
     Vector3 rotationOffset;
     bool isAnimated = false;
-    bool isBackCull = true;
 
      // use to init static variables, must be called by the user at init time
      static void Initialize();
      static void Terminate();
 
-     // Component logic interface, this are call form the ActorManager automaticaly
+     // Component logic interface, this are call form the ActorManager automaticaly     
      void OnInit(ActorManager *actorManager);
      void OnTerminate(ActorManager *actorManager) override;
-     void OnUpdate(ActorManager *actorManager, f32 dt);
-     void OnRender(ActorManager *actorManager);
 
-     void SetBackCulling(bool value)
-     {
-         isBackCull = value;
-     }
+     static void OnSetRenderState();
+     void OnRender(ActorManager *actorManager);
 };

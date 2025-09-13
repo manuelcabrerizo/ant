@@ -136,6 +136,7 @@ void ActorManager::LateUpdateComponents(f32 dt)
 template<typename ComponentType>
 void ActorManager::RenderComponents()
 {
+    ComponentType::OnSetRenderState();
     ComponentList<ComponentType>* list = GetComponents<ComponentType>();
     list->RenderComponents(this);
 }

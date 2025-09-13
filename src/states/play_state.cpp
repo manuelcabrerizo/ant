@@ -5,6 +5,7 @@
 #include <components/component.h>
 #include <components/transform_component.h>
 #include <components/render_component.h>
+#include <components/tiled_render_component.h>
 #include <components/physics_component.h>
 #include <components/collider_component.h>
 #include <components/camera_component.h>
@@ -56,6 +57,7 @@ void PlayState::OnEnter()
 
     CameraComponent::Initialize();
     RenderComponent::Initialize();
+    TiledRenderComponent::Initialize();
 
     InitializeActorManager();
 
@@ -68,6 +70,7 @@ void PlayState::OnExit()
 
     actorManager.Terminate();
 
+    TiledRenderComponent::Terminate();
     RenderComponent::Terminate();
     CameraComponent::Terminate();
 
@@ -112,6 +115,7 @@ void PlayState::OnUpdate(float deltaTime)
 void PlayState::OnRender()
 {
     actorManager.RenderComponents<RenderComponent>();
+    actorManager.RenderComponents<TiledRenderComponent>();
 
     actorManager.RenderComponents<WeaponComponent>();
     actorManager.RenderComponents<EffectComponent>();
@@ -137,6 +141,7 @@ void PlayState::InitializeActorManager()
     actorManager.BeingInitialization(128, 64, FRAME_MEMORY);
     actorManager.AddComponentType<TransformComponent, 100>();
     actorManager.AddComponentType<RenderComponent, 100>();
+    actorManager.AddComponentType<TiledRenderComponent, 50>();
     actorManager.AddComponentType<PhysicsComponent, 100>();
     actorManager.AddComponentType<ColliderComponent, 100>();
     actorManager.AddComponentType<PlayerControllerComponent, 1>();

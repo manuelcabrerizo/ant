@@ -55,6 +55,11 @@ void MenuState::OnEnter()
     notification.extent = Vector2(windowWidth, windowHeight);
     OnResize(&notification);
     PlatformShowMouse(true);
+
+    // set render state
+    GraphicsManager::Get()->SetBlendingOff();
+    GraphicsManager::Get()->SetDepthStencilOn();
+
 }
 
 void MenuState::OnExit()

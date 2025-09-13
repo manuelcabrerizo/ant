@@ -17,7 +17,7 @@ struct PS_Input
 };
 
 float4 fs_main(PS_Input i) : SV_TARGET
-{
+{    
     float4 color = diffuseMap.SampleLevel(samplerState, i.uv, 0);
     if (color.a < 0.5f)
     {

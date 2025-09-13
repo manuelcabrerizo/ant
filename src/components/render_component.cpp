@@ -9,15 +9,14 @@
 #include <asset_managers/shader_manager.h>
 
 UniformBuffer *RenderComponent::uniformBuffer = nullptr;
-PerDrawUbo RenderComponent::ubo;
+RenderComponent::PerDrawUbo RenderComponent::ubo;
 UniformBuffer *RenderComponent::matrixBuffer = nullptr;
 
 void RenderComponent::Initialize()
 {
     ubo.model = Matrix4(1.0f);
     uniformBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_VS, &ubo, sizeof(ubo), 1);
-    GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
-
+    
     Matrix4 buffer[100] = {};
     matrixBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_VS, buffer, sizeof(Matrix4)*100, 2);
     GraphicsManager::Get()->UniformBufferBind(matrixBuffer);
@@ -27,6 +26,14 @@ void RenderComponent::Terminate()
 {
     GraphicsManager::Get()->UniformBufferFree(uniformBuffer);
     GraphicsManager::Get()->UniformBufferFree(matrixBuffer);
+}
+
+void RenderComponent::OnSetRenderState()
+{
+    GraphicsManager::Get()->SetRasterizerStateCullBack();
+    GraphicsManager::Get()->SetBlendingOff();
+    GraphicsManager::Get()->SetDepthStencilOn();
+    GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
 }
 
 void RenderComponent::OnInit(ActorManager *actorManager)
@@ -63,17 +70,6 @@ void RenderComponent::OnRender(ActorManager *actorManager)
     Matrix4 rotOffset = Matrix4::RotateX(rotationOffset.x) * Matrix4::RotateY(rotationOffset.y) * Matrix4::RotateZ(rotationOffset.z);
 
     ubo.model = rotOffset * ubo.model;
-
-    // Create diferent render components for diferent types of rendering states
-    if (isBackCull)
-    {
-        GraphicsManager::Get()->SetRasterizerStateCullBack();
-    }
-    else
-    {
-        GraphicsManager::Get()->SetRasterizerStateCullNone();
-    }
-
 
     // bind the vertex shader
     if(!isAnimated)

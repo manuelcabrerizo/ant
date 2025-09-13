@@ -102,6 +102,7 @@ void GameManager::LoadDefaultAssets()
     // Load Vertex the shaders
     VertexShaderManager::Get()->Load("default", "data/shaders/vert.hlsl", STATIC_MEMORY);
     VertexShaderManager::Get()->Load("animation", "data/shaders/animation_vert.hlsl", STATIC_MEMORY);
+    VertexShaderManager::Get()->Load("tiled_vert", "data/shaders/tiled_vert.hlsl", STATIC_MEMORY);
     VertexShaderManager::Get()->Load("ui_vert", "data/shaders/ui_vert.hlsl", STATIC_MEMORY);
     VertexShaderManager::Get()->Load("particle_vert", "data/shaders/particle_vert.hlsl", STATIC_MEMORY);
     VertexShaderManager::Get()->Bind("default");
@@ -144,7 +145,7 @@ void GameManager::LoadDefaultAssets()
         TextureManager::Get()->Get("magma"),
         TextureManager::Get()->Get("DefaultMaterial_Noise"), STATIC_MEMORY);
     
-    MaterialManager::Get()->LoadPortal("lambert12",
+    MaterialManager::Get()->LoadPortal("MetalFenceMaterial",
         FragmentShaderManager::Get()->Get("fence_frag"),
         TextureManager::Get()->Get("fence"),
         TextureManager::Get()->Get("DefaultMaterial_Noise"), STATIC_MEMORY);

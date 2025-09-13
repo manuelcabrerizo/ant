@@ -73,15 +73,18 @@ void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)
     shootTimer -= dt;
 }
 
+void WeaponComponent::OnSetRenderState()
+{
+    GraphicsManager::Get()->SetRasterizerStateCullBack();
+    GraphicsManager::Get()->SetDepthStencilOnWriteMaskZero();
+}
+
 void WeaponComponent::OnRender(ActorManager* actorManager)
 {
-    GraphicsManager::Get()->SetDepthStencilOnWriteMaskZero();
     GraphicsManager::Get()->SetAlphaBlending();
     bloodPs.Render();
     GraphicsManager::Get()->SetAdditiveBlending();
     shootPs.Render();
-    GraphicsManager::Get()->SetBlendingOff();
-    GraphicsManager::Get()->SetDepthStencilOn();
 }
 
 void WeaponComponent::OnShoot(ShootNotification* notification)
