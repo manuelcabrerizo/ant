@@ -5,12 +5,12 @@
         <scale x="0.02" y="0.02" z="0.02"/>
         <direction x="0" y="0" z="1"/>
     </TransformComponent>
-    <RenderComponent>
+	<AnimatedRenderComponent>
         <model name="enemy"/>
 		<materials>
 		</materials>
 		<rotationOffset x="0" y="180" z="0"/>
-    </RenderComponent>
+    </AnimatedRenderComponent>
 	<ColliderComponents>
 		<offset x="0" y="1.0" z="0"/>
 		<ColliderComponent>

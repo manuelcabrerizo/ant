@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\components\animated__render_component.cpp" />
     <ClCompile Include="src\components\effect_component.cpp" />
     <ClCompile Include="src\components\key_component.cpp" />
     <ClCompile Include="src\components\portal_component.cpp" />
@@ -200,6 +201,7 @@
     <ClCompile Include="src\ui_renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\components\animated_render_component.h" />
     <ClInclude Include="src\components\effect_component.h" />
     <ClInclude Include="src\components\key_component.h" />
     <ClInclude Include="src\components\portal_component.h" />

@@ -6,7 +6,6 @@
 
 struct UniformBuffer;
 class TransformComponent;
-class AnimationComponent;
 class Model;
 
 class RenderComponent : public Component<RenderComponent>
@@ -19,13 +18,9 @@ private:
 
     static UniformBuffer *uniformBuffer;
     static PerDrawUbo ubo;
-    static UniformBuffer *matrixBuffer;
-
-    AnimationComponent *animation = nullptr;
 public:
     Model *model;
     Vector3 rotationOffset;
-    bool isAnimated = false;
 
      // use to init static variables, must be called by the user at init time
      static void Initialize();

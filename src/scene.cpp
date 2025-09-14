@@ -127,7 +127,6 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
             // TODO: load this component from a file
             actorManager->AddComponent<AnimationComponent>(enemy, {});
             RenderComponent* render = enemy->GetComponent<RenderComponent>();
-            render->isAnimated = true;
         }
         else
         {
