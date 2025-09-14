@@ -41,7 +41,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     KeyComponent keyComponent;
     actorManager->AddComponent<KeyComponent>(key, keyComponent);
     TransformComponent* keyTransform = key->GetComponent<TransformComponent>();
-    keyTransform->position = Vector3(59, -29.5, 32);
+    keyTransform->position = Vector3(59, -29, 32);
 
     // Create the fence
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);

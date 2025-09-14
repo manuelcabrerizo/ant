@@ -13,6 +13,7 @@ private:
 
     bool isGrabbed = false;
     bool wasGrabbed = false;
+    float timer = 0.0f;
 
     void OnGrabbed();
 public:

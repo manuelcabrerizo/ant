@@ -9,16 +9,20 @@ void KeyComponent::OnInit(ActorManager* actorManager)
 {
     transform = owner->GetComponent<TransformComponent>();
 
-    Vector3 size = Vector3(0.5f, 1, 0.25);
+    Vector3 size = Vector3(0.75f, 0.25, 0.75);
     AABB aabb;
     aabb.Init(size * -0.5f, size * 0.5f);
     trigger = Collider(aabb, owner);
-    trigger.SetOffset(Vector3(0, 0.5, 0));
+    trigger.SetOffset(Vector3(0, 0, 0));
     trigger.UpdatePosition(transform->position);
 }
 
 void KeyComponent::OnUpdate(ActorManager* actorManager, f32 dt)
 {
+    transform->direction = Matrix4::TransformVector(Matrix4::RotateY(timer), Vector3::forward);
+    timer += dt;
+
+
     isGrabbed = false;
 
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
