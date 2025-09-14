@@ -44,20 +44,47 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     keyTransform->position = Vector3(59, -29.5, 32);
 
     // Create the fence
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    File fencesFile = PlatformReadFile("data/entities/fences.txt", SCRATCH_MEMORY);
+    FileReader reader = FileReader(&fencesFile);
+    while (const char* line = reader.GetNextLine())
     {
         Actor* fence = actorManager->CreateActorFromFile("data/xml/fence.xml");
-        TransformComponent* fenceTransform = fence->GetComponent<TransformComponent>();
-        fenceTransform->position = Vector3(42, 4, 35.5);
-        fenceTransform->scale = Vector3(12, 12, 0);
-        fenceTransform->direction = Vector3::right;
+        TransformComponent* pTransform = fence->GetComponent<TransformComponent>();
+        Vector3 pos,sca;
+        float rot;
+        if (sscanf(line, "fence: [[%f, %f, %f], [%f, %f, %f], %f]",
+            &pos.x, &pos.y, &pos.z, &sca.x, &sca.y, &sca.z, &rot) == 7)
+        {
+            pTransform->position = pos;
+            pTransform->direction = Matrix4::TransformVector(Matrix4::RotateY((rot / 180.0f) * ANT_PI), Vector3::forward);
+            pTransform->scale = sca;
+
+            // Add collider
+            ColliderComponent colliderComponent;
+            colliderComponent.Init(3, FRAME_MEMORY);
+            colliderComponent.SetOffset(Vector3(0, 1, 0));
+
+            Vector3 front = pTransform->direction;
+            Vector3 right = Vector3::Cross(Vector3::up, front).Normalized();
+            Vector3 up = Vector3::Cross(front, right);
+
+            Vector3 rotation[] = { right, up, front };
+
+            OBB obb;
+            obb.Init(Vector3::zero, rotation, Vector3(pTransform->scale.x, pTransform->scale.y, 0.25f));
+            Collider collider_ = Collider(obb, fence);
+            colliderComponent.AddSubCollider(collider_);
+            
+            actorManager->AddComponent(fence, colliderComponent);
+
+        }
+        else
+        {
+            ASSERT(!"ERROR: invalid file format");
+        }
     }
-    {
-        Actor* fence = actorManager->CreateActorFromFile("data/xml/fence.xml");
-        TransformComponent* fenceTransform = fence->GetComponent<TransformComponent>();
-        fenceTransform->position = Vector3(22.5, 4, 23.4);
-        fenceTransform->scale = Vector3(8, 12, 0);
-        fenceTransform->direction = Vector3::forward;
-    }
+    MemoryManager::Get()->ReleaseFrame(frame);
 
 
     // Temp fix, EffectComponent is to big to be created on the stack
@@ -82,9 +109,9 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     }
 
     // Create the portals
-    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
     File portalsFile = PlatformReadFile("data/entities/portals.txt", SCRATCH_MEMORY);
-    FileReader reader = FileReader(&portalsFile);
+    reader = FileReader(&portalsFile);
     while (const char* line = reader.GetNextLine())
     {
         Actor* portal = actorManager->CreateActorFromFile("data/xml/portal.xml");
@@ -92,7 +119,6 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         PortalComponent* portalCmp = portal->GetComponent<PortalComponent>();
         Vector3 pPos, pDst;
         float rPos, rDst;
-        char portalBuffer[256];
         if (sscanf(line, "portal: [[%f, %f, %f], %f] dst: [[%f, %f, %f], %f]",
             &pPos.x, &pPos.y, &pPos.z, &rPos, &pDst.x, &pDst.y, &pDst.z, &rDst) == 8)
         {
