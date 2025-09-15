@@ -53,7 +53,6 @@ void EnemyComponent::OnTerminate(ActorManager *actorManager)
 
 void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
-    /*
     if(physics->grounded && life > 0)
     {
 
@@ -61,8 +60,9 @@ void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
         character.rotation += lookSeering.angular * dt;
         character.rotation *= powf(0.001f, dt); // angular drag
         character.orientation += character.rotation * dt;
+        transform->rotation.y = character.orientation * -1.0f;
+
         Vector3 moveDir = Vector3(-sinf(character.orientation), 0.0f, cosf(character.orientation)).Normalized();
-        transform->direction = moveDir;
 
         SteeringOutput pursueSteering = pursue.GetSteering();
         physics->acceleration = moveDir * pursueSteering.linear.Magnitude();
@@ -70,7 +70,6 @@ void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
         character.velocity = physics->velocity;
         character.velocity.y = 0.0f;
     }
-    */
 }
 
 void EnemyComponent::OnEnemyHit(EnemyHitNotification* enemyHit)
