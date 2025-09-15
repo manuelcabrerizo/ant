@@ -10,6 +10,7 @@ class ColliderComponent : public Component<ColliderComponent>
 private:
     Array<Collider> colliders;
     Vector3 offset;
+    bool isTrigger = false;
 private:
     TransformComponent* transform = nullptr;
 
@@ -24,5 +25,7 @@ public:
     Vector3 GetOffset();
     
     void SetOffset(const Vector3& offset);
+    void SetIsTrigger(bool value);
+    bool IsTrigger() const;
 };
 

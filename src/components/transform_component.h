@@ -8,5 +8,8 @@ class TransformComponent : public Component<TransformComponent>
 public:
     Vector3 position;
     Vector3 scale;
-    Vector3 direction; // TODO: use quaternions for orientation
+    Vector3 rotation; // Euler angles
+
+    // TODO: add front right and up vectors for gameplay
+    //Vector3 direction;
 };

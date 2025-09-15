@@ -28,6 +28,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     ModelManager::Get()->Load("portal", "data/models/Portal/source/Portal.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("key", "data/models/Key/source/Key.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("fence", "data/models/Fence/source/Fence.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("button", "data/models/Button/source/button.fbx", FRAME_MEMORY);
 
     // Load animation data
     SkeletonManager::Get()->Load("Bloodwraith", "data/models/bloodwraith/source/bloodwraith.fbx", FRAME_MEMORY);
@@ -52,26 +53,33 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     {
         Actor* fence = actorManager->CreateActorFromFile("data/xml/fence.xml");
         TransformComponent* pTransform = fence->GetComponent<TransformComponent>();
-        Vector3 pos,sca;
-        Vector3 triggerPos, triggerSca;
+        Vector3 fPos,fSca, fRot;
+        Vector3 bPos, bSca, bRot;
         float rot, triggerRot;
-        if (sscanf(line, "fence: [[%f, %f, %f], [%f, %f, %f], %f] trigger: [[%f, %f, %f], [%f, %f, %f], %f]",
-            &pos.x, &pos.y, &pos.z, &sca.x, &sca.y, &sca.z, &rot,
-            &triggerPos.x, &triggerPos.y, &triggerPos.z,
-            &triggerSca.x, &triggerSca.y, &triggerSca.z,
-            &triggerRot) == 14)
+        if (sscanf(line, "fence: [[%f, %f, %f], [%f, %f, %f], [%f, %f, %f]] button: [[%f, %f, %f], [%f, %f, %f], [%f, %f, %f]]",
+            &fPos.x, &fPos.y, &fPos.z,
+            &fSca.x, &fSca.y, &fSca.z,
+            &fRot.x, &fRot.y, &fRot.z,
+            &bPos.x, &bPos.y, &bPos.z,
+            &bSca.x, &bSca.y, &bSca.z,
+            &bRot.x, &bRot.y, &bRot.z) == 18)
         {
-            pTransform->position = pos;
-            pTransform->direction = Matrix4::TransformVector(Matrix4::RotateY((rot / 180.0f) * ANT_PI), Vector3::forward);
-            pTransform->scale = sca;
+            fRot *= 1.0f / 180.0f;
+            fRot *= (float)ANT_PI;
+            bRot *= 1.0f / 180.0f;
+            bRot *= (float)ANT_PI;
+
+            pTransform->position = fPos;
+            pTransform->rotation = fRot;
+            pTransform->scale = fSca;
 
             // Add collider
             ColliderComponent colliderComponent;
             colliderComponent.Init(3, FRAME_MEMORY);
 
-            Vector3 front = pTransform->direction;
-            Vector3 right = Vector3::Cross(Vector3::up, front).Normalized();
-            Vector3 up = Vector3::Cross(front, right);
+            Vector3 front = Matrix4::TransformVector(Matrix4::TransformFromEuler(pTransform->rotation.x, pTransform->rotation.y, pTransform->rotation.z), Vector3::forward);
+            Vector3 right = Matrix4::TransformVector(Matrix4::TransformFromEuler(pTransform->rotation.x, pTransform->rotation.y, pTransform->rotation.z), Vector3::right);
+            Vector3 up = Matrix4::TransformVector(Matrix4::TransformFromEuler(pTransform->rotation.x, pTransform->rotation.y, pTransform->rotation.z), Vector3::up);
 
             Vector3 rotation[] = { right, up, front };
 
@@ -82,15 +90,16 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
             actorManager->AddComponent(fence, colliderComponent);
 
             // Add Fence Component
-            AABB aabb;
-            aabb.Init(triggerPos - triggerSca * 0.5f, triggerPos + triggerSca * 0.5f);
             FenceComponent fenceComponent;
-            fenceComponent.SetTrigger(Collider(aabb, fence));
-            fenceComponent.SetIsOneTimeTrigger(true);
-            fenceComponent.SetIsOpen(false);
-            fenceComponent.SetOpenPosition(pTransform->position + Vector3::up * 3.0f);
-            fenceComponent.SetClosePosition(pTransform->position);
             actorManager->AddComponent(fence, fenceComponent);
+
+
+            // Create the button
+            Actor* button = actorManager->CreateActorFromFile("data/xml/button.xml");
+            TransformComponent* bTransform = button->GetComponent<TransformComponent>();
+            bTransform->position = bPos;
+            bTransform->rotation = bRot;
+            bTransform->scale = bSca;
         }
         else
         {
@@ -137,7 +146,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         {
             rDst += 180.0;
             pTransform->position = pPos;
-            pTransform->direction = Matrix4::TransformVector(Matrix4::RotateY((rPos/180.0f)*ANT_PI), Vector3::forward);
+            pTransform->rotation.y = rPos/180.0f*ANT_PI;
             portalCmp->SetDestination(pDst, (rDst/180.0f) * ANT_PI);
         }
         else

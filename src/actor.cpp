@@ -4,7 +4,8 @@ const char *tagNames[(int)ActorTag::TagCount] =
 {
     "Default",
     "Player",
-    "Enemy"
+    "Enemy",
+    "Key",
 };
 
 ActorTag Actor::TagNameToTag(const char* tagName)
@@ -27,3 +28,14 @@ ActorTag Actor::GetTag()
 {
     return tag;
 }
+
+bool Actor::IsEnable()
+{
+    return isEnable;
+}
+void Actor::SetEnable(bool value)
+{
+    isEnable = value;
+}
+
+

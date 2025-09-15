@@ -182,7 +182,7 @@ bool CollisionWorld::Intersect(ColliderComponent *collider, Array<CollisionData>
     bool isIntersecting = false;
     for (int i = 0; i < colliders.size; ++i)
     {
-        if (!colliders[i]->enable)
+        if (!colliders[i]->owner->IsEnable() || !colliders[i]->enable)
         {
             continue;
         }

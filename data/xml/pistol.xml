@@ -3,8 +3,8 @@
     <TransformComponent>
         <position x="0" y="0" z="0"/>
         <scale x="0.025" y="0.025" z="0.025"/>
-        <direction x="0" y="0" z="1"/>
-    </TransformComponent>
+		<rotation x="0" y="0" z="0"/>
+	</TransformComponent>
     <RenderComponent>
         <model name="anim-gun"/>
 		<materials>

@@ -2,11 +2,11 @@
 <Actor tag="Key">
 	<TransformComponent>
 		<position x="0" y="0" z="0"/>
-		<scale x="0.2" y="0.2" z="0.2"/>
+		<scale x="1" y="1" z="1"/>
 		<rotation x="0" y="0" z="0"/>
 	</TransformComponent>
 	<RenderComponent>
-		<model name="key"/>
+		<model name="button"/>
 		<materials>
 		</materials>
 		<rotationOffset x="0" y="0" z="0"/>
@@ -15,7 +15,7 @@
 		<offset x="0" y="0" z="0"/>
 		<ColliderComponent>
 			<type colliderType="0"/>
-			<values x="0.75" y="0.25" z="0.75"/>
+			<values x="1" y="1" z="1"/>
 		</ColliderComponent>
 	</ColliderComponents>
 </Actor>

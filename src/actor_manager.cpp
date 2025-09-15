@@ -118,14 +118,18 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
             attributes->QueryFloatAttribute("y", &scale.y);
             attributes->QueryFloatAttribute("z", &scale.z);
             attributes = attributes->NextSiblingElement();
-            Vector3 direction;
-            attributes->QueryFloatAttribute("x", &direction.x);
-            attributes->QueryFloatAttribute("y", &direction.y);
-            attributes->QueryFloatAttribute("z", &direction.z);
+            Vector3 rotation;
+            attributes->QueryFloatAttribute("x", &rotation.x);
+            attributes->QueryFloatAttribute("y", &rotation.y);
+            attributes->QueryFloatAttribute("z", &rotation.z);
+
+            rotation *= 1.0f / 180.0f;
+            rotation *= (float)ANT_PI;
+
             TransformComponent transform;
             transform.position = position;
             transform.scale = scale;
-            transform.direction = direction;
+            transform.rotation = rotation;
             AddComponent<TransformComponent>(actor, transform);
         }
         else if (strcmp("CameraComponent", componentType) == 0)

@@ -53,6 +53,7 @@ void EnemyComponent::OnTerminate(ActorManager *actorManager)
 
 void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
+    /*
     if(physics->grounded && life > 0)
     {
 
@@ -69,6 +70,7 @@ void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
         character.velocity = physics->velocity;
         character.velocity.y = 0.0f;
     }
+    */
 }
 
 void EnemyComponent::OnEnemyHit(EnemyHitNotification* enemyHit)

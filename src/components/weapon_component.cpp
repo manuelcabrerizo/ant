@@ -44,11 +44,13 @@ void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)
     TransformComponent* weaponTransform = weapon->GetComponent<TransformComponent>();
     AnchorComponent* weaponAnchor = weapon->GetComponent<AnchorComponent>();
 
-    Vector3 front = transform->direction.Normalized();
-    Vector3 right = Vector3(0.0f, 1.0f, 0.0f).Cross(front).Normalized();
-    Vector3 up = front.Cross(right);
+    Matrix4 rotMat = Matrix4::TransformFromEuler(transform->rotation);
+    Vector3 front = Matrix4::TransformVector(rotMat, Vector3::forward);
+    Vector3 right = Matrix4::TransformVector(rotMat, Vector3::right);
+    Vector3 up = Matrix4::TransformVector(rotMat, Vector3::up);
+
     weaponTransform->position = transform->position + front * 0.25f + right * 0.1f + up * -0.2f;
-    weaponTransform->direction = transform->direction;
+    weaponTransform->rotation = transform->rotation;
     
     weaponAnchor->position = weaponTransform->position  +
         right * weaponAnchor->offset.x +

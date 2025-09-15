@@ -3,7 +3,7 @@
 	<TransformComponent>
 		<position x="5" y="1.01" z="10"/>
 		<scale x="0.01" y="0.01" z="0.01"/>
-		<direction x="0" y="0" z="1"/>
+		<rotation x="0" y="0" z="0"/>
 	</TransformComponent>
 	<RenderComponent>
 		<model name="wizard"/>

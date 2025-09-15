@@ -3,8 +3,8 @@
     <TransformComponent>
         <position x="-2" y="4.0" z="0"/>
         <scale x="1" y="1" z="1"/>
-        <direction x="0" y="0" z="1"/>
-    </TransformComponent>
+		<rotation x="0" y="0" z="0"/>
+	</TransformComponent>
     <CameraComponent>
         <position x="0" y="0" z="-4"/>
         <direction x="0" y="0" z="1"/>

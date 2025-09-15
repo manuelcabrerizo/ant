@@ -226,6 +226,16 @@ Matrix4 Matrix4::TransformFromBasis(const Vector3& o, const Vector3& r, const Ve
         o.x, o.y, o.z, 1);
 }
 
+Matrix4 Matrix4::TransformFromEuler(float x, float y, float z)
+{
+    return Matrix4::RotateZ(z) * Matrix4::RotateX(x) * Matrix4::RotateY(y);
+}
+
+Matrix4 Matrix4::TransformFromEuler(const Vector3& rotation)
+{
+    return Matrix4::RotateZ(rotation.z) * Matrix4::RotateX(rotation.x) * Matrix4::RotateY(rotation.y);
+}
+
 Matrix4 Matrix4::Transposed(const Matrix4 &m)
 {
 	return {

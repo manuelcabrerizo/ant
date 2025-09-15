@@ -285,6 +285,7 @@
     <ClInclude Include="src\ui_button.h" />
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="data\xml\button.xml" />
     <Xml Include="data\xml\default.xml" />
     <Xml Include="data\xml\fence.xml" />
     <Xml Include="data\xml\key.xml" />

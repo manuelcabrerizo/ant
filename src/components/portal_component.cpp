@@ -13,9 +13,11 @@ void PortalComponent::OnInit(ActorManager* actorManager)
     colliderComponent.Init(3, FRAME_MEMORY);
     colliderComponent.SetOffset(Vector3(0, 1, 0));
 
-    Vector3 front = transform->direction;
-    Vector3 right = Vector3::Cross(Vector3::up, front).Normalized();
-    Vector3 up = Vector3::Cross(front, right);
+    // TODO: optimice the collider be initialize using euler angles
+    Matrix4 rotMat = Matrix4::TransformFromEuler(transform->rotation);
+    Vector3 front = Matrix4::TransformVector(rotMat, Vector3::forward);
+    Vector3 right = Matrix4::TransformVector(rotMat, Vector3::right);
+    Vector3 up = Matrix4::TransformVector(rotMat, Vector3::up);
 
     Vector3 rotation[] = { right, up, front };
     

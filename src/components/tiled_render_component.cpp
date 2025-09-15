@@ -44,19 +44,8 @@ void TiledRenderComponent::OnRender(ActorManager* actorManager)
 {
     Matrix4 tra = Matrix4::Translate(transform->position);
     Matrix4 sca = Matrix4::Scale(transform->scale);
-
-    Vector3 front = transform->direction.Normalized();
-    Vector3 right = Vector3::Cross(Vector3::up, front).Normalized();
-    Vector3 up = Vector3::Cross(front, right);
-
-    Matrix4 ori = Matrix4::TransformFromBasis(Vector3::zero, right, up, front);
-
-    GraphicsManager::Get()->DebugDrawLine(transform->position, transform->position + right, Vector3(1, 0, 0));
-    GraphicsManager::Get()->DebugDrawLine(transform->position, transform->position + up, Vector3(0, 1, 0));
-    GraphicsManager::Get()->DebugDrawLine(transform->position, transform->position + front, Vector3(0, 0, 1));
-
+    Matrix4 ori = Matrix4::TransformFromEuler(transform->rotation);
     ubo.model = sca * ori * tra;
-
     Matrix4 rotOffset = Matrix4::RotateX(rotationOffset.x) * Matrix4::RotateY(rotationOffset.y) * Matrix4::RotateZ(rotationOffset.z);
 
     ubo.model = rotOffset * ubo.model;

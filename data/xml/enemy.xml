@@ -3,8 +3,8 @@
     <TransformComponent>
         <position x="0" y="0" z="0"/>
         <scale x="0.02" y="0.02" z="0.02"/>
-        <direction x="0" y="0" z="1"/>
-    </TransformComponent>
+		<rotation x="0" y="0" z="0"/>
+	</TransformComponent>
 	<AnimatedRenderComponent>
         <model name="enemy"/>
 		<materials>

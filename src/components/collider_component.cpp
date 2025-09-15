@@ -47,3 +47,13 @@ void ColliderComponent::SetOffset(const Vector3& offset)
 {
     this->offset = offset;
 }
+
+void ColliderComponent::SetIsTrigger(bool value)
+{
+    isTrigger = value;
+}
+
+bool ColliderComponent::IsTrigger() const
+{
+    return isTrigger;
+}

@@ -41,7 +41,7 @@ void ComponentList<ComponentType>::UpdateComponents(ActorManager* actorManager, 
     for (int i = 0; i < components.size; i++)
     {
         ComponentType* component = &components[i];
-        if (component->initialized && component->enable)
+        if (component->initialized && component->owner->IsEnable() && component->enable)
         {
             component->OnUpdate(actorManager, dt);
         }
@@ -54,7 +54,7 @@ void ComponentList<ComponentType>::LateUpdateComponents(ActorManager* actorManag
     for (int i = 0; i < components.size; i++)
     {
         ComponentType* component = &components[i];
-        if (component->initialized && component->enable)
+        if (component->initialized && component->owner->IsEnable() && component->enable)
         {
             component->OnLateUpdate(actorManager, dt);
         }
@@ -67,7 +67,7 @@ void ComponentList<ComponentType>::RenderComponents(ActorManager* actorManager)
     for (int i = 0; i < components.size; i++)
     {
         ComponentType* component = &components[i];
-        if (component->initialized && component->enable)
+        if (component->initialized && component->owner->IsEnable() && component->enable)
         {
             component->OnRender(actorManager);
         }

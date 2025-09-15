@@ -56,27 +56,46 @@ void PhysicsComponent::ProcessCollisionDetectionAndResolution()
     // TODO: remove colliders ids and use the owner instread
     grounded = CollisionWorld::Get()->Intersect(groundSegment, collisionData, owner);
 
+    Array<CollisionData> contacts;
+    contacts.Init(MAX_COLLISION_COUNT, SCRATCH_MEMORY);
+
     collisionData.Clear();
     if(CollisionWorld::Get()->Intersect(collider, collisionData))
     {
-        int iterations = 0;
-        while(collisionData.size > 0 && iterations < 10)
+        contacts.Clear();
+        for (int i = 0; i < collisionData.size; i++)
         {
-            Vector3 n = collisionData[0].n;
-            f32 penetration = collisionData[0].penetration;
+            if (collisionData[i].collider->IsTrigger() == false)
+            {
+                contacts.Push(collisionData[i]);
+            }
+        }
+
+        int iterations = 0;
+        while(contacts.size > 0 && iterations < 10)
+        {
+            Vector3 n = contacts[0].n;
+            f32 penetration = contacts[0].penetration;
             transform->position += n * penetration;
             transform->position += n * 0.001f;
             acceleration = Vector3(0.0f);
             velocity -= n * velocity.Dot(n);
-
-            collisionData.Clear();
-
             Array<Collider>& colliders = collider->GetColliders();
             for (int i = 0; i < colliders.size; i++)
             {
                 colliders[i].UpdatePosition(transform->position + collider->GetOffset());
             }
+
+            collisionData.Clear();
             CollisionWorld::Get()->Intersect(collider, collisionData);
+            contacts.Clear();
+            for (int i = 0; i < collisionData.size; i++)
+            {
+                if (collisionData[i].collider->IsTrigger() == false)
+                {
+                    contacts.Push(collisionData[i]);
+                }
+            }
 
             iterations++;
         }    

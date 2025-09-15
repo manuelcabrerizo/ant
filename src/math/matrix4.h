@@ -65,6 +65,9 @@ public:
     static Matrix4 RotateY(float angle);
     static Matrix4 RotateZ(float angle);
     static Matrix4 TransformFromBasis(const Vector3& o, const Vector3& r, const Vector3& u, const Vector3& f);
+    static Matrix4 TransformFromEuler(float x, float y, float z);
+    static Matrix4 TransformFromEuler(const Vector3& rotation);
+
     // TODO: make them not static
     static Matrix4 Transposed(const Matrix4 &m);
     static float Determinant(const Matrix4 &m);

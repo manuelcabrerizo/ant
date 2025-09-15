@@ -41,7 +41,7 @@ void CameraComponent::OnTerminate(ActorManager *actorManager)
 void CameraComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
      SetPosition(transform->position);
-     SetDirection(transform->direction);
+     SetDirection(Matrix4::TransformVector(Matrix4::TransformFromEuler(transform->rotation), Vector3::forward));
      ubo.view = GetView();
      GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
      // TODO: try no to do this on the Update

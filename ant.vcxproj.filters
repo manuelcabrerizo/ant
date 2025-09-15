@@ -495,6 +495,7 @@
     <Xml Include="data\xml\portal.xml" />
     <Xml Include="data\xml\default.xml" />
     <Xml Include="data\xml\fence.xml" />
+    <Xml Include="data\xml\button.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\actor_manager.tpp" />

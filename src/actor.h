@@ -10,6 +10,7 @@ enum class ActorTag
     Default = 0,
     Player,
     Enemy,
+    Key,
 
     TagCount
 };
@@ -21,6 +22,7 @@ private:
     int id = 0;
     ActorTag tag = ActorTag::Default;
     ActorManager* actorManager = nullptr;
+    bool isEnable = true;
 public:
     static ActorTag TagNameToTag(const char* tagName);
 
@@ -38,6 +40,9 @@ public:
     {
         return actorManager;
     }
+
+    bool IsEnable();
+    void SetEnable(bool value);
 };
 
 template<typename ComponentType>

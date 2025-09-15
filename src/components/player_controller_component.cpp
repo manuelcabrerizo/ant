@@ -5,6 +5,7 @@
 #include "weapon_component.h"
 #include "anchor_component.h"
 #include "render_component.h"
+#include "collider_component.h"
 
 #include <math/algebra.h>
 #include <math/vector3.h>
@@ -15,6 +16,8 @@
 #include <graphics_manager.h>
 
 #include <platform.h>
+#include <collisions/collision_utils.h>
+#include <collision.h>
 
 void PlayerControllerComponent::OnInit(ActorManager *actorManager)
 {
@@ -23,6 +26,7 @@ void PlayerControllerComponent::OnInit(ActorManager *actorManager)
     camera = owner->GetComponent<CameraComponent>();
     physics = owner->GetComponent<PhysicsComponent>();
     weapon = owner->GetComponent<WeaponComponent>();
+    collider = owner->GetComponent<ColliderComponent>();
 
     lastPosition = transform->position;
 }   
@@ -36,6 +40,7 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
     ProcessMouseMovement();
     ProcessKeyboardMovement();
+    ProcessTriggers();
 
     //if ((transform->position - lastPosition).MagnitudeSq() < 0.0001f)
     {
@@ -58,6 +63,17 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
     }
 }
 
+void PlayerControllerComponent::OnKeyTrigger(Actor* key)
+{
+    // TODO: increase the key counter
+    key->SetEnable(false);
+}
+
+void PlayerControllerComponent::OnEnemyCollision(Actor* enemy)
+{
+
+}
+
 void PlayerControllerComponent::ProcessMouseMovement()
 {
     yaw += InputManager::Get()->MouseXMovement() * 0.001f;
@@ -72,10 +88,9 @@ void PlayerControllerComponent::ProcessMouseMovement()
         pitch = -limit;
     }
 
-    Vector3 dir = Vector3(0.0f, 0.0f, 1.0f);
-    transform->direction = Matrix4::TransformVector(Matrix4::RotateX(pitch), dir);
-    transform->direction = Matrix4::TransformVector(Matrix4::RotateY(yaw), transform->direction);
-    transform->direction.Normalize();
+    transform->rotation.x = pitch;
+    transform->rotation.y = yaw;
+
     i32 windowX, windowY, windowW, windowH;
     PlaformGetWindowPos(&windowX, &windowY);
     PlatformClientDimensions(&windowW, &windowH);
@@ -118,4 +133,32 @@ void PlayerControllerComponent::ProcessKeyboardMovement()
 
     Vector3 movement = (moveDirection * speed);
     physics->acceleration = movement;
+}
+
+void PlayerControllerComponent::ProcessTriggers()
+{
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+
+    Array<CollisionData> collisionData;
+    collisionData.Init(MAX_COLLISION_COUNT, SCRATCH_MEMORY);
+
+    collisionData.Clear();
+    if (CollisionWorld::Get()->Intersect(collider, collisionData))
+    {
+        for (int i = 0; i < collisionData.size; i++)
+        {
+            if (collisionData[i].collider->IsTrigger())
+            {
+                Actor* other = collisionData[i].collider->owner;
+                switch (other->GetTag())
+                {
+                case ActorTag::Key: OnKeyTrigger(other); break;
+                case ActorTag::Enemy: OnEnemyCollision(other); break;
+                }
+            }
+        }
+
+    }
+
+    MemoryManager::Get()->ReleaseFrame(frame);
 }
