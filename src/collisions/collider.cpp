@@ -202,7 +202,7 @@ void Collider::DebugDraw() const
         } break;
         case ColliderType::MESH_COLLIDER:
         {
-            meshCollider.DebugDraw(color);
+            //meshCollider.DebugDraw(color);
         } break;
     }
 }

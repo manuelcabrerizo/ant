@@ -11,6 +11,7 @@
 #include <components/portal_component.h>
 #include <components/effect_component.h>
 #include <components/key_component.h>
+#include <components/fence_component.h>
 
 #include <strings.h>
 #include <math/algebra.h>
@@ -52,9 +53,13 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         Actor* fence = actorManager->CreateActorFromFile("data/xml/fence.xml");
         TransformComponent* pTransform = fence->GetComponent<TransformComponent>();
         Vector3 pos,sca;
-        float rot;
-        if (sscanf(line, "fence: [[%f, %f, %f], [%f, %f, %f], %f]",
-            &pos.x, &pos.y, &pos.z, &sca.x, &sca.y, &sca.z, &rot) == 7)
+        Vector3 triggerPos, triggerSca;
+        float rot, triggerRot;
+        if (sscanf(line, "fence: [[%f, %f, %f], [%f, %f, %f], %f] trigger: [[%f, %f, %f], [%f, %f, %f], %f]",
+            &pos.x, &pos.y, &pos.z, &sca.x, &sca.y, &sca.z, &rot,
+            &triggerPos.x, &triggerPos.y, &triggerPos.z,
+            &triggerSca.x, &triggerSca.y, &triggerSca.z,
+            &triggerRot) == 14)
         {
             pTransform->position = pos;
             pTransform->direction = Matrix4::TransformVector(Matrix4::RotateY((rot / 180.0f) * ANT_PI), Vector3::forward);
@@ -63,7 +68,6 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
             // Add collider
             ColliderComponent colliderComponent;
             colliderComponent.Init(3, FRAME_MEMORY);
-            colliderComponent.SetOffset(Vector3(0, 1, 0));
 
             Vector3 front = pTransform->direction;
             Vector3 right = Vector3::Cross(Vector3::up, front).Normalized();
@@ -72,12 +76,21 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
             Vector3 rotation[] = { right, up, front };
 
             OBB obb;
-            obb.Init(Vector3::zero, rotation, Vector3(pTransform->scale.x, pTransform->scale.y, 0.25f));
+            obb.Init(Vector3::zero, rotation, Vector3(pTransform->scale.x*0.5f, pTransform->scale.y*0.5f, 0.25f));
             Collider collider_ = Collider(obb, fence);
             colliderComponent.AddSubCollider(collider_);
-            
             actorManager->AddComponent(fence, colliderComponent);
 
+            // Add Fence Component
+            AABB aabb;
+            aabb.Init(triggerPos - triggerSca * 0.5f, triggerPos + triggerSca * 0.5f);
+            FenceComponent fenceComponent;
+            fenceComponent.SetTrigger(Collider(aabb, fence));
+            fenceComponent.SetIsOneTimeTrigger(true);
+            fenceComponent.SetIsOpen(false);
+            fenceComponent.SetOpenPosition(pTransform->position + Vector3::up * 3.0f);
+            fenceComponent.SetClosePosition(pTransform->position);
+            actorManager->AddComponent(fence, fenceComponent);
         }
         else
         {

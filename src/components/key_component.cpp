@@ -4,6 +4,7 @@
 #include "collider_component.h"
 #include "render_component.h"
 #include <collision.h>
+#include <math/algebra.h>
 
 void KeyComponent::OnInit(ActorManager* actorManager)
 {
@@ -20,8 +21,11 @@ void KeyComponent::OnInit(ActorManager* actorManager)
 void KeyComponent::OnUpdate(ActorManager* actorManager, f32 dt)
 {
     transform->direction = Matrix4::TransformVector(Matrix4::RotateY(timer), Vector3::forward);
+    if (timer > (ANT_PI * 2.0f))
+    {
+        timer = 0;
+    }
     timer += dt;
-
 
     isGrabbed = false;
 

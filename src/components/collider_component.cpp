@@ -25,6 +25,7 @@ void ColliderComponent::OnUpdate(ActorManager* actorManager, f32 dt)
 void ColliderComponent::Init(int size, int memoryType)
 {
     colliders.Init(size, memoryType);
+    offset = Vector3::zero;
 }
 
 void ColliderComponent::AddSubCollider(const Collider& collider)
