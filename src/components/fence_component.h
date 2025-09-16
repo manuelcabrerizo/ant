@@ -23,7 +23,7 @@ private:
 
     void OnObjectSignal(SignalNotification* onSignal);
 public:
-    void OnInit(ActorManager* actorManager);
+    void OnInit(ActorManager* actorManager) override;
     void OnUpdate(ActorManager* actorManager, float deltaTime);
     void OnTerminate(ActorManager* actorManager) override;
     void OnNotify(NotificationType type, Notification* notification) override;

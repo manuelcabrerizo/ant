@@ -7,12 +7,15 @@ void FenceComponent::OnInit(ActorManager* actorManager)
     NotificationManager::Get()->AddListener(this, NotificationType::Signal);
 
     transform = owner->GetComponent<TransformComponent>();
-    speed = 0.5f;
+    speed = 0.25f;
 }
 
 void FenceComponent::OnTerminate(ActorManager* actorManager)
 {
-    NotificationManager::Get()->RemoveListener(this, NotificationType::Signal);
+    if (!isActive)
+    {
+        NotificationManager::Get()->RemoveListener(this, NotificationType::Signal);
+    }
 }
 
 void FenceComponent::OnUpdate(ActorManager* actorManager, float deltaTime)
@@ -55,6 +58,7 @@ void FenceComponent::OnObjectSignal(SignalNotification* onSignal)
     if (isSignal)
     {
         isActive = true;
+        NotificationManager::Get()->RemoveListener(this, NotificationType::Signal);
     }
 }
 
