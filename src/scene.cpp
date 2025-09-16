@@ -12,6 +12,7 @@
 #include <components/effect_component.h>
 #include <components/key_component.h>
 #include <components/fence_component.h>
+#include <components/button_component.h>
 
 #include <strings.h>
 #include <math/algebra.h>
@@ -53,33 +54,29 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     {
         Actor* fence = actorManager->CreateActorFromFile("data/xml/fence.xml");
         TransformComponent* pTransform = fence->GetComponent<TransformComponent>();
-        Vector3 fPos,fSca, fRot;
+        Vector3 sPos,ePos, rot, sca;
         Vector3 bPos, bSca, bRot;
-        float rot, triggerRot;
-        if (sscanf(line, "fence: [[%f, %f, %f], [%f, %f, %f], [%f, %f, %f]] button: [[%f, %f, %f], [%f, %f, %f], [%f, %f, %f]]",
-            &fPos.x, &fPos.y, &fPos.z,
-            &fSca.x, &fSca.y, &fSca.z,
-            &fRot.x, &fRot.y, &fRot.z,
-            &bPos.x, &bPos.y, &bPos.z,
-            &bSca.x, &bSca.y, &bSca.z,
-            &bRot.x, &bRot.y, &bRot.z) == 18)
+        if (sscanf(line, "p: [[%f, %f, %f], [%f, %f, %f]] rs: [[%f, %f, %f], [%f, %f, %f]] b: [[%f, %f, %f], [%f, %f, %f], [%f, %f, %f]]",
+            &sPos.x, &sPos.y, &sPos.z, &ePos.x, &ePos.y, &ePos.z, &rot.x, &rot.y, &rot.z, &sca.x, &sca.y, &sca.z,
+            &bPos.x, &bPos.y, &bPos.z, &bRot.x, &bRot.y, &bRot.z, &bSca.x, &bSca.y, &bSca.z) == 21)
         {
-            fRot *= 1.0f / 180.0f;
-            fRot *= (float)ANT_PI;
+            rot *= 1.0f / 180.0f;
+            rot *= (float)ANT_PI;
             bRot *= 1.0f / 180.0f;
             bRot *= (float)ANT_PI;
 
-            pTransform->position = fPos;
-            pTransform->rotation = fRot;
-            pTransform->scale = fSca;
+            pTransform->position = sPos;
+            pTransform->rotation = rot;
+            pTransform->scale = sca;
 
             // Add collider
             ColliderComponent colliderComponent;
             colliderComponent.Init(3, FRAME_MEMORY);
 
-            Vector3 front = Matrix4::TransformVector(Matrix4::TransformFromEuler(pTransform->rotation.x, pTransform->rotation.y, pTransform->rotation.z), Vector3::forward);
-            Vector3 right = Matrix4::TransformVector(Matrix4::TransformFromEuler(pTransform->rotation.x, pTransform->rotation.y, pTransform->rotation.z), Vector3::right);
-            Vector3 up = Matrix4::TransformVector(Matrix4::TransformFromEuler(pTransform->rotation.x, pTransform->rotation.y, pTransform->rotation.z), Vector3::up);
+            Matrix4 rotMat = Matrix4::TransformFromEuler(pTransform->rotation);
+            Vector3 front = Matrix4::TransformVector(rotMat, Vector3::forward);
+            Vector3 right = Matrix4::TransformVector(rotMat, Vector3::right);
+            Vector3 up = Matrix4::TransformVector(rotMat, Vector3::up);
 
             Vector3 rotation[] = { right, up, front };
 
@@ -89,17 +86,23 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
             colliderComponent.AddSubCollider(collider_);
             actorManager->AddComponent(fence, colliderComponent);
 
-            // Add Fence Component
-            FenceComponent fenceComponent;
-            actorManager->AddComponent(fence, fenceComponent);
-
-
             // Create the button
             Actor* button = actorManager->CreateActorFromFile("data/xml/button.xml");
             TransformComponent* bTransform = button->GetComponent<TransformComponent>();
+            ColliderComponent* bCollider = button->GetComponent<ColliderComponent>();
             bTransform->position = bPos;
             bTransform->rotation = bRot;
             bTransform->scale = bSca;
+            bCollider->SetIsTrigger(true);
+            ButtonComponent buttonComponent;
+            actorManager->AddComponent(button, buttonComponent);
+
+            // Add Fence Component
+            FenceComponent fenceComponent;
+            fenceComponent.SetStartPosition(sPos);
+            fenceComponent.SetEndPosition(ePos);
+            fenceComponent.AddButton(button);
+            actorManager->AddComponent(fence, fenceComponent);
         }
         else
         {

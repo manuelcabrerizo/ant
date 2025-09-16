@@ -6,6 +6,7 @@
 #include "anchor_component.h"
 #include "render_component.h"
 #include "collider_component.h"
+#include "button_component.h"
 
 #include <math/algebra.h>
 #include <math/vector3.h>
@@ -67,6 +68,15 @@ void PlayerControllerComponent::OnKeyTrigger(Actor* key)
 {
     // TODO: increase the key counter
     key->SetEnable(false);
+}
+
+void PlayerControllerComponent::OnButtonTrigger(Actor* button)
+{
+    ButtonComponent* buttonComponent = button->GetComponent<ButtonComponent>();
+    buttonComponent->SetSignal(true);
+    SignalNotification notification;
+    notification.signable = (ISignable*)buttonComponent;
+    NotificationManager::Get()->SendNotification(NotificationType::Signal, &notification);
 }
 
 void PlayerControllerComponent::OnEnemyCollision(Actor* enemy)
@@ -154,6 +164,7 @@ void PlayerControllerComponent::ProcessTriggers()
                 {
                 case ActorTag::Key: OnKeyTrigger(other); break;
                 case ActorTag::Enemy: OnEnemyCollision(other); break;
+                case ActorTag::Button: OnButtonTrigger(other); break;
                 }
             }
         }

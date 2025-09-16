@@ -19,6 +19,7 @@
 #include <components/effect_component.h>
 #include <components/key_component.h>
 #include <components/fence_component.h>
+#include <components/button_component.h>
 
 #include <collision.h>
 #include <math/algebra.h>
@@ -107,6 +108,7 @@ void PlayState::OnUpdate(float deltaTime)
     actorManager.UpdateComponents<PortalComponent>(deltaTime);
     actorManager.UpdateComponents<EffectComponent>(deltaTime);
     actorManager.UpdateComponents<KeyComponent>(deltaTime);
+    actorManager.UpdateComponents<FenceComponent>(deltaTime);
     // Late Update
     actorManager.LateUpdateComponents<PhysicsComponent>(deltaTime);
 
@@ -162,6 +164,7 @@ void PlayState::InitializeActorManager()
     actorManager.AddComponentType<EffectComponent, 10>();
     actorManager.AddComponentType<KeyComponent, 2>();
     actorManager.AddComponentType<FenceComponent, 10>();
+    actorManager.AddComponentType<ButtonComponent, 10>();
     // NOTE: add more component types ...
     actorManager.EndInitialization();
 }

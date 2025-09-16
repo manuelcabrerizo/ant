@@ -9,6 +9,7 @@ enum class NotificationType
     OnResize,
     EnemyHit,
     PlayerMove,
+    Signal,
 
     // last item
     Count
@@ -41,4 +42,11 @@ struct PlayerMoveNotification : public Notification
     TransformComponent* transform;
     Vector3 position;
     Vector3 velocity;
+};
+
+class ISignable;
+
+struct SignalNotification : public Notification
+{
+    ISignable* signable;
 };

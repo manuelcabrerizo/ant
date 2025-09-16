@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\components\animated__render_component.cpp" />
+    <ClCompile Include="src\components\button_component.cpp" />
     <ClCompile Include="src\components\effect_component.cpp" />
     <ClCompile Include="src\components\fence_component.cpp" />
     <ClCompile Include="src\components\key_component.cpp" />
@@ -203,12 +204,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\components\animated_render_component.h" />
+    <ClInclude Include="src\components\button_component.h" />
     <ClInclude Include="src\components\effect_component.h" />
     <ClInclude Include="src\components\fence_component.h" />
     <ClInclude Include="src\components\key_component.h" />
     <ClInclude Include="src\components\portal_component.h" />
     <ClInclude Include="src\asset_managers\animation_manager.h" />
     <ClInclude Include="src\components\tiled_render_component.h" />
+    <ClInclude Include="src\interfaces\ISignable.h" />
     <ClInclude Include="src\particle_systems\blood_ps.h" />
     <ClInclude Include="src\particle_systems\fire_ps.h" />
     <ClInclude Include="src\particle_systems\particle_system.h" />

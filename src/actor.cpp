@@ -6,6 +6,7 @@ const char *tagNames[(int)ActorTag::TagCount] =
     "Player",
     "Enemy",
     "Key",
+    "Button",
 };
 
 ActorTag Actor::TagNameToTag(const char* tagName)

@@ -23,6 +23,7 @@ private:
     Vector3 lastPosition;
 
     void OnKeyTrigger(Actor* key);
+    void OnButtonTrigger(Actor* button);
     void OnEnemyCollision(Actor* enemy);
 
     void ProcessMouseMovement();

@@ -11,6 +11,7 @@ enum class ActorTag
     Player,
     Enemy,
     Key,
+    Button,
 
     TagCount
 };
