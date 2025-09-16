@@ -15,9 +15,12 @@ private:
     TransformComponent* transform;
     Vector3 startPosition;
     Vector3 endPosition;
-    bool isActive = false;
-    float timer = 0.0f;
+
     float speed = 1.0f;
+    float distanceToMoveSq;
+
+    bool isActive = false;
+    bool isListener = true;
 
     StaticArray<ISignable*, 4> signables;
 

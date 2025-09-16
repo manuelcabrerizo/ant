@@ -75,7 +75,7 @@ void PlayerControllerComponent::OnButtonTrigger(Actor* button)
     ButtonComponent* buttonComponent = button->GetComponent<ButtonComponent>();
     buttonComponent->SetSignal(true);
     SignalNotification notification;
-    notification.signable = (ISignable*)buttonComponent;
+    notification.signable = static_cast<ISignable*>(buttonComponent);
     NotificationManager::Get()->SendNotification(NotificationType::Signal, &notification);
 }
 

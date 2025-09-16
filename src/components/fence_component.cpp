@@ -5,14 +5,17 @@
 void FenceComponent::OnInit(ActorManager* actorManager)
 {
     NotificationManager::Get()->AddListener(this, NotificationType::Signal);
+    isListener = true;
 
     transform = owner->GetComponent<TransformComponent>();
+    transform->position = startPosition;
     speed = 0.25f;
+    distanceToMoveSq = (endPosition - startPosition).Magnitude();
 }
 
 void FenceComponent::OnTerminate(ActorManager* actorManager)
 {
-    if (!isActive)
+    if (isListener)
     {
         NotificationManager::Get()->RemoveListener(this, NotificationType::Signal);
     }
@@ -20,18 +23,20 @@ void FenceComponent::OnTerminate(ActorManager* actorManager)
 
 void FenceComponent::OnUpdate(ActorManager* actorManager, float deltaTime)
 {
-    if (!isActive  || timer > 1.0f) return;
+    if (!isActive) return;
 
-    if (timer < 1.0f)
+    float lenSq = (endPosition - transform->position).Magnitude();
+    float normalizeDistanceToTarget = (lenSq / distanceToMoveSq);
+    if (normalizeDistanceToTarget > 0.001f)
     {
-        Vector3 position = startPosition.Lerp(endPosition, timer);
+        Vector3 position = transform->position.Lerp(endPosition, (speed / normalizeDistanceToTarget) * deltaTime);
         transform->position = position;
     }
     else
     {
         transform->position = endPosition;
+        isActive = false;
     }
-    timer += speed * deltaTime;
 }
 
 void FenceComponent::OnObjectSignal(SignalNotification* onSignal)
@@ -58,6 +63,7 @@ void FenceComponent::OnObjectSignal(SignalNotification* onSignal)
     if (isSignal)
     {
         isActive = true;
+        isListener = false;
         NotificationManager::Get()->RemoveListener(this, NotificationType::Signal);
     }
 }
