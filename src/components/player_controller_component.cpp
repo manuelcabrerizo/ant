@@ -29,8 +29,9 @@ void PlayerControllerComponent::OnInit(ActorManager *actorManager)
     physics = owner->GetComponent<PhysicsComponent>();
     weapon = owner->GetComponent<WeaponComponent>();
     collider = owner->GetComponent<ColliderComponent>();
-
     lastPosition = transform->position;
+
+    keyCount = 0;
 }   
 
 void PlayerControllerComponent::OnTerminate(ActorManager *actorManager)
@@ -64,7 +65,7 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 
 void PlayerControllerComponent::OnKeyTrigger(Actor* key)
 {
-    // TODO: increase the key counter
+    keyCount++;
     key->SetEnable(false);
 }
 

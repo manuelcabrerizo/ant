@@ -21,6 +21,7 @@ private:
     f32 pitch = 0;
     float speed;
     Vector3 lastPosition;
+    int keyCount = 0;
 
     void OnKeyTrigger(Actor* key);
     void OnButtonTrigger(Actor* button);

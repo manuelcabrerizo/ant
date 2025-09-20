@@ -2,7 +2,6 @@
 
 #include "component.h"
 #include <math/vector3.h>
-#include <collisions/collider.h>
 
 class PortalComponent : public Component<PortalComponent>
 {
