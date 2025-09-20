@@ -105,7 +105,6 @@ void PlayState::OnUpdate(float deltaTime)
     actorManager.UpdateComponents<PhysicsComponent>(deltaTime);
     actorManager.UpdateComponents<ColliderComponent>(deltaTime);
     actorManager.UpdateComponents<AnimationComponent>(deltaTime);
-    actorManager.UpdateComponents<PortalComponent>(deltaTime);
     actorManager.UpdateComponents<EffectComponent>(deltaTime);
     actorManager.UpdateComponents<KeyComponent>(deltaTime);
     actorManager.UpdateComponents<FenceComponent>(deltaTime);

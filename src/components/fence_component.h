@@ -6,13 +6,10 @@
 #include <interfaces/ISignable.h>
 #include <notification_manager.h>
 
-
-class TransformComponent;
-
 class FenceComponent : public Component<FenceComponent>, public INotificable
 {
 private:
-    TransformComponent* transform;
+    class TransformComponent* transform;
     Vector3 startPosition;
     Vector3 endPosition;
 

@@ -9,7 +9,7 @@ void FenceComponent::OnInit(ActorManager* actorManager)
 
     transform = owner->GetComponent<TransformComponent>();
     transform->position = startPosition;
-    speed = 0.25f;
+    speed = 1.0f;
     distanceToMoveSq = (endPosition - startPosition).Magnitude();
 }
 
@@ -25,17 +25,21 @@ void FenceComponent::OnUpdate(ActorManager* actorManager, float deltaTime)
 {
     if (!isActive) return;
 
-    float lenSq = (endPosition - transform->position).Magnitude();
-    float normalizeDistanceToTarget = (lenSq / distanceToMoveSq);
-    if (normalizeDistanceToTarget > 0.001f)
+    Vector3 toTarget = endPosition - transform->position;
+    float distToTarget = toTarget.Magnitude();
+    if (distToTarget > 0.001f)
     {
-        Vector3 position = transform->position.Lerp(endPosition, (speed / normalizeDistanceToTarget) * deltaTime);
-        transform->position = position;
-    }
-    else
-    {
-        transform->position = endPosition;
-        isActive = false;
+        Vector3 dir = toTarget.Normalized();
+        float step = speed * deltaTime;
+        if (step >= distToTarget)
+        {
+            transform->position = endPosition;
+            isActive = false;
+        }
+        else
+        {
+            transform->position += dir * step;
+        }
     }
 }
 

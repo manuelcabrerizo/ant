@@ -7,6 +7,7 @@
 #include "render_component.h"
 #include "collider_component.h"
 #include "button_component.h"
+#include "portal_component.h"
 
 #include <math/algebra.h>
 #include <math/vector3.h>
@@ -43,14 +44,11 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
     ProcessKeyboardMovement();
     ProcessTriggers();
 
-    //if ((transform->position - lastPosition).MagnitudeSq() < 0.0001f)
-    {
-        PlayerMoveNotification playerNoti;
-        playerNoti.position = transform->position;
-        playerNoti.velocity = physics->velocity;
-        playerNoti.transform = transform;
-        NotificationManager::Get()->SendNotification(NotificationType::PlayerMove, &playerNoti);
-    }
+    PlayerMoveNotification playerNoti;
+    playerNoti.position = transform->position;
+    playerNoti.velocity = physics->velocity;
+    playerNoti.transform = transform;
+    NotificationManager::Get()->SendNotification(NotificationType::PlayerMove, &playerNoti);    
 
     lastPosition = transform->position;
 
@@ -77,6 +75,15 @@ void PlayerControllerComponent::OnButtonTrigger(Actor* button)
     SignalNotification notification;
     notification.signable = static_cast<ISignable*>(buttonComponent);
     NotificationManager::Get()->SendNotification(NotificationType::Signal, &notification);
+}
+
+void PlayerControllerComponent::OnPortalTrigger(Actor* portal)
+{
+    PortalComponent* portalComponent = portal->GetComponent<PortalComponent>();
+    transform->position = portalComponent->GetDestPosition();
+    SetRotation(portalComponent->GetDestRotation());
+    physics->velocity = Vector3::zero;
+    physics->acceleration = Vector3::zero;
 }
 
 void PlayerControllerComponent::OnEnemyCollision(Actor* enemy)
@@ -165,6 +172,7 @@ void PlayerControllerComponent::ProcessTriggers()
                 case ActorTag::Key: OnKeyTrigger(other); break;
                 case ActorTag::Enemy: OnEnemyCollision(other); break;
                 case ActorTag::Button: OnButtonTrigger(other); break;
+                case ActorTag::Portal: OnPortalTrigger(other); break;
                 }
             }
         }

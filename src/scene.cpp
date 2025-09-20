@@ -139,9 +139,8 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     reader = FileReader(&portalsFile);
     while (const char* line = reader.GetNextLine())
     {
-        Actor* portal = actorManager->CreateActorFromFile("data/xml/portal.xml");
-        TransformComponent* pTransform = portal->GetComponent<TransformComponent>();
-        PortalComponent* portalCmp = portal->GetComponent<PortalComponent>();
+        Actor* portalVisual = actorManager->CreateActorFromFile("data/xml/portal.xml");
+        TransformComponent* pTransform = portalVisual->GetComponent<TransformComponent>();
         Vector3 pPos, pDst;
         float rPos, rDst;
         if (sscanf(line, "portal: [[%f, %f, %f], %f] dst: [[%f, %f, %f], %f]",
@@ -150,7 +149,77 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
             rDst += 180.0;
             pTransform->position = pPos;
             pTransform->rotation.y = rPos/180.0f*ANT_PI;
-            portalCmp->SetDestination(pDst, (rDst/180.0f) * ANT_PI);
+            
+            // TODO: optimice the collider be initialize using euler angles
+            Matrix4 rotMat = Matrix4::TransformFromEuler(pTransform->rotation);
+            Vector3 front = Matrix4::TransformVector(rotMat, Vector3::forward);
+            Vector3 right = Matrix4::TransformVector(rotMat, Vector3::right);
+            Vector3 up = Matrix4::TransformVector(rotMat, Vector3::up);
+
+            Vector3 rotation[] = { right, up, front };
+
+            // Add Collider components
+            {
+                ColliderComponent colliderComponent;
+                colliderComponent.Init(3, FRAME_MEMORY);
+                colliderComponent.SetOffset(Vector3(0, 1, 0));
+
+                // Left Collider
+                {
+                    OBB obb;
+                    obb.Init(Vector3::zero, rotation, Vector3(0.5, 2, 0.5));
+                    Collider collider_ = Collider(obb, portalVisual);
+                    collider_.SetOffset(up * 1.f + right * -1.5);
+                    colliderComponent.AddSubCollider(collider_);
+                }
+
+                // Right Collider
+                {
+                    OBB obb;
+                    obb.Init(Vector3::zero, rotation, Vector3(0.5, 2, 0.5));
+                    Collider collider_ = Collider(obb, portalVisual);
+                    collider_.SetOffset(up * 1.f + right * 1.5);
+                    colliderComponent.AddSubCollider(collider_);
+                }
+
+                // Up Collider
+                {
+                    OBB obb;
+                    obb.Init(Vector3::zero, rotation, Vector3(2, 0.5, 0.5));
+                    Collider collider_ = Collider(obb, portalVisual);
+                    collider_.SetOffset(up * 3.f);
+                    colliderComponent.AddSubCollider(collider_);
+                }
+
+                actorManager->AddComponent(portalVisual, colliderComponent);
+            }
+
+            // Create the trigger actor
+            {
+                Actor* portalTrigger = actorManager->CreateActor();
+                portalTrigger->SetTag(ActorTag::Portal);
+                TransformComponent transformCmp = *pTransform;
+                actorManager->AddComponent(portalTrigger, transformCmp);
+
+                PortalComponent portalCmp;
+                portalCmp.SetDestination(pDst, (rDst / 180.0f) * ANT_PI);
+                actorManager->AddComponent(portalTrigger, portalCmp);
+
+                {
+                    Vector3 offset = Vector3(0, 0.5f, 0);
+                    Vector3 position = transformCmp.position + offset;
+                    OBB obb;
+                    obb.Init(transformCmp.position, rotation, Vector3(1.5, 2, 0.25));
+                    Collider collider_ = Collider(obb, portalTrigger);
+                    collider_.SetOffset(up * 1.5f + front * 0.3);
+
+                    ColliderComponent colliderComponent;
+                    colliderComponent.Init(1, FRAME_MEMORY);
+                    colliderComponent.AddSubCollider(collider_);
+                    colliderComponent.SetIsTrigger(true);
+                    actorManager->AddComponent(portalTrigger, colliderComponent);
+                }
+            }
         }
         else
         {
