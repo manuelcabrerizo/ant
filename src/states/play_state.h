@@ -3,8 +3,10 @@
 #include "state.h"
 
 #include <ui_renderer.h>
+#include <text_renderer.h>
 #include <actor_manager.h>
 #include <notification_manager.h>
+
 
 class GameManager;
 class Scene;
@@ -18,9 +20,14 @@ private:
     GameManager* gameManager = nullptr;
     Scene* scene = nullptr;
     UIRenderer uiRenderer;
+    TextRenderer textRenderer;
 
     int windowWidth;
     int windowHeight;
+
+    float timeAccumulator;
+    int frameCounter;
+    int FPS;
 
     Vector2 crosshairSize;
     Vector2 crosshairPosition;

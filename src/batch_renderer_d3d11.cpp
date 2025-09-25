@@ -7,12 +7,23 @@
 
 VertexQuad vertices[] =
 {
-    VertexQuad{ Vector3(-0.5, -0.5, 0), Vector2(0, 0) },
-    VertexQuad{ Vector3(0.5,  0.5, 0), Vector2(1, 1) },
-    VertexQuad{ Vector3(-0.5,  0.5, 0), Vector2(0, 1) },
-    VertexQuad{ Vector3(0.5,  0.5, 0), Vector2(1, 1) },
-    VertexQuad{ Vector3(-0.5, -0.5, 0), Vector2(0, 0) },
-    VertexQuad{ Vector3(0.5, -0.5, 0), Vector2(1, 0) }
+    // Center Quads
+#if 1
+    VertexQuad{ Vector3(-0.5, -0.5, 0), Vector2(1, 0) },
+    VertexQuad{ Vector3(0.5,  0.5, 0), Vector2(0, 1) },
+    VertexQuad{ Vector3(-0.5,  0.5, 0), Vector2(1, 1) },
+    VertexQuad{ Vector3(0.5,  0.5, 0), Vector2(0, 1) },
+    VertexQuad{ Vector3(-0.5, -0.5, 0), Vector2(1, 0) },
+    VertexQuad{ Vector3(0.5, -0.5, 0), Vector2(0, 0) }
+#else
+    // BottomLeft Corner Quad
+    VertexQuad{ Vector3(0,  0, 0), Vector2(1, 0) },
+    VertexQuad{ Vector3(1,  1, 0), Vector2(0, 1) },
+    VertexQuad{ Vector3(0,  1, 0), Vector2(1, 1) },
+    VertexQuad{ Vector3(1,  1, 0), Vector2(0, 1) },
+    VertexQuad{ Vector3(0,  0, 0), Vector2(1, 0) },
+    VertexQuad{ Vector3(1,  0, 0), Vector2(0, 0) }
+#endif
 };
 
 void BatchRendererD3D11::Init(ID3D11Device* device, ID3D11DeviceContext* deviceContext,
@@ -78,6 +89,45 @@ void BatchRendererD3D11::DrawQuad(const Vector3& position, const Vector3& scale,
         vertex->pos = Matrix4::TransformPoint(rotation, vertex->pos);
         vertex->pos += position;
         vertex->uv = vertices[i].uv;
+        vertex->col = color;
+        vertex++;
+    }
+
+    cpuBuffer.size += 6;
+}
+
+void BatchRendererD3D11::DrawQuad(const Vector3& position, const Vector3& scale,
+    const Matrix4& rotation, const Vector4& uvs, const Vector3& color)
+{
+    if (cpuBuffer.size + 6 > cpuBuffer.GetCapacity())
+    {
+        Present();
+    }
+
+    ASSERT(cpuBuffer.size + 6 <= cpuBuffer.GetCapacity());
+
+    Vector2 minUv = Vector2(uvs.x, uvs.y);
+    Vector2 maxUv = Vector2(uvs.z, uvs.w);
+
+    Vector2 uvsArray[] =
+    {
+         Vector2(maxUv.x, minUv.y),
+         Vector2(minUv.x, maxUv.y),
+         Vector2(maxUv.x, maxUv.y),
+         Vector2(minUv.x, maxUv.y),
+         Vector2(maxUv.x, minUv.y),
+         Vector2(minUv.x, minUv.y)
+    };
+
+    VertexQuad* vertex = cpuBuffer.data + cpuBuffer.size;
+    for (int i = 0; i < 6; i++)
+    {
+        vertex->pos.x = vertices[i].pos.x * scale.x;
+        vertex->pos.y = vertices[i].pos.y * scale.y;
+        vertex->pos.z = 0;
+        vertex->pos = Matrix4::TransformPoint(rotation, vertex->pos);
+        vertex->pos += position;
+        vertex->uv = uvsArray[i];
         vertex->col = color;
         vertex++;
     }

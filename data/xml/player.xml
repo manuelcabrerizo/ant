@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Actor tag="Player">
     <TransformComponent>
-        <position x="-2" y="4.0" z="0"/>
+        <position x="0" y="4.0" z="-2"/>
         <scale x="1" y="1" z="1"/>
 		<rotation x="0" y="0" z="0"/>
 	</TransformComponent>

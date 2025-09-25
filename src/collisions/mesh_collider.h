@@ -23,5 +23,7 @@ public:
     const Array<Triangle>& GetTriangles() const;
 
     void DebugDraw(const Vector3& color) const;
+
+    AABB GetRootVolume() const;
 };
 

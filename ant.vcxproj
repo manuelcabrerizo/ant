@@ -198,6 +198,7 @@
     <ClCompile Include="src\states\state_machine.cpp" />
     <ClCompile Include="src\strings.cpp" />
     <ClCompile Include="libs\tinyxml2\tinyxml2.cpp" />
+    <ClCompile Include="src\text_renderer.cpp" />
     <ClCompile Include="src\utils.cpp" />
     <ClCompile Include="src\win32_platform.cpp" />
     <ClCompile Include="src\ui_renderer.cpp" />
@@ -282,6 +283,7 @@
     <ClInclude Include="src\states\state.h" />
     <ClInclude Include="src\strings.h" />
     <ClInclude Include="libs\tinyxml2\tinyxml2.h" />
+    <ClInclude Include="src\text_renderer.h" />
     <ClInclude Include="src\utils.h" />
     <ClInclude Include="src\states\state_machine.h" />
     <ClInclude Include="src\ui_renderer.h" />

@@ -86,6 +86,7 @@ private:
      
      ID3D11SamplerState *samplerStateLinearClamp;
      ID3D11SamplerState *samplerStateLinearWrap;
+     ID3D11SamplerState* samplerStateNearestWrap;
 
      ID3D11RasterizerState *wireFrameRasterizer;
      ID3D11RasterizerState *fillRasterizerCullBack;

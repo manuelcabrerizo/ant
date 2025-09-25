@@ -209,3 +209,16 @@ bool BVHNode::Intersect(const AABB& bVolume, const Capsule& capsule, Array<Colli
     }
     return isIntersecting;
 }
+
+void BVHNode::DebugDraw(const Vector3& color)
+{
+    volume.DebugDraw(color);
+    if (childern[0])
+    {
+        childern[0]->DebugDraw(color);
+    }
+    if (childern[1])
+    {
+        childern[1]->DebugDraw(color);
+    }
+}

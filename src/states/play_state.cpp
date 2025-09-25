@@ -33,6 +33,7 @@
 void PlayState::Init(GameManager *gameManager)
 {
     uiRenderer.Init();
+    textRenderer.Init("data/fonts/atlas.rtpa", STATIC_MEMORY);
     this->gameManager = gameManager;
     this->scene = gameManager->GetCurrentScene();
 }
@@ -40,10 +41,15 @@ void PlayState::Init(GameManager *gameManager)
 void PlayState::Terminate()
 {
     uiRenderer.Terminate();
+    textRenderer.Terminate();
 }
 
 void PlayState::OnEnter()
 {
+    this->timeAccumulator = 0;
+    this->frameCounter = 0;
+    this->FPS = 0;
+
     memoryFrame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
 
     NotificationManager::Get()->AddListener(this, NotificationType::OnResize);
@@ -95,6 +101,15 @@ void PlayState::OnExit()
 
 void PlayState::OnUpdate(float deltaTime)
 {
+    frameCounter++;
+    timeAccumulator += deltaTime;
+    if (timeAccumulator >= 1.0f)
+    {
+        FPS = frameCounter;
+        frameCounter = 0;
+        timeAccumulator -= 1.0f;
+    }
+
     // Initialize new components
     actorManager.InitializeNewComponents();
     // Update
@@ -133,6 +148,19 @@ void PlayState::OnRender()
     GraphicsManager::Get()->SetBlendingOff();
     GraphicsManager::Get()->SetDepthStencilOn();
     uiRenderer.DrawQuat(crosshairPosition, crosshairSize, 0, "Crosshair");
+
+    // Render Text (the Render state is for rendering 3D text)
+    GraphicsManager::Get()->SetAlphaBlending();
+    GraphicsManager::Get()->SetDepthStencilOnWriteMaskZero();
+    GraphicsManager::Get()->SetRasterizerStateCullNone();
+
+    char buffer[256];
+    sprintf(buffer, "FPS: %d", FPS);
+
+    textRenderer.DrawString(buffer, Vector2(0, windowHeight - 36), 1.0f);
+    GraphicsManager::Get()->SetRasterizerStateCullBack();
+    GraphicsManager::Get()->SetDepthStencilOn();
+
 }
 
 void PlayState::OnResize(OnResizeNotification* onResize)
@@ -142,6 +170,7 @@ void PlayState::OnResize(OnResizeNotification* onResize)
     Vector2 extent = onResize->extent;
     crosshairPosition = (extent * 0.5f);
     uiRenderer.OnResize(extent);
+    textRenderer.OnResize(extent);
 }
 
 void PlayState::InitializeActorManager()

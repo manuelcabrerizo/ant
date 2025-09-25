@@ -71,6 +71,50 @@ void AABB::Init(const Capsule& capsule)
     Init(a, b);
 }
 
+void AABB::Init(const OBB& obb)
+{
+    Vector3 c = obb.GetCenter();
+    Vector3 e = obb.GetExtent();
+    Vector3 u[3] = { 
+        obb.GetOrientation(0),
+        obb.GetOrientation(1),
+        obb.GetOrientation(2)
+    };
+
+    Vector3 FLB = u[0] * -e.x + u[1] * -e.y + u[2] * -e.z;
+    Vector3 FLT = u[0] * -e.x + u[1] * e.y + u[2] * -e.z;
+    Vector3 FRT = u[0] * e.x + u[1] * e.y + u[2] * -e.z;
+    Vector3 FRB = u[0] * e.x + u[1] * -e.y + u[2] * -e.z;
+
+    Vector3 BLB = u[0] * -e.x + u[1] * -e.y + u[2] * e.z;
+    Vector3 BLT = u[0] * -e.x + u[1] * e.y + u[2] * e.z;
+    Vector3 BRT = u[0] * e.x + u[1] * e.y + u[2] * e.z;
+    Vector3 BRB = u[0] * e.x + u[1] * -e.y + u[2] * e.z;
+
+    FLB += c;
+    FLT += c;
+    FRT += c;
+    FRB += c;
+
+    BLB += c;
+    BLT += c;
+    BRT += c;
+    BRB += c;
+
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    Array<Vector3> vertices;
+    vertices.Init(8, SCRATCH_MEMORY);
+    vertices.Push(FLB); vertices.Push(FLT); vertices.Push(FRT); vertices.Push(FRB);
+    vertices.Push(BLB); vertices.Push(BLT); vertices.Push(BRT); vertices.Push(BRB);
+    this->Init(vertices);
+    MemoryManager::Get()->ReleaseFrame(frame);
+}
+
+void AABB::Init(const MeshCollider& meshCollider)
+{
+    *this = meshCollider.GetRootVolume();
+}
+
 void AABB::SetMin(const Vector3& min)
 {
     this->min = min;

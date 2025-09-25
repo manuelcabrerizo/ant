@@ -106,10 +106,21 @@ const Array<Triangle>& MeshCollider::GetTriangles() const
 
 void MeshCollider::DebugDraw(const Vector3& color) const
 {
-    for (int i = 0; i < boundingBoxes.size; i++)
-    {
-        boundingBoxes[i].DebugDraw(color);
-    }
+    root->DebugDraw(color);
+    //for (int i = 0; i < boundingBoxes.size; i++)
+    //{
+    //    boundingBoxes[i].DebugDraw(color);
+    //}
 }
+
+AABB MeshCollider::GetRootVolume() const
+{
+    if (root)
+    {
+        return root->volume;
+    }
+    return {};
+}
+
 
 

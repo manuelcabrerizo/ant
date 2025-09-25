@@ -25,7 +25,7 @@ void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32
 
      //  Default renderer settings
      deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
-     deviceContext->PSSetSamplers(0, 1, &samplerStateLinearWrap);
+     deviceContext->PSSetSamplers(0, 1, &samplerStateNearestWrap);
 
      D3D11_VIEWPORT viewport;
      viewport.TopLeftX = 0;
@@ -68,6 +68,7 @@ void GraphicsManagerD3D11::Shutdown()
      
      samplerStateLinearClamp->Release();
      samplerStateLinearWrap->Release();
+     samplerStateNearestWrap->Release();
 
      depthStencilOn->Release();
      depthStencilOff->Release();
@@ -881,6 +882,16 @@ void GraphicsManagerD3D11::CreateSamplerStates()
      {
           ASSERT(!"Error: Failed Creating sampler state Linear\n");
      }
+
+     colorMapDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+     colorMapDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+     colorMapDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+     colorMapDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+     if (FAILED(device->CreateSamplerState(&colorMapDesc, &samplerStateNearestWrap)))
+     {
+         ASSERT(!"Error: Failed Creating sampler state Linear\n");
+     }
+
 }
 
 void GraphicsManagerD3D11::CreateRasterizerStates()

@@ -20,6 +20,8 @@ public:
     void Init(const AABB& one, const AABB& two);
     void Init(const Capsule& capsule);
     void Init(const Sphere& sphere);
+    void Init(const OBB& obb);
+    void Init(const MeshCollider& meshCollider);
 
     void SetMin(const Vector3& min);
     void SetMax(const Vector3& max);

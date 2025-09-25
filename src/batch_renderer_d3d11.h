@@ -31,4 +31,6 @@ public:
     void Present() override;
     void DrawQuad(const Vector3& position, const Vector3& scale,
         const Matrix4& rotation, const Vector3& color) override;
+    void DrawQuad(const Vector3& position, const Vector3& scale,
+        const Matrix4& rotation, const Vector4& uvs, const Vector3& color);
 };

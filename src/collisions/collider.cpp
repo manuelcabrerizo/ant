@@ -17,7 +17,7 @@ Collider::Collider(const OBB& obb, Actor* actor)
     this->owner = actor;
     this->type = ColliderType::OBB;
     this->obb = obb;
-    // TODO: this->volume.Init(obb);
+    this->volume.Init(obb);
 }
 
 Collider::Collider(const Sphere& sphere, Actor* actor)
@@ -41,7 +41,7 @@ Collider::Collider(const MeshCollider& meshCollider, Actor* actor)
     this->owner = actor;
     this->type = ColliderType::MESH_COLLIDER;
     this->meshCollider = meshCollider;
-    // TODO: this->volume.Init(meshCollider);
+    this->volume.Init(meshCollider);
 }
 
 bool Collider::Intersect(const Ray& ray, float& t) const
@@ -82,6 +82,12 @@ bool Collider::Intersect(const Segment& segment, float& t) const
 
 bool Collider::Intersect(const Collider& other, Array<CollisionData>& collisionData) const
 {
+    // early out is the bounding bolumes are not intersecting
+    if (!volume.Intersect(other.volume))
+    {
+        return false;
+    }
+
     if (other.type == ColliderType::MESH_COLLIDER)
     {
         return other.meshCollider.Intersect(*this, &collisionData);
@@ -161,7 +167,7 @@ void Collider::UpdatePosition(const Vector3& position)
         {
             Vector3 absPos = position + offset;
             obb.SetCenter(absPos);
-            // TODO: volume.Init(obb);
+            volume.Init(obb);
         } break;
         case ColliderType::SPHERE:
         {
@@ -185,26 +191,27 @@ void Collider::DebugDraw() const
     {
         case ColliderType::AABB:
         {
-            aabb.DebugDraw(color);
+            //aabb.DebugDraw(color);
         } break;
         case ColliderType::OBB:
         {
-            obb.DebugDraw(color);
+            //obb.DebugDraw(color);
         } break;
         case ColliderType::SPHERE:
         {
-            sphere.DebugDraw(12, color);
+            //sphere.DebugDraw(12, color);
         } break;
         case ColliderType::CAPSULE:
         {
             //capsule.DebugDraw(6, color);
-            //volume.DebugDraw(Vector3(0, 0, 1));
         } break;
         case ColliderType::MESH_COLLIDER:
         {
             //meshCollider.DebugDraw(color);
         } break;
     }
+    volume.DebugDraw(Vector3(0, 0, 1));
+
 }
 
 void Collider::SetOffset(const Vector3& offset)

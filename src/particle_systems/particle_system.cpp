@@ -8,8 +8,8 @@ BatchRenderer* ParticleSystem::batch = nullptr;
 void ParticleSystem::Init()
 {
     batch = GraphicsManager::Get()->BatchRendererAlloc(
-        VertexShaderManager::Get()->Get("particle_vert"),
-        FragmentShaderManager::Get()->Get("particle_frag"),
+        VertexShaderManager::Get()->Get("batch_vert"),
+        FragmentShaderManager::Get()->Get("batch_frag"),
         TextureManager::Get()->Get("DefaultMaterial_Diffuse"));
 }
 

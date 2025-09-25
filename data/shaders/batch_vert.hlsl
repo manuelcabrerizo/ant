@@ -20,16 +20,6 @@ cbuffer Matrices : register(b0)
     float4x4 proj;
 };
 
-float4x4 BuildRotationMatrix(float3 right, float3 up, float3 forward)
-{
-    return float4x4(
-        right.x, up.x, forward.x, 0.0,
-        right.y, up.y, forward.y, 0.0,
-        right.z, up.z, forward.z, 0.0,
-        0.0, 0.0, 0.0, 1.0
-    );
-}
-
 PS_Input vs_main(VS_Input i)
 {
     PS_Input o = (PS_Input) 0;

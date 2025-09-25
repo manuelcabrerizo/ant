@@ -104,14 +104,14 @@ void GameManager::LoadDefaultAssets()
     VertexShaderManager::Get()->Load("animation", "data/shaders/animation_vert.hlsl", STATIC_MEMORY);
     VertexShaderManager::Get()->Load("tiled_vert", "data/shaders/tiled_vert.hlsl", STATIC_MEMORY);
     VertexShaderManager::Get()->Load("ui_vert", "data/shaders/ui_vert.hlsl", STATIC_MEMORY);
-    VertexShaderManager::Get()->Load("particle_vert", "data/shaders/particle_vert.hlsl", STATIC_MEMORY);
+    VertexShaderManager::Get()->Load("batch_vert", "data/shaders/batch_vert.hlsl", STATIC_MEMORY);
     VertexShaderManager::Get()->Bind("default");
 
     // Load Fragment the shaders
     FragmentShaderManager::Get()->Load("default", "data/shaders/frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("color", "data/shaders/color.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("ui_frag", "data/shaders/ui_frag.hlsl", STATIC_MEMORY);
-    FragmentShaderManager::Get()->Load("particle_frag", "data/shaders/particle_frag.hlsl", STATIC_MEMORY);
+    FragmentShaderManager::Get()->Load("batch_frag", "data/shaders/batch_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("portal_frag", "data/shaders/portal_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("magma_frag", "data/shaders/magma_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("fence_frag", "data/shaders/fence_frag.hlsl", STATIC_MEMORY);

@@ -39,6 +39,8 @@ public:
     bool Intersect(const AABB& volume, const OBB& obb, Array<CollisionData>* collisionData) const;
     bool Intersect(const AABB& volume, const Sphere& shpere, Array<CollisionData>* collisionData) const;
     bool Intersect(const AABB& volume, const Capsule& capsule, Array<CollisionData>* collisionData) const;
+
+    void DebugDraw(const Vector3& color);
 };
 
 
