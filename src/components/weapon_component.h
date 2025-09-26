@@ -25,6 +25,13 @@ private:
     float shootDuration = 0.05f;
     float shootTimer = 0.0f;
 
+    float animationTime = 0.0f;
+    float shootAnimationTime = 0.0f;
+
+    float animationOffsetY = 0.0f;
+    float animationOffsetX = 0.0f;
+    float animationOffsetZ = 0.0f;
+
     void OnShoot(ShootNotification* notification);
 public:
     Actor *weapon = nullptr;

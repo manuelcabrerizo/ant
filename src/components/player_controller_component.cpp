@@ -55,9 +55,8 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 
     if (InputManager::Get()->MouseButtonJustDown(MOUSE_BUTTON_LEFT))
     {
-        AnchorComponent* weaponAnchor = weaponActor->GetComponent<AnchorComponent>();
         ShootNotification notification;
-        notification.shootPosition = weaponAnchor->position;
+        notification.shootPosition = camera->GetPosition();
         notification.shootDirection = camera->GetFront();
         NotificationManager::Get()->SendNotification(NotificationType::Shoot, &notification);
     }

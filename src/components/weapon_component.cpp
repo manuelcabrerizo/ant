@@ -4,10 +4,11 @@
 #include "collider_component.h"
 #include "render_component.h"
 #include "camera_component.h"
+#include "physics_component.h"
 
 #include <collision.h>
-
 #include <asset_managers/texture_manager.h>
+#include <math/algebra.h>
 
 
 static unsigned long long shootCounter = 0;
@@ -29,14 +30,18 @@ void WeaponComponent::OnInit(ActorManager *actorManager)
     shootPs.SetPosition(transform->position);
     shootPs.SetTexture(TextureManager::Get()->Get("Shoot"));
     shootPs.Stop();
+
+    animationTime = 0;
+    animationOffsetY = (sinf(animationTime) * 0.5f + 0.5f) * 0.015f;
+    animationOffsetX = sinf(animationTime * 0.5f) * 0.01f;
+    float t = 1.0f - shootAnimationTime;
+    animationOffsetZ = fmax((sinf(t * ANT_PI)), 0) * -0.075f;
 }
 
 void WeaponComponent::OnTerminate(ActorManager *actorManager)
 {
     NotificationManager::Get()->RemoveListener(this, NotificationType::Shoot);
 }
-
-#include <windows.h>
 
 void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
@@ -51,6 +56,28 @@ void WeaponComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 
     weaponTransform->position = transform->position + front * 0.25f + right * 0.1f + up * -0.2f;
     weaponTransform->rotation = transform->rotation;
+
+    // Weapon movement animation
+    PhysicsComponent* physics = owner->GetComponent<PhysicsComponent>();
+    if (physics->acceleration.MagnitudeSq() > 0)
+    {
+        animationOffsetY = (sinf(animationTime) * 0.5f + 0.5f) * 0.015f;
+        animationOffsetX = sinf(animationTime * 0.5f) * 0.01f;
+        animationTime += (physics->acceleration.Magnitude() * 0.3f) * dt;
+    }
+
+    animationOffsetZ = 0.0f;
+    if (shootAnimationTime > 0.0f)
+    {
+        float t = 1.0f - shootAnimationTime;
+        animationOffsetZ = fmax((sinf(t * ANT_PI)), 0) * -0.075f;
+        shootAnimationTime -= 4.0f * dt;
+    }
+
+    weaponTransform->position += right * animationOffsetX;
+    weaponTransform->position += up * animationOffsetY;
+    weaponTransform->position += front * animationOffsetZ;
+
     
     weaponAnchor->position = weaponTransform->position  +
         right * weaponAnchor->offset.x +
@@ -91,10 +118,18 @@ void WeaponComponent::OnRender(ActorManager* actorManager)
 
 void WeaponComponent::OnShoot(ShootNotification* notification)
 {
+    if (shootAnimationTime > 0.0f)
+    {
+        return;
+    }
+
     // Render shoot particles
     shootPs.SetPosition(notification->shootPosition);
     shootPs.Play();
     shootTimer = shootDuration;
+
+    // Start shoot Aimation
+    shootAnimationTime = 1.0f;
 
     // Scratch Buffer for collisionData results
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);

@@ -33,7 +33,7 @@
 void PlayState::Init(GameManager *gameManager)
 {
     uiRenderer.Init();
-    textRenderer.Init("data/fonts/atlas.rtpa", STATIC_MEMORY);
+    textRenderer.Init("data/fonts/times.rtpa", STATIC_MEMORY);
     this->gameManager = gameManager;
     this->scene = gameManager->GetCurrentScene();
 }
@@ -157,7 +157,8 @@ void PlayState::OnRender()
     char buffer[256];
     sprintf(buffer, "FPS: %d", FPS);
 
-    textRenderer.DrawString(buffer, Vector2(0, windowHeight - 36), 1.0f);
+    textRenderer.DrawString(buffer, Vector2(5, windowHeight - 32), 1.0f);
+    textRenderer.DrawString("Hello, Sailor!", Vector2(5, windowHeight - 64), 1.0f);
     GraphicsManager::Get()->SetRasterizerStateCullBack();
     GraphicsManager::Get()->SetDepthStencilOn();
 
