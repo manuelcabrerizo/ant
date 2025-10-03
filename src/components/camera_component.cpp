@@ -46,6 +46,8 @@ void CameraComponent::OnUpdate(ActorManager *actorManager, f32 dt)
      GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
      // TODO: try no to do this on the Update
      GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
+
+     GraphicsManager::Get()->UpdateViewPosition(transform->position);
 }
 
 void CameraComponent::OnResize(OnResizeNotification* onResize)

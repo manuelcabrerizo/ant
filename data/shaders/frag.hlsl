@@ -17,35 +17,129 @@ cbuffer TextureUbo : register(b0)
     float shininess;
 };
 
+struct DirectionalLight
+{
+    float4 ambient;
+    float4 diffuse;
+    float4 specular;
+    float3 direction;
+    float pad;
+};
+
+struct PointLight
+{
+    float4 ambient;
+    float4 diffuse;
+    float4 specular;
+    float3 position;
+    float range;
+    float3 att;
+    float pad;
+};
+
+cbuffer LightConstBuffer : register(b4)
+{
+    DirectionalLight directionalLight;
+    PointLight pointLights[8];
+    int lightCount;
+    float3 viewPos;
+};
+
+
+void CalcPointLight(float4 color, PointLight L, float3 pos,
+    float3 normal, float3 toEye,
+    out float4 ambient,
+    out float4 diffuse,
+    out float4 spec)
+{
+    // Initialize outputs
+    ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    spec    = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    
+    float3 lightVec = L.position - pos;
+    float d = length(lightVec);
+    
+    if(d > L.range)
+    {
+        return;
+    }
+    
+    lightVec /= d;
+    
+    // Ambient term
+    ambient = color * L.ambient;
+    
+    float diffuseFactor = dot(lightVec, normal);
+    
+    [flatten]
+    if(diffuseFactor > 0.0f)
+    {
+        float3 v = reflect(-lightVec, normal);
+        float specFactor = pow(max(dot(v, toEye), 0.0f), 4);
+        
+        diffuse = diffuseFactor * color * L.diffuse;
+        spec = specFactor * float4(1, 1, 1, 1) * L.specular;
+    }
+}
+
+void CalcDirectionalLight(float4 color, DirectionalLight L,
+    float3 normal, float3 toEye, 
+    out float4 ambient,
+    out float4 diffuse,
+    out float4 spec)
+{
+    // Initialize outputs
+    ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    spec    = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    // The light vector aims opposite the direction the light rays travel
+    float3 lightVec = -L.direction;
+    
+    // Add ambient term
+    ambient = color * L.ambient;
+    
+    // Add diffuse and specular term, provided the surface is in
+    // the line of site of the light
+    float diffuseFactor = dot(lightVec, normal);
+    
+    // Flatten to avoid dynamic branching
+    [flatten]
+    if(diffuseFactor > 0.0f)
+    {
+        float3 v = reflect(-lightVec, normal);
+        float specFactor = pow(max(dot(v, toEye), 0.0f), 8);
+        
+        diffuse = diffuseFactor * color * L.diffuse;
+        spec = specFactor * float4(1, 1, 1, 1) * L.specular;
+    }
+}
+
+
 float4 fs_main(PS_Input i) : SV_TARGET
 {
-    float3 ambient = float3(1.0f, 1.0f, 1.0f);
+    float4 baseColor = diffuseMap.Sample(samplerState, i.uv);
+    float3 n = normalize(i.nor);    
+    float3 toEye = normalize(viewPos - i.fragPos);
     
-    float3 ligthPos0 = float3(30.0f, 20.0f, 20.0f);
-    float3 ligthDir0 = normalize(ligthPos0 - i.fragPos);
-    float3 lightColor0 = float3(0.8f, 0.4f, 0.8f);
-
-    float3 ligthPos1 = float3(0.0f, 20.0f, -20.0f);
-    float3 ligthDir1 = normalize(ligthPos1 - i.fragPos);
-    float3 lightColor1 = float3(0.8f, 0.4f, 0.8f);
+    float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 spec    = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 A, D, S;
     
-    float3 ligthPos2 = float3(0.0f, 20.0f, 40.0f);
-    float3 ligthDir2 = normalize(ligthPos2 - i.fragPos);
-    float3 lightColor2 = float3(0.8f, 0.8f, 0.4f);
-
-    float3 ligthPos3 = float3(-30.0f, 20.0f, 20.0f);
-    float3 ligthDir3 = normalize(ligthPos3 - i.fragPos);
-    float3 lightColor3 = float3(0.8f, 0.4f, 0.4f);
-
-    float3 color = diffuseMap.Sample(samplerState, i.uv).rgb;
-
-    float3 n = normalize(i.nor);
-    float diffuse0 = max(dot(ligthDir0, n), 0.1f);
-    float diffuse1 = max(dot(ligthDir1, n), 0.1f);
-    float diffuse2 = max(dot(ligthDir2, n), 0.1f);
-    float diffuse3 = max(dot(ligthDir3, n), 0.1f);
-
-    float3 finalColor = (ambient * color) + color * ((lightColor0 * diffuse0) + (lightColor1 * diffuse1) + (lightColor2 * diffuse2) + (lightColor3 * diffuse3));
-
-    return float4(finalColor, 1.0f);
+    CalcDirectionalLight(baseColor, directionalLight, n, toEye, A, D, S);
+    ambient += A;
+    diffuse += D;
+    spec    += S;
+    
+    for (int index = 0; index < 8; index++)
+    {
+        CalcPointLight(baseColor, pointLights[index], i.fragPos, n, toEye, A, D, S);
+        ambient += A;
+        diffuse += D;
+        spec    += S;
+    }
+    
+    return ambient + diffuse + spec;
 }

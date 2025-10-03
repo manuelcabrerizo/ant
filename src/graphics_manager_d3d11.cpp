@@ -9,6 +9,8 @@
 
 #include <dxgidebug.h>
 
+#include <common.h>
+
 void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32 stackNum)
 {    
      window = (HWND *)osWindow;
@@ -25,7 +27,8 @@ void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32
 
      //  Default renderer settings
      deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
-     deviceContext->PSSetSamplers(0, 1, &samplerStateNearestWrap);
+     //deviceContext->PSSetSamplers(0, 1, &samplerStateNearestWrap);
+     deviceContext->PSSetSamplers(0, 1, &samplerStateLinearWrap);
 
      D3D11_VIEWPORT viewport;
      viewport.TopLeftX = 0;
@@ -49,6 +52,8 @@ void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32
 
      SetRasterizerStateCullBack();
 
+     CreateLightsUniformBuffer();
+
      //swapChain->SetFullscreenState(TRUE, nullptr);
 }
 
@@ -57,6 +62,8 @@ typedef DXGI_GET_DEBUG_INTERFACE(DXGIGetDebugInterfacePtr);
 
 void GraphicsManagerD3D11::Shutdown()
 {
+    DestroyLightsUniformBuffer();
+
      deviceContext->Flush();
      deviceContext->ClearState();
      swapChain->SetFullscreenState(FALSE, nullptr);
@@ -540,6 +547,32 @@ void GraphicsManagerD3D11::BatchRendererFree(BatchRenderer* batchRenderer)
     batchRendererAllocator.Free(batchRendererd3d11);
 }
 
+void GraphicsManagerD3D11::SetDirectionalLight(const DirectionalLight& light)
+{
+    lighsUbo.directionalLight = light;
+    UniformBufferUpdate(lightsUniformBuffer, &lighsUbo);
+
+}
+
+void GraphicsManagerD3D11::AddPointLights(PointLight* lights, int count)
+{
+    ASSERT(count <= GetMaxPointLightCount());
+    memcpy(lighsUbo.pointLights, lights, sizeof(PointLight) * count);
+    lighsUbo.pointLightsCount = count;
+    UniformBufferUpdate(lightsUniformBuffer, &lighsUbo);
+}
+
+int GraphicsManagerD3D11::GetMaxPointLightCount()
+{
+    return MAX_POINT_LIGHTS;
+}
+
+void GraphicsManagerD3D11::UpdateViewPosition(const Vector3& viewPos)
+{
+    // TODO: move this to other Uniform buffer to its updated once per frame
+    lighsUbo.viewPos = viewPos;
+    UniformBufferUpdate(lightsUniformBuffer, &lighsUbo);
+}
 
 // TODO: use macros for debug build
 void GraphicsManagerD3D11::DebugInit()
@@ -1008,4 +1041,15 @@ void GraphicsManagerD3D11::CreateBendingStates()
     blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
     blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
     device->CreateBlendState(&blendStateDesc, &subtractiveBlending);
+}
+
+void GraphicsManagerD3D11::CreateLightsUniformBuffer()
+{
+    lighsUbo = {};
+    lightsUniformBuffer = UniformBufferAlloc(BIND_TO_PS, &lighsUbo, sizeof(lighsUbo), LIGHTS_UBO_BIND_INDEX);
+    UniformBufferBind(lightsUniformBuffer);
+}
+void GraphicsManagerD3D11::DestroyLightsUniformBuffer()
+{
+    UniformBufferFree(lightsUniformBuffer);
 }

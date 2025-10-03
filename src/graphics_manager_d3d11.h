@@ -65,6 +65,17 @@ struct TextureD3D11 : Texture
      ID3D11ShaderResourceView *shaderResourceView;
 };
 
+const int LIGHTS_UBO_BIND_INDEX = 4;
+const int MAX_POINT_LIGHTS = 8;
+
+struct LightsUbo
+{
+    DirectionalLight directionalLight;
+    PointLight pointLights[MAX_POINT_LIGHTS];
+    int pointLightsCount;
+    Vector3 viewPos;
+};
+
 class GraphicsManagerD3D11 : public GraphicsManager
 {
 private:     
@@ -110,6 +121,9 @@ private:
      ObjectAllocator<FragmentShaderD3D11> fragmentShaderAllocator;
      ObjectAllocator<TextureD3D11> textureAllocator;
      ObjectAllocator<BatchRendererD3D11> batchRendererAllocator;
+
+     UniformBuffer* lightsUniformBuffer = nullptr;
+     LightsUbo lighsUbo;
 
 #if ANT_DEBUG
      DebugRendererD3D11 debugRenderer;
@@ -172,6 +186,12 @@ public:
      BatchRenderer* BatchRendererAlloc(VertexShader* vertShader, FragmentShader* fragShader, Texture* texture) override;
      void BatchRendererFree(BatchRenderer* batchRenderer) override;
 
+     void SetDirectionalLight(const DirectionalLight& light) override;
+     void AddPointLights(PointLight* lights, int count) override;
+     int GetMaxPointLightCount() override;
+
+     void UpdateViewPosition(const Vector3& viewPos) override;
+
      void DebugInit() override;
      void DebugTerminate() override;
      void DebugPresent() override;
@@ -189,4 +209,7 @@ private:
      void CreateRasterizerStates();
      void CreateDepthStencilStates();
      void CreateBendingStates();
+
+     void CreateLightsUniformBuffer();
+     void DestroyLightsUniformBuffer();
 };

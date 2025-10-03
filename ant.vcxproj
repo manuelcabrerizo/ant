@@ -132,6 +132,7 @@
     <ClCompile Include="src\components\effect_component.cpp" />
     <ClCompile Include="src\components\fence_component.cpp" />
     <ClCompile Include="src\components\key_component.cpp" />
+    <ClCompile Include="src\components\point_light_component.cpp" />
     <ClCompile Include="src\components\portal_component.cpp" />
     <ClCompile Include="src\asset_managers\animation_manager.cpp" />
     <ClCompile Include="src\components\tiled_render_component.cpp" />
@@ -209,10 +210,12 @@
     <ClInclude Include="src\components\effect_component.h" />
     <ClInclude Include="src\components\fence_component.h" />
     <ClInclude Include="src\components\key_component.h" />
+    <ClInclude Include="src\components\point_light_component.h" />
     <ClInclude Include="src\components\portal_component.h" />
     <ClInclude Include="src\asset_managers\animation_manager.h" />
     <ClInclude Include="src\components\tiled_render_component.h" />
     <ClInclude Include="src\interfaces\ISignable.h" />
+    <ClInclude Include="src\lights\light.h" />
     <ClInclude Include="src\particle_systems\blood_ps.h" />
     <ClInclude Include="src\particle_systems\fire_ps.h" />
     <ClInclude Include="src\particle_systems\particle_system.h" />

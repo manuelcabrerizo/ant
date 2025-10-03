@@ -3,6 +3,7 @@
 #include "platform.h"
 #include "math/vector3.h"
 #include "batch_renderer.h"
+#include "lights/light.h"
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
@@ -96,7 +97,13 @@ public:
 
      virtual BatchRenderer* BatchRendererAlloc(VertexShader* vertShader, FragmentShader* fragShader, Texture* texture) = 0;
      virtual void BatchRendererFree(BatchRenderer *batchRenderer) = 0;
+
+     virtual void SetDirectionalLight(const DirectionalLight& light) = 0;
+     virtual void AddPointLights(PointLight* lights, int cout) = 0;
+     virtual int GetMaxPointLightCount() = 0;
      
+     virtual void UpdateViewPosition(const Vector3& viewPos) = 0;
+
      virtual void DebugInit() = 0;
      virtual void DebugTerminate() = 0;
      virtual void DebugPresent() = 0;
