@@ -36,10 +36,10 @@ struct FrameBufferD3D11 : FrameBuffer
 {
      u32 x, y, w, h;
      u32 msaa = 1;
-     u32 msaaQuality;
      DXGI_FORMAT format;
 
      ID3D11Texture2D *texture;
+     ID3D11Texture2D* depthStencilTexture;
      ID3D11RenderTargetView *renderTargetView;
      ID3D11DepthStencilView *depthStencilView;
 
@@ -135,6 +135,7 @@ public:
 
      void OnResize(i32 width, i32 height) override;
      
+     void BackBufferBind() override;
      void BeginFrame(f32 r, f32 g, f32 b) override;
      void EndFrame(i32 vsync) override;
 
@@ -176,12 +177,23 @@ public:
      void FragmentShaderFree(FragmentShader* shader) override;
      void FragmentShaderBind(FragmentShader* shader) override;
 
-
      Texture *TextureAlloc(const char *filepath) override;
      void TextureFree(Texture *texture) override;
      void TextureBind(Texture *texture, i32 slot) override;
      i32 TextureWidth(Texture *texture) override;
      i32 TextureHeight(Texture *texture) override;
+
+     FrameBuffer* FrameBufferAlloc(
+         unsigned int x, unsigned int y,
+         unsigned int w, unsigned int h,
+         FrameBufferFormat format,
+         bool hasMsaa = false, int msaa = 1) override;
+     void FrameBufferFree(FrameBuffer* frameBuffer) override;
+     void FrameBufferClear(FrameBuffer* frameBuffer, float r, float g, float b) override;
+     void FrameBufferBindAsRenderTarget(FrameBuffer* frameBuffer) override;
+     void FrameBufferBindAsTexture(FrameBuffer* frameBuffer, int slot) override;
+     void FrameBufferUnbindAsTexture(FrameBuffer* frameBuffer, int slot) override;
+     void FrameBufferResolve(FrameBuffer* frameBuffer) override;
 
      BatchRenderer* BatchRendererAlloc(VertexShader* vertShader, FragmentShader* fragShader, Texture* texture) override;
      void BatchRendererFree(BatchRenderer* batchRenderer) override;

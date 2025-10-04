@@ -18,10 +18,20 @@ void GameManager::Init()
     menuState.Init(this);
     playState.Init(this);
     stateMachine.Push(&menuState);
+
+    int width, height;
+    PlatformClientDimensions(&width, &height);
+    frameBuffer = GraphicsManager::Get()->FrameBufferAlloc(0, 0, width, height, FrameBufferFormat::FORMAT_R16G16B16A16_FLOAT, true, 4);
+    uiRenderer.Init(true);
+
+    PlatformClientDimensions(&clientWidth, &clientHeight);
 }
 
 void GameManager::Terminate()
 {
+    uiRenderer.Terminate();
+    GraphicsManager::Get()->FrameBufferFree(frameBuffer);
+
     stateMachine.Clear();
     playState.Terminate();
     menuState.Terminate();
@@ -53,9 +63,18 @@ void GameManager::Update(f32 dt)
 
 void GameManager::Render(f32 dt)
 {
-    GraphicsManager::Get()->BeginFrame(0.2f, 0.2f, 0.4f);
-
+    GraphicsManager::Get()->FrameBufferBindAsRenderTarget(frameBuffer);
+    GraphicsManager::Get()->FrameBufferClear(frameBuffer, 0.2f, 0.2f, 0.4f);
     stateMachine.Render();
+
+    GraphicsManager::Get()->FrameBufferResolve(frameBuffer);
+
+    GraphicsManager::Get()->BackBufferBind();
+    GraphicsManager::Get()->BeginFrame(0, 1, 0);
+
+    // TODO: render the frameBuffer into a texture
+    GraphicsManager::Get()->FrameBufferBindAsTexture(frameBuffer, 0);
+    uiRenderer.DrawQuat(Vector2(clientWidth/2, clientHeight/2), Vector2(clientWidth, clientHeight), 99, false);
 
     GraphicsManager::Get()->EndFrame(1);
 }

@@ -26,7 +26,7 @@ void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32
      CreateBendingStates();
 
      //  Default renderer settings
-     deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+     BackBufferBind();
      deviceContext->PSSetSamplers(0, 1, &samplerStateLinearWrap);
 
      D3D11_VIEWPORT viewport;
@@ -140,6 +140,12 @@ void GraphicsManagerD3D11::OnResize(i32 width, i32 height)
      vp.TopLeftY = 0;
      deviceContext->RSSetViewports( 1, &vp );
 }
+
+void GraphicsManagerD3D11::BackBufferBind()
+{
+    deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+}
+
 
 void GraphicsManagerD3D11::BeginFrame(f32 r, f32 g, f32 b)
 {
@@ -288,12 +294,6 @@ void GraphicsManagerD3D11::IndexBufferFree(IndexBuffer *indexBuffer)
      indexBufferAllocator.Free(ib);
 }
 
-void GraphicsManagerD3D11::IndexBufferBind(IndexBuffer *indexBuffer)
-{
-     IndexBufferD3D11 *ib = (IndexBufferD3D11 *)indexBuffer;
-     deviceContext->IASetIndexBuffer(ib->buffer, ib->format, 0);
-}
-
 UniformBuffer *GraphicsManagerD3D11::UniformBufferAlloc(u32 bindTo, void *data, u32 dataSize, u32 slot)
 {
      UniformBufferD3D11 *ub = uniformBufferAllocator.Alloc();
@@ -318,6 +318,12 @@ UniformBuffer *GraphicsManagerD3D11::UniformBufferAlloc(u32 bindTo, void *data, 
      }
 
      return (UniformBuffer *)ub;
+}
+
+void GraphicsManagerD3D11::IndexBufferBind(IndexBuffer* indexBuffer)
+{
+    IndexBufferD3D11* ib = (IndexBufferD3D11*)indexBuffer;
+    deviceContext->IASetIndexBuffer(ib->buffer, ib->format, 0);
 }
 
 void GraphicsManagerD3D11::UniformBufferFree(UniformBuffer *uniformBuffer)
@@ -529,6 +535,188 @@ i32 GraphicsManagerD3D11::TextureHeight(Texture *texture)
 {
      TextureD3D11 *tx = (TextureD3D11 *)texture;
      return tx->h;
+}
+
+
+FrameBuffer* GraphicsManagerD3D11::FrameBufferAlloc(
+    unsigned int x, unsigned int y,
+    unsigned int w, unsigned int h,
+    FrameBufferFormat format,
+    bool hasMsaa, int msaa)
+{
+    // select the format
+    DXGI_FORMAT dxgiFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    switch (format)
+    {
+    case FrameBufferFormat::FORMAT_B8G8R8A8_UNORM:
+    {
+        dxgiFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+    } break;
+    case FrameBufferFormat::FORMAT_R16G16B16A16_FLOAT:
+    {
+        dxgiFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+    } break;
+    }
+
+    FrameBufferD3D11* frameBuffer = frameBufferAllocator.Alloc();
+    frameBuffer->x = x;
+    frameBuffer->y = y;
+    frameBuffer->w = w;
+    frameBuffer->h = h;
+    frameBuffer->msaa = msaa;
+    frameBuffer->format = dxgiFormat;
+
+
+    // Create texture an  resolve texture is is a msaa frame buffer
+    D3D11_TEXTURE2D_DESC texDesc{};
+    texDesc.Width = w;
+    texDesc.Height = h;
+    texDesc.MipLevels = 1;
+    texDesc.ArraySize = 1;
+    texDesc.Format = dxgiFormat;
+    texDesc.SampleDesc.Count = msaa;
+    texDesc.SampleDesc.Quality = msaaQuality4x - 1;
+    texDesc.Usage = D3D11_USAGE_DEFAULT;
+    texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+    texDesc.CPUAccessFlags = 0;
+    texDesc.MiscFlags = 0;
+    if (FAILED(device->CreateTexture2D(&texDesc, 0, &frameBuffer->texture)))
+    {
+        ASSERT(!"Error creating frame buffer texture");
+    }
+    if (hasMsaa)
+    {
+        texDesc = {};
+        texDesc.Width = w;
+        texDesc.Height = h;
+        texDesc.MipLevels = 1;
+        texDesc.ArraySize = 1;
+        texDesc.Format = dxgiFormat;
+        texDesc.SampleDesc.Count = 1;
+        texDesc.SampleDesc.Quality = 0;
+        texDesc.Usage = D3D11_USAGE_DEFAULT;
+        texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+        texDesc.CPUAccessFlags = 0;
+        texDesc.MiscFlags = 0;
+        if (FAILED(device->CreateTexture2D(&texDesc, 0, &frameBuffer->resolveTexture)))
+        {
+            ASSERT(!"Error creating frame buffer resolve texture");
+        }
+    }
+
+    // Create render target view
+    D3D11_RENDER_TARGET_VIEW_DESC rtvDesc{};
+    rtvDesc.Format = dxgiFormat;
+    rtvDesc.ViewDimension = hasMsaa ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
+    rtvDesc.Texture2D.MipSlice = 0;
+    if (FAILED(device->CreateRenderTargetView(frameBuffer->texture, &rtvDesc, &frameBuffer->renderTargetView)))
+    {
+        ASSERT(!"Error creating frame buffer render target view");
+    }
+
+    // Create shader resource view
+    D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+    srvDesc.Format = dxgiFormat;
+    srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+    srvDesc.Texture2D.MipLevels = 1;
+    srvDesc.Texture2D.MostDetailedMip = 0;
+    if (FAILED(device->CreateShaderResourceView(hasMsaa ? frameBuffer->resolveTexture : frameBuffer->texture, &srvDesc, &frameBuffer->shaderResourceView)))
+    {
+        ASSERT(!"Error creating frame buffer shader resource view");
+    }
+
+    // Create depth stencil view
+    // create the depth stencil texture
+    D3D11_TEXTURE2D_DESC depthStencilTextureDesc{};
+    depthStencilTextureDesc.Width = w;
+    depthStencilTextureDesc.Height = h;
+    depthStencilTextureDesc.MipLevels = 1;
+    depthStencilTextureDesc.ArraySize = 1;
+    depthStencilTextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    if (hasMsaa)
+    {
+        depthStencilTextureDesc.SampleDesc.Count = msaa;
+        depthStencilTextureDesc.SampleDesc.Quality = msaaQuality4x - 1;
+    }
+    else
+    {
+        depthStencilTextureDesc.SampleDesc.Count = 1;
+        depthStencilTextureDesc.SampleDesc.Quality = 0;
+    }
+    depthStencilTextureDesc.Usage = D3D11_USAGE_DEFAULT;
+    depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    depthStencilTextureDesc.CPUAccessFlags = 0;
+    depthStencilTextureDesc.MiscFlags = 0;
+    if (FAILED(device->CreateTexture2D(&depthStencilTextureDesc, nullptr, &frameBuffer->depthStencilTexture)))
+    {
+        ASSERT(!"Error creating frame buffer depth stencil texture");
+    }
+    // create the depth stencil view
+    D3D11_DEPTH_STENCIL_VIEW_DESC descDSV{};
+    descDSV.Flags = 0;
+    descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    descDSV.ViewDimension = hasMsaa ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
+    descDSV.Texture2D.MipSlice = 0;
+    if (FAILED(device->CreateDepthStencilView(frameBuffer->depthStencilTexture, &descDSV, &frameBuffer->depthStencilView))) {
+        ASSERT(!"Error creating frame buffer depth stencil view");
+    }
+
+    return static_cast<FrameBuffer*>(frameBuffer);
+}
+
+void GraphicsManagerD3D11::FrameBufferFree(FrameBuffer* frameBuffer)
+{
+    FrameBufferD3D11* fb = static_cast<FrameBufferD3D11*>(frameBuffer);
+    fb->texture->Release();
+    fb->depthStencilTexture->Release();
+    fb->renderTargetView->Release();
+    fb->depthStencilView->Release();
+    fb->resolveTexture->Release();
+    fb->shaderResourceView->Release();
+    frameBufferAllocator.Free(fb);
+}
+
+void GraphicsManagerD3D11::FrameBufferClear(FrameBuffer* frameBuffer, float r, float g, float b)
+{
+    FrameBufferD3D11* fb = static_cast<FrameBufferD3D11*>(frameBuffer);
+    float clearColor[] = { r, g, b, 1.0f };
+    deviceContext->ClearRenderTargetView(fb->renderTargetView, clearColor);
+    deviceContext->ClearDepthStencilView(fb->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+}
+
+void GraphicsManagerD3D11::FrameBufferBindAsRenderTarget(FrameBuffer* frameBuffer)
+{
+    FrameBufferD3D11* fb = static_cast<FrameBufferD3D11*>(frameBuffer);
+    deviceContext->OMSetRenderTargets(1, &fb->renderTargetView, fb->depthStencilView);
+    D3D11_VIEWPORT vp;
+    vp.Width = static_cast<float>(fb->w);
+    vp.Height = static_cast<float>(fb->h);
+    vp.MinDepth = 0.0f;
+    vp.MaxDepth = 1.0f;
+    vp.TopLeftX = static_cast<float>(fb->x);
+    vp.TopLeftY = static_cast<float>(fb->y);
+    deviceContext->RSSetViewports(1, &vp);
+}
+
+void GraphicsManagerD3D11::FrameBufferBindAsTexture(FrameBuffer* frameBuffer, int slot)
+{
+    FrameBufferD3D11* fb = static_cast<FrameBufferD3D11*>(frameBuffer);
+    deviceContext->PSSetShaderResources(slot, 1, &fb->shaderResourceView);
+}
+
+void GraphicsManagerD3D11::FrameBufferUnbindAsTexture(FrameBuffer* frameBuffer, int slot)
+{
+    FrameBufferD3D11* fb = static_cast<FrameBufferD3D11*>(frameBuffer);
+    deviceContext->PSSetShaderResources(slot, 1, nullptr);
+}
+
+void GraphicsManagerD3D11::FrameBufferResolve(FrameBuffer* frameBuffer)
+{
+    FrameBufferD3D11* fb = static_cast<FrameBufferD3D11*>(frameBuffer);
+    if (fb->msaa > 1)
+    {
+        deviceContext->ResolveSubresource(fb->resolveTexture, 0, fb->texture, 0, fb->format);
+    }
 }
 
 BatchRenderer* GraphicsManagerD3D11::BatchRendererAlloc(

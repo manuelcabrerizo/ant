@@ -26,9 +26,11 @@ private:
     UIUbo matrices;
 
 public:
-    void Init();
+    void Init(bool isRenderTarget = false);
     void Terminate();
     void OnResize(const Vector2& extent);
-    void DrawQuat(const Vector2& position, const Vector2& size, int zIndex, const char* textureName);
+    void DrawQuat(const Vector2& position, const Vector2& size, int zIndex, const char* textureName, bool alphaBlended = true);
+    void DrawQuat(const Vector2& position, const Vector2& size, int zIndex, bool alphaBlended = true);
+
 };
 

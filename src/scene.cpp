@@ -271,7 +271,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     PointLight pointLight;
     pointLight.ambient = Vector4(0.1, 0.1, 0.1, 0);
     pointLight.diffuse = Vector4(1, 1, 0.5, 1);
-    pointLight.specular = Vector4(10, 5, 0.2, 1);
+    pointLight.specular = Vector4(1, 1, 1, 1);
     pointLight.position = Vector3(0, 2, 0);
     pointLight.range = 1000.0f;
     pointLight.att = Vector3(); // ???
@@ -279,7 +279,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     PointLight pointLight1;
     pointLight1.ambient = Vector4(0.1, 0.1, 0.1, 0);
     pointLight1.diffuse = Vector4(1, 1, 0.5, 1);
-    pointLight1.specular = Vector4(10, 5, 0.2, 1);
+    pointLight1.specular = Vector4(1, 1, 1, 1);
     pointLight1.position = Vector3(0, 2, 25);
     pointLight1.range = 1000.0f;
     pointLight1.att = Vector3();

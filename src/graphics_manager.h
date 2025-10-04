@@ -17,6 +17,12 @@ enum class GraphicsManagerType
      VULKAN
 };
 
+enum class FrameBufferFormat
+{
+    FORMAT_B8G8R8A8_UNORM,
+    FORMAT_R16G16B16A16_FLOAT
+};
+
 enum UniformBufferBind
 {
      BIND_TO_VS = (1 << 0),
@@ -48,6 +54,7 @@ public:
 
      virtual void OnResize(i32 width, i32 height) = 0;
      
+     virtual void BackBufferBind() = 0;
      virtual void BeginFrame(f32 r, f32 g, f32 b) = 0;
      virtual void EndFrame(i32 vsync) = 0;
 
@@ -94,6 +101,18 @@ public:
      virtual void TextureBind(Texture *texture, i32 slot) = 0;
      virtual i32 TextureWidth(Texture *texture) = 0;
      virtual i32 TextureHeight(Texture *texture) = 0;
+
+     virtual FrameBuffer* FrameBufferAlloc(
+         unsigned int x, unsigned int y,
+         unsigned int w, unsigned int h,
+         FrameBufferFormat format,
+         bool hasMsaa = false, int msaa = 1) = 0;
+     virtual void FrameBufferFree(FrameBuffer* frameBuffer) = 0;
+     virtual void FrameBufferClear(FrameBuffer* frameBuffer, float r, float g, float b) = 0;
+     virtual void FrameBufferBindAsRenderTarget(FrameBuffer* frameBuffer) = 0;
+     virtual void FrameBufferBindAsTexture(FrameBuffer* frameBuffer, int slot) = 0;
+     virtual void FrameBufferUnbindAsTexture(FrameBuffer* frameBuffer, int slot) = 0;
+     virtual void FrameBufferResolve(FrameBuffer* frameBuffer) = 0;
 
      virtual BatchRenderer* BatchRendererAlloc(VertexShader* vertShader, FragmentShader* fragShader, Texture* texture) = 0;
      virtual void BatchRendererFree(BatchRenderer *batchRenderer) = 0;
