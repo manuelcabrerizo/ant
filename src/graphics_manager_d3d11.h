@@ -177,7 +177,7 @@ public:
      void FragmentShaderFree(FragmentShader* shader) override;
      void FragmentShaderBind(FragmentShader* shader) override;
 
-     Texture *TextureAlloc(const char *filepath) override;
+     Texture *TextureAlloc(const char *filepath, bool isSrgb = true) override;
      void TextureFree(Texture *texture) override;
      void TextureBind(Texture *texture, i32 slot) override;
      i32 TextureWidth(Texture *texture) override;

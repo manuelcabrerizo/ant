@@ -21,7 +21,13 @@ void GameManager::Init()
 
     int width, height;
     PlatformClientDimensions(&width, &height);
+
+
     frameBuffer = GraphicsManager::Get()->FrameBufferAlloc(0, 0, width, height, FrameBufferFormat::FORMAT_R16G16B16A16_FLOAT, true, 4);
+    bloomBuffers[0] = GraphicsManager::Get()->FrameBufferAlloc(0, 0, width, height, FrameBufferFormat::FORMAT_R16G16B16A16_FLOAT);
+    bloomBuffers[1] = GraphicsManager::Get()->FrameBufferAlloc(0, 0, width, height, FrameBufferFormat::FORMAT_R16G16B16A16_FLOAT);
+    bloomUniformBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_PS, &bloomUbo, sizeof(bloomUbo), 5);
+
     uiRenderer.Init(true);
 
     PlatformClientDimensions(&clientWidth, &clientHeight);
@@ -31,6 +37,9 @@ void GameManager::Terminate()
 {
     uiRenderer.Terminate();
     GraphicsManager::Get()->FrameBufferFree(frameBuffer);
+    GraphicsManager::Get()->FrameBufferFree(bloomBuffers[0]);
+    GraphicsManager::Get()->FrameBufferFree(bloomBuffers[1]);
+    GraphicsManager::Get()->UniformBufferFree(bloomUniformBuffer);
 
     stateMachine.Clear();
     playState.Terminate();
@@ -63,20 +72,55 @@ void GameManager::Update(f32 dt)
 
 void GameManager::Render(f32 dt)
 {
+    // Render the scene into the frame buffer
     GraphicsManager::Get()->FrameBufferBindAsRenderTarget(frameBuffer);
     GraphicsManager::Get()->FrameBufferClear(frameBuffer, 0.2f, 0.2f, 0.4f);
     stateMachine.Render();
-
     GraphicsManager::Get()->FrameBufferResolve(frameBuffer);
+    
+    // Select only the bright parts
+    GraphicsManager::Get()->FrameBufferBindAsRenderTarget(bloomBuffers[0]);
+    GraphicsManager::Get()->FrameBufferClear(bloomBuffers[0], 0, 0, 0);
+    FragmentShaderManager::Get()->Bind("bloomSelector");
+    GraphicsManager::Get()->FrameBufferBindAsTexture(frameBuffer, 0);
+    uiRenderer.DrawQuat(Vector2(clientWidth / 2, clientHeight / 2), Vector2(clientWidth, clientHeight), 99, false);
+
+    GraphicsManager::Get()->UniformBufferBind(bloomUniformBuffer);
+
+    FragmentShaderManager::Get()->Bind("bloom");
+    for (int i = 0; i < 6; i++)
+    {
+        // Horizontal Bloom
+        bloomUbo.horizontal = 1;
+        GraphicsManager::Get()->UniformBufferUpdate(bloomUniformBuffer, &bloomUbo);
+        GraphicsManager::Get()->FrameBufferBindAsRenderTarget(bloomBuffers[1]);
+        GraphicsManager::Get()->FrameBufferClear(bloomBuffers[1], 0, 0, 0);
+        GraphicsManager::Get()->FrameBufferBindAsTexture(bloomBuffers[0], 0);
+        uiRenderer.DrawQuat(Vector2(clientWidth / 2, clientHeight / 2), Vector2(clientWidth, clientHeight), 99, false);
+        GraphicsManager::Get()->FrameBufferUnbindAsTexture(bloomBuffers[0], 0);
+
+        // Vertical Bloom
+        bloomUbo.horizontal = 0;
+        GraphicsManager::Get()->UniformBufferUpdate(bloomUniformBuffer, &bloomUbo);
+        GraphicsManager::Get()->FrameBufferBindAsRenderTarget(bloomBuffers[0]);
+        GraphicsManager::Get()->FrameBufferClear(bloomBuffers[0], 0, 0, 0);
+        GraphicsManager::Get()->FrameBufferBindAsTexture(bloomBuffers[1], 0);
+        uiRenderer.DrawQuat(Vector2(clientWidth / 2, clientHeight / 2), Vector2(clientWidth, clientHeight), 99, false);
+        GraphicsManager::Get()->FrameBufferUnbindAsTexture(bloomBuffers[1], 0);
+    }
 
     GraphicsManager::Get()->BackBufferBind();
     GraphicsManager::Get()->BeginFrame(0, 1, 0);
 
-    // TODO: render the frameBuffer into a texture
+    FragmentShaderManager::Get()->Bind("post_frag");
     GraphicsManager::Get()->FrameBufferBindAsTexture(frameBuffer, 0);
+    GraphicsManager::Get()->FrameBufferBindAsTexture(bloomBuffers[0], 1);
     uiRenderer.DrawQuat(Vector2(clientWidth/2, clientHeight/2), Vector2(clientWidth, clientHeight), 99, false);
+    GraphicsManager::Get()->FrameBufferUnbindAsTexture(frameBuffer, 0);
+    GraphicsManager::Get()->FrameBufferUnbindAsTexture(bloomBuffers[1], 1);
 
-    GraphicsManager::Get()->EndFrame(1);
+
+    GraphicsManager::Get()->EndFrame(0);
 }
 
 void GameManager::ChangeToMenuState()
@@ -96,8 +140,8 @@ Scene* GameManager::GetCurrentScene()
 
 void GameManager::InitializeAssetsManagers()
 {
-    VertexShaderManager::Initialize(8);
-    FragmentShaderManager::Initialize(8);
+    VertexShaderManager::Initialize(16);
+    FragmentShaderManager::Initialize(16);
     TextureManager::Initialize(64);
     MaterialManager::Initialize(64);
     ModelManager::Initialize(32);
@@ -130,10 +174,14 @@ void GameManager::LoadDefaultAssets()
     FragmentShaderManager::Get()->Load("default", "data/shaders/frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("color", "data/shaders/color.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("ui_frag", "data/shaders/ui_frag.hlsl", STATIC_MEMORY);
+    FragmentShaderManager::Get()->Load("post_frag", "data/shaders/post_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("batch_frag", "data/shaders/batch_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("portal_frag", "data/shaders/portal_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("magma_frag", "data/shaders/magma_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("fence_frag", "data/shaders/fence_frag.hlsl", STATIC_MEMORY);
+    FragmentShaderManager::Get()->Load("bloomSelector", "data/shaders/bloomSelector.hlsl", STATIC_MEMORY);
+    FragmentShaderManager::Get()->Load("bloom", "data/shaders/bloom.hlsl", STATIC_MEMORY);
+
     FragmentShaderManager::Get()->Bind("default");
 
     // Load textures
@@ -168,6 +216,9 @@ void GameManager::LoadDefaultAssets()
         FragmentShaderManager::Get()->Get("fence_frag"),
         TextureManager::Get()->Get("fence"),
         TextureManager::Get()->Get("DefaultMaterial_Noise"), STATIC_MEMORY);
+
+    MaterialManager::Get()->LoadSolidColor("RedBorderMaterial",
+        FragmentShaderManager::Get()->Get("color"), Vector3(5, 0, 0), Vector3(0, 0, 0), Vector3(0, 0, 0), 2, STATIC_MEMORY);
         
     // Load Models
     ModelManager::Get()->Load("box", "data/models/cube.fbx", STATIC_MEMORY);

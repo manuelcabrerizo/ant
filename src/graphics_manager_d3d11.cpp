@@ -28,6 +28,7 @@ void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32
      //  Default renderer settings
      BackBufferBind();
      deviceContext->PSSetSamplers(0, 1, &samplerStateLinearWrap);
+     deviceContext->PSSetSamplers(1, 1, &samplerStateLinearClamp);
 
      D3D11_VIEWPORT viewport;
      viewport.TopLeftX = 0;
@@ -455,7 +456,7 @@ void GraphicsManagerD3D11::FragmentShaderBind(FragmentShader* shader)
     deviceContext->PSSetShader(sh->pixelShader, 0, 0);
 }
 
-Texture *GraphicsManagerD3D11::TextureAlloc(const char *filepath)
+Texture *GraphicsManagerD3D11::TextureAlloc(const char *filepath, bool isSrgb)
 {
      TextureD3D11 *tx = textureAllocator.Alloc();
 
@@ -477,7 +478,7 @@ Texture *GraphicsManagerD3D11::TextureAlloc(const char *filepath)
      texDesc.Height = tx->h;
      texDesc.MipLevels = 0;
      texDesc.ArraySize = 1;
-     texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+     texDesc.Format = isSrgb ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
      texDesc.SampleDesc.Count = 1;
      texDesc.SampleDesc.Quality = 0;
      texDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -494,7 +495,7 @@ Texture *GraphicsManagerD3D11::TextureAlloc(const char *filepath)
      {
          deviceContext->UpdateSubresource(tx->texture, 0, 0, subresourceData.pSysMem, subresourceData.SysMemPitch, 0);
          D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-         srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+         texDesc.Format = isSrgb ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
          srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
          srvDesc.Texture2D.MipLevels = -1;
          srvDesc.Texture2D.MostDetailedMip = 0;
@@ -671,7 +672,10 @@ void GraphicsManagerD3D11::FrameBufferFree(FrameBuffer* frameBuffer)
     fb->depthStencilTexture->Release();
     fb->renderTargetView->Release();
     fb->depthStencilView->Release();
-    fb->resolveTexture->Release();
+    if (fb->resolveTexture)
+    {
+        fb->resolveTexture->Release();
+    }
     fb->shaderResourceView->Release();
     frameBufferAllocator.Free(fb);
 }
@@ -707,7 +711,8 @@ void GraphicsManagerD3D11::FrameBufferBindAsTexture(FrameBuffer* frameBuffer, in
 void GraphicsManagerD3D11::FrameBufferUnbindAsTexture(FrameBuffer* frameBuffer, int slot)
 {
     FrameBufferD3D11* fb = static_cast<FrameBufferD3D11*>(frameBuffer);
-    deviceContext->PSSetShaderResources(slot, 1, nullptr);
+    ID3D11ShaderResourceView* null[] = { nullptr };
+    deviceContext->PSSetShaderResources(slot, 1, null);
 }
 
 void GraphicsManagerD3D11::FrameBufferResolve(FrameBuffer* frameBuffer)

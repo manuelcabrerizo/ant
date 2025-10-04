@@ -32,13 +32,13 @@ TextureManager* TextureManager::Get()
     return &instance;
 }
 
-void TextureManager::Load(const char* name, const char* path, int memoryType)
+void TextureManager::Load(const char* name, const char* path, int memoryType, bool isSrgb)
 {
     if (!Contains(name))
     {
         TextureHandle textureHandle{};
         memcpy((void*)textureHandle.name, (void*)name, strlen(name));
-        textureHandle.texture = GraphicsManager::Get()->TextureAlloc(path);
+        textureHandle.texture = GraphicsManager::Get()->TextureAlloc(path, isSrgb);
 
         AssetManager::Add(textureHandle, memoryType);
     }

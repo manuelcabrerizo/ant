@@ -96,7 +96,7 @@ public:
      virtual void FragmentShaderFree(FragmentShader* shader) = 0;
      virtual void FragmentShaderBind(FragmentShader* shader) = 0;
 
-     virtual Texture *TextureAlloc(const char *filepath) = 0;
+     virtual Texture *TextureAlloc(const char *filepath, bool isSrgb = true) = 0;
      virtual void TextureFree(Texture *texture) = 0;
      virtual void TextureBind(Texture *texture, i32 slot) = 0;
      virtual i32 TextureWidth(Texture *texture) = 0;

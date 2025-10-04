@@ -150,7 +150,7 @@ void Model::Init(const char *filepath, i32 memoryType)
                      normalTextureName = tempPath + (nameIndex + 1);
 
                      texturesNames.Push(std::string(normalTextureName));
-                     TextureManager::Get()->Load(normalTextureName, texturePath, memoryType);
+                     TextureManager::Get()->Load(normalTextureName, texturePath, memoryType, false);
 
                  }
              }

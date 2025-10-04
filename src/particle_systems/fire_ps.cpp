@@ -31,6 +31,7 @@ void FireParticleSystem::OnParticlesUpdate(StaticArray<Particle, 500>& particles
         Vector3 up = Vector3::Cross(front, right);
         Matrix4 rotMat = Matrix4::TransformFromBasis(Vector3::zero, right, up, front);
         particle.rotation = particle.offsetRot.ToMatrix4() * rotMat;
+        particle.color = Vector3(10);
     }
 }
 

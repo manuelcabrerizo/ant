@@ -22,6 +22,6 @@ public:
     static void Shutdown();
     static TextureManager* Get();
 
-    void Load(const char* name, const char* path, int memoryType);
+    void Load(const char* name, const char* path, int memoryType, bool isSrgb = true);
     Texture* Get(const char* name);
 };
