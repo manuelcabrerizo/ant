@@ -10,6 +10,7 @@ struct PS_Input
     float3 nor : NORMAL;
     float2 uv : TEXCOORD0;
     float3 fragPos : TEXCOORD1;
+    float3x3 TBN : TEXCOORD2;
 };
 
 cbuffer TextureUbo : register(b0)
@@ -45,8 +46,9 @@ cbuffer LightConstBuffer : register(b4)
     float3 viewPos;
 };
 
-
-void CalcPointLight(float4 color, PointLight L, float3 pos,
+void CalcPointLight(
+    float4 diffColor, float4 specColor,
+    PointLight L, float3 pos,
     float3 normal, float3 toEye,
     out float4 ambient,
     out float4 diffuse,
@@ -68,7 +70,7 @@ void CalcPointLight(float4 color, PointLight L, float3 pos,
     lightVec /= d;
     
     // Ambient term
-    ambient = color * L.ambient;
+    ambient = diffColor * L.ambient;
     
     float diffuseFactor = dot(lightVec, normal);
     
@@ -76,14 +78,16 @@ void CalcPointLight(float4 color, PointLight L, float3 pos,
     if(diffuseFactor > 0.0f)
     {
         float3 v = reflect(-lightVec, normal);
-        float specFactor = pow(max(dot(v, toEye), 0.0f), 4);
+        float specFactor = pow(max(dot(v, toEye), 0.0f), shininess);
         
-        diffuse = diffuseFactor * color * L.diffuse;
-        spec = specFactor * float4(1, 1, 1, 1) * L.specular;
+        diffuse = diffuseFactor * diffColor * L.diffuse;
+        spec = specFactor * specColor * L.specular;
     }
 }
 
-void CalcDirectionalLight(float4 color, DirectionalLight L,
+void CalcDirectionalLight(
+    float4 diffColor, float4 specColor,
+    DirectionalLight L,
     float3 normal, float3 toEye, 
     out float4 ambient,
     out float4 diffuse,
@@ -98,7 +102,7 @@ void CalcDirectionalLight(float4 color, DirectionalLight L,
     float3 lightVec = -L.direction;
     
     // Add ambient term
-    ambient = color * L.ambient;
+    ambient = diffColor * L.ambient;
     
     // Add diffuse and specular term, provided the surface is in
     // the line of site of the light
@@ -109,10 +113,10 @@ void CalcDirectionalLight(float4 color, DirectionalLight L,
     if(diffuseFactor > 0.0f)
     {
         float3 v = reflect(-lightVec, normal);
-        float specFactor = pow(max(dot(v, toEye), 0.0f), 8);
+        float specFactor = pow(max(dot(v, toEye), 0.0f), shininess);
         
-        diffuse = diffuseFactor * color * L.diffuse;
-        spec = specFactor * float4(1, 1, 1, 1) * L.specular;
+        diffuse = diffuseFactor * diffColor * L.diffuse;
+        spec = specFactor * specColor * L.specular;
     }
 }
 
@@ -120,7 +124,14 @@ void CalcDirectionalLight(float4 color, DirectionalLight L,
 float4 fs_main(PS_Input i) : SV_TARGET
 {
     float4 baseColor = diffuseMap.Sample(samplerState, i.uv);
-    float3 n = normalize(i.nor);    
+    float4 specColor = spacularMap.Sample(samplerState, i.uv);
+    float4 normalColor = normalMap.Sample(samplerState, i.uv);
+    
+    float3 n = normalColor.rgb;
+    n = n * 2.0f - 1.0f;
+    n = normalize(mul(i.TBN, n));
+    //n = normalize(i.nor);
+    
     float3 toEye = normalize(viewPos - i.fragPos);
     
     float4 ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -128,14 +139,14 @@ float4 fs_main(PS_Input i) : SV_TARGET
     float4 spec    = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float4 A, D, S;
     
-    CalcDirectionalLight(baseColor, directionalLight, n, toEye, A, D, S);
+    CalcDirectionalLight(baseColor, specColor, directionalLight, n, toEye, A, D, S);
     ambient += A;
     diffuse += D;
     spec    += S;
     
     for (int index = 0; index < 8; index++)
     {
-        CalcPointLight(baseColor, pointLights[index], i.fragPos, n, toEye, A, D, S);
+        CalcPointLight(baseColor, specColor, pointLights[index], i.fragPos, n, toEye, A, D, S);
         ambient += A;
         diffuse += D;
         spec    += S;

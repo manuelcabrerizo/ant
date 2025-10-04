@@ -116,6 +116,45 @@ void Model::Init(const char *filepath, i32 memoryType)
                  }
              }
 
+             if (material->GetTextureCount(aiTextureType_NORMALS) > 0)
+             {
+                 aiString path;
+                 if (material->GetTexture(aiTextureType_NORMALS, 0, &path, 0, 0, 0, 0, 0) == AI_SUCCESS)
+                 {
+                     i32 prevIndex = Strings::FindPenultimateInstance(filepath, '/');
+                     i32 postIndex = Strings::FindFirstInstance(path.C_Str(), '\\');
+
+                     // ERROR: invalid model foulder structure, (we use source/textures standar)
+                     ASSERT(prevIndex != -1 && postIndex != -1);
+
+                     const char* texturePath = (const char*)MemoryManager::Get()->Alloc(_MAX_PATH, SCRATCH_MEMORY);
+                     const char* tempPath = (const char*)MemoryManager::Get()->Alloc(_MAX_PATH, SCRATCH_MEMORY);
+                     memset((void*)texturePath, 0, _MAX_PATH);
+                     memset((void*)tempPath, 0, _MAX_PATH);
+
+                     memcpy((void*)texturePath, filepath, prevIndex);
+                     memcpy((void*)tempPath, path.C_Str() + postIndex, path.length - postIndex);
+
+                     Strings::ReplaceInstance((char*)tempPath, '\\', '/');
+
+                     memcpy((void*)(texturePath + strlen(texturePath)), tempPath, strlen(tempPath));
+
+                     i32 nameIndex = Strings::FindLastInstance(tempPath, '/');
+                     i32 extensionIndex = Strings::FindLastInstance(tempPath, '.');
+
+                     // ERROR: invalid model foulder structure, (we use source/textures standar)
+                     ASSERT(nameIndex != -1 && extensionIndex != -1);
+
+                     memset((void*)(tempPath + extensionIndex), 0, strlen(tempPath) - extensionIndex);
+
+                     normalTextureName = tempPath + (nameIndex + 1);
+
+                     texturesNames.Push(std::string(normalTextureName));
+                     TextureManager::Get()->Load(normalTextureName, texturePath, memoryType);
+
+                 }
+             }
+
              aiColor3D aiDiffuseColor;
              Vector3 diffuseColor;
              if (material->Get(AI_MATKEY_COLOR_DIFFUSE, aiDiffuseColor) == AI_SUCCESS)
@@ -189,6 +228,8 @@ void Model::Init(const char *filepath, i32 memoryType)
                Vertex *vertex = vertices + i;
                vertex->pos = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z};
                vertex->nor = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+               vertex->tan = { mesh->mTangents[i].x * -1.0f, mesh->mTangents[i].y * -1.0f, mesh->mTangents[i].z * -1.0f };
+               vertex->bit = { mesh->mBitangents[i].x * -1.0f, mesh->mBitangents[i].y * -1.0f, mesh->mBitangents[i].z * -1.0f };
                vertex->uvs = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
 
                for(u32 j = 0; j < MAX_BONE_INFLUENCE; j++)

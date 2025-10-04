@@ -14,6 +14,7 @@ struct PS_Input
     float3 nor : NORMAL;
     float2 uv : TEXCOORD0;
     float3 fragPos : TEXCOORD1;
+    float3x3 TBN : TEXCOORD2;
 };
 
 float4 fs_main(PS_Input i) : SV_TARGET

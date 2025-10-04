@@ -4,9 +4,11 @@ struct VS_Input
 {
     float3 pos : POSITION;
     float3 nor : NORMAL;
-    float2 uv  : TEXCOORD0;
-    int4 boneIds   : TEXCOORD1;
-    float4 weigths : TEXCOORD2;
+    float3 tan : TEXCOORD0;
+    float3 bit : TEXCOORD1;
+    float2 uv  : TEXCOORD2;
+    int4 boneIds   : TEXCOORD3;
+    float4 weigths : TEXCOORD4;
 };
 
 struct PS_Input
@@ -15,6 +17,7 @@ struct PS_Input
     float3 nor : NORMAL;
     float2 uv : TEXCOORD0;
     float3 fragPos : TEXCOORD1;
+    float3x3 TBN : TEXCOORD2;
 };
 
 cbuffer Matrices : register(b0)
@@ -64,10 +67,17 @@ PS_Input vs_main(VS_Input i)
 
     float3 wNor = mul(i.nor, (float3x3)model);
     wNor = normalize(wNor);
+    
+    float3 T = normalize(mul(float4(i.tan, 0.0f), model).rgb);
+    float3 B = normalize(mul(float4(i.bit, 0.0f), model).rgb);
+    float3 N = normalize(mul(float4(i.nor, 0.0f), model).rgb);
+    float3x3 TBN = float3x3(T, B, N);
 
     o.pos = wPos;
     o.nor = wNor;
     o.uv = i.uv;
     o.fragPos = fragPos;
+    o.TBN = TBN;
+    
     return o;
 }

@@ -4,9 +4,11 @@ struct VS_Input
 {
     float3 pos : POSITION;
     float3 nor : NORMAL;
-    float2 uv  : TEXCOORD0;
-    int4 boneIds   : TEXCOORD1;
-    float4 weigths : TEXCOORD2;
+    float3 tan : TEXCOORD0;
+    float3 bit : TEXCOORD1;
+    float2 uv : TEXCOORD2;
+    int4 boneIds : TEXCOORD3;
+    float4 weigths : TEXCOORD4;
 };
 
 struct PS_Input

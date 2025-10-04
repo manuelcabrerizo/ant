@@ -261,27 +261,27 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
 
     // Add Lights
     DirectionalLight light;
-    light.ambient = Vector4(1.0, 1.0, 1.0, 0);
-    light.diffuse = Vector4(4, 2, 2, 0);
-    light.specular = Vector4(0, 0, 0, 0);
+    light.ambient = Vector4(1, 1, 1, 0);
+    light.diffuse = Vector4(4, 4, 4, 0);
+    light.specular = Vector4(2, 2, 2, 0);
     light.direction = Vector3(2, -1, 1);
     light.direction.Normalize();
     GraphicsManager::Get()->SetDirectionalLight(light);
 
     PointLight pointLight;
-    pointLight.ambient = Vector4(1, 1, 1, 1);
-    pointLight.diffuse = Vector4(4, 3, 2, 1);
-    pointLight.specular = Vector4(0.2, 0.2, 0.2, 1);
+    pointLight.ambient = Vector4(0.1, 0.1, 0.1, 0);
+    pointLight.diffuse = Vector4(1, 1, 0.5, 1);
+    pointLight.specular = Vector4(10, 5, 0.2, 1);
     pointLight.position = Vector3(0, 2, 0);
-    pointLight.range = 20.0f;
+    pointLight.range = 1000.0f;
     pointLight.att = Vector3(); // ???
 
     PointLight pointLight1;
-    pointLight1.ambient = Vector4(1, 1, 1, 1);
-    pointLight1.diffuse = Vector4(2, 4, 2, 1);
-    pointLight1.specular = Vector4(0.2, 0.2, 0.2, 1);
+    pointLight1.ambient = Vector4(0.1, 0.1, 0.1, 0);
+    pointLight1.diffuse = Vector4(1, 1, 0.5, 1);
+    pointLight1.specular = Vector4(10, 5, 0.2, 1);
     pointLight1.position = Vector3(0, 2, 25);
-    pointLight1.range = 20.0f;
+    pointLight1.range = 1000.0f;
     pointLight1.att = Vector3();
 
     PointLight pointLights[2] = { pointLight, pointLight1 };

@@ -12,12 +12,13 @@
 
 class Material;
 
-// TODO: separate static from animated vertex
 #define MAX_BONE_INFLUENCE 4
 struct Vertex
 {
      Vector3 pos;
      Vector3 nor;
+     Vector3 tan;
+     Vector3 bit;
      Vector2 uvs;
      i32 boneId[MAX_BONE_INFLUENCE];
      f32 weights[MAX_BONE_INFLUENCE];

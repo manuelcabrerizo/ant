@@ -27,7 +27,6 @@ void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32
 
      //  Default renderer settings
      deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
-     //deviceContext->PSSetSamplers(0, 1, &samplerStateNearestWrap);
      deviceContext->PSSetSamplers(0, 1, &samplerStateLinearWrap);
 
      D3D11_VIEWPORT viewport;

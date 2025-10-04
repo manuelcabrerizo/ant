@@ -4,6 +4,7 @@ struct PS_Input
     float3 nor : NORMAL;
     float2 uv : TEXCOORD0;
     float3 fragPos : TEXCOORD1;
+    float3x3 TBN : TEXCOORD2;
 };
 
 cbuffer SolidColorUbo : register(b0)
