@@ -1,7 +1,6 @@
 SamplerState samplerStateWrap : register(s0);
 SamplerState samplerStateClamp : register(s1);
 
-
 Texture2D diffuseMap : register(t0);
 
 struct PS_Input
@@ -35,10 +34,10 @@ float4 fs_main(PS_Input i) : SV_TARGET
     {
         for (int index = 1; index < 5; ++index)
         {
-            result += diffuseMap.Sample(samplerStateClamp, i.uv + float2(0.0, texOffset.x * index)).rgb * weight[index];
-            result += diffuseMap.Sample(samplerStateClamp, i.uv - float2(0.0, texOffset.x * index)).rgb * weight[index];
+            result += diffuseMap.Sample(samplerStateClamp, i.uv + float2(0.0, texOffset.y * index)).rgb * weight[index];
+            result += diffuseMap.Sample(samplerStateClamp, i.uv - float2(0.0, texOffset.y * index)).rgb * weight[index];
         }
     }
 
-    return float4(result, 1.0f);
+    return float4(result, 1.0f);    
 }

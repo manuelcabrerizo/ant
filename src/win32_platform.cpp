@@ -138,7 +138,12 @@ int CALLBACK WinMain(HINSTANCE hInstance,
           {
                gWindow = window;
                
-               GraphicsManager::Init((void *)&window, WINDOW_WIDTH, WINDOW_HEIGHT, GraphicsManagerType::D3D11, STATIC_MEMORY);
+               RECT clientRect;
+               GetClientRect(window, &clientRect);
+               gWindowWidth = clientRect.right - clientRect.left;
+               gWindowHeight = clientRect.bottom - clientRect.top;
+
+               GraphicsManager::Init((void *)&window, gWindowWidth, gWindowWidth, GraphicsManagerType::D3D11, STATIC_MEMORY);
                ShowWindow(window, SW_SHOW);
 
                PlatformShowMouse(false);

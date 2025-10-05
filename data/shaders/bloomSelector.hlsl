@@ -12,7 +12,7 @@ struct PS_Input
 };
 
 float4 fs_main(PS_Input i) : SV_TARGET
-{
+{    
     float3 hdrColor = diffuseMap.Sample(samplerStateClamp, i.uv).rgb;
     float4 result = float4(0.0, 0.0, 0.0, 0.0);
     float brightness = dot(hdrColor.rgb, float3(0.2126, 0.7152, 0.0722));

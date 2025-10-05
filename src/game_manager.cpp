@@ -21,8 +21,6 @@ void GameManager::Init()
 
     int width, height;
     PlatformClientDimensions(&width, &height);
-
-
     frameBuffer = GraphicsManager::Get()->FrameBufferAlloc(0, 0, width, height, FrameBufferFormat::FORMAT_R16G16B16A16_FLOAT, true, 4);
     bloomBuffers[0] = GraphicsManager::Get()->FrameBufferAlloc(0, 0, width, height, FrameBufferFormat::FORMAT_R16G16B16A16_FLOAT);
     bloomBuffers[1] = GraphicsManager::Get()->FrameBufferAlloc(0, 0, width, height, FrameBufferFormat::FORMAT_R16G16B16A16_FLOAT);
@@ -72,42 +70,48 @@ void GameManager::Update(f32 dt)
 
 void GameManager::Render(f32 dt)
 {
+    float hWidth = clientWidth * 0.5f;
+    float hHeight = clientHeight * 0.5f;
+
     // Render the scene into the frame buffer
     GraphicsManager::Get()->FrameBufferBindAsRenderTarget(frameBuffer);
     GraphicsManager::Get()->FrameBufferClear(frameBuffer, 0.2f, 0.2f, 0.4f);
     stateMachine.Render();
     GraphicsManager::Get()->FrameBufferResolve(frameBuffer);
     
+    GraphicsManager::Get()->FrameBufferClear(bloomBuffers[1], 0, 0, 0);
+    GraphicsManager::Get()->FrameBufferClear(bloomBuffers[0], 0, 0, 0);
+
+    GraphicsManager::Get()->SetDepthStencilOff();
+
     // Select only the bright parts
     GraphicsManager::Get()->FrameBufferBindAsRenderTarget(bloomBuffers[0]);
-    GraphicsManager::Get()->FrameBufferClear(bloomBuffers[0], 0, 0, 0);
     FragmentShaderManager::Get()->Bind("bloomSelector");
     GraphicsManager::Get()->FrameBufferBindAsTexture(frameBuffer, 0);
-    uiRenderer.DrawQuat(Vector2(clientWidth / 2, clientHeight / 2), Vector2(clientWidth, clientHeight), 99, false);
-
+    uiRenderer.DrawQuat(Vector2(hWidth, hHeight), Vector2(clientWidth, clientHeight), 99, false);
+    
     GraphicsManager::Get()->UniformBufferBind(bloomUniformBuffer);
-
     FragmentShaderManager::Get()->Bind("bloom");
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 5; i++)
     {
         // Horizontal Bloom
-        bloomUbo.horizontal = 1;
+        bloomUbo.horizontal = 0;
         GraphicsManager::Get()->UniformBufferUpdate(bloomUniformBuffer, &bloomUbo);
         GraphicsManager::Get()->FrameBufferBindAsRenderTarget(bloomBuffers[1]);
-        GraphicsManager::Get()->FrameBufferClear(bloomBuffers[1], 0, 0, 0);
         GraphicsManager::Get()->FrameBufferBindAsTexture(bloomBuffers[0], 0);
-        uiRenderer.DrawQuat(Vector2(clientWidth / 2, clientHeight / 2), Vector2(clientWidth, clientHeight), 99, false);
+        uiRenderer.DrawQuat(Vector2(hWidth, hHeight), Vector2(clientWidth, clientHeight), 99, false);
         GraphicsManager::Get()->FrameBufferUnbindAsTexture(bloomBuffers[0], 0);
 
         // Vertical Bloom
-        bloomUbo.horizontal = 0;
+        bloomUbo.horizontal = 1;
         GraphicsManager::Get()->UniformBufferUpdate(bloomUniformBuffer, &bloomUbo);
         GraphicsManager::Get()->FrameBufferBindAsRenderTarget(bloomBuffers[0]);
-        GraphicsManager::Get()->FrameBufferClear(bloomBuffers[0], 0, 0, 0);
         GraphicsManager::Get()->FrameBufferBindAsTexture(bloomBuffers[1], 0);
-        uiRenderer.DrawQuat(Vector2(clientWidth / 2, clientHeight / 2), Vector2(clientWidth, clientHeight), 99, false);
+        uiRenderer.DrawQuat(Vector2(hWidth, hHeight), Vector2(clientWidth, clientHeight), 99, false);
         GraphicsManager::Get()->FrameBufferUnbindAsTexture(bloomBuffers[1], 0);
     }
+    
+    GraphicsManager::Get()->SetDepthStencilOn();
 
     GraphicsManager::Get()->BackBufferBind();
     GraphicsManager::Get()->BeginFrame(0, 1, 0);
@@ -115,9 +119,9 @@ void GameManager::Render(f32 dt)
     FragmentShaderManager::Get()->Bind("post_frag");
     GraphicsManager::Get()->FrameBufferBindAsTexture(frameBuffer, 0);
     GraphicsManager::Get()->FrameBufferBindAsTexture(bloomBuffers[0], 1);
-    uiRenderer.DrawQuat(Vector2(clientWidth/2, clientHeight/2), Vector2(clientWidth, clientHeight), 99, false);
+    uiRenderer.DrawQuat(Vector2(hWidth, hHeight), Vector2(clientWidth, clientHeight), 99, false);
     GraphicsManager::Get()->FrameBufferUnbindAsTexture(frameBuffer, 0);
-    GraphicsManager::Get()->FrameBufferUnbindAsTexture(bloomBuffers[1], 1);
+    GraphicsManager::Get()->FrameBufferUnbindAsTexture(bloomBuffers[0], 1);
 
 
     GraphicsManager::Get()->EndFrame(0);

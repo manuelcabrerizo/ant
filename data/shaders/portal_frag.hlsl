@@ -26,7 +26,7 @@ float4 fs_main(PS_Input i) : SV_TARGET
     textureUv.y += time * 0.1f;
     float4 color = diffuseMap.Sample(samplerState, textureUv);
     
-    color *= 100.0f;
+    color *= 80.0f;
     
     return color;
 }

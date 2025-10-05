@@ -1094,7 +1094,8 @@ void GraphicsManagerD3D11::CreateSamplerStates()
      colorMapDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
      colorMapDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
      colorMapDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-     colorMapDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+     //colorMapDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+     colorMapDesc.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
      colorMapDesc.MaxLOD = D3D11_FLOAT32_MAX;
      if (FAILED(device->CreateSamplerState(&colorMapDesc, &samplerStateLinearClamp)))
      {

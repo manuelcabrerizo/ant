@@ -122,7 +122,7 @@ void TextRenderer::DrawString(const char* text, const Vector2& position, float s
             baseX + position.x + cursorX + offsetX,
             baseY + position.y + offsetY, 0),
             Vector3(sprite.sourceWidth, sprite.sourceHeight, 1), Matrix4(),
-            Vector4(endX, 1-endY, startX, 1-startY), Vector3(1, 1, 0));
+            Vector4(endX, 1-endY, startX, 1-startY), Vector3(4, 4, 0));
 
         cursorX += static_cast<float>(sprite.charAdvanceX);
     }
