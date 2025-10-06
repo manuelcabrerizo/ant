@@ -5,6 +5,7 @@
 #include <components/component.h>
 #include <components/transform_component.h>
 #include <components/render_component.h>
+#include <components/weapon_render_component.h>
 #include <components/animated_render_component.h>
 #include <components/tiled_render_component.h>
 #include <components/physics_component.h>
@@ -33,14 +34,30 @@
 void PlayState::Init(GameManager *gameManager)
 {
     uiRenderer.Init();
+    frameRenderer.Init(true);
     textRenderer.Init("data/fonts/times.rtpa", STATIC_MEMORY);
     this->gameManager = gameManager;
     this->scene = gameManager->GetCurrentScene();
+
+    int width, height;
+    PlatformClientDimensions(&width, &height);
+    frameBuffer = GraphicsManager::Get()->FrameBufferAlloc(0, 0, width, height, FrameBufferFormat::FORMAT_R16G16B16A16_FLOAT, true, 4);
+    weaponFrameBuffer = GraphicsManager::Get()->FrameBufferAlloc(0, 0, width, height, FrameBufferFormat::FORMAT_R16G16B16A16_FLOAT, true, 4);
+    bloomBuffers[0] = GraphicsManager::Get()->FrameBufferAlloc(0, 0, width * bloomScale, height * bloomScale, FrameBufferFormat::FORMAT_R16G16B16A16_FLOAT);
+    bloomBuffers[1] = GraphicsManager::Get()->FrameBufferAlloc(0, 0, width * bloomScale, height * bloomScale, FrameBufferFormat::FORMAT_R16G16B16A16_FLOAT);
+    bloomUniformBuffer = GraphicsManager::Get()->UniformBufferAlloc(BIND_TO_PS, &bloomUbo, sizeof(bloomUbo), 5);
 }
 
 void PlayState::Terminate()
 {
+    GraphicsManager::Get()->FrameBufferFree(frameBuffer);
+    GraphicsManager::Get()->FrameBufferFree(weaponFrameBuffer);
+    GraphicsManager::Get()->FrameBufferFree(bloomBuffers[0]);
+    GraphicsManager::Get()->FrameBufferFree(bloomBuffers[1]);
+    GraphicsManager::Get()->UniformBufferFree(bloomUniformBuffer);
+
     uiRenderer.Terminate();
+    frameRenderer.Terminate();
     textRenderer.Terminate();
 }
 
@@ -66,6 +83,7 @@ void PlayState::OnEnter()
 
     CameraComponent::Initialize();
     RenderComponent::Initialize();
+    WeaponRenderComponent::Initialize();
     AnimatedRenderComponent::Initialize();
     TiledRenderComponent::Initialize();
 
@@ -82,6 +100,7 @@ void PlayState::OnExit()
 
     TiledRenderComponent::Terminate();
     AnimatedRenderComponent::Terminate();
+    WeaponRenderComponent::Terminate();
     RenderComponent::Terminate();
     CameraComponent::Terminate();
 
@@ -134,12 +153,72 @@ void PlayState::OnUpdate(float deltaTime)
 
 void PlayState::OnRender()
 {
+    float hWidth = windowWidth * 0.5f;
+    float hHeight = windowHeight * 0.5f;
+
+    // Draw the weapon render component
+    GraphicsManager::Get()->FrameBufferBindAsRenderTarget(weaponFrameBuffer);
+    GraphicsManager::Get()->FrameBufferClear(weaponFrameBuffer, 0.0f, 0.0f, 0.0f);
+    actorManager.RenderComponents<WeaponRenderComponent>();
+    GraphicsManager::Get()->FrameBufferResolve(weaponFrameBuffer);
+
+    // Draw the other render components
+    GraphicsManager::Get()->FrameBufferBindAsRenderTarget(frameBuffer);
+    GraphicsManager::Get()->FrameBufferClear(frameBuffer, 0.2f, 0.2f, 0.4f);
     actorManager.RenderComponents<RenderComponent>();
     actorManager.RenderComponents<AnimatedRenderComponent>();
     actorManager.RenderComponents<TiledRenderComponent>();
-
     actorManager.RenderComponents<WeaponComponent>();
     actorManager.RenderComponents<EffectComponent>();
+    GraphicsManager::Get()->FrameBufferResolve(frameBuffer);
+
+    GraphicsManager::Get()->FrameBufferClear(bloomBuffers[1], 0, 0, 0);
+    GraphicsManager::Get()->FrameBufferClear(bloomBuffers[0], 0, 0, 0);
+    GraphicsManager::Get()->SetDepthStencilOff();
+
+    // Select only the bright parts
+    GraphicsManager::Get()->FrameBufferBindAsRenderTarget(bloomBuffers[0]);
+    FragmentShaderManager::Get()->Bind("bloomSelector");
+    GraphicsManager::Get()->FrameBufferBindAsTexture(frameBuffer, 0);
+    GraphicsManager::Get()->FrameBufferBindAsTexture(weaponFrameBuffer, 1);
+    frameRenderer.DrawQuat(Vector2(hWidth, hHeight), Vector2(windowWidth, windowHeight), 99, false);
+
+    GraphicsManager::Get()->UniformBufferBind(bloomUniformBuffer);
+    FragmentShaderManager::Get()->Bind("bloom");
+    for (int i = 0; i < bloomAmount; i++)
+    {
+        // Horizontal Bloom
+        bloomUbo.horizontal = 0;
+        GraphicsManager::Get()->UniformBufferUpdate(bloomUniformBuffer, &bloomUbo);
+        GraphicsManager::Get()->FrameBufferBindAsRenderTarget(bloomBuffers[1]);
+        GraphicsManager::Get()->FrameBufferBindAsTexture(bloomBuffers[0], 0);
+        frameRenderer.DrawQuat(Vector2(hWidth, hHeight), Vector2(windowWidth, windowHeight), 99, false);
+        GraphicsManager::Get()->FrameBufferUnbindAsTexture(bloomBuffers[0], 0);
+
+        // Vertical Bloom
+        bloomUbo.horizontal = 1;
+        GraphicsManager::Get()->UniformBufferUpdate(bloomUniformBuffer, &bloomUbo);
+        GraphicsManager::Get()->FrameBufferBindAsRenderTarget(bloomBuffers[0]);
+        GraphicsManager::Get()->FrameBufferBindAsTexture(bloomBuffers[1], 0);
+        frameRenderer.DrawQuat(Vector2(hWidth, hHeight), Vector2(windowWidth, windowHeight), 99, false);
+        GraphicsManager::Get()->FrameBufferUnbindAsTexture(bloomBuffers[1], 0);
+    }
+
+    // Draw to the Back Buffer
+    GraphicsManager::Get()->SetDepthStencilOn();
+    GraphicsManager::Get()->BackBufferBind();
+    GraphicsManager::Get()->BeginFrame(0, 1, 0);
+
+    FragmentShaderManager::Get()->Bind("post_frag");
+    GraphicsManager::Get()->FrameBufferBindAsTexture(frameBuffer, 0);
+    GraphicsManager::Get()->FrameBufferBindAsTexture(weaponFrameBuffer, 1);
+    GraphicsManager::Get()->FrameBufferBindAsTexture(bloomBuffers[0], 2);
+    frameRenderer.DrawQuat(Vector2(hWidth, hHeight), Vector2(windowWidth, windowHeight), 99, false);
+    GraphicsManager::Get()->FrameBufferUnbindAsTexture(frameBuffer, 0);
+    GraphicsManager::Get()->FrameBufferUnbindAsTexture(weaponFrameBuffer, 1);
+    GraphicsManager::Get()->FrameBufferUnbindAsTexture(bloomBuffers[0], 2);
+
+    // Draw the UI
 
     //CollisionWorld::Get()->DebugDraw();
     GraphicsManager::Get()->DebugPresent();
@@ -162,6 +241,7 @@ void PlayState::OnRender()
     GraphicsManager::Get()->SetRasterizerStateCullBack();
     GraphicsManager::Get()->SetDepthStencilOn();
 
+    GraphicsManager::Get()->EndFrame(1);
 }
 
 void PlayState::OnResize(OnResizeNotification* onResize)
@@ -179,6 +259,7 @@ void PlayState::InitializeActorManager()
     actorManager.BeingInitialization(128, 64, FRAME_MEMORY);
     actorManager.AddComponentType<TransformComponent, 100>();
     actorManager.AddComponentType<RenderComponent, 100>();
+    actorManager.AddComponentType<WeaponRenderComponent, 10>();
     actorManager.AddComponentType<AnimatedRenderComponent, 100>();
     actorManager.AddComponentType<TiledRenderComponent, 50>();
     actorManager.AddComponentType<PhysicsComponent, 100>();

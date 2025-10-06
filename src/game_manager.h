@@ -3,26 +3,11 @@
 #include <states/state_machine.h>
 #include <states/menu_state.h>
 #include <states/play_state.h>
-#include <graphics_manager.h>
-#include <ui_renderer.h>
-
-struct BloomUbo
-{
-    int horizontal;
-    Vector3 pad;
-};
 
 class GameManager
 {
 private:
     Array<Scene> scenes;
-
-    FrameBuffer* frameBuffer = nullptr;
-    FrameBuffer* bloomBuffers[2] = { nullptr, nullptr };
-    UniformBuffer* bloomUniformBuffer = nullptr;
-    BloomUbo bloomUbo;
-
-    UIRenderer uiRenderer;
     int clientWidth;
     int clientHeight;
 

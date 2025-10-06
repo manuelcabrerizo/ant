@@ -5,12 +5,12 @@
         <scale x="0.025" y="0.025" z="0.025"/>
 		<rotation x="0" y="0" z="0"/>
 	</TransformComponent>
-    <RenderComponent>
+    <WeaponRenderComponent>
         <model name="anim-gun"/>
 		<materials>
 		</materials>
 		<rotationOffset x="0" y="0" z="0"/>
-    </RenderComponent>
+    </WeaponRenderComponent>
     <AnchorComponent>
         <offset x="0.0" y="0.075" z="0.2"/>
     </AnchorComponent>

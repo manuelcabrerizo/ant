@@ -3,6 +3,7 @@
 #include <components/component.h>
 #include <components/transform_component.h>
 #include <components/render_component.h>
+#include <components/weapon_render_component.h>
 #include <components/animated_render_component.h>
 #include <components/tiled_render_component.h>
 #include <components/physics_component.h>
@@ -212,6 +213,55 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
 
             MemoryManager::Get()->ReleaseFrame(frame);
         }
+        else if (strcmp("WeaponRenderComponent", componentType) == 0)
+        {
+            tinyxml2::XMLElement* attributes = component->FirstChildElement();
+
+            const char* modelPath = 0;
+            attributes->QueryStringAttribute("name", &modelPath);
+
+            attributes = attributes->NextSiblingElement();
+
+            Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+            Array<const char*> materialNames;
+
+            if (attributes->ChildElementCount() > 0)
+            {
+                materialNames.Init(attributes->ChildElementCount(), SCRATCH_MEMORY);
+
+                tinyxml2::XMLElement* material = attributes->FirstChildElement();
+                while (material != nullptr)
+                {
+                    const char* materialPath = 0;
+                    material->QueryStringAttribute("name", &materialPath);
+                    materialNames.Push(materialPath);
+                    material = material->NextSiblingElement();
+                }
+            }
+
+            ASSERT(modelPath);
+
+            attributes = attributes->NextSiblingElement();
+
+            Vector3 rotationOffset;
+            attributes->QueryFloatAttribute("x", &rotationOffset.x);
+            attributes->QueryFloatAttribute("y", &rotationOffset.y);
+            attributes->QueryFloatAttribute("z", &rotationOffset.z);
+
+            rotationOffset *= (ANT_PI / 180.0f);
+
+            WeaponRenderComponent render;
+            render.model = ModelManager::Get()->Get(modelPath);
+            ASSERT(materialNames.size <= render.model->GetMeshCount());
+            for (i32 i = 0; i < materialNames.size; ++i)
+            {
+                render.model->SetMaterialAtMeshIndex(i, MaterialManager::Get()->Get(materialNames[i]));
+            }
+            render.rotationOffset = rotationOffset;
+            AddComponent<WeaponRenderComponent>(actor, render);
+
+            MemoryManager::Get()->ReleaseFrame(frame);
+            }
         else if (strcmp("AnimatedRenderComponent", componentType) == 0)
         {
             tinyxml2::XMLElement* attributes = component->FirstChildElement();

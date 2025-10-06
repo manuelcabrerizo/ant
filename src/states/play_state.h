@@ -7,10 +7,14 @@
 #include <actor_manager.h>
 #include <notification_manager.h>
 
+struct BloomUbo
+{
+    int horizontal;
+    Vector3 pad;
+};
 
 class GameManager;
 class Scene;
-
 class PlayState : public IState, INotificable
 {
 private:
@@ -20,7 +24,17 @@ private:
     GameManager* gameManager = nullptr;
     Scene* scene = nullptr;
     UIRenderer uiRenderer;
+    UIRenderer frameRenderer;
     TextRenderer textRenderer;
+
+    FrameBuffer* frameBuffer = nullptr;
+    FrameBuffer* weaponFrameBuffer = nullptr;
+
+    FrameBuffer* bloomBuffers[2] = { nullptr, nullptr };
+    UniformBuffer* bloomUniformBuffer = nullptr;
+    BloomUbo bloomUbo;
+    float bloomScale = 1.0f / 2.0f;
+    int bloomAmount = 2;
 
     int windowWidth;
     int windowHeight;

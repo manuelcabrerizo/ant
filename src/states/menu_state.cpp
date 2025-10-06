@@ -10,13 +10,13 @@ void MenuState::Init(GameManager* gameManager)
     uiRenderer.Init();
 
     // Load menu assets
-    TextureManager::Get()->Load("PlayButton", "data/textures/play_button.png", STATIC_MEMORY);
-    TextureManager::Get()->Load("PlayButtonSelected", "data/textures/play_button_selected.png", STATIC_MEMORY);
-    TextureManager::Get()->Load("PlayButtonClicked", "data/textures/play_button_clicked.png", STATIC_MEMORY);
-    TextureManager::Get()->Load("ExitButton", "data/textures/exit_button.png", STATIC_MEMORY);
-    TextureManager::Get()->Load("ExitButtonSelected", "data/textures/exit_button_selected.png", STATIC_MEMORY);
-    TextureManager::Get()->Load("ExitButtonClicked", "data/textures/exit_button_clicked.png", STATIC_MEMORY);
-    TextureManager::Get()->Load("BackGround", "data/textures/blood_1.png", STATIC_MEMORY);
+    TextureManager::Get()->Load("PlayButton", "data/textures/play_button.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("PlayButtonSelected", "data/textures/play_button_selected.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("PlayButtonClicked", "data/textures/play_button_clicked.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("ExitButton", "data/textures/exit_button.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("ExitButtonSelected", "data/textures/exit_button_selected.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("ExitButtonClicked", "data/textures/exit_button_clicked.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("BackGround", "data/textures/blood_1.png", STATIC_MEMORY, false);
 
     // allocate memory for the buttons
     buttons.Init(2, STATIC_MEMORY);
@@ -79,11 +79,16 @@ void MenuState::OnUpdate(float deltaTime)
 
 void MenuState::OnRender()
 {
+    GraphicsManager::Get()->BackBufferBind();
+    GraphicsManager::Get()->BeginFrame(0, 1, 0);
+
     DrawBackGround();
     for (int i = 0; i < buttons.size; i++)
     {
         buttons[i].Render(uiRenderer, 0);
     }
+
+    GraphicsManager::Get()->EndFrame(1);
 }
 
 void MenuState::OnResize(OnResizeNotification* onResize)

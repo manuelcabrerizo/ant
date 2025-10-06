@@ -133,8 +133,8 @@ void GraphicsManagerD3D11::OnResize(i32 width, i32 height)
 
      // Set up the viewport.
      D3D11_VIEWPORT vp;
-     vp.Width = (f32)width;
-     vp.Height = (f32)height;
+     vp.Width = static_cast<float>(windowWidth);
+     vp.Height = static_cast<float>(windowHeight);
      vp.MinDepth = 0.0f;
      vp.MaxDepth = 1.0f;
      vp.TopLeftX = 0;
@@ -145,6 +145,14 @@ void GraphicsManagerD3D11::OnResize(i32 width, i32 height)
 void GraphicsManagerD3D11::BackBufferBind()
 {
     deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+    D3D11_VIEWPORT vp;
+    vp.Width = static_cast<float>(windowWidth);
+    vp.Height = static_cast<float>(windowHeight);
+    vp.MinDepth = 0.0f;
+    vp.MaxDepth = 1.0f;
+    vp.TopLeftX = 0;
+    vp.TopLeftY = 0;
+    deviceContext->RSSetViewports(1, &vp);
 }
 
 
@@ -1094,8 +1102,8 @@ void GraphicsManagerD3D11::CreateSamplerStates()
      colorMapDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
      colorMapDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
      colorMapDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-     //colorMapDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-     colorMapDesc.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+     colorMapDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+     //colorMapDesc.Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
      colorMapDesc.MaxLOD = D3D11_FLOAT32_MAX;
      if (FAILED(device->CreateSamplerState(&colorMapDesc, &samplerStateLinearClamp)))
      {
