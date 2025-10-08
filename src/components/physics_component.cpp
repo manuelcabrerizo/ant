@@ -1,6 +1,7 @@
 #include "physics_component.h"
 #include "transform_component.h"
 #include "collider_component.h"
+#include "notification_manager.h"
 
 #include <collision.h>
 
@@ -19,11 +20,6 @@ void PhysicsComponent::OnUpdate(ActorManager *actorManager, f32 dt)
         colliders[i].UpdatePosition(transform->position + collider->GetOffset());
     }
     ProcessCollisionDetectionAndResolution();
-}
-
-void PhysicsComponent::OnLateUpdate(ActorManager* actorManager, float dt)
-{
-    // ProcessCollisionDetectionAndResolution();
 }
 
 void PhysicsComponent::ProcessPhysics(float dt)
@@ -53,7 +49,6 @@ void PhysicsComponent::ProcessCollisionDetectionAndResolution()
     Array<CollisionData> collisionData;
     collisionData.Init(MAX_COLLISION_COUNT, SCRATCH_MEMORY);
 
-    // TODO: remove colliders ids and use the owner instread
     grounded = CollisionWorld::Get()->Intersect(groundSegment, collisionData, owner);
 
     Array<CollisionData> contacts;
@@ -74,6 +69,13 @@ void PhysicsComponent::ProcessCollisionDetectionAndResolution()
         int iterations = 0;
         while(contacts.size > 0 && iterations < 10)
         {
+            if (owner->GetTag() == ActorTag::Player && contacts[0].collider->owner->GetTag() == ActorTag::Enemy)
+            {
+                EnemyHitPlayerNotification notification;
+                notification.enemy = contacts[0].collider->owner;
+                NotificationManager::Get()->SendNotification(NotificationType::EnemyHitPlayer, &notification);
+            }
+
             Vector3 n = contacts[0].n;
             f32 penetration = contacts[0].penetration;
             transform->position += n * penetration;

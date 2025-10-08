@@ -24,6 +24,8 @@
 
 void PlayerControllerComponent::OnInit(ActorManager *actorManager)
 {
+    NotificationManager::Get()->AddListener(this, NotificationType::EnemyHitPlayer);
+
     speed = 40.0f;    
     transform = owner->GetComponent<TransformComponent>();
     camera = owner->GetComponent<CameraComponent>();
@@ -31,18 +33,18 @@ void PlayerControllerComponent::OnInit(ActorManager *actorManager)
     weapon = owner->GetComponent<WeaponComponent>();
     collider = owner->GetComponent<ColliderComponent>();
     lastPosition = transform->position;
+    life = maxLife;
 }   
 
 void PlayerControllerComponent::OnTerminate(ActorManager *actorManager)
 {
-
+    NotificationManager::Get()->RemoveListener(this, NotificationType::EnemyHitPlayer);
 }
 
 void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
     ProcessMouseMovement();
     ProcessKeyboardMovement();
-    ProcessTriggers();
 
     PlayerMoveNotification playerNoti;
     playerNoti.position = transform->position;
@@ -60,6 +62,12 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
         NotificationManager::Get()->SendNotification(NotificationType::Shoot, &notification);
     }
 }
+
+void PlayerControllerComponent::OnLateUpdate(ActorManager* actorManager, float dt)
+{
+    ProcessTriggers();
+}
+
 
 void PlayerControllerComponent::OnButtonTrigger(Actor* button)
 {
@@ -79,11 +87,6 @@ void PlayerControllerComponent::OnPortalTrigger(Actor* portal)
     physics->acceleration = Vector3::zero;
 }
 
-void PlayerControllerComponent::OnEnemyCollision(Actor* enemy)
-{
-
-}
-
 void PlayerControllerComponent::OnAmmoTrigger(Actor* ammo)
 {
     weapon->SetAmmo(weapon->GetMaxAmmo());
@@ -95,6 +98,11 @@ void PlayerControllerComponent::OnEndTrigger(Actor* endTrigger)
 {
     PlayerWinNotification notification;
     NotificationManager::Get()->SendNotification(NotificationType::PlayerWin, &notification);
+}
+
+void PlayerControllerComponent::OnEnemyCollision(EnemyHitPlayerNotification* enemyHitPlayer)
+{
+    life = max(life - 10, 0);
 }
 
 void PlayerControllerComponent::ProcessMouseMovement()
@@ -175,7 +183,6 @@ void PlayerControllerComponent::ProcessTriggers()
                 Actor* other = collisionData[i].collider->owner;
                 switch (other->GetTag())
                 {
-                case ActorTag::Enemy: OnEnemyCollision(other); break;
                 case ActorTag::Button: OnButtonTrigger(other); break;
                 case ActorTag::Portal: OnPortalTrigger(other); break;
                 case ActorTag::EndTrigger: OnEndTrigger(other); break;
@@ -187,4 +194,12 @@ void PlayerControllerComponent::ProcessTriggers()
     }
 
     MemoryManager::Get()->ReleaseFrame(frame);
+}
+
+void PlayerControllerComponent::OnNotify(NotificationType type, Notification* notification)
+{
+    switch (type)
+    {
+    case NotificationType::EnemyHitPlayer: OnEnemyCollision((EnemyHitPlayerNotification*)notification); break;
+    }
 }

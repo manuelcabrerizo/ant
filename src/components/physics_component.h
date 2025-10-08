@@ -23,5 +23,4 @@ public:
 
     void OnInit(ActorManager *actorManager);
     void OnUpdate(ActorManager *actorManager, f32 dt);
-    void OnLateUpdate(ActorManager* actorManager, float dt);
 };

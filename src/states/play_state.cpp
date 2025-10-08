@@ -158,7 +158,7 @@ void PlayState::OnUpdate(float deltaTime)
     actorManager.UpdateComponents<AmmoComponent>(deltaTime);
     actorManager.UpdateComponents<FenceComponent>(deltaTime);
     // Late Update
-    actorManager.LateUpdateComponents<PhysicsComponent>(deltaTime);
+    actorManager.LateUpdateComponents<PlayerControllerComponent>(deltaTime);
 
     if (InputManager::Get()->KeyJustDown(KEY_P) || isPlayerWin)
     {
