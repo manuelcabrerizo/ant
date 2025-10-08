@@ -45,6 +45,7 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
     ProcessMouseMovement();
     ProcessKeyboardMovement();
+    ProcessTriggers();
 
     PlayerMoveNotification playerNoti;
     playerNoti.position = transform->position;
@@ -62,12 +63,6 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
         NotificationManager::Get()->SendNotification(NotificationType::Shoot, &notification);
     }
 }
-
-void PlayerControllerComponent::OnLateUpdate(ActorManager* actorManager, float dt)
-{
-    ProcessTriggers();
-}
-
 
 void PlayerControllerComponent::OnButtonTrigger(Actor* button)
 {
@@ -190,7 +185,6 @@ void PlayerControllerComponent::ProcessTriggers()
                 }
             }
         }
-
     }
 
     MemoryManager::Get()->ReleaseFrame(frame);
