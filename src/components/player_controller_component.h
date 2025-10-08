@@ -21,12 +21,11 @@ private:
     f32 pitch = 0;
     float speed;
     Vector3 lastPosition;
-    int keyCount = 0;
 
-    void OnKeyTrigger(Actor* key);
     void OnButtonTrigger(Actor* button);
     void OnPortalTrigger(Actor* portal);
     void OnEnemyCollision(Actor* enemy);
+    void OnAmmoTrigger(Actor* ammo);
     void OnEndTrigger(Actor* endTrigger);
 
     void ProcessMouseMovement();

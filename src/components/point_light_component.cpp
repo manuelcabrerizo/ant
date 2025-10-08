@@ -1,1 +1,0 @@
-#include "point_light_component.h"

@@ -11,6 +11,9 @@ enum class NotificationType
     PlayerMove,
     Signal,
     PlayerWin,
+    EnemySpawn,
+    EnemyKill,
+    AmmoChange,
 
     // last item
     Count
@@ -54,4 +57,18 @@ struct SignalNotification : public Notification
 
 struct PlayerWinNotification : public Notification
 {
+};
+
+struct EnemySpawnNotification : public Notification
+{
+};
+
+struct EnemyKillNotification : public Notification
+{
+};
+
+struct AmmoChangeNotification : public Notification
+{
+    int maxAmmo;
+    int currentAmmo;
 };

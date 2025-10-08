@@ -32,6 +32,9 @@ private:
     float animationOffsetX = 0.0f;
     float animationOffsetZ = 0.0f;
 
+    int maxAmmo = 10;
+    int currentAmmo = 0;
+
     void OnShoot(ShootNotification* notification);
 public:
     Actor *weapon = nullptr;
@@ -43,4 +46,7 @@ public:
     
     static void OnSetRenderState();
     void OnRender(ActorManager* actorManager);
+
+    void SetAmmo(int ammo);
+    int GetMaxAmmo();
 };

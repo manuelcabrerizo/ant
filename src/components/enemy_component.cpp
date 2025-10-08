@@ -44,6 +44,9 @@ void EnemyComponent::OnInit(ActorManager *actorManager)
     face.SetTimeToTarget(0.01f);
 
     life = maxLife;
+
+    EnemySpawnNotification notification;
+    NotificationManager::Get()->SendNotification(NotificationType::EnemySpawn, &notification);
 }
 
 void EnemyComponent::OnTerminate(ActorManager *actorManager)
@@ -97,6 +100,8 @@ void EnemyComponent::OnEnemyHit(EnemyHitNotification* enemyHit)
             physics->enable = false;
             collider->enable = false;
             animation->Transition((int)EnemyAnimation::Dead, 0.25f);
+            EnemyKillNotification notification;
+            NotificationManager::Get()->SendNotification(NotificationType::EnemyKill, &notification);
         }
         life--;
     }

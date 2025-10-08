@@ -10,10 +10,10 @@ enum class ActorTag
     Default = 0,
     Player,
     Enemy,
-    Key,
     Button,
     Portal,
     EndTrigger,
+    Ammo,
 
     TagCount
 };

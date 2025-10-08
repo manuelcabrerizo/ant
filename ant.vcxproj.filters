@@ -222,9 +222,6 @@
     <ClCompile Include="src\particle_systems\fire_ps.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\key_component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\components\tiled_render_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -240,13 +237,13 @@
     <ClCompile Include="src\text_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\components\point_light_component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\components\weapon_render_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\components\button_render_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\components\ammo_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -482,9 +479,6 @@
     <ClInclude Include="src\particle_systems\fire_ps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\components\key_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\components\tiled_render_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -503,9 +497,6 @@
     <ClInclude Include="src\text_renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\components\point_light_component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\lights\light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -515,9 +506,12 @@
     <ClInclude Include="src\components\button_render_component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\components\ammo_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="data\xml\key.xml" />
+    <Xml Include="data\xml\ammo.xml" />
     <Xml Include="data\xml\enemy.xml" />
     <Xml Include="data\xml\house.xml" />
     <Xml Include="data\xml\pistol.xml" />

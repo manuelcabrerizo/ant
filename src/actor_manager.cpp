@@ -15,6 +15,7 @@
 #include <components/player_controller_component.h>
 #include <components/enemy_component.h>
 #include <components/portal_component.h>
+#include <components/ammo_component.h>
 
 #include <math/algebra.h>
 #include <math/vector3.h>
@@ -440,6 +441,11 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
         {
             EnemyComponent enemy;
             AddComponent<EnemyComponent>(actor, enemy);
+        }
+        else if (strcmp("AmmoComponent", componentType) == 0)
+        {
+            AmmoComponent ammo;
+            AddComponent<AmmoComponent>(actor, ammo);
         }
         else if (strcmp("AnchorComponent", componentType) == 0)
         {

@@ -36,6 +36,8 @@ void WeaponComponent::OnInit(ActorManager *actorManager)
     animationOffsetX = sinf(animationTime * 0.5f) * 0.01f;
     float t = 1.0f - shootAnimationTime;
     animationOffsetZ = fmax((sinf(t * ANT_PI)), 0) * -0.075f;
+
+    SetAmmo(0);
 }
 
 void WeaponComponent::OnTerminate(ActorManager *actorManager)
@@ -123,6 +125,12 @@ void WeaponComponent::OnShoot(ShootNotification* notification)
         return;
     }
 
+    if (currentAmmo <= 0)
+    {
+        return;
+    }
+    SetAmmo(currentAmmo - 1);
+
     // Render shoot particles
     shootPs.SetPosition(notification->shootPosition);
     shootPs.Play();
@@ -165,3 +173,23 @@ void WeaponComponent::OnNotify(NotificationType type, Notification* notification
     case NotificationType::Shoot: OnShoot((ShootNotification*)notification); break;
     }
 }
+
+void WeaponComponent::SetAmmo(int ammo)
+{
+    if (ammo > maxAmmo)
+    {
+        ammo = maxAmmo;
+    }
+    this->currentAmmo = ammo;
+
+    AmmoChangeNotification noti;
+    noti.maxAmmo = maxAmmo;
+    noti.currentAmmo = currentAmmo;
+    NotificationManager::Get()->SendNotification(NotificationType::AmmoChange, &noti);
+}
+
+int WeaponComponent::GetMaxAmmo()
+{
+    return maxAmmo;
+}
+

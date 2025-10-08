@@ -19,7 +19,7 @@
 #include <components/animation_component.h>
 #include <components/portal_component.h>
 #include <components/effect_component.h>
-#include <components/key_component.h>
+#include <components/ammo_component.h>
 #include <components/fence_component.h>
 #include <components/button_component.h>
 
@@ -68,11 +68,16 @@ void PlayState::OnEnter()
     this->frameCounter = 0;
     this->FPS = 0;
     this->isPlayerWin = false;
+    this->enemyCount = 0;
+    this->enemyKillCount = 0;
 
     memoryFrame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
 
     NotificationManager::Get()->AddListener(this, NotificationType::OnResize);
     NotificationManager::Get()->AddListener(this, NotificationType::PlayerWin);
+    NotificationManager::Get()->AddListener(this, NotificationType::EnemySpawn);
+    NotificationManager::Get()->AddListener(this, NotificationType::EnemyKill);
+    NotificationManager::Get()->AddListener(this, NotificationType::AmmoChange);
 
     PlatformClientDimensions(&windowWidth, &windowHeight);
     Vector2 extent = Vector2(windowWidth, windowHeight);
@@ -111,6 +116,10 @@ void PlayState::OnExit()
 
     NotificationManager::Get()->RemoveListener(this, NotificationType::OnResize);
     NotificationManager::Get()->RemoveListener(this, NotificationType::PlayerWin);
+    NotificationManager::Get()->RemoveListener(this, NotificationType::EnemySpawn);
+    NotificationManager::Get()->RemoveListener(this, NotificationType::EnemyKill);
+    NotificationManager::Get()->RemoveListener(this, NotificationType::AmmoChange);
+
 
     // Remove all assets loaded for the level
     AnimationManager::Get()->Clear(FRAME_MEMORY);
@@ -146,7 +155,7 @@ void PlayState::OnUpdate(float deltaTime)
     actorManager.UpdateComponents<ColliderComponent>(deltaTime);
     actorManager.UpdateComponents<AnimationComponent>(deltaTime);
     actorManager.UpdateComponents<EffectComponent>(deltaTime);
-    actorManager.UpdateComponents<KeyComponent>(deltaTime);
+    actorManager.UpdateComponents<AmmoComponent>(deltaTime);
     actorManager.UpdateComponents<FenceComponent>(deltaTime);
     // Late Update
     actorManager.LateUpdateComponents<PhysicsComponent>(deltaTime);
@@ -242,9 +251,14 @@ void PlayState::OnRender()
 
     char buffer[256];
     sprintf(buffer, "FPS: %d", FPS);
-
     textRenderer.DrawString(buffer, Vector2(5, windowHeight - 32), 1.0f);
-    textRenderer.DrawString("Hello, Sailor!", Vector2(5, windowHeight - 64), 1.0f);
+
+    sprintf(buffer, "Enemies Killed: %d | %d", enemyKillCount, enemyCount);
+    textRenderer.DrawString(buffer, Vector2(5, windowHeight - 64), 1.0f);
+
+    sprintf(buffer, "Ammo: %d | %d", currentAmmo, maxAmmo);
+    textRenderer.DrawString(buffer, Vector2(5, windowHeight - 96), 1.0f);
+    
     GraphicsManager::Get()->SetRasterizerStateCullBack();
     GraphicsManager::Get()->SetDepthStencilOn();
 
@@ -267,6 +281,22 @@ void PlayState::OnPlayerWin(PlayerWinNotification* playerWin)
     isPlayerWin = true;
 }
 
+void PlayState::OnEnemySpawn(EnemySpawnNotification* enemySpawn)
+{
+    enemyCount++;
+}
+
+void PlayState::OnEnemyKill(EnemyKillNotification* enemyKill)
+{
+    enemyKillCount++;
+}
+
+void PlayState::OnAmmoChange(AmmoChangeNotification* ammoChange)
+{
+    currentAmmo = ammoChange->currentAmmo;
+    maxAmmo = ammoChange->maxAmmo;
+}
+
 void PlayState::InitializeActorManager()
 {
     actorManager.BeingInitialization(128, 64, FRAME_MEMORY);
@@ -286,7 +316,7 @@ void PlayState::InitializeActorManager()
     actorManager.AddComponentType<AnimationComponent, 40>();
     actorManager.AddComponentType<PortalComponent, 10>();
     actorManager.AddComponentType<EffectComponent, 10>();
-    actorManager.AddComponentType<KeyComponent, 2>();
+    actorManager.AddComponentType<AmmoComponent, 20>();
     actorManager.AddComponentType<FenceComponent, 10>();
     actorManager.AddComponentType<ButtonComponent, 10>();
     // NOTE: add more component types ...
@@ -299,5 +329,8 @@ void PlayState::OnNotify(NotificationType type, Notification* notification)
     {
     case NotificationType::OnResize: OnResize((OnResizeNotification*)notification); break;
     case NotificationType::PlayerWin: OnPlayerWin((PlayerWinNotification*)notification); break;
+    case NotificationType::EnemySpawn: OnEnemySpawn((EnemySpawnNotification*)notification); break;
+    case NotificationType::EnemyKill: OnEnemyKill((EnemyKillNotification*)notification); break;
+    case NotificationType::AmmoChange: OnAmmoChange((AmmoChangeNotification*)notification); break;
     }
 }

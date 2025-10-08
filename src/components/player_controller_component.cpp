@@ -8,6 +8,7 @@
 #include "collider_component.h"
 #include "button_component.h"
 #include "portal_component.h"
+#include "ammo_component.h"
 
 #include <math/algebra.h>
 #include <math/vector3.h>
@@ -30,8 +31,6 @@ void PlayerControllerComponent::OnInit(ActorManager *actorManager)
     weapon = owner->GetComponent<WeaponComponent>();
     collider = owner->GetComponent<ColliderComponent>();
     lastPosition = transform->position;
-
-    keyCount = 0;
 }   
 
 void PlayerControllerComponent::OnTerminate(ActorManager *actorManager)
@@ -62,12 +61,6 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
     }
 }
 
-void PlayerControllerComponent::OnKeyTrigger(Actor* key)
-{
-    keyCount++;
-    key->SetEnable(false);
-}
-
 void PlayerControllerComponent::OnButtonTrigger(Actor* button)
 {
     ButtonComponent* buttonComponent = button->GetComponent<ButtonComponent>();
@@ -89,6 +82,13 @@ void PlayerControllerComponent::OnPortalTrigger(Actor* portal)
 void PlayerControllerComponent::OnEnemyCollision(Actor* enemy)
 {
 
+}
+
+void PlayerControllerComponent::OnAmmoTrigger(Actor* ammo)
+{
+    weapon->SetAmmo(weapon->GetMaxAmmo());
+    AmmoComponent* ammoComponent = ammo->GetComponent<AmmoComponent>();
+    ammoComponent->Grab();
 }
 
 void PlayerControllerComponent::OnEndTrigger(Actor* endTrigger)
@@ -175,11 +175,11 @@ void PlayerControllerComponent::ProcessTriggers()
                 Actor* other = collisionData[i].collider->owner;
                 switch (other->GetTag())
                 {
-                case ActorTag::Key: OnKeyTrigger(other); break;
                 case ActorTag::Enemy: OnEnemyCollision(other); break;
                 case ActorTag::Button: OnButtonTrigger(other); break;
                 case ActorTag::Portal: OnPortalTrigger(other); break;
                 case ActorTag::EndTrigger: OnEndTrigger(other); break;
+                case ActorTag::Ammo: OnAmmoTrigger(other); break;
                 }
             }
         }

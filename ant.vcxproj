@@ -127,13 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\components\ammo_component.cpp" />
     <ClCompile Include="src\components\animated__render_component.cpp" />
     <ClCompile Include="src\components\button_component.cpp" />
     <ClCompile Include="src\components\button_render_component.cpp" />
     <ClCompile Include="src\components\effect_component.cpp" />
     <ClCompile Include="src\components\fence_component.cpp" />
-    <ClCompile Include="src\components\key_component.cpp" />
-    <ClCompile Include="src\components\point_light_component.cpp" />
     <ClCompile Include="src\components\portal_component.cpp" />
     <ClCompile Include="src\asset_managers\animation_manager.cpp" />
     <ClCompile Include="src\components\tiled_render_component.cpp" />
@@ -207,13 +206,12 @@
     <ClCompile Include="src\ui_renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\components\ammo_component.h" />
     <ClInclude Include="src\components\animated_render_component.h" />
     <ClInclude Include="src\components\button_component.h" />
     <ClInclude Include="src\components\button_render_component.h" />
     <ClInclude Include="src\components\effect_component.h" />
     <ClInclude Include="src\components\fence_component.h" />
-    <ClInclude Include="src\components\key_component.h" />
-    <ClInclude Include="src\components\point_light_component.h" />
     <ClInclude Include="src\components\portal_component.h" />
     <ClInclude Include="src\asset_managers\animation_manager.h" />
     <ClInclude Include="src\components\tiled_render_component.h" />
@@ -300,7 +298,7 @@
     <Xml Include="data\xml\button.xml" />
     <Xml Include="data\xml\default.xml" />
     <Xml Include="data\xml\fence.xml" />
-    <Xml Include="data\xml\key.xml" />
+    <Xml Include="data\xml\ammo.xml" />
     <Xml Include="data\xml\enemy.xml" />
     <Xml Include="data\xml\house.xml" />
     <Xml Include="data\xml\level1.xml" />

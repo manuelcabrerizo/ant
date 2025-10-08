@@ -47,10 +47,17 @@ private:
     Vector2 crosshairPosition;
 
     bool isPlayerWin = false;
+    int enemyCount = 0;
+    int enemyKillCount = 0;
+    int currentAmmo = 0;
+    int maxAmmo = 0;
 
     void InitializeActorManager();
     void OnResize(OnResizeNotification* onResize);
     void OnPlayerWin(PlayerWinNotification* playerWin);
+    void OnEnemySpawn(EnemySpawnNotification* enemySpawn);
+    void OnEnemyKill(EnemyKillNotification* enemyKill);
+    void OnAmmoChange(AmmoChangeNotification* ammoChange);
 public:
     void Init(GameManager *gameManager);
     void Terminate();

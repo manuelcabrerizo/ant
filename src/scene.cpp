@@ -11,7 +11,6 @@
 #include <components/collider_component.h>
 #include <components/portal_component.h>
 #include <components/effect_component.h>
-#include <components/key_component.h>
 #include <components/fence_component.h>
 #include <components/button_component.h>
 
@@ -31,7 +30,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     ModelManager::Get()->Load("bullet", "data/models/testBullet.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("level1", "data/models/TestLevel/source/TestLevel.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("portal", "data/models/Portal/source/Portal.fbx", FRAME_MEMORY);
-    ModelManager::Get()->Load("key", "data/models/Key/source/Key.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("ammo", "data/models/Ammo/source/Ammo.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("fence", "data/models/Fence/source/Fence.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("button", "data/models/Button/source/button.fbx", FRAME_MEMORY);
 
@@ -43,13 +42,6 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
 
     // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");
-
-    // Create the key
-    Actor* key = actorManager->CreateActorFromFile("data/xml/key.xml");
-    KeyComponent keyComponent;
-    actorManager->AddComponent<KeyComponent>(key, keyComponent);
-    TransformComponent* keyTransform = key->GetComponent<TransformComponent>();
-    keyTransform->position = Vector3(59.562684376750326f, -29, 32.048033260074035f);
 
     // Create the fence
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
@@ -304,6 +296,27 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     }
     MemoryManager::Get()->ReleaseFrame(frame);
 
+    // Create the Ammos
+    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    file = PlatformReadFile("data/entities/ammos.txt", SCRATCH_MEMORY);
+    reader = FileReader(&file);
+    while (const char* line = reader.GetNextLine())
+    {
+        char name[256];
+        Vector3 position;
+        Vector3 scale;
+        if (sscanf(line, "[[%f, %f, %f], [%f, %f, %f]]", &position.x, &position.y, &position.z, &scale.x, &scale.y, &scale.z) == 6)
+        {
+            Actor* ammo = actorManager->CreateActorFromFile("data/xml/ammo.xml");
+            TransformComponent* transform = ammo->GetComponent<TransformComponent>();
+            transform->position = position;
+        }
+        else
+        {
+            ASSERT(!"ERROR: invalid file format");
+        }
+    }
+    MemoryManager::Get()->ReleaseFrame(frame);
 
     // Create the player
     Actor* player = actorManager->CreateActorFromFile("data/xml/player.xml");
