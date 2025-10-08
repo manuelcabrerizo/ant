@@ -50,8 +50,10 @@ public:
 
     void Play();
     void Stop();
-    bool IsPlaying(); 
     void Transition(int to, float timeToTarget);
+    bool IsPlaying(); 
+    bool IsFinish();
+    bool IsTransitioning();
 
     Matrix4* GetMatrices()
     {

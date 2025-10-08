@@ -35,6 +35,10 @@ public:
         const Vector3& diffuse, const Vector3& specular, f32 shininess);
     void Terminate() override;
     void Bind() override;
+
+    void SetAmbient(const Vector3& ambient);
+    void SetDiffuse(const Vector3& diffuse);
+    void SetSpecular(const Vector3& specular);
 private:
     static i32 instanceCount;
     static UniformBuffer* uniformBuffer;

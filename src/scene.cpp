@@ -5,6 +5,7 @@
 #include <asset_managers/animation_manager.h>
 
 #include <components/transform_component.h>
+#include <components/camera_component.h>
 #include <components/render_component.h>
 #include <components/animation_component.h>
 #include <components/collider_component.h>
@@ -14,8 +15,11 @@
 #include <components/fence_component.h>
 #include <components/button_component.h>
 
+#include <fstream>
 #include <strings.h>
 #include <math/algebra.h>
+#include <components/tiled_render_component.h>
+#include <collisions/collider.h>
 
 void Scene::Load(ActorManager* actorManager_, const char* filepath)
 {
@@ -35,6 +39,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     SkeletonManager::Get()->Load("Bloodwraith", "data/models/bloodwraith/source/bloodwraith.fbx", FRAME_MEMORY);
     AnimationManager::Get()->Load("Walking", "data/animations/Mutant Walking.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
     AnimationManager::Get()->Load("Death", "data/animations/Zombie Death.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
+    AnimationManager::Get()->Load("Idle", "data/animations/Orc Idle.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
 
     // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");
@@ -244,7 +249,6 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
             transform->position = position;
 
             // Set up the enemy animation component
-            // TODO: load this component from a file
             actorManager->AddComponent<AnimationComponent>(enemy, {});
             RenderComponent* render = enemy->GetComponent<RenderComponent>();
         }
@@ -255,38 +259,98 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     }
     MemoryManager::Get()->ReleaseFrame(frame);
 
+    // Create the End Trigger
+    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    file = PlatformReadFile("data/entities/endTriggers.txt", SCRATCH_MEMORY);
+    reader = FileReader(&file);
+    while (const char* line = reader.GetNextLine())
+    {
+        char name[256];
+        Vector3 position;
+        Vector3 scale;
+        if (sscanf(line, "[[%f, %f, %f], [%f, %f, %f]]", &position.x, &position.y, &position.z, &scale.x, &scale.y, &scale.z) == 6)
+        {
+            // Create the enemy and position it
+            Actor* endTrigger = actorManager->CreateActor();
+            endTrigger->SetTag(ActorTag::EndTrigger);
+
+            // Add transform component
+            TransformComponent transform;
+            transform.position = position;
+            transform.scale = Vector3(1, 1, 1);
+            transform.rotation = Vector3(0, 0, 0);
+            actorManager->AddComponent<TransformComponent>(endTrigger, transform);
+
+            // Add collision component
+            Vector3 hScale = scale * 0.5f;
+            Vector3 min = position - Vector3::right * hScale.x - Vector3::up * hScale.y - Vector3::forward * hScale.z;
+            Vector3 max = position + Vector3::right * hScale.x + Vector3::up * hScale.y + Vector3::forward * hScale.z;
+
+            AABB aabb;
+            aabb.Init(min, max);
+            Collider collider(aabb, endTrigger);
+            
+            ColliderComponent colliderComponent;
+            colliderComponent.Init(1, FRAME_MEMORY);
+            colliderComponent.AddSubCollider(collider);
+            colliderComponent.SetIsTrigger(true);
+            
+            actorManager->AddComponent<ColliderComponent>(endTrigger, colliderComponent);
+        }
+        else
+        {
+            ASSERT(!"ERROR: invalid file format");
+        }
+    }
+    MemoryManager::Get()->ReleaseFrame(frame);
+
 
     // Create the player
-    actorManager->CreateActorFromFile("data/xml/player.xml");
+    Actor* player = actorManager->CreateActorFromFile("data/xml/player.xml");
+    
+    actorManager->InitializeNewComponents();
 
     // Add Lights
     DirectionalLight light;
-    light.ambient = Vector4(0.2, 0.2, 0.2, 0);
-    light.diffuse = Vector4(10, 10, 10, 0);
-    light.specular = Vector4(3, 3, 3, 0);
+    light.ambient = Vector4(0.1, 0.1, 0.05, 0);
+    light.diffuse = Vector4(2.125, 1, 1.5, 0);
+    light.specular = Vector4(1.5, 1.5, 1.5, 0);
     light.direction = Vector3(2, -1, 1);
     light.direction.Normalize();
     GraphicsManager::Get()->SetDirectionalLight(light);
 
-    PointLight pointLight;
-    pointLight.ambient = Vector4(0.1, 0.1, 0.1, 0);
-    pointLight.diffuse = Vector4(0.5, 4, 0.5, 1);
-    pointLight.specular = Vector4(1, 1, 1, 1);
-    pointLight.position = Vector3(0, 2, 0);
-    pointLight.range = 40.0f;
-    pointLight.att = Vector3(); // ???
+    // Create the Points Lights
+    PointLight pointLights[8];
+    int lightsCount = 0;
 
-    PointLight pointLight1;
-    pointLight1.ambient = Vector4(0.1, 0.1, 0.1, 0);
-    pointLight1.diffuse = Vector4(40, 10, 1, 1);
-    pointLight1.specular = Vector4(1, 1, 1, 1);
-    pointLight1.position = Vector3(0, 2, 25);
-    pointLight1.range = 40.0f;
-    pointLight1.att = Vector3();
+    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    file = PlatformReadFile("data/entities/Lights.txt", SCRATCH_MEMORY);
+    reader = FileReader(&file);
+    while (const char* line = reader.GetNextLine())
+    {
+        ASSERT(lightsCount < 8);
+        char name[256];
+        Vector3 position;
+        Vector3 scale;
+        if (sscanf(line, "[[%f, %f, %f], [%f, %f, %f]]", &position.x, &position.y, &position.z, &scale.x, &scale.y, &scale.z) == 6)
+        {
+            PointLight pointLight;
+            pointLight.ambient = Vector4(0.2, 0.1, 0.3, 0);
+            pointLight.diffuse = Vector4(1.2, 2.5, 1.25, 1);
+            pointLight.specular = Vector4(0.1, 0.0, 0.3, 1);
+            pointLight.position = position;
+            pointLight.range = scale.x*2.5f;
+            pointLight.att = Vector3();
+            pointLights[lightsCount++] = pointLight;
+        }
+        else
+        {
+            ASSERT(!"ERROR: invalid file format");
+        }
+    }
+    MemoryManager::Get()->ReleaseFrame(frame);
 
-    PointLight pointLights[2] = { pointLight, pointLight1 };
-    GraphicsManager::Get()->AddPointLights(pointLights, 2);
-    
+    GraphicsManager::Get()->AddPointLights(pointLights, lightsCount);
 }
 
 void Scene::Unload()

@@ -24,9 +24,8 @@ void CameraComponent::OnInit(ActorManager *actorManager)
 {
     NotificationManager::Get()->AddListener(this, NotificationType::OnResize);
 
-    int windowWidth, windowHeight;
     PlatformClientDimensions(&windowWidth, &windowHeight);
-    ubo.proj = Matrix4::Perspective(90.0f, (float)windowWidth / (float)windowHeight, 0.05f, 200.0f);
+    ubo.proj = Matrix4::Perspective(fov, (float)windowWidth / (float)windowHeight, 0.05f, 200.0f);
     GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
     GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
 
@@ -42,17 +41,13 @@ void CameraComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
      SetPosition(transform->position);
      SetDirection(Matrix4::TransformVector(Matrix4::TransformFromEuler(transform->rotation), Vector3::forward));
-     ubo.view = GetView();
-     GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
-     // TODO: try no to do this on the Update
-     GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
-
+     UpdateUbo();
      GraphicsManager::Get()->UpdateViewPosition(transform->position);
 }
 
 void CameraComponent::OnResize(OnResizeNotification* onResize)
 {
-    ubo.proj = Matrix4::Perspective(90.0f, onResize->extent.x / onResize->extent.y, 0.05f, 200.0f);
+    ubo.proj = Matrix4::Perspective(fov, onResize->extent.x / onResize->extent.y, 0.05f, 200.0f);
 }
 
 void CameraComponent::OnNotify(NotificationType type, Notification *notification)
@@ -89,6 +84,12 @@ void CameraComponent::SetDirection(Vector3 dir)
      worldFront = Vector3(front.x, 0.0f, front.z).Normalized();
 }
 
+void CameraComponent::SetFov(float fov)
+{
+    this->fov = fov;
+    ubo.proj = Matrix4::Perspective(fov, (float)windowWidth / (float)windowHeight, 0.05f, 200.0f);
+}
+
 Vector3 CameraComponent::GetPosition()
 {
      return position;
@@ -123,4 +124,11 @@ Vector3 CameraComponent::GetWorldUp()
 Matrix4 CameraComponent::GetView()
 {
      return Matrix4::LookAt(position, position + front, worldUp);
+}
+
+void CameraComponent::UpdateUbo()
+{
+    ubo.view = GetView();
+    GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
+    GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
 }

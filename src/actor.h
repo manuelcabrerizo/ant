@@ -13,6 +13,7 @@ enum class ActorTag
     Key,
     Button,
     Portal,
+    EndTrigger,
 
     TagCount
 };

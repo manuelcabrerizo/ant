@@ -118,7 +118,7 @@ public:
      virtual void BatchRendererFree(BatchRenderer *batchRenderer) = 0;
 
      virtual void SetDirectionalLight(const DirectionalLight& light) = 0;
-     virtual void AddPointLights(PointLight* lights, int cout) = 0;
+     virtual void AddPointLights(PointLight* lights, int count) = 0;
      virtual int GetMaxPointLightCount() = 0;
      
      virtual void UpdateViewPosition(const Vector3& viewPos) = 0;

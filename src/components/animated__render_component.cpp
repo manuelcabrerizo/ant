@@ -39,6 +39,7 @@ void AnimatedRenderComponent::OnSetRenderState()
 
 void AnimatedRenderComponent::OnInit(ActorManager* actorManager)
 {
+    transform = owner->GetComponent<TransformComponent>();
     animation = owner->GetComponent<AnimationComponent>();
 }
 
@@ -48,8 +49,6 @@ void AnimatedRenderComponent::OnTerminate(ActorManager* actorManager)
 
 void AnimatedRenderComponent::OnRender(ActorManager* actorManager)
 {
-    TransformComponent* transform = owner->GetComponent<TransformComponent>();
-
     Matrix4 tra = Matrix4::Translate(transform->position);
     Matrix4 sca = Matrix4::Scale(transform->scale);
     Matrix4 ori = Matrix4::TransformFromEuler(transform->rotation);

@@ -91,6 +91,12 @@ void PlayerControllerComponent::OnEnemyCollision(Actor* enemy)
 
 }
 
+void PlayerControllerComponent::OnEndTrigger(Actor* endTrigger)
+{
+    PlayerWinNotification notification;
+    NotificationManager::Get()->SendNotification(NotificationType::PlayerWin, &notification);
+}
+
 void PlayerControllerComponent::ProcessMouseMovement()
 {
     yaw += InputManager::Get()->MouseXMovement() * 0.001f;
@@ -173,6 +179,7 @@ void PlayerControllerComponent::ProcessTriggers()
                 case ActorTag::Enemy: OnEnemyCollision(other); break;
                 case ActorTag::Button: OnButtonTrigger(other); break;
                 case ActorTag::Portal: OnPortalTrigger(other); break;
+                case ActorTag::EndTrigger: OnEndTrigger(other); break;
                 }
             }
         }

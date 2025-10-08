@@ -21,9 +21,10 @@ void EnemyComponent::OnInit(ActorManager *actorManager)
 
     // Initialize animation component
     animation->SetSkeleton(SkeletonManager::Get()->Get("Bloodwraith"));
+    animation->AddAnimation((int)EnemyAnimation::Idle, AnimationManager::Get()->Get("Idle"), false);
     animation->AddAnimation((int)EnemyAnimation::Walk, AnimationManager::Get()->Get("Walking"), true);
     animation->AddAnimation((int)EnemyAnimation::Dead, AnimationManager::Get()->Get("Death"), false);
-    animation->SetAnimation((int)EnemyAnimation::Walk);
+    animation->SetAnimation((int)EnemyAnimation::Idle);
 
     pursue.SetCharacter(&character);
     pursue.SetTarget(&target);
@@ -53,22 +54,37 @@ void EnemyComponent::OnTerminate(ActorManager *actorManager)
 
 void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 {
-    if(physics->grounded && life > 0)
+    float distToTargetSq = (transform->position - target.position).MagnitudeSq();
+    wasInRadio = isInRadio;
+    isInRadio = (distToTargetSq <= detectionRadio * detectionRadio);
+    if (isInRadio)
     {
+        if (physics->grounded && life > 0)
+        {
 
-        SteeringOutput lookSeering = face.GetSteering();
-        character.rotation += lookSeering.angular * dt;
-        character.rotation *= powf(0.001f, dt); // angular drag
-        character.orientation += character.rotation * dt;
-        transform->rotation.y = character.orientation * -1.0f;
+            SteeringOutput lookSeering = face.GetSteering();
+            character.rotation += lookSeering.angular * dt;
+            character.rotation *= powf(0.001f, dt); // angular drag
+            character.orientation += character.rotation * dt;
+            transform->rotation.y = character.orientation * -1.0f;
 
-        Vector3 moveDir = Vector3(-sinf(character.orientation), 0.0f, cosf(character.orientation)).Normalized();
+            Vector3 moveDir = Vector3(-sinf(character.orientation), 0.0f, cosf(character.orientation)).Normalized();
 
-        SteeringOutput pursueSteering = pursue.GetSteering();
-        physics->acceleration = moveDir * pursueSteering.linear.Magnitude();
-        character.position = transform->position;
-        character.velocity = physics->velocity;
-        character.velocity.y = 0.0f;
+            SteeringOutput pursueSteering = pursue.GetSteering();
+            physics->acceleration = moveDir * pursueSteering.linear.Magnitude();
+            character.position = transform->position;
+            character.velocity = physics->velocity;
+            character.velocity.y = 0.0f;
+        }
+    }
+
+    if (life > 0 && isInRadio && !wasInRadio)
+    {
+        animation->Transition((int)EnemyAnimation::Walk, 0.25f);
+    }
+    if (life > 0 && !isInRadio && wasInRadio)
+    {
+        animation->Transition((int)EnemyAnimation::Idle, 0.25f);
     }
 }
 

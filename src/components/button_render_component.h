@@ -7,8 +7,10 @@
 struct UniformBuffer;
 class TransformComponent;
 class Model;
+class ButtonComponent;
+class SolidColorMaterial;
 
-class RenderComponent : public Component<RenderComponent>
+class ButtonRenderComponent : public Component<ButtonRenderComponent>
 {
 private:
     struct PerDrawUbo
@@ -18,11 +20,12 @@ private:
 
     static UniformBuffer *uniformBuffer;
     static PerDrawUbo ubo;
-
-    TransformComponent* transform = nullptr;
 public:
     Model *model;
     Vector3 rotationOffset;
+    SolidColorMaterial* buttonMaterial = nullptr;
+    ButtonComponent* buttonComponent = nullptr;
+    TransformComponent* transform = nullptr;
 
      // use to init static variables, must be called by the user at init time
      static void Initialize();

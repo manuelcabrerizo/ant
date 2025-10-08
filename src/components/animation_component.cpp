@@ -123,6 +123,24 @@ bool AnimationComponent::IsPlaying()
     return isPlaying;
 }
 
+bool AnimationComponent::IsFinish()
+{
+    AnimationNode* node = GetCurrentAnimation();
+    if (node->isLooping)
+    {
+        return true;
+    }
+    else
+    {
+        return node->time >= node->animation->GetDuration();
+    }
+}
+
+bool AnimationComponent::IsTransitioning()
+{
+    return isTransitioning;
+}
+
 void AnimationComponent::Transition(int to, float timeToTarget)
 {
     isTransitioning = true;

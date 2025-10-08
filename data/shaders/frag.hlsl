@@ -2,7 +2,7 @@ SamplerState samplerState : register(s0);
 
 Texture2D diffuseMap : register(t0);
 Texture2D normalMap : register(t1);
-Texture2D spacularMap : register(t2);
+Texture2D specularMap : register(t2);
 
 struct PS_Input
 {
@@ -123,8 +123,8 @@ void CalcDirectionalLight(
 
 float4 fs_main(PS_Input i) : SV_TARGET
 {
-    float4 baseColor = diffuseMap.Sample(samplerState, i.uv);
-    float4 specColor = spacularMap.Sample(samplerState, i.uv);
+    float4 baseColor = diffuseMap.Sample(samplerState, i.uv);    
+    float4 specColor = specularMap.Sample(samplerState, i.uv);
     float4 normalColor = normalMap.Sample(samplerState, i.uv);
     
     float3 n = normalColor.rgb;

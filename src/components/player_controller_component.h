@@ -27,6 +27,7 @@ private:
     void OnButtonTrigger(Actor* button);
     void OnPortalTrigger(Actor* portal);
     void OnEnemyCollision(Actor* enemy);
+    void OnEndTrigger(Actor* endTrigger);
 
     void ProcessMouseMovement();
     void ProcessKeyboardMovement();

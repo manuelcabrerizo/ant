@@ -13,10 +13,11 @@ class ColliderComponent;
 
 enum class EnemyAnimation
 {
+    Idle,
     Walk,
     Dead,
 
-    Count
+    Count,
 };
 
 class EnemyComponent : public Component<EnemyComponent>, INotificable
@@ -35,6 +36,9 @@ private:
 
     int maxLife = 3;
     int life = 3;
+    float detectionRadio = 30.0f;
+    bool isInRadio = false;
+    bool wasInRadio = false;
 
     void OnEnemyHit(EnemyHitNotification* enemyHit);
     void OnPlayerMove(PlayerMoveNotification* playerMove);

@@ -27,6 +27,10 @@ private:
      Vector3 up;
      Vector3 worldUp;
      Vector3 worldFront;
+
+     float fov = 90.0f;
+     int windowWidth;
+     int windowHeight;
 public:
      // use to init static variables, must be called by the user at init time
      static void Initialize();
@@ -43,6 +47,7 @@ public:
      void Init(Vector3 pos, Vector3 dir);
      void SetPosition(Vector3 pos);
      void SetDirection(Vector3 dir);
+     void SetFov(float fov);
      Vector3 GetPosition();
      Vector3 GetFront();
      Vector3 GetRight();
@@ -50,4 +55,6 @@ public:
      Vector3 GetWorldFront();
      Vector3 GetWorldUp();
      Matrix4 GetView();
+
+     void UpdateUbo();
 };

@@ -18,6 +18,8 @@ private:
 
     static UniformBuffer* uniformBuffer;
     static PerDrawUbo ubo;
+
+    TransformComponent* transform = nullptr;
 public:
     Model* model;
     Vector3 rotationOffset;

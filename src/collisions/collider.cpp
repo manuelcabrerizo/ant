@@ -191,11 +191,11 @@ void Collider::DebugDraw() const
     {
         case ColliderType::AABB:
         {
-            //aabb.DebugDraw(color);
+            aabb.DebugDraw(color);
         } break;
         case ColliderType::OBB:
         {
-            //obb.DebugDraw(color);
+            obb.DebugDraw(color);
         } break;
         case ColliderType::SPHERE:
         {

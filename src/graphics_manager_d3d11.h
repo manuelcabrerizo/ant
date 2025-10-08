@@ -4,9 +4,9 @@
 #include <d3dcompiler.h>
 
 #include <containers.h>
-#include <debug_renderer_d3d11.h>
-
 #include <graphics_manager.h>
+
+#include <debug_renderer_d3d11.h>
 #include <batch_renderer_d3d11.h>
 
 struct VertexBufferD3D11 : public VertexBuffer
@@ -124,6 +124,7 @@ private:
 
      UniformBuffer* lightsUniformBuffer = nullptr;
      LightsUbo lighsUbo;
+
 
 #if ANT_DEBUG
      DebugRendererD3D11 debugRenderer;

@@ -21,6 +21,7 @@ private:
     static PerDrawUbo ubo;
     static UniformBuffer* matrixBuffer;
 
+    TransformComponent* transform = nullptr;
     AnimationComponent* animation = nullptr;
 public:
     Model* model;

@@ -46,8 +46,11 @@ private:
     Vector2 crosshairSize;
     Vector2 crosshairPosition;
 
+    bool isPlayerWin = false;
+
     void InitializeActorManager();
     void OnResize(OnResizeNotification* onResize);
+    void OnPlayerWin(PlayerWinNotification* playerWin);
 public:
     void Init(GameManager *gameManager);
     void Terminate();

@@ -58,9 +58,22 @@ void SolidColorMaterial::Bind()
     ubo.specular = this->specular;
     ubo.shininess = this->shininess;
     GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &ubo);
-
-
     GraphicsManager::Get()->FragmentShaderBind(shader);
+}
+
+void SolidColorMaterial::SetAmbient(const Vector3& ambient)
+{
+    this->ambient = ambient;
+}
+
+void SolidColorMaterial::SetDiffuse(const Vector3& diffuse)
+{
+    this->diffuse = diffuse;
+}
+
+void SolidColorMaterial::SetSpecular(const Vector3& specular)
+{
+    this->specular = specular;
 }
 
 i32 TextureMaterial::instanceCount = 0;

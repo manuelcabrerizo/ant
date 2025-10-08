@@ -10,6 +10,7 @@ enum class NotificationType
     EnemyHit,
     PlayerMove,
     Signal,
+    PlayerWin,
 
     // last item
     Count
@@ -49,4 +50,8 @@ class ISignable;
 struct SignalNotification : public Notification
 {
     ISignable* signable;
+};
+
+struct PlayerWinNotification : public Notification
+{
 };

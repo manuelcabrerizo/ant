@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="src\components\animated__render_component.cpp" />
     <ClCompile Include="src\components\button_component.cpp" />
+    <ClCompile Include="src\components\button_render_component.cpp" />
     <ClCompile Include="src\components\effect_component.cpp" />
     <ClCompile Include="src\components\fence_component.cpp" />
     <ClCompile Include="src\components\key_component.cpp" />
@@ -208,6 +209,7 @@
   <ItemGroup>
     <ClInclude Include="src\components\animated_render_component.h" />
     <ClInclude Include="src\components\button_component.h" />
+    <ClInclude Include="src\components\button_render_component.h" />
     <ClInclude Include="src\components\effect_component.h" />
     <ClInclude Include="src\components\fence_component.h" />
     <ClInclude Include="src\components\key_component.h" />

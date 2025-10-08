@@ -7,6 +7,7 @@
 #include <components/render_component.h>
 #include <components/weapon_render_component.h>
 #include <components/animated_render_component.h>
+#include <components/button_render_component.h>
 #include <components/tiled_render_component.h>
 #include <components/physics_component.h>
 #include <components/collider_component.h>
@@ -66,10 +67,12 @@ void PlayState::OnEnter()
     this->timeAccumulator = 0;
     this->frameCounter = 0;
     this->FPS = 0;
+    this->isPlayerWin = false;
 
     memoryFrame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
 
     NotificationManager::Get()->AddListener(this, NotificationType::OnResize);
+    NotificationManager::Get()->AddListener(this, NotificationType::PlayerWin);
 
     PlatformClientDimensions(&windowWidth, &windowHeight);
     Vector2 extent = Vector2(windowWidth, windowHeight);
@@ -86,6 +89,7 @@ void PlayState::OnEnter()
     WeaponRenderComponent::Initialize();
     AnimatedRenderComponent::Initialize();
     TiledRenderComponent::Initialize();
+    ButtonRenderComponent::Initialize();
 
     InitializeActorManager();
 
@@ -98,6 +102,7 @@ void PlayState::OnExit()
 
     actorManager.Terminate();
 
+    ButtonRenderComponent::Terminate();
     TiledRenderComponent::Terminate();
     AnimatedRenderComponent::Terminate();
     WeaponRenderComponent::Terminate();
@@ -105,6 +110,7 @@ void PlayState::OnExit()
     CameraComponent::Terminate();
 
     NotificationManager::Get()->RemoveListener(this, NotificationType::OnResize);
+    NotificationManager::Get()->RemoveListener(this, NotificationType::PlayerWin);
 
     // Remove all assets loaded for the level
     AnimationManager::Get()->Clear(FRAME_MEMORY);
@@ -145,7 +151,7 @@ void PlayState::OnUpdate(float deltaTime)
     // Late Update
     actorManager.LateUpdateComponents<PhysicsComponent>(deltaTime);
 
-    if (InputManager::Get()->KeyJustDown(KEY_P))
+    if (InputManager::Get()->KeyJustDown(KEY_P) || isPlayerWin)
     {
         gameManager->ChangeToMenuState();
     }
@@ -166,10 +172,15 @@ void PlayState::OnRender()
     GraphicsManager::Get()->FrameBufferBindAsRenderTarget(frameBuffer);
     GraphicsManager::Get()->FrameBufferClear(frameBuffer, 0.2f, 0.2f, 0.4f);
     actorManager.RenderComponents<RenderComponent>();
+    actorManager.RenderComponents<ButtonRenderComponent>();
     actorManager.RenderComponents<AnimatedRenderComponent>();
     actorManager.RenderComponents<TiledRenderComponent>();
     actorManager.RenderComponents<WeaponComponent>();
     actorManager.RenderComponents<EffectComponent>();
+#if ANT_DEBUG
+    CollisionWorld::Get()->DebugDraw();
+    GraphicsManager::Get()->DebugPresent();
+#endif
     GraphicsManager::Get()->FrameBufferResolve(frameBuffer);
 
     GraphicsManager::Get()->FrameBufferClear(bloomBuffers[1], 0, 0, 0);
@@ -219,10 +230,6 @@ void PlayState::OnRender()
     GraphicsManager::Get()->FrameBufferUnbindAsTexture(bloomBuffers[0], 2);
 
     // Draw the UI
-
-    //CollisionWorld::Get()->DebugDraw();
-    GraphicsManager::Get()->DebugPresent();
-
     // Render the Crosshair
     GraphicsManager::Get()->SetBlendingOff();
     GraphicsManager::Get()->SetDepthStencilOn();
@@ -254,6 +261,11 @@ void PlayState::OnResize(OnResizeNotification* onResize)
     textRenderer.OnResize(extent);
 }
 
+void PlayState::OnPlayerWin(PlayerWinNotification* playerWin)
+{
+    isPlayerWin = true;
+}
+
 void PlayState::InitializeActorManager()
 {
     actorManager.BeingInitialization(128, 64, FRAME_MEMORY);
@@ -262,6 +274,7 @@ void PlayState::InitializeActorManager()
     actorManager.AddComponentType<WeaponRenderComponent, 10>();
     actorManager.AddComponentType<AnimatedRenderComponent, 100>();
     actorManager.AddComponentType<TiledRenderComponent, 50>();
+    actorManager.AddComponentType<ButtonRenderComponent, 10>();
     actorManager.AddComponentType<PhysicsComponent, 100>();
     actorManager.AddComponentType<ColliderComponent, 100>();
     actorManager.AddComponentType<PlayerControllerComponent, 1>();
@@ -284,5 +297,6 @@ void PlayState::OnNotify(NotificationType type, Notification* notification)
     switch (type)
     {
     case NotificationType::OnResize: OnResize((OnResizeNotification*)notification); break;
+    case NotificationType::PlayerWin: OnPlayerWin((PlayerWinNotification*)notification); break;
     }
 }

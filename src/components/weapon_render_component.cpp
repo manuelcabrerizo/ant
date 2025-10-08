@@ -33,6 +33,7 @@ void WeaponRenderComponent::OnSetRenderState()
 
 void WeaponRenderComponent::OnInit(ActorManager* actorManager)
 {
+    transform = owner->GetComponent<TransformComponent>();
 }
 
 void WeaponRenderComponent::OnTerminate(ActorManager* actorManager)
@@ -41,8 +42,6 @@ void WeaponRenderComponent::OnTerminate(ActorManager* actorManager)
 
 void WeaponRenderComponent::OnRender(ActorManager* actorManager)
 {
-    TransformComponent* transform = owner->GetComponent<TransformComponent>();
-
     Matrix4 tra = Matrix4::Translate(transform->position);
     Matrix4 sca = Matrix4::Scale(transform->scale);
     Matrix4 ori = Matrix4::TransformFromEuler(transform->rotation.x, transform->rotation.y, transform->rotation.z);
