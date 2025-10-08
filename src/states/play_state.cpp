@@ -170,7 +170,7 @@ void PlayState::OnRender()
 
     // Draw the other render components
     GraphicsManager::Get()->FrameBufferBindAsRenderTarget(frameBuffer);
-    GraphicsManager::Get()->FrameBufferClear(frameBuffer, 0.2f, 0.2f, 0.4f);
+    GraphicsManager::Get()->FrameBufferClear(frameBuffer, 0.0f, 0.0f, 0.0f);
     actorManager.RenderComponents<RenderComponent>();
     actorManager.RenderComponents<ButtonRenderComponent>();
     actorManager.RenderComponents<AnimatedRenderComponent>();
@@ -257,6 +257,7 @@ void PlayState::OnResize(OnResizeNotification* onResize)
     windowHeight = onResize->extent.y;
     Vector2 extent = onResize->extent;
     crosshairPosition = (extent * 0.5f);
+    frameRenderer.OnResize(extent);
     uiRenderer.OnResize(extent);
     textRenderer.OnResize(extent);
 }

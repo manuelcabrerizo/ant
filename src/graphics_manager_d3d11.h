@@ -195,6 +195,8 @@ public:
      void FrameBufferBindAsTexture(FrameBuffer* frameBuffer, int slot) override;
      void FrameBufferUnbindAsTexture(FrameBuffer* frameBuffer, int slot) override;
      void FrameBufferResolve(FrameBuffer* frameBuffer) override;
+     void FrameBufferGetDimensions(FrameBuffer* frameBuffer, unsigned int& width, unsigned int& height) override;
+
 
      BatchRenderer* BatchRendererAlloc(VertexShader* vertShader, FragmentShader* fragShader, Texture* texture) override;
      void BatchRendererFree(BatchRenderer* batchRenderer) override;

@@ -113,6 +113,7 @@ public:
      virtual void FrameBufferBindAsTexture(FrameBuffer* frameBuffer, int slot) = 0;
      virtual void FrameBufferUnbindAsTexture(FrameBuffer* frameBuffer, int slot) = 0;
      virtual void FrameBufferResolve(FrameBuffer* frameBuffer) = 0;
+     virtual void FrameBufferGetDimensions(FrameBuffer* frameBuffer, unsigned int& width, unsigned int& height) = 0;
 
      virtual BatchRenderer* BatchRendererAlloc(VertexShader* vertShader, FragmentShader* fragShader, Texture* texture) = 0;
      virtual void BatchRendererFree(BatchRenderer *batchRenderer) = 0;

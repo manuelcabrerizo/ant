@@ -144,7 +144,7 @@ void GraphicsManagerD3D11::OnResize(i32 width, i32 height)
 
 void GraphicsManagerD3D11::BackBufferBind()
 {
-    deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+    deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);  
     D3D11_VIEWPORT vp;
     vp.Width = static_cast<float>(windowWidth);
     vp.Height = static_cast<float>(windowHeight);
@@ -731,6 +731,14 @@ void GraphicsManagerD3D11::FrameBufferResolve(FrameBuffer* frameBuffer)
         deviceContext->ResolveSubresource(fb->resolveTexture, 0, fb->texture, 0, fb->format);
     }
 }
+
+void GraphicsManagerD3D11::FrameBufferGetDimensions(FrameBuffer* frameBuffer, unsigned int& width, unsigned int& height)
+{
+    FrameBufferD3D11* fb = static_cast<FrameBufferD3D11*>(frameBuffer);
+    width = fb->w;
+    height = fb->h;
+}
+
 
 BatchRenderer* GraphicsManagerD3D11::BatchRendererAlloc(
     VertexShader* vertShader, FragmentShader* fragShader, Texture* texture)

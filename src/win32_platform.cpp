@@ -129,11 +129,11 @@ int CALLBACK WinMain(HINSTANCE hInstance,
      wndClass.lpszClassName = "AntWindowClass";
      if(RegisterClassA(&wndClass))
      {
-          HWND window = CreateWindowA(wndClass.lpszClassName,
-                                      "Ant", WS_OVERLAPPEDWINDOW,
-                                      CW_USEDEFAULT, CW_USEDEFAULT,
-                                      WINDOW_WIDTH, WINDOW_HEIGHT,
-                                      0, 0, hInstance, 0);
+        HWND window = CreateWindowA(wndClass.lpszClassName,
+                                    "Ant", WS_OVERLAPPEDWINDOW,
+                                    CW_USEDEFAULT, CW_USEDEFAULT,
+                                    WINDOW_WIDTH, WINDOW_HEIGHT,
+                                    0, 0, hInstance, 0);
           if(window)
           {
                gWindow = window;
