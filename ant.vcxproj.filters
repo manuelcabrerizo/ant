@@ -246,6 +246,15 @@
     <ClCompile Include="src\components\ammo_component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\states\pause_state.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\states\victory_state.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\states\game_over_state.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\actor.h">
@@ -507,6 +516,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\components\ammo_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\states\pause_state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\states\victory_state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\states\game_over_state.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

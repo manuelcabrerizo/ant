@@ -8,6 +8,7 @@ void UIButton<Type>::Init(
     const Vector2& position, const Vector2& size, const char* texture[],
     Type* instance, void (Type::* OnClick)())
 {
+    this->state = UIButtonState::MouseOut;
     this->position = position;
     this->size = size;
     this->texture[0] = texture[0];

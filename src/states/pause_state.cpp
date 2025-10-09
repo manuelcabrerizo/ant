@@ -1,22 +1,22 @@
-#include "menu_state.h"
+#include "pause_state.h"
 #include <game_manager.h>
 #include <input_manager.h>
 #include <asset_managers/texture_manager.h>
 #include <notification_manager.h>
 
-void MenuState::Init(GameManager* gameManager)
+void PauseState::Init(GameManager* gameManager)
 {
     this->gameManager = gameManager;
     uiRenderer.Init();
     textRenderer.Init("data/fonts/times.rtpa", STATIC_MEMORY);
 
     // Load menu assets
-    TextureManager::Get()->Load("PlayButton", "data/textures/play_button.png", STATIC_MEMORY, false);
-    TextureManager::Get()->Load("PlayButtonSelected", "data/textures/play_button_selected.png", STATIC_MEMORY, false);
-    TextureManager::Get()->Load("PlayButtonClicked", "data/textures/play_button_clicked.png", STATIC_MEMORY, false);
-    TextureManager::Get()->Load("ExitButton", "data/textures/exit_button.png", STATIC_MEMORY, false);
-    TextureManager::Get()->Load("ExitButtonSelected", "data/textures/exit_button_selected.png", STATIC_MEMORY, false);
-    TextureManager::Get()->Load("ExitButtonClicked", "data/textures/exit_button_clicked.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("ResumeButton", "data/textures/resume_button.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("ResumeButtonSelected", "data/textures/resume_button_selected.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("ResumeButtonClicked", "data/textures/resume_button_clicked.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("MenuButton", "data/textures/menu_button.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("MenuButtonSelected", "data/textures/menu_button_selected.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("MenuButtonClicked", "data/textures/menu_button_clicked.png", STATIC_MEMORY, false);
     TextureManager::Get()->Load("PauseBackground", "data/textures/stone_hell_5.png", STATIC_MEMORY, false);
 
     // allocate memory for the buttons
@@ -30,25 +30,25 @@ void MenuState::Init(GameManager* gameManager)
     Vector2 offset = Vector2(0.0f, 60.0f);
     
     // Create the play button
-    UIButton<MenuState> playButton;
-    const char* playButtonTextures[] = { "PlayButton", "PlayButtonSelected", "PlayButtonClicked" };
-    playButton.Init(position + offset, size, playButtonTextures, this, &MenuState::OnPlayButtonClick);
+    UIButton<PauseState> playButton;
+    const char* playButtonTextures[] = { "ResumeButton", "ResumeButtonSelected", "ResumeButtonClicked" };
+    playButton.Init(position + offset, size, playButtonTextures, this, &PauseState::OnResumeButtonClick);
     buttons.Push(playButton);
 
     // Create the exit button
-    UIButton<MenuState> exitButton;
-    const char* exitButtonTextures[] = { "ExitButton", "ExitButtonSelected", "ExitButtonClicked" };
-    exitButton.Init(position - offset, size, exitButtonTextures, this, &MenuState::OnExitButtonClick);
+    UIButton<PauseState> exitButton;
+    const char* exitButtonTextures[] = { "MenuButton", "MenuButtonSelected", "MenuButtonClicked" };
+    exitButton.Init(position - offset, size, exitButtonTextures, this, &PauseState::OnMenuButtonClick);
     buttons.Push(exitButton);
 }
 
-void MenuState::Terminate()
+void PauseState::Terminate()
 {
     textRenderer.Terminate();
     uiRenderer.Terminate();
 }
 
-void MenuState::OnEnter()
+void PauseState::OnEnter()
 {
     NotificationManager::Get()->AddListener(this, NotificationType::OnResize);
 
@@ -64,22 +64,27 @@ void MenuState::OnEnter()
 
 }
 
-void MenuState::OnExit()
+void PauseState::OnExit()
 {
     PlatformShowMouse(false);
 
     NotificationManager::Get()->RemoveListener(this, NotificationType::OnResize);
 }
 
-void MenuState::OnUpdate(float deltaTime)
+void PauseState::OnUpdate(float deltaTime)
 {
+    if (InputManager::Get()->KeyJustDown(KEY_ESCAPE))
+    {
+        gameManager->PopPauseState();
+    }
+
     for (int i = 0; i < buttons.size; i++)
     {
         buttons[i].Update();
     }
 }
 
-void MenuState::OnRender()
+void PauseState::OnRender()
 {
     GraphicsManager::Get()->BackBufferBind();
     GraphicsManager::Get()->BeginFrame(0, 0, 0);
@@ -97,16 +102,16 @@ void MenuState::OnRender()
 
     float ratioX = windowWidth / 1920.0f;
     float ratioY = windowHeight / 1080.0f;
-    float positionX = (windowWidth * 0.5f) - (700 * ratioX);
+    float positionX = (windowWidth * 0.5f) - (275 * ratioX);
     float positionY = windowHeight - (300 * ratioY);
-    textRenderer.DrawString("FPS GAME DEMO", Vector2(positionX, positionY), 6.0f*ratioX, Vector3(0.75, 0.25f, 1.0f));
+    textRenderer.DrawString("PAUSE", Vector2(positionX, positionY), 6.0f * ratioX, Vector3(1.0f, 1.0f, 0.5f));
 
     GraphicsManager::Get()->SetRasterizerStateCullBack();
     GraphicsManager::Get()->SetDepthStencilOn();
     GraphicsManager::Get()->EndFrame(1);
 }
 
-void MenuState::OnResize(OnResizeNotification* onResize)
+void PauseState::OnResize(OnResizeNotification* onResize)
 {
     windowWidth = onResize->extent.x;
     windowHeight = onResize->extent.y;
@@ -120,17 +125,17 @@ void MenuState::OnResize(OnResizeNotification* onResize)
     textRenderer.OnResize(extent);
 }
 
-void MenuState::OnPlayButtonClick()
+void PauseState::OnResumeButtonClick()
 {
-    gameManager->ChangeToPlayState();
+    gameManager->PopPauseState();
 }
 
-void MenuState::OnExitButtonClick()
+void PauseState::OnMenuButtonClick()
 {
-    PlatformQuitApplication();
+    gameManager->ChangeToMenuState();
 }
 
-void MenuState::DrawBackGround()
+void PauseState::DrawBackGround()
 {
     int tileWidth = 512;
     int tileHeight = 512;
@@ -147,7 +152,7 @@ void MenuState::DrawBackGround()
     }
 }
 
-void MenuState::OnNotify(NotificationType type, Notification* notification)
+void PauseState::OnNotify(NotificationType type, Notification* notification)
 {
     switch (type)
     {

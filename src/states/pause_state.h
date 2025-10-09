@@ -9,14 +9,14 @@
 
 class GameManager;
 
-class MenuState : public IState, INotificable
+class PauseState : public IState, INotificable
 {
 private:
     GameManager* gameManager = nullptr;
     UIRenderer uiRenderer;
     TextRenderer textRenderer;
 
-    Array<UIButton<MenuState>> buttons;
+    Array<UIButton<PauseState>> buttons;
     int windowWidth;
     int windowHeight;
 
@@ -33,7 +33,7 @@ public:
     void OnRender() override;
     void OnNotify(NotificationType type, Notification* notification) override;
 
-    void OnPlayButtonClick();
-    void OnExitButtonClick();
+    void OnResumeButtonClick();
+    void OnMenuButtonClick();
     void DrawBackGround();
 };

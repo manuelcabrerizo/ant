@@ -2,48 +2,52 @@
 
 void StateMachine::Push(IState* state)
 {
-    if (current == nullptr ||
-        current != state)
+    if (states.empty() || states.top() != state)
     {
-        current = state;
-        current->OnEnter();
+        state->OnEnter();
+        states.push(state);
     }
 }
 
 void StateMachine::Pop()
 {
-    if (current != nullptr)
+    if (!states.empty())
     {
-        current->OnExit();
-        current = nullptr;
+        states.top()->OnExit();
+        states.pop();
     }
 }
 
 void StateMachine::ChangeState(IState* state)
 {
-    Pop();
+    Clear();
     Push(state);
+}
+
+IState* StateMachine::Peek()
+{
+    return !states.empty() ? states.top() : nullptr;
 }
 
 void StateMachine::Update(float deltaTime)
 {
-    if (current != nullptr)
+    if (!states.empty())
     {
-        current->OnUpdate(deltaTime);
+        states.top()->OnUpdate(deltaTime);
     }
 }
 
 void StateMachine::Render()
 {
-    if (current != nullptr)
+    if (!states.empty())
     {
-        current->OnRender();
+        states.top()->OnRender();
     }
 }
 
 void StateMachine::Clear()
 {
-    while (current != nullptr)
+    while (!states.empty())
     {
         Pop();
     }

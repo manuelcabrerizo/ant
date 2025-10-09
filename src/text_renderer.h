@@ -56,5 +56,5 @@ public:
     void Terminate();
     void OnResize(const Vector2& extent);
 
-    void DrawString(const char* text, const Vector2& position, float size);
+    void DrawString(const char* text, const Vector2& position, float size, const Vector3& color);
 };

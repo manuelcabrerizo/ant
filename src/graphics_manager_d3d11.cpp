@@ -29,6 +29,7 @@ void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32
      BackBufferBind();
      deviceContext->PSSetSamplers(0, 1, &samplerStateLinearWrap);
      deviceContext->PSSetSamplers(1, 1, &samplerStateLinearClamp);
+     deviceContext->PSSetSamplers(2, 1, &samplerStateNearestWrap);
 
      D3D11_VIEWPORT viewport;
      viewport.TopLeftX = 0;

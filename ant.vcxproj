@@ -145,6 +145,8 @@
     <ClCompile Include="src\bounding_volume_hierarchie.cpp" />
     <ClCompile Include="src\components\collider_component.cpp" />
     <ClCompile Include="src\particle_systems\shoot_ps.cpp" />
+    <ClCompile Include="src\states\game_over_state.cpp" />
+    <ClCompile Include="src\states\pause_state.cpp" />
     <ClCompile Include="src\states\play_state.cpp" />
     <ClCompile Include="src\states\menu_state.cpp" />
     <ClCompile Include="src\components\component.cpp" />
@@ -198,6 +200,7 @@
     <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\notification_manager.cpp" />
     <ClCompile Include="src\states\state_machine.cpp" />
+    <ClCompile Include="src\states\victory_state.cpp" />
     <ClCompile Include="src\strings.cpp" />
     <ClCompile Include="libs\tinyxml2\tinyxml2.cpp" />
     <ClCompile Include="src\text_renderer.cpp" />
@@ -226,6 +229,8 @@
     <ClInclude Include="src\bounding_volume_hierarchie.h" />
     <ClInclude Include="src\components\collider_component.h" />
     <ClInclude Include="src\particle_systems\shoot_ps.h" />
+    <ClInclude Include="src\states\game_over_state.h" />
+    <ClInclude Include="src\states\pause_state.h" />
     <ClInclude Include="src\states\play_state.h" />
     <ClInclude Include="src\states\menu_state.h" />
     <ClInclude Include="src\component_list.h" />
@@ -286,6 +291,7 @@
     <ClInclude Include="src\notification_manager.h" />
     <ClInclude Include="src\platform.h" />
     <ClInclude Include="src\states\state.h" />
+    <ClInclude Include="src\states\victory_state.h" />
     <ClInclude Include="src\strings.h" />
     <ClInclude Include="libs\tinyxml2\tinyxml2.h" />
     <ClInclude Include="src\text_renderer.h" />

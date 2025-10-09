@@ -17,13 +17,19 @@ void GameManager::Init()
     scenes.Init(1, STATIC_MEMORY);
     menuState.Init(this);
     playState.Init(this);
-    stateMachine.Push(&menuState);
+    pauseState.Init(this);
+    victoryState.Init(this);
+    gameOverState.Init(this);
+    stateMachine.Push(&gameOverState);
     PlatformClientDimensions(&clientWidth, &clientHeight);
 }
 
 void GameManager::Terminate()
 {
     stateMachine.Clear();
+    gameOverState.Terminate();
+    victoryState.Terminate();
+    pauseState.Terminate();
     playState.Terminate();
     menuState.Terminate();
     GraphicsManager::Get()->DebugTerminate();
@@ -34,7 +40,6 @@ void GameManager::Terminate()
 
 void GameManager::Update(f32 dt)
 {
-    // TODO: automate this calls
     MaterialManager::Get()->Get("AlienPortalMaterial")->Update(dt);
     MaterialManager::Get()->Get("Level1MagmaMaterial")->Update(dt);
     MaterialManager::Get()->Get("FinalMaterial")->Update(dt);
@@ -65,6 +70,29 @@ void GameManager::ChangeToMenuState()
 void GameManager::ChangeToPlayState()
 {
     stateMachine.ChangeState(&playState);
+}
+
+void GameManager::ChangeToVictoryState()
+{
+    stateMachine.ChangeState(&victoryState);
+}
+
+void GameManager::ChangeToGameOverState()
+{
+    stateMachine.ChangeState(&gameOverState);
+}
+
+void GameManager::PushPauseState()
+{
+    stateMachine.Push(&pauseState);
+}
+
+void GameManager::PopPauseState()
+{
+    if (stateMachine.Peek() == &pauseState)
+    {
+        stateMachine.Pop();
+    }
 }
 
 Scene* GameManager::GetCurrentScene()
@@ -102,6 +130,7 @@ void GameManager::LoadDefaultAssets()
     VertexShaderManager::Get()->Load("tiled_vert", "data/shaders/tiled_vert.hlsl", STATIC_MEMORY);
     VertexShaderManager::Get()->Load("ui_vert", "data/shaders/ui_vert.hlsl", STATIC_MEMORY);
     VertexShaderManager::Get()->Load("batch_vert", "data/shaders/batch_vert.hlsl", STATIC_MEMORY);
+    VertexShaderManager::Get()->Load("text_vert", "data/shaders/text_vert.hlsl", STATIC_MEMORY);
     VertexShaderManager::Get()->Bind("default");
 
     // Load Fragment the shaders
@@ -110,6 +139,7 @@ void GameManager::LoadDefaultAssets()
     FragmentShaderManager::Get()->Load("ui_frag", "data/shaders/ui_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("post_frag", "data/shaders/post_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("batch_frag", "data/shaders/batch_frag.hlsl", STATIC_MEMORY);
+    FragmentShaderManager::Get()->Load("text_frag", "data/shaders/text_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("portal_frag", "data/shaders/portal_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("magma_frag", "data/shaders/magma_frag.hlsl", STATIC_MEMORY);
     FragmentShaderManager::Get()->Load("fence_frag", "data/shaders/fence_frag.hlsl", STATIC_MEMORY);

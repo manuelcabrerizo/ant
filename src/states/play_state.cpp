@@ -144,6 +144,16 @@ void PlayState::OnUpdate(float deltaTime)
         timeAccumulator -= 1.0f;
     }
 
+    if (InputManager::Get()->KeyJustDown(KEY_ESCAPE))
+    {
+        gameManager->PushPauseState();
+    }
+
+    if (isPlayerWin)
+    {
+        gameManager->ChangeToVictoryState();
+    }
+
     // Initialize new components
     actorManager.InitializeNewComponents();
     // Update
@@ -157,11 +167,6 @@ void PlayState::OnUpdate(float deltaTime)
     actorManager.UpdateComponents<EffectComponent>(deltaTime);
     actorManager.UpdateComponents<AmmoComponent>(deltaTime);
     actorManager.UpdateComponents<FenceComponent>(deltaTime);
-
-    if (InputManager::Get()->KeyJustDown(KEY_P) || isPlayerWin)
-    {
-        gameManager->ChangeToMenuState();
-    }
 }
 
 void PlayState::OnRender()
@@ -225,7 +230,7 @@ void PlayState::OnRender()
     // Draw to the Back Buffer
     GraphicsManager::Get()->SetDepthStencilOn();
     GraphicsManager::Get()->BackBufferBind();
-    GraphicsManager::Get()->BeginFrame(0, 1, 0);
+    GraphicsManager::Get()->BeginFrame(0, 0, 0);
 
     FragmentShaderManager::Get()->Bind("post_frag");
     GraphicsManager::Get()->FrameBufferBindAsTexture(frameBuffer, 0);
@@ -249,18 +254,18 @@ void PlayState::OnRender()
 
     char buffer[256];
     sprintf(buffer, "FPS: %d", FPS);
-    textRenderer.DrawString(buffer, Vector2(5, windowHeight - 32), 1.0f);
+    textRenderer.DrawString(buffer, Vector2(5, windowHeight - 32), 1.0f, Vector3(0, 1, 0));
 
     sprintf(buffer, "Enemies Killed: %d | %d", enemyKillCount, enemyCount);
-    textRenderer.DrawString(buffer, Vector2(5, windowHeight - 64), 1.0f);
+    textRenderer.DrawString(buffer, Vector2(5, windowHeight - 64), 1.0f, Vector3(1, 1, 0));
 
     sprintf(buffer, "Ammo: %d | %d", currentAmmo, maxAmmo);
-    textRenderer.DrawString(buffer, Vector2(5, windowHeight - 96), 1.0f);
+    textRenderer.DrawString(buffer, Vector2(5, windowHeight - 96), 1.0f, Vector3(1, 1, 0));
     
     GraphicsManager::Get()->SetRasterizerStateCullBack();
     GraphicsManager::Get()->SetDepthStencilOn();
 
-    GraphicsManager::Get()->EndFrame(1);
+    GraphicsManager::Get()->EndFrame(0);
 }
 
 void PlayState::OnResize(OnResizeNotification* onResize)

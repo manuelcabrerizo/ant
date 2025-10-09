@@ -1,10 +1,10 @@
-#include "menu_state.h"
+#include "victory_state.h"
 #include <game_manager.h>
 #include <input_manager.h>
 #include <asset_managers/texture_manager.h>
 #include <notification_manager.h>
 
-void MenuState::Init(GameManager* gameManager)
+void VictoryState::Init(GameManager* gameManager)
 {
     this->gameManager = gameManager;
     uiRenderer.Init();
@@ -14,9 +14,9 @@ void MenuState::Init(GameManager* gameManager)
     TextureManager::Get()->Load("PlayButton", "data/textures/play_button.png", STATIC_MEMORY, false);
     TextureManager::Get()->Load("PlayButtonSelected", "data/textures/play_button_selected.png", STATIC_MEMORY, false);
     TextureManager::Get()->Load("PlayButtonClicked", "data/textures/play_button_clicked.png", STATIC_MEMORY, false);
-    TextureManager::Get()->Load("ExitButton", "data/textures/exit_button.png", STATIC_MEMORY, false);
-    TextureManager::Get()->Load("ExitButtonSelected", "data/textures/exit_button_selected.png", STATIC_MEMORY, false);
-    TextureManager::Get()->Load("ExitButtonClicked", "data/textures/exit_button_clicked.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("MenuButton", "data/textures/menu_button.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("MenuButtonSelected", "data/textures/menu_button_selected.png", STATIC_MEMORY, false);
+    TextureManager::Get()->Load("MenuButtonClicked", "data/textures/menu_button_clicked.png", STATIC_MEMORY, false);
     TextureManager::Get()->Load("PauseBackground", "data/textures/stone_hell_5.png", STATIC_MEMORY, false);
 
     // allocate memory for the buttons
@@ -30,25 +30,25 @@ void MenuState::Init(GameManager* gameManager)
     Vector2 offset = Vector2(0.0f, 60.0f);
     
     // Create the play button
-    UIButton<MenuState> playButton;
+    UIButton<VictoryState> playButton;
     const char* playButtonTextures[] = { "PlayButton", "PlayButtonSelected", "PlayButtonClicked" };
-    playButton.Init(position + offset, size, playButtonTextures, this, &MenuState::OnPlayButtonClick);
+    playButton.Init(position + offset, size, playButtonTextures, this, &VictoryState::OnPlayButtonClick);
     buttons.Push(playButton);
 
     // Create the exit button
-    UIButton<MenuState> exitButton;
-    const char* exitButtonTextures[] = { "ExitButton", "ExitButtonSelected", "ExitButtonClicked" };
-    exitButton.Init(position - offset, size, exitButtonTextures, this, &MenuState::OnExitButtonClick);
+    UIButton<VictoryState> exitButton;
+    const char* exitButtonTextures[] = { "MenuButton", "MenuButtonSelected", "MenuButtonClicked" };
+    exitButton.Init(position - offset, size, exitButtonTextures, this, &VictoryState::OnMenuButtonClick);
     buttons.Push(exitButton);
 }
 
-void MenuState::Terminate()
+void VictoryState::Terminate()
 {
     textRenderer.Terminate();
     uiRenderer.Terminate();
 }
 
-void MenuState::OnEnter()
+void VictoryState::OnEnter()
 {
     NotificationManager::Get()->AddListener(this, NotificationType::OnResize);
 
@@ -64,14 +64,14 @@ void MenuState::OnEnter()
 
 }
 
-void MenuState::OnExit()
+void VictoryState::OnExit()
 {
     PlatformShowMouse(false);
 
     NotificationManager::Get()->RemoveListener(this, NotificationType::OnResize);
 }
 
-void MenuState::OnUpdate(float deltaTime)
+void VictoryState::OnUpdate(float deltaTime)
 {
     for (int i = 0; i < buttons.size; i++)
     {
@@ -79,7 +79,7 @@ void MenuState::OnUpdate(float deltaTime)
     }
 }
 
-void MenuState::OnRender()
+void VictoryState::OnRender()
 {
     GraphicsManager::Get()->BackBufferBind();
     GraphicsManager::Get()->BeginFrame(0, 0, 0);
@@ -97,16 +97,16 @@ void MenuState::OnRender()
 
     float ratioX = windowWidth / 1920.0f;
     float ratioY = windowHeight / 1080.0f;
-    float positionX = (windowWidth * 0.5f) - (700 * ratioX);
+    float positionX = (windowWidth * 0.5f) - (375 * ratioX);
     float positionY = windowHeight - (300 * ratioY);
-    textRenderer.DrawString("FPS GAME DEMO", Vector2(positionX, positionY), 6.0f*ratioX, Vector3(0.75, 0.25f, 1.0f));
+    textRenderer.DrawString("VICTORY", Vector2(positionX, positionY), 6.0f*ratioX, Vector3(0.5, 1.0f, 0.5f));
 
     GraphicsManager::Get()->SetRasterizerStateCullBack();
     GraphicsManager::Get()->SetDepthStencilOn();
     GraphicsManager::Get()->EndFrame(1);
 }
 
-void MenuState::OnResize(OnResizeNotification* onResize)
+void VictoryState::OnResize(OnResizeNotification* onResize)
 {
     windowWidth = onResize->extent.x;
     windowHeight = onResize->extent.y;
@@ -120,17 +120,17 @@ void MenuState::OnResize(OnResizeNotification* onResize)
     textRenderer.OnResize(extent);
 }
 
-void MenuState::OnPlayButtonClick()
+void VictoryState::OnPlayButtonClick()
 {
     gameManager->ChangeToPlayState();
 }
 
-void MenuState::OnExitButtonClick()
+void VictoryState::OnMenuButtonClick()
 {
-    PlatformQuitApplication();
+    gameManager->ChangeToMenuState();
 }
 
-void MenuState::DrawBackGround()
+void VictoryState::DrawBackGround()
 {
     int tileWidth = 512;
     int tileHeight = 512;
@@ -147,7 +147,7 @@ void MenuState::DrawBackGround()
     }
 }
 
-void MenuState::OnNotify(NotificationType type, Notification* notification)
+void VictoryState::OnNotify(NotificationType type, Notification* notification)
 {
     switch (type)
     {

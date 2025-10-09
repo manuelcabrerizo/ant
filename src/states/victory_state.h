@@ -9,14 +9,14 @@
 
 class GameManager;
 
-class MenuState : public IState, INotificable
+class VictoryState : public IState, INotificable
 {
 private:
     GameManager* gameManager = nullptr;
     UIRenderer uiRenderer;
     TextRenderer textRenderer;
 
-    Array<UIButton<MenuState>> buttons;
+    Array<UIButton<VictoryState>> buttons;
     int windowWidth;
     int windowHeight;
 
@@ -34,6 +34,6 @@ public:
     void OnNotify(NotificationType type, Notification* notification) override;
 
     void OnPlayButtonClick();
-    void OnExitButtonClick();
+    void OnMenuButtonClick();
     void DrawBackGround();
 };

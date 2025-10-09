@@ -3,6 +3,9 @@
 #include <states/state_machine.h>
 #include <states/menu_state.h>
 #include <states/play_state.h>
+#include <states/pause_state.h>
+#include <states/victory_state.h>
+#include <states/game_over_state.h>
 
 class GameManager
 {
@@ -13,6 +16,10 @@ private:
 
     MenuState menuState;
     PlayState playState;
+    PauseState pauseState;
+    VictoryState victoryState;
+    GameOverState gameOverState;
+
     StateMachine stateMachine;
 
     void InitializeAssetsManagers();
@@ -27,6 +34,10 @@ public:
 
     void ChangeToMenuState();
     void ChangeToPlayState();
+    void ChangeToVictoryState();
+    void ChangeToGameOverState();
+    void PushPauseState();
+    void PopPauseState();
 
     Scene* GetCurrentScene();
 };

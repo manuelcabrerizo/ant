@@ -61,8 +61,8 @@ void TextRenderer::Init(const char* atlasInfoPath, int memoryType)
 
     // Init the batch renderer
     batch = GraphicsManager::Get()->BatchRendererAlloc(
-        VertexShaderManager::Get()->Get("batch_vert"),
-        FragmentShaderManager::Get()->Get("batch_frag"),
+        VertexShaderManager::Get()->Get("text_vert"),
+        FragmentShaderManager::Get()->Get("text_frag"),
         atlas);
 
 
@@ -84,7 +84,7 @@ void TextRenderer::OnResize(const Vector2& extent)
     matrices.proj = Matrix4::Ortho(0, extent.x, 0, extent.y, 0, 100);
 }
 
-void TextRenderer::DrawString(const char* text, const Vector2& position, float size)
+void TextRenderer::DrawString(const char* text, const Vector2& position, float size, const Vector3& color)
 {
     GraphicsManager::Get()->UniformBufferUpdate(uniformBuffer, &matrices);
     GraphicsManager::Get()->UniformBufferBind(uniformBuffer);
@@ -112,19 +112,20 @@ void TextRenderer::DrawString(const char* text, const Vector2& position, float s
         endX /= static_cast<float>(info.width);
         endY /= static_cast<float>(info.height);
 
-        float baseY = (sprite.sourceHeight / 2);
-        float baseX = (sprite.sourceWidth / 2);
+        float baseY = (sprite.sourceHeight / 2) * size;
+        float baseX = (sprite.sourceWidth / 2) * size;
 
-        float offsetY = (info.fontSize - sprite.sourceHeight) - sprite.charOffsetY;
-        float offsetX = sprite.charOffsetX;
+        float offsetY = ((info.fontSize - sprite.sourceHeight) - sprite.charOffsetY) * size;
+        float offsetX = (sprite.charOffsetX) * size;
 
         batch->DrawQuad(Vector3(
             baseX + position.x + cursorX + offsetX,
             baseY + position.y + offsetY, 0),
-            Vector3(sprite.sourceWidth, sprite.sourceHeight, 1), Matrix4(),
-            Vector4(endX, 1-endY, startX, 1-startY), Vector3(4, 4, 0));
+            Vector3(sprite.sourceWidth * size, sprite.sourceHeight * size, 1),
+            Matrix4(),
+            Vector4(endX, 1-endY, startX, 1-startY), color);
 
-        cursorX += static_cast<float>(sprite.charAdvanceX);
+        cursorX += static_cast<float>(sprite.charAdvanceX) * size;
     }
     batch->Present();
 }
