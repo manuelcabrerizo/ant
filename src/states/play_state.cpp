@@ -68,8 +68,13 @@ void PlayState::OnEnter()
     this->frameCounter = 0;
     this->FPS = 0;
     this->isPlayerWin = false;
+    this->isPlayerGameOver = false;
     this->enemyCount = 0;
     this->enemyKillCount = 0;
+    this->currentAmmo = 0;
+    this->maxAmmo = 0;
+    this->currentLife = 0;
+    this->maxLife = 0;
 
     memoryFrame = MemoryManager::Get()->GetFrame(FRAME_MEMORY);
 
@@ -78,6 +83,7 @@ void PlayState::OnEnter()
     NotificationManager::Get()->AddListener(this, NotificationType::EnemySpawn);
     NotificationManager::Get()->AddListener(this, NotificationType::EnemyKill);
     NotificationManager::Get()->AddListener(this, NotificationType::AmmoChange);
+    NotificationManager::Get()->AddListener(this, NotificationType::PlayerLifeChange);
 
     PlatformClientDimensions(&windowWidth, &windowHeight);
     Vector2 extent = Vector2(windowWidth, windowHeight);
@@ -119,6 +125,7 @@ void PlayState::OnExit()
     NotificationManager::Get()->RemoveListener(this, NotificationType::EnemySpawn);
     NotificationManager::Get()->RemoveListener(this, NotificationType::EnemyKill);
     NotificationManager::Get()->RemoveListener(this, NotificationType::AmmoChange);
+    NotificationManager::Get()->RemoveListener(this, NotificationType::PlayerLifeChange);
 
 
     // Remove all assets loaded for the level
@@ -152,6 +159,10 @@ void PlayState::OnUpdate(float deltaTime)
     if (isPlayerWin)
     {
         gameManager->ChangeToVictoryState();
+    }
+    if (isPlayerGameOver)
+    {
+        gameManager->ChangeToGameOverState();
     }
 
     // Initialize new components
@@ -255,11 +266,14 @@ void PlayState::OnRender()
     sprintf(buffer, "FPS: %d", FPS);
     textRenderer.DrawString(buffer, Vector2(5, windowHeight - 32), 1.0f, Vector3(0, 1, 0));
 
-    sprintf(buffer, "Enemies Killed: %d | %d", enemyKillCount, enemyCount);
+    sprintf(buffer, "Life: %d | %d", currentLife, maxLife);
     textRenderer.DrawString(buffer, Vector2(5, windowHeight - 64), 1.0f, Vector3(1, 1, 0));
 
     sprintf(buffer, "Ammo: %d | %d", currentAmmo, maxAmmo);
     textRenderer.DrawString(buffer, Vector2(5, windowHeight - 96), 1.0f, Vector3(1, 1, 0));
+
+    sprintf(buffer, "Enemies Killed: %d | %d", enemyKillCount, enemyCount);
+    textRenderer.DrawString(buffer, Vector2(5, windowHeight - 128), 1.0f, Vector3(1, 1, 0));
     
     GraphicsManager::Get()->SetRasterizerStateCullBack();
     GraphicsManager::Get()->SetDepthStencilOn();
@@ -299,6 +313,16 @@ void PlayState::OnAmmoChange(AmmoChangeNotification* ammoChange)
     maxAmmo = ammoChange->maxAmmo;
 }
 
+void PlayState::OnPlayerLifeChange(PlayerLifeChangeNotification* playerLifeChange)
+{
+    if (playerLifeChange->life == 0)
+    {
+        isPlayerGameOver = true;
+    }
+    currentLife = playerLifeChange->life;
+    maxLife = playerLifeChange->maxLife;
+}
+
 void PlayState::InitializeActorManager()
 {
     actorManager.BeingInitialization(128, 64, FRAME_MEMORY);
@@ -334,5 +358,6 @@ void PlayState::OnNotify(NotificationType type, Notification* notification)
     case NotificationType::EnemySpawn: OnEnemySpawn((EnemySpawnNotification*)notification); break;
     case NotificationType::EnemyKill: OnEnemyKill((EnemyKillNotification*)notification); break;
     case NotificationType::AmmoChange: OnAmmoChange((AmmoChangeNotification*)notification); break;
+    case NotificationType::PlayerLifeChange: OnPlayerLifeChange((PlayerLifeChangeNotification*)notification); break;
     }
 }

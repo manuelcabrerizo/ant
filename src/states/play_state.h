@@ -47,10 +47,13 @@ private:
     Vector2 crosshairPosition;
 
     bool isPlayerWin = false;
+    bool isPlayerGameOver = false;
     int enemyCount = 0;
     int enemyKillCount = 0;
     int currentAmmo = 0;
     int maxAmmo = 0;
+    int currentLife = 0;
+    int maxLife = 0;
 
     void InitializeActorManager();
     void OnResize(OnResizeNotification* onResize);
@@ -58,6 +61,7 @@ private:
     void OnEnemySpawn(EnemySpawnNotification* enemySpawn);
     void OnEnemyKill(EnemyKillNotification* enemyKill);
     void OnAmmoChange(AmmoChangeNotification* ammoChange);
+    void OnPlayerLifeChange(PlayerLifeChangeNotification* playerLifeChange);
 public:
     void Init(GameManager *gameManager);
     void Terminate();

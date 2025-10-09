@@ -33,7 +33,7 @@ void PlayerControllerComponent::OnInit(ActorManager *actorManager)
     weapon = owner->GetComponent<WeaponComponent>();
     collider = owner->GetComponent<ColliderComponent>();
     lastPosition = transform->position;
-    life = maxLife;
+    SetLife(maxLife);
 }   
 
 void PlayerControllerComponent::OnTerminate(ActorManager *actorManager)
@@ -46,6 +46,15 @@ void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
     ProcessMouseMovement();
     ProcessKeyboardMovement();
     ProcessTriggers();
+
+    if (isImmortal)
+    {
+        if (immortalTimer <= 0.0f)
+        {
+            isImmortal = false;
+        }
+        immortalTimer -= dt;
+    }
 
     PlayerMoveNotification playerNoti;
     playerNoti.position = transform->position;
@@ -95,9 +104,19 @@ void PlayerControllerComponent::OnEndTrigger(Actor* endTrigger)
     NotificationManager::Get()->SendNotification(NotificationType::PlayerWin, &notification);
 }
 
+void PlayerControllerComponent::OnDeadTrigger(Actor* deadTrigger)
+{
+    SetLife(0);
+}
+
 void PlayerControllerComponent::OnEnemyCollision(EnemyHitPlayerNotification* enemyHitPlayer)
 {
-    life = max(life - 10, 0);
+    if (!isImmortal)
+    {
+        SetLife(life - 5);
+        isImmortal = true;
+        immortalTimer = immortalTime;
+    }
 }
 
 void PlayerControllerComponent::ProcessMouseMovement()
@@ -182,12 +201,22 @@ void PlayerControllerComponent::ProcessTriggers()
                 case ActorTag::Portal: OnPortalTrigger(other); break;
                 case ActorTag::EndTrigger: OnEndTrigger(other); break;
                 case ActorTag::Ammo: OnAmmoTrigger(other); break;
+                case ActorTag::DeadTrigger: OnDeadTrigger(other); break;
                 }
             }
         }
     }
 
     MemoryManager::Get()->ReleaseFrame(frame);
+}
+
+void PlayerControllerComponent::SetLife(int life)
+{
+    this->life = min(max(life, 0), maxLife);
+    PlayerLifeChangeNotification notification;
+    notification.maxLife = this->maxLife;
+    notification.life = this->life;
+    NotificationManager::Get()->SendNotification(NotificationType::PlayerLifeChange, &notification);
 }
 
 void PlayerControllerComponent::OnNotify(NotificationType type, Notification* notification)

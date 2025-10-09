@@ -14,6 +14,7 @@ enum class ActorTag
     Portal,
     EndTrigger,
     Ammo,
+    DeadTrigger,
 
     TagCount
 };

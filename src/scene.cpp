@@ -296,6 +296,51 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     }
     MemoryManager::Get()->ReleaseFrame(frame);
 
+    // Create the End Trigger
+    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    file = PlatformReadFile("data/entities/deadTriggers.txt", SCRATCH_MEMORY);
+    reader = FileReader(&file);
+    while (const char* line = reader.GetNextLine())
+    {
+        char name[256];
+        Vector3 position;
+        Vector3 scale;
+        if (sscanf(line, "[[%f, %f, %f], [%f, %f, %f]]", &position.x, &position.y, &position.z, &scale.x, &scale.y, &scale.z) == 6)
+        {
+            // Create the enemy and position it
+            Actor* endTrigger = actorManager->CreateActor();
+            endTrigger->SetTag(ActorTag::DeadTrigger);
+
+            // Add transform component
+            TransformComponent transform;
+            transform.position = position;
+            transform.scale = Vector3(1, 1, 1);
+            transform.rotation = Vector3(0, 0, 0);
+            actorManager->AddComponent<TransformComponent>(endTrigger, transform);
+
+            // Add collision component
+            Vector3 hScale = scale * 0.5f;
+            Vector3 min = position - Vector3::right * hScale.x - Vector3::up * hScale.y - Vector3::forward * hScale.z;
+            Vector3 max = position + Vector3::right * hScale.x + Vector3::up * hScale.y + Vector3::forward * hScale.z;
+
+            AABB aabb;
+            aabb.Init(min, max);
+            Collider collider(aabb, endTrigger);
+
+            ColliderComponent colliderComponent;
+            colliderComponent.Init(1, FRAME_MEMORY);
+            colliderComponent.AddSubCollider(collider);
+            colliderComponent.SetIsTrigger(true);
+
+            actorManager->AddComponent<ColliderComponent>(endTrigger, colliderComponent);
+        }
+        else
+        {
+            ASSERT(!"ERROR: invalid file format");
+        }
+    }
+    MemoryManager::Get()->ReleaseFrame(frame);
+
     // Create the Ammos
     frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
     file = PlatformReadFile("data/entities/ammos.txt", SCRATCH_MEMORY);

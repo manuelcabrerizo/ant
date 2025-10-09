@@ -15,6 +15,7 @@ enum class NotificationType
     EnemyKill,
     AmmoChange,
     EnemyHitPlayer,
+    PlayerLifeChange,
 
     // last item
     Count
@@ -77,4 +78,10 @@ struct AmmoChangeNotification : public Notification
 struct EnemyHitPlayerNotification : public Notification
 {
     Actor* enemy;
+};
+
+struct PlayerLifeChangeNotification : public Notification
+{
+    int maxLife;
+    int life;
 };

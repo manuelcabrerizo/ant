@@ -26,16 +26,23 @@ private:
     int life = 0;
     int maxLife = 100;
 
+    bool isImmortal = false;
+    float immortalTime = 0.5f;
+    float immortalTimer = 0.0f;
+
     void OnButtonTrigger(Actor* button);
     void OnPortalTrigger(Actor* portal);
     void OnAmmoTrigger(Actor* ammo);
     void OnEndTrigger(Actor* endTrigger);
+    void OnDeadTrigger(Actor* deadTrigger);
 
     void OnEnemyCollision(EnemyHitPlayerNotification* enemyHitPlayer);
 
     void ProcessMouseMovement();
     void ProcessKeyboardMovement();
     void ProcessTriggers();
+
+    void SetLife(int life);
 public:
     Actor *weaponActor;
 
