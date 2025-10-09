@@ -9,6 +9,7 @@
 #include "notification_manager.h"
 #include "input_manager.h"
 #include "graphics_manager.h"
+#include "audio_manager.h"
 #include "game_manager.h"
 
 static bool running;
@@ -23,6 +24,8 @@ static int gDpi;
 
 LRESULT Wndproc(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+
      InputManager* im = InputManager::Get();
      
      LRESULT result = 0;
@@ -144,6 +147,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                gWindowHeight = clientRect.bottom - clientRect.top;
 
                GraphicsManager::Init((void *)&window, gWindowWidth, gWindowWidth, GraphicsManagerType::D3D11, STATIC_MEMORY);
+               AudioManager::Init(STATIC_MEMORY);
+
                ShowWindow(window, SW_SHOW);
 
                PlatformShowMouse(false);
@@ -174,6 +179,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                          dt = 0.033f;
                     }
                     
+                    AudioManager::Get()->Update();
                     InputManager::Get()->Process();  
                     while(PeekMessageA(&message, window, 0, 0, PM_REMOVE))
                     {
@@ -187,6 +193,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
                     }    
                }
                gameManager.Terminate();
+               AudioManager::Terminate();
                GraphicsManager::Terminate();
           }
           else

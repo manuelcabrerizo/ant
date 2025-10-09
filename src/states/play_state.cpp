@@ -280,7 +280,7 @@ void PlayState::OnRender()
     GraphicsManager::Get()->SetRasterizerStateCullBack();
     GraphicsManager::Get()->SetDepthStencilOn();
 
-    GraphicsManager::Get()->EndFrame(1);
+    GraphicsManager::Get()->EndFrame(0);
 }
 
 void PlayState::OnResize(OnResizeNotification* onResize)

@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\audio_manager.cpp" />
     <ClCompile Include="src\components\ammo_component.cpp" />
     <ClCompile Include="src\components\animated__render_component.cpp" />
     <ClCompile Include="src\components\button_component.cpp" />
@@ -215,6 +216,7 @@
     <ClCompile Include="src\ui_renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\audio_manager.h" />
     <ClInclude Include="src\components\ammo_component.h" />
     <ClInclude Include="src\components\animated_render_component.h" />
     <ClInclude Include="src\components\button_component.h" />

@@ -6,6 +6,7 @@
 #include <asset_managers/material_manager.h>
 #include <asset_managers/model_manager.h>
 #include <asset_managers/animation_manager.h>
+#include <audio_manager.h>
 
 void GameManager::Init()
 {
@@ -181,6 +182,9 @@ void GameManager::LoadDefaultAssets()
         
     // Load Models
     ModelManager::Get()->Load("box", "data/models/cube.fbx", STATIC_MEMORY);
+
+    // Load sound
+    AudioManager::Get()->LoadSound(SoundName::Shoot, "data/audio/test.wav");
 }
 
 void GameManager::ShowMemoryUsage()
