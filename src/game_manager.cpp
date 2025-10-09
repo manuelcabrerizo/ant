@@ -20,7 +20,7 @@ void GameManager::Init()
     pauseState.Init(this);
     victoryState.Init(this);
     gameOverState.Init(this);
-    stateMachine.Push(&gameOverState);
+    stateMachine.Push(&menuState);
     PlatformClientDimensions(&clientWidth, &clientHeight);
 }
 

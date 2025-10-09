@@ -90,7 +90,6 @@ void VictoryState::OnRender()
         buttons[i].Render(uiRenderer, 0);
     }
 
-    // Render Text (the Render state is for rendering 3D text)
     GraphicsManager::Get()->SetAlphaBlending();
     GraphicsManager::Get()->SetDepthStencilOnWriteMaskZero();
     GraphicsManager::Get()->SetRasterizerStateCullNone();

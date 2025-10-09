@@ -247,7 +247,6 @@ void PlayState::OnRender()
     GraphicsManager::Get()->SetDepthStencilOn();
     uiRenderer.DrawQuat(crosshairPosition, crosshairSize, 0, "Crosshair");
 
-    // Render Text (the Render state is for rendering 3D text)
     GraphicsManager::Get()->SetAlphaBlending();
     GraphicsManager::Get()->SetDepthStencilOnWriteMaskZero();
     GraphicsManager::Get()->SetRasterizerStateCullNone();
