@@ -26,6 +26,7 @@ private:
     void ShutdownAssetsManagers();
 
     void LoadDefaultAssets();
+    void ShowMemoryUsage();
 public:     
     void Init();
     void Terminate();

@@ -44,17 +44,6 @@ void GameManager::Update(f32 dt)
     MaterialManager::Get()->Get("Level1MagmaMaterial")->Update(dt);
     MaterialManager::Get()->Get("FinalMaterial")->Update(dt);
     stateMachine.Update(dt);
-
-    /*
-    size_t freeMemory = MemoryManager::Get()->GetFreeMemoryCount(STATIC_MEMORY);
-    char buffer[256] = {};
-    sprintf(buffer, "STATIC: free memory: %zu\n", freeMemory);
-    OutputDebugString(buffer);
-
-    freeMemory = MemoryManager::Get()->GetFreeMemoryCount(FRAME_MEMORY);
-    sprintf(buffer, "FRAME: free memory: %zu\n", freeMemory);
-    OutputDebugString(buffer);
-    */
 }
 
 void GameManager::Render(f32 dt)
@@ -192,4 +181,16 @@ void GameManager::LoadDefaultAssets()
         
     // Load Models
     ModelManager::Get()->Load("box", "data/models/cube.fbx", STATIC_MEMORY);
+}
+
+void GameManager::ShowMemoryUsage()
+{
+    size_t freeMemory = MemoryManager::Get()->GetFreeMemoryCount(STATIC_MEMORY);
+    char buffer[256] = {};
+    sprintf(buffer, "STATIC: free memory: %zu\n", freeMemory);
+    OutputDebugString(buffer);
+
+    freeMemory = MemoryManager::Get()->GetFreeMemoryCount(FRAME_MEMORY);
+    sprintf(buffer, "FRAME: free memory: %zu\n", freeMemory);
+    OutputDebugString(buffer);
 }
