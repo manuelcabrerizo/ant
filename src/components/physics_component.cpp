@@ -69,13 +69,6 @@ void PhysicsComponent::ProcessCollisionDetectionAndResolution()
         int iterations = 0;
         while(contacts.size > 0 && iterations < 10)
         {
-            if (owner->GetTag() == ActorTag::Player && contacts[0].collider->owner->GetTag() == ActorTag::Enemy)
-            {
-                EnemyHitPlayerNotification notification;
-                notification.enemy = contacts[0].collider->owner;
-                NotificationManager::Get()->SendNotification(NotificationType::EnemyHitPlayer, &notification);
-            }
-
             Vector3 n = contacts[0].n;
             f32 penetration = contacts[0].penetration;
             transform->position += n * penetration;

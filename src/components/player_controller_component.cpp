@@ -24,8 +24,6 @@
 
 void PlayerControllerComponent::OnInit(ActorManager *actorManager)
 {
-    NotificationManager::Get()->AddListener(this, NotificationType::EnemyHitPlayer);
-
     speed = 40.0f;    
     transform = owner->GetComponent<TransformComponent>();
     camera = owner->GetComponent<CameraComponent>();
@@ -38,7 +36,6 @@ void PlayerControllerComponent::OnInit(ActorManager *actorManager)
 
 void PlayerControllerComponent::OnTerminate(ActorManager *actorManager)
 {
-    NotificationManager::Get()->RemoveListener(this, NotificationType::EnemyHitPlayer);
 }
 
 void PlayerControllerComponent::OnUpdate(ActorManager *actorManager, f32 dt)
@@ -109,15 +106,15 @@ void PlayerControllerComponent::OnDeadTrigger(Actor* deadTrigger)
     SetLife(0);
 }
 
-void PlayerControllerComponent::OnEnemyCollision(EnemyHitPlayerNotification* enemyHitPlayer)
-{
-    if (!isImmortal)
-    {
-        SetLife(life - 5);
-        isImmortal = true;
-        immortalTimer = immortalTime;
-    }
-}
+//void PlayerControllerComponent::OnEnemyCollision(EnemyHitPlayerNotification* enemyHitPlayer)
+//{
+//    if (!isImmortal)
+//    {
+//        SetLife(life - 5);
+//        isImmortal = true;
+//        immortalTimer = immortalTime;
+//    }
+//}
 
 void PlayerControllerComponent::ProcessMouseMovement()
 {
@@ -223,6 +220,5 @@ void PlayerControllerComponent::OnNotify(NotificationType type, Notification* no
 {
     switch (type)
     {
-    case NotificationType::EnemyHitPlayer: OnEnemyCollision((EnemyHitPlayerNotification*)notification); break;
     }
 }

@@ -14,7 +14,6 @@ enum class NotificationType
     EnemySpawn,
     EnemyKill,
     AmmoChange,
-    EnemyHitPlayer,
     PlayerLifeChange,
 
     // last item
@@ -73,11 +72,6 @@ struct AmmoChangeNotification : public Notification
 {
     int maxAmmo;
     int currentAmmo;
-};
-
-struct EnemyHitPlayerNotification : public Notification
-{
-    Actor* enemy;
 };
 
 struct PlayerLifeChangeNotification : public Notification

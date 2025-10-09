@@ -36,8 +36,6 @@ private:
     void OnEndTrigger(Actor* endTrigger);
     void OnDeadTrigger(Actor* deadTrigger);
 
-    void OnEnemyCollision(EnemyHitPlayerNotification* enemyHitPlayer);
-
     void ProcessMouseMovement();
     void ProcessKeyboardMovement();
     void ProcessTriggers();
@@ -49,7 +47,6 @@ public:
     void OnInit(ActorManager *actorManager);
     void OnTerminate(ActorManager *actorManager) override;
     void OnUpdate(ActorManager *actorManager, f32 dt);
-    void OnLateUpdate(ActorManager* actorManager, float dt);
     void OnRender(ActorManager* actorManager);
     void OnNotify(NotificationType type, Notification* notification) override;
 

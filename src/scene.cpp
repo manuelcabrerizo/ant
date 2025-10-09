@@ -39,6 +39,9 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     AnimationManager::Get()->Load("Walking", "data/animations/Mutant Walking.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
     AnimationManager::Get()->Load("Death", "data/animations/Zombie Death.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
     AnimationManager::Get()->Load("Idle", "data/animations/Orc Idle.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
+    AnimationManager::Get()->Load("Hit", "data/animations/Zombie Reaction Hit.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
+    AnimationManager::Get()->Load("Attack", "data/animations/Zombie Attack.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
+
 
     // Create the level
     actorManager->CreateActorFromFile("data/xml/level1.xml");

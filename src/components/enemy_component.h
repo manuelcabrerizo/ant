@@ -6,6 +6,13 @@
 
 #include <notification_manager.h>
 
+#include <states/state_machine.h>
+#include <enemy/enemy_attack_state.h>
+#include <enemy/enemy_dead_state.h>
+#include <enemy/enemy_hit_state.h>
+#include <enemy/enemy_idle_state.h>
+#include <enemy/enemy_walk_state.h>
+
 class TransformComponent;
 class PhysicsComponent;
 class AnimationComponent;
@@ -16,13 +23,29 @@ enum class EnemyAnimation
     Idle,
     Walk,
     Dead,
+    Attack,
+    Hit,
 
     Count,
 };
 
 class EnemyComponent : public Component<EnemyComponent>, INotificable
 {
+    friend EnemyIdleState;
+    friend EnemyWalkState;
+    friend EnemyAttackState;
+    friend EnemyHitState;
+    friend EnemyDeadState;
+
 private:
+
+    StateMachine states;
+    EnemyIdleState idleState;
+    EnemyWalkState walkState;
+    EnemyAttackState attackState;
+    EnemyHitState hitState;
+    EnemyDeadState deadState;
+
     TransformComponent* transform;
     PhysicsComponent* physics;
     AnimationComponent* animation;
@@ -30,15 +53,13 @@ private:
 
     Kinematic character;
     Kinematic target;
-    //SteeringWander wander;
     SteeringPursue pursue;
     SteeringFace face;
 
     int maxLife = 3;
     int life = 3;
+    float attackRadio = 2.5f;
     float detectionRadio = 30.0f;
-    bool isInRadio = false;
-    bool wasInRadio = false;
 
     void OnEnemyHit(EnemyHitNotification* enemyHit);
     void OnPlayerMove(PlayerMoveNotification* playerMove);
