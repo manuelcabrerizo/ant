@@ -136,6 +136,46 @@ bool CollisionWorld::Intersect(const Segment& segment, Array<CollisionData>& col
     return isIntersecting;
 }
 
+bool CollisionWorld::Intersect(const Sphere& sphere, Array<CollisionData>& collisionData, Actor* ignoreActor) const
+{
+    bool isIntersecting = false;
+    for (int i = 0; i < colliders.size; ++i)
+    {
+        if (!colliders[i]->enable)
+        {
+            continue;
+        }
+
+        Array<Collider>& subColliders = colliders[i]->GetColliders();
+        for (int j = 0; j < subColliders.size; j++)
+        {
+            Collider* collider = &subColliders[j];
+            if (collider->GetOwner() != ignoreActor)
+            {
+                int collisionCount = collisionData.size;
+                bool intersect = collider->Intersect(sphere, collisionData);
+                if (intersect)
+                {
+                    int newCollision = collisionData.size - collisionCount;
+                    for (int j = 0; j < newCollision; j++)
+                    {
+                        CollisionData& data = collisionData[collisionCount + j];
+                        data.collider = colliders[i];
+                    }
+                }
+                isIntersecting |= intersect;
+            }
+        }
+    }
+
+    if (collisionData.size > 0)
+    {
+        CollisionUtils::SortCollisionByTime(collisionData);
+    }
+
+    return isIntersecting;
+}
+
 bool CollisionWorld::Intersect(ColliderComponent *collider, Array<CollisionData>& collisionData) const
 {
     if (!collider->enable)

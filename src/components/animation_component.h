@@ -33,10 +33,6 @@ private:
 
     Matrix4 finalBoneMatrices[100];
     f32 deltaTime = 0.0f;
-
-    AnimationNode* GetCurrentAnimation();
-    AnimationNode* GetNextAnimation();
-
 public:
     void OnInit(ActorManager* actorManager) override;
     void OnUpdate(ActorManager* actorManager, f32 dt);
@@ -54,6 +50,9 @@ public:
     bool IsPlaying(); 
     bool IsFinish();
     bool IsTransitioning();
+
+    AnimationNode* GetCurrentAnimation();
+    AnimationNode* GetNextAnimation();
 
     Matrix4* GetMatrices()
     {

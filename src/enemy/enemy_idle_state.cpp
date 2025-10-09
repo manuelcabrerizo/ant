@@ -10,7 +10,7 @@ void EnemyIdleState::Init(EnemyComponent* owner)
 
 void EnemyIdleState::OnEnter()
 {
-    owner->animation->Transition((int)EnemyAnimation::Idle, 0.25f);
+    owner->animation->Transition((int)EnemyAnimation::Idle, 0.5f);
 }
 
 void EnemyIdleState::OnExit()

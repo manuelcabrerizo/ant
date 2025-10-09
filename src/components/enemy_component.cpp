@@ -5,6 +5,7 @@
 #include "collider_component.h"
 
 #include <asset_managers/animation_manager.h>
+#include <particle_systems/blood_ps.h>
 
 #include <math.h>
 #include <math/algebra.h>
@@ -57,6 +58,9 @@ void EnemyComponent::OnEnemyHit(EnemyHitNotification* enemyHit)
 
     if (enemyHit->enemy == owner && states.Peek() != &hitState)
     {
+        enemyHit->ps->Play();
+        *enemyHit->bloodTimer = enemyHit->bloodDuration;
+
         if ((life - 1) == 0)
         {
             states.ChangeState(&deadState);

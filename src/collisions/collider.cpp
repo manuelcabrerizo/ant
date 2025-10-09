@@ -80,6 +80,24 @@ bool Collider::Intersect(const Segment& segment, float& t) const
     return false;
 }
 
+bool Collider::Intersect(const Sphere& sphere, Array<CollisionData>& collisionData) const
+{
+    // early out is the bounding bolumes are not intersecting
+    if (!volume.Intersect(sphere))
+    {
+        return false;
+    }
+
+    switch (type)
+    {
+    case ColliderType::AABB:   return sphere.Intersect(aabb, &collisionData);
+    case ColliderType::OBB:    return sphere.Intersect(obb, &collisionData);
+    case ColliderType::SPHERE: return sphere.Intersect(sphere, &collisionData);
+    case ColliderType::CAPSULE:return sphere.Intersect(capsule, &collisionData);
+    }
+}
+
+
 bool Collider::Intersect(const Collider& other, Array<CollisionData>& collisionData) const
 {
     // early out is the bounding bolumes are not intersecting

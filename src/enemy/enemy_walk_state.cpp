@@ -30,7 +30,7 @@ void EnemyWalkState::Init(EnemyComponent* owner)
 
 void EnemyWalkState::OnEnter()
 {
-    owner->animation->Transition((int)EnemyAnimation::Walk, 0.25f);
+    owner->animation->Transition((int)EnemyAnimation::Walk, 0.5f);
 }
 
 void EnemyWalkState::OnExit()

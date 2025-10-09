@@ -153,11 +153,11 @@ void WeaponComponent::OnShoot(ShootNotification* notification)
         if (data.collider->owner->GetTag() == ActorTag::Enemy)
         {
             bloodPs.SetPosition(shootRay.GetOrigin() + shootRay.GetDirection() * data.t);
-            bloodPs.Play();
-            bloodTimer = bloodDuration;
-
             EnemyHitNotification notification;
             notification.enemy = data.collider->owner;
+            notification.ps = &bloodPs;
+            notification.bloodTimer = &bloodTimer;
+            notification.bloodDuration = bloodDuration;
             NotificationManager::Get()->SendNotification(NotificationType::EnemyHit, &notification);
         }
     }

@@ -9,7 +9,7 @@ void EnemyHitState::Init(EnemyComponent* owner)
 
 void EnemyHitState::OnEnter()
 {
-    owner->animation->Transition((int)EnemyAnimation::Hit, 0.25f);
+    owner->animation->Transition((int)EnemyAnimation::Dead, 0.25f);
     timer = timeToWait;
 }
 

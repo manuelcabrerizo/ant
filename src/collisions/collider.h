@@ -53,6 +53,7 @@ public:
 
     bool Intersect(const Ray& ray, float& t) const;
     bool Intersect(const Segment& segment, float& t) const;
+    bool Intersect(const Sphere& sphere, Array<CollisionData>& collisionData) const;
     bool Intersect(const Collider& other, Array<CollisionData>& collisionData) const;
 
     void UpdatePosition(const Vector3& position);

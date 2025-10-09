@@ -36,6 +36,8 @@ private:
     void OnEndTrigger(Actor* endTrigger);
     void OnDeadTrigger(Actor* deadTrigger);
 
+    void OnPlayerHit(PlayerHitNotification* playerHit);
+
     void ProcessMouseMovement();
     void ProcessKeyboardMovement();
     void ProcessTriggers();

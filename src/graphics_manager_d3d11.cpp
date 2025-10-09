@@ -55,7 +55,7 @@ void GraphicsManagerD3D11::Initialize(void *osWindow, i32 width, i32 height, i32
 
      CreateLightsUniformBuffer();
 
-     swapChain->SetFullscreenState(TRUE, nullptr);
+     //swapChain->SetFullscreenState(TRUE, nullptr);
 }
 
 #define DXGI_GET_DEBUG_INTERFACE(name) HRESULT name(REFIID riid, void** ppDebug)

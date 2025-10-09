@@ -15,6 +15,7 @@ enum class NotificationType
     EnemyKill,
     AmmoChange,
     PlayerLifeChange,
+    PlayerHit,
 
     // last item
     Count
@@ -34,10 +35,14 @@ struct OnResizeNotification : public Notification
 };
 
 class Actor;
+class BloodParticleSystem;
 
 struct EnemyHitNotification : public Notification
 {
     Actor* enemy;
+    BloodParticleSystem* ps;
+    float* bloodTimer;
+    float bloodDuration;
 };
 
 class TransformComponent;
@@ -78,4 +83,10 @@ struct PlayerLifeChangeNotification : public Notification
 {
     int maxLife;
     int life;
+};
+
+struct PlayerHitNotification : public Notification
+{
+    Actor* actor;
+    int hitAmount;
 };
