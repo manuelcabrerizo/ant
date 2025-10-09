@@ -21,6 +21,7 @@
 #include <platform.h>
 #include <collisions/collision_utils.h>
 #include <collision.h>
+#include "heal_component.h"
 
 void PlayerControllerComponent::OnInit(ActorManager *actorManager)
 {
@@ -96,6 +97,13 @@ void PlayerControllerComponent::OnAmmoTrigger(Actor* ammo)
     weapon->SetAmmo(weapon->GetMaxAmmo());
     AmmoComponent* ammoComponent = ammo->GetComponent<AmmoComponent>();
     ammoComponent->Grab();
+}
+
+void PlayerControllerComponent::OnHealTrigger(Actor* heal)
+{
+    SetLife(life + 20);
+    HealComponent* healComponent = heal->GetComponent<HealComponent>();
+    healComponent->Grab();
 }
 
 void PlayerControllerComponent::OnEndTrigger(Actor* endTrigger)
@@ -201,6 +209,7 @@ void PlayerControllerComponent::ProcessTriggers()
                 case ActorTag::Portal: OnPortalTrigger(other); break;
                 case ActorTag::EndTrigger: OnEndTrigger(other); break;
                 case ActorTag::Ammo: OnAmmoTrigger(other); break;
+                case ActorTag::Heal: OnHealTrigger(other); break;
                 case ActorTag::DeadTrigger: OnDeadTrigger(other); break;
                 }
             }

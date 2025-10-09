@@ -15,6 +15,7 @@ enum class ActorTag
     EndTrigger,
     Ammo,
     DeadTrigger,
+    Heal,
 
     TagCount
 };

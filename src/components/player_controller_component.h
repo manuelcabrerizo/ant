@@ -33,6 +33,7 @@ private:
     void OnButtonTrigger(Actor* button);
     void OnPortalTrigger(Actor* portal);
     void OnAmmoTrigger(Actor* ammo);
+    void OnHealTrigger(Actor* heal);
     void OnEndTrigger(Actor* endTrigger);
     void OnDeadTrigger(Actor* deadTrigger);
 

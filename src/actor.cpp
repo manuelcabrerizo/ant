@@ -9,7 +9,8 @@ const char *tagNames[(int)ActorTag::TagCount] =
     "Portal",
     "EndTrigger",
     "Ammo",
-    "DeadTrigger"
+    "DeadTrigger",
+    "Heal"
 };
 
 ActorTag Actor::TagNameToTag(const char* tagName)

@@ -16,6 +16,7 @@
 #include <components/enemy_component.h>
 #include <components/portal_component.h>
 #include <components/ammo_component.h>
+#include <components/heal_component.h>
 
 #include <math/algebra.h>
 #include <math/vector3.h>
@@ -446,6 +447,11 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
         {
             AmmoComponent ammo;
             AddComponent<AmmoComponent>(actor, ammo);
+        }
+        else if (strcmp("HealComponent", componentType) == 0)
+        {
+            HealComponent ammo;
+            AddComponent<HealComponent>(actor, ammo);
         }
         else if (strcmp("AnchorComponent", componentType) == 0)
         {

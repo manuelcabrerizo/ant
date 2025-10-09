@@ -14,6 +14,7 @@ void EnemyAttackState::OnEnter()
 {
     owner->animation->Transition((int)EnemyAnimation::Attack, 0.25f);
     animationNode = owner->animation->GetNextAnimation();
+    animationNode->time = 0.0f;
     isPlayerHit = false;
 }
 
@@ -24,7 +25,8 @@ void EnemyAttackState::OnExit()
 void EnemyAttackState::OnUpdate(float deltaTime)
 {
     float distToTargetSq = (owner->transform->position - owner->target.position).MagnitudeSq();
-    if (distToTargetSq > owner->attackRadio * owner->attackRadio)
+    float stopAttackRadio = owner->attackRadio * 1.5f;
+    if (distToTargetSq > stopAttackRadio * stopAttackRadio)
     {
         owner->states.ChangeState(&owner->walkState);
     }
@@ -43,6 +45,7 @@ void EnemyAttackState::OnUpdate(float deltaTime)
 
     if (time >= duration - 0.1f)
     {
+        animationNode->time = 0.0f;
         isPlayerHit = false;
     }
 }
@@ -72,7 +75,7 @@ void EnemyAttackState::TryAttack()
             {
                 PlayerHitNotification notification;
                 notification.actor = owner->owner;
-                notification.hitAmount = 10;
+                notification.hitAmount = 40;
                 NotificationManager::Get()->SendNotification(NotificationType::PlayerHit, &notification);
             }
         }

@@ -20,6 +20,7 @@
 #include <components/portal_component.h>
 #include <components/effect_component.h>
 #include <components/ammo_component.h>
+#include <components/heal_component.h>
 #include <components/fence_component.h>
 #include <components/button_component.h>
 
@@ -177,6 +178,7 @@ void PlayState::OnUpdate(float deltaTime)
     actorManager.UpdateComponents<AnimationComponent>(deltaTime);
     actorManager.UpdateComponents<EffectComponent>(deltaTime);
     actorManager.UpdateComponents<AmmoComponent>(deltaTime);
+    actorManager.UpdateComponents<HealComponent>(deltaTime);
     actorManager.UpdateComponents<FenceComponent>(deltaTime);
 }
 
@@ -278,7 +280,7 @@ void PlayState::OnRender()
     GraphicsManager::Get()->SetRasterizerStateCullBack();
     GraphicsManager::Get()->SetDepthStencilOn();
 
-    GraphicsManager::Get()->EndFrame(0);
+    GraphicsManager::Get()->EndFrame(1);
 }
 
 void PlayState::OnResize(OnResizeNotification* onResize)
@@ -343,6 +345,7 @@ void PlayState::InitializeActorManager()
     actorManager.AddComponentType<PortalComponent, 10>();
     actorManager.AddComponentType<EffectComponent, 10>();
     actorManager.AddComponentType<AmmoComponent, 20>();
+    actorManager.AddComponentType<HealComponent, 20>();
     actorManager.AddComponentType<FenceComponent, 10>();
     actorManager.AddComponentType<ButtonComponent, 10>();
     // NOTE: add more component types ...

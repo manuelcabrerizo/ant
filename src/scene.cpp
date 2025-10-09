@@ -31,6 +31,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     ModelManager::Get()->Load("level1", "data/models/TestLevel/source/TestLevel.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("portal", "data/models/Portal/source/Portal.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("ammo", "data/models/Ammo/source/Ammo.fbx", FRAME_MEMORY);
+    ModelManager::Get()->Load("heal", "data/models/Heal/Heal.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("fence", "data/models/Fence/source/Fence.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("button", "data/models/Button/source/button.fbx", FRAME_MEMORY);
 
@@ -356,6 +357,28 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         if (sscanf(line, "[[%f, %f, %f], [%f, %f, %f]]", &position.x, &position.y, &position.z, &scale.x, &scale.y, &scale.z) == 6)
         {
             Actor* ammo = actorManager->CreateActorFromFile("data/xml/ammo.xml");
+            TransformComponent* transform = ammo->GetComponent<TransformComponent>();
+            transform->position = position;
+        }
+        else
+        {
+            ASSERT(!"ERROR: invalid file format");
+        }
+    }
+    MemoryManager::Get()->ReleaseFrame(frame);
+
+    // Create the Heals
+    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    file = PlatformReadFile("data/entities/heals.txt", SCRATCH_MEMORY);
+    reader = FileReader(&file);
+    while (const char* line = reader.GetNextLine())
+    {
+        char name[256];
+        Vector3 position;
+        Vector3 scale;
+        if (sscanf(line, "[[%f, %f, %f], [%f, %f, %f]]", &position.x, &position.y, &position.z, &scale.x, &scale.y, &scale.z) == 6)
+        {
+            Actor* ammo = actorManager->CreateActorFromFile("data/xml/heal.xml");
             TransformComponent* transform = ammo->GetComponent<TransformComponent>();
             transform->position = position;
         }

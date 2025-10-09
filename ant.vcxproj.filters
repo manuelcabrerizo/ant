@@ -270,6 +270,9 @@
     <ClCompile Include="src\enemy\enemy_hit_state.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\components\heal_component.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\actor.h">
@@ -557,6 +560,9 @@
     <ClInclude Include="src\enemy\enemy_hit_state.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\components\heal_component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="data\xml\ammo.xml" />
@@ -574,6 +580,7 @@
     <Xml Include="data\xml\default.xml" />
     <Xml Include="data\xml\fence.xml" />
     <Xml Include="data\xml\button.xml" />
+    <Xml Include="data\xml\heal.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\actor_manager.tpp" />

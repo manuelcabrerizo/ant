@@ -56,7 +56,7 @@ void EnemyComponent::OnUpdate(ActorManager *actorManager, f32 dt)
 void EnemyComponent::OnEnemyHit(EnemyHitNotification* enemyHit)
 {
 
-    if (enemyHit->enemy == owner && states.Peek() != &hitState)
+    if (enemyHit->enemy == owner /* && states.Peek() != &hitState*/)
     {
         enemyHit->ps->Play();
         *enemyHit->bloodTimer = enemyHit->bloodDuration;
