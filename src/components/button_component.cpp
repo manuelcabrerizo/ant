@@ -1,5 +1,6 @@
 #include "button_component.h"
 #include "transform_component.h"
+#include <audio_manager.h>
 
 void ButtonComponent::OnInit(ActorManager* actorManager)
 {
@@ -21,5 +22,6 @@ void ButtonComponent::SetSignal(bool value)
     if (isSignal && !wasSignal)
     {
         transform->position -= up * 0.1f;
+        AudioManager::Get()->PlaySoundFx(SoundName::ButtonPush, false);
     }
 }

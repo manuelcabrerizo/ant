@@ -22,6 +22,7 @@
 #include <collisions/collision_utils.h>
 #include <collision.h>
 #include "heal_component.h"
+#include <audio_manager.h>
 
 void PlayerControllerComponent::OnInit(ActorManager *actorManager)
 {
@@ -90,6 +91,7 @@ void PlayerControllerComponent::OnPortalTrigger(Actor* portal)
     SetRotation(portalComponent->GetDestRotation());
     physics->velocity = Vector3::zero;
     physics->acceleration = Vector3::zero;
+    AudioManager::Get()->PlaySoundFx(SoundName::PortalEnter, false);
 }
 
 void PlayerControllerComponent::OnAmmoTrigger(Actor* ammo)
@@ -97,6 +99,9 @@ void PlayerControllerComponent::OnAmmoTrigger(Actor* ammo)
     weapon->SetAmmo(weapon->GetMaxAmmo());
     AmmoComponent* ammoComponent = ammo->GetComponent<AmmoComponent>();
     ammoComponent->Grab();
+
+    AudioManager::Get()->PlaySoundFx(SoundName::AmmoPickup, false);
+
 }
 
 void PlayerControllerComponent::OnHealTrigger(Actor* heal)
@@ -104,6 +109,8 @@ void PlayerControllerComponent::OnHealTrigger(Actor* heal)
     SetLife(life + 20);
     HealComponent* healComponent = heal->GetComponent<HealComponent>();
     healComponent->Grab();
+
+    AudioManager::Get()->PlaySoundFx(SoundName::LifePickup, false);
 }
 
 void PlayerControllerComponent::OnEndTrigger(Actor* endTrigger)
@@ -181,7 +188,10 @@ void PlayerControllerComponent::ProcessKeyboardMovement()
     if(physics->grounded && InputManager::Get()->KeyJustDown(KEY_SPACE))
     {
          physics->velocity.y = 0.0f;
-         physics->velocity += Vector3(0.0f, 9.8f*1.5f, 0.0f);                    
+         physics->velocity += Vector3(0.0f, 9.8f*1.5f, 0.0f);  
+
+         AudioManager::Get()->PlaySoundFx(SoundName::Jump, false);
+
     }
 
     Vector3 movement = (moveDirection * speed);

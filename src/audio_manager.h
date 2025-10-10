@@ -8,12 +8,22 @@
 
 enum class SoundName
 {
-    Shoot = 0,
+    Music = 0,
+    Shoot,
+    EnemyHit,
+    Jump,
+    AmmoPickup,
+    LifePickup,
+    ButtonPush,
+    PortalEnter,
+
+
     Count
 };
 
 struct Sound
 {
+    SoundName soundName;
     IXAudio2SourceVoice* voice;
     int index;
 };
@@ -35,17 +45,19 @@ public:
     void LoadSound(SoundName sound, const char* filepath);
     void PlaySoundFx(SoundName sound, bool loop);
     void PlaySoundFxAtPosition(SoundName sound, const Vector3& position, bool loop);
+    void StopSoundFx(SoundName sound);
     void Update();
     
 private:
     void Initialize(int memoryType);
     void Shutdown();
 
-    Sound GetSound();
+    Sound GetSound(SoundName soundName);
     void ReleaseSound(Sound sound);
 
     static AudioManager* instance;
 
+    WAVEFORMATEX format;
     IXAudio2* xAudio2 = nullptr;
     IXAudio2MasteringVoice* masterVoice = nullptr;
     StaticArray<Wav, static_cast<int>(SoundName::Count)> wavs;

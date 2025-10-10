@@ -9,6 +9,7 @@
 #include <collision.h>
 #include <asset_managers/texture_manager.h>
 #include <math/algebra.h>
+#include <audio_manager.h>
 
 
 static unsigned long long shootCounter = 0;
@@ -130,6 +131,8 @@ void WeaponComponent::OnShoot(ShootNotification* notification)
         return;
     }
     SetAmmo(currentAmmo - 1);
+
+    AudioManager::Get()->PlaySoundFx(SoundName::Shoot, false);
 
     // Render shoot particles
     shootPs.SetPosition(notification->shootPosition);

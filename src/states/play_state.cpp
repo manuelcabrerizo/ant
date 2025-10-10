@@ -32,6 +32,7 @@
 #include <asset_managers/animation_manager.h>
 #include <asset_managers/material_manager.h>
 #include <asset_managers/texture_manager.h>
+#include <audio_manager.h>
 
 void PlayState::Init(GameManager *gameManager)
 {
@@ -106,10 +107,14 @@ void PlayState::OnEnter()
     InitializeActorManager();
 
     scene->Load(&actorManager, "");
+
+    AudioManager::Get()->PlaySoundFx(SoundName::Music, true);
 }
 
 void PlayState::OnExit()
 {
+    AudioManager::Get()->StopSoundFx(SoundName::Music);
+
     scene->Unload();
 
     actorManager.Terminate();

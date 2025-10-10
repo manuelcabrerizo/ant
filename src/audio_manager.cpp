@@ -42,13 +42,18 @@ void AudioManager::Initialize(int memoryType)
         ASSERT(!"Error: mastering voice failed to create");
     }
 
-    Wav test;
-    LoadAudioFile("data/audio/test.wav", &test);
+    format.wFormatTag = WAVE_FORMAT_PCM;
+    format.nChannels = 2;
+    format.nSamplesPerSec = 44100;
+    format.wBitsPerSample = 16;
+    format.nBlockAlign = (format.nChannels * format.wBitsPerSample) >> 3;
+    format.nAvgBytesPerSec = format.nSamplesPerSec * format.nBlockAlign;
+    format.cbSize = 0;
 
     for (int i = 0; i < voices.GetCapacity(); i++)
     {
         IXAudio2SourceVoice* voice = nullptr;
-        if (FAILED(xAudio2->CreateSourceVoice(&voice, (WAVEFORMATEX*)&test.format, 0, XAUDIO2_DEFAULT_FREQ_RATIO, nullptr, nullptr, nullptr)))
+        if (FAILED(xAudio2->CreateSourceVoice(&voice, &format, 0, XAUDIO2_DEFAULT_FREQ_RATIO, nullptr, nullptr, nullptr)))
         {
             ASSERT(!"Error: mastering voice failed to create");
         }
@@ -94,16 +99,25 @@ void AudioManager::LoadSound(SoundName sound, const char* filepath)
 
 void AudioManager::PlaySoundFx(SoundName soundName, bool loop)
 {
-    Sound sound = GetSound();
+    Sound sound = GetSound(soundName);
+    if (!sound.voice)
+    {
+        return;
+    }
+
+    sound.voice->FlushSourceBuffers();
+
     // fill the source voice
     XAUDIO2_BUFFER buffer = {};
     buffer.AudioBytes = wavs[static_cast<int>(soundName)].size;
     buffer.pAudioData = (BYTE*)wavs[static_cast<int>(soundName)].data;
     buffer.Flags = XAUDIO2_END_OF_STREAM;
-    buffer.LoopCount = loop ? XAUDIO2_LOOP_INFINITE : 1;
-    if (FAILED(sound.voice->SubmitSourceBuffer(&buffer)))
+    buffer.LoopCount = loop ? XAUDIO2_LOOP_INFINITE : 0;
+    
+    HRESULT hr = sound.voice->SubmitSourceBuffer(&buffer);
+    if (FAILED(hr))
     {
-        ASSERT(!"Error: filling ship voice source");
+        ASSERT(!"Error: filling voice source");
     }
 
     sound.voice->Start();
@@ -112,6 +126,22 @@ void AudioManager::PlaySoundFx(SoundName soundName, bool loop)
 void AudioManager::PlaySoundFxAtPosition(SoundName soundName, const Vector3& position, bool loop)
 {
     // TODO: ...
+}
+
+void AudioManager::StopSoundFx(SoundName soundName)
+{
+    for (int i = playingSounds.size - 1; i >= 0; i--)
+    {
+        Sound& sound = playingSounds[i];
+        XAUDIO2_VOICE_STATE state;
+        if(sound.soundName == soundName)
+        {
+            sound.voice->Stop();
+            ReleaseSound(sound);
+            playingSounds[i] = playingSounds[playingSounds.size - 1];
+            playingSounds.size--;
+        }
+    }
 }
 
 void AudioManager::Update()
@@ -131,13 +161,14 @@ void AudioManager::Update()
     }
 }
 
-Sound AudioManager::GetSound()
+Sound AudioManager::GetSound(SoundName soundName)
 {
     Sound sound = {};
     if (firstFree > -1)
     {
         sound.voice = voices[firstFree];
         sound.index = firstFree;
+        sound.soundName = soundName;
         int nextFree = freeList[firstFree];
         freeList[firstFree] = -1;
         firstFree = nextFree;

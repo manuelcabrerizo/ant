@@ -184,7 +184,14 @@ void GameManager::LoadDefaultAssets()
     ModelManager::Get()->Load("box", "data/models/cube.fbx", STATIC_MEMORY);
 
     // Load sound
-    AudioManager::Get()->LoadSound(SoundName::Shoot, "data/audio/test.wav");
+    AudioManager::Get()->LoadSound(SoundName::Music, "data/audio/DavidKBD-03 - Ghastly Apparition-full.wav");
+    AudioManager::Get()->LoadSound(SoundName::Shoot, "data/audio/shoot.wav");
+    AudioManager::Get()->LoadSound(SoundName::EnemyHit, "data/audio/03. Defiant Roar.wav");
+    AudioManager::Get()->LoadSound(SoundName::Jump, "data/audio/Jump.wav");
+    AudioManager::Get()->LoadSound(SoundName::AmmoPickup, "data/audio/Collectable_09.wav");
+    AudioManager::Get()->LoadSound(SoundName::LifePickup, "data/audio/FifthOctArpH.wav");
+    AudioManager::Get()->LoadSound(SoundName::PortalEnter, "data/audio/Collectable_00.wav");
+    AudioManager::Get()->LoadSound(SoundName::ButtonPush, "data/audio/25_Wind_01.wav");
 }
 
 void GameManager::ShowMemoryUsage()
