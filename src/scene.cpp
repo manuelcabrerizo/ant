@@ -24,6 +24,27 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
 {
     this->actorManager = actorManager_;
 
+    LoadAssets();
+    actorManager->CreateActorFromFile("data/xml/level1.xml");
+    CreateFenceActors("data/xml/fence.xml", "data/entities/fences.txt");
+    CreateEffectActors();
+    CreatePortalActors("data/xml/portal.xml", "data/entities/portals.txt");
+    CreateEnemyActors("data/xml/enemy.xml", "data/entities/enemies1.txt");
+    CreateEndTriggerActors("data/entities/endTriggers.txt");
+    CreateDeadTriggerActors("data/entities/deadTriggers.txt");
+    CreateAmmoActors("data/xml/ammo.xml", "data/entities/ammos.txt");
+    CreateHealActors("data/xml/heal.xml", "data/entities/heals.txt");
+    Actor* player = actorManager->CreateActorFromFile("data/xml/player.xml");
+    actorManager->InitializeNewComponents();
+    CreateLights("data/entities/Lights.txt");
+}
+
+void Scene::Unload()
+{
+}
+
+void Scene::LoadAssets()
+{
     // Load the models
     ModelManager::Get()->Load("enemy", "data/models/bloodwraith/source/bloodwraith.fbx", FRAME_MEMORY);
     ModelManager::Get()->Load("anim-gun", "data/models/Revolver/source/Retribution.fbx", FRAME_MEMORY);
@@ -42,20 +63,19 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     AnimationManager::Get()->Load("Idle", "data/animations/Orc Idle.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
     AnimationManager::Get()->Load("Hit", "data/animations/Zombie Reaction Hit.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
     AnimationManager::Get()->Load("Attack", "data/animations/Zombie Attack.fbx", ModelManager::Get()->Get("enemy"), FRAME_MEMORY);
+}
 
-
-    // Create the level
-    actorManager->CreateActorFromFile("data/xml/level1.xml");
-
+void Scene::CreateFenceActors(const char* fenceActorFile, const char* fenceInstancesFile)
+{
     // Create the fence
     Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
-    File fencesFile = PlatformReadFile("data/entities/fences.txt", SCRATCH_MEMORY);
+    File fencesFile = PlatformReadFile(fenceInstancesFile, SCRATCH_MEMORY);
     FileReader reader = FileReader(&fencesFile);
     while (const char* line = reader.GetNextLine())
     {
-        Actor* fence = actorManager->CreateActorFromFile("data/xml/fence.xml");
+        Actor* fence = actorManager->CreateActorFromFile(fenceActorFile);
         TransformComponent* pTransform = fence->GetComponent<TransformComponent>();
-        Vector3 sPos,ePos, rot, sca;
+        Vector3 sPos, ePos, rot, sca;
         Vector3 bPos, bSca, bRot;
         if (sscanf(line, "p: [[%f, %f, %f], [%f, %f, %f]] rs: [[%f, %f, %f], [%f, %f, %f]] b: [[%f, %f, %f], [%f, %f, %f], [%f, %f, %f]]",
             &sPos.x, &sPos.y, &sPos.z, &ePos.x, &ePos.y, &ePos.z, &rot.x, &rot.y, &rot.z, &sca.x, &sca.y, &sca.z,
@@ -82,7 +102,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
             Vector3 rotation[] = { right, up, front };
 
             OBB obb;
-            obb.Init(Vector3::zero, rotation, Vector3(pTransform->scale.x*0.5f, pTransform->scale.y*0.5f, 0.25f));
+            obb.Init(Vector3::zero, rotation, Vector3(pTransform->scale.x * 0.5f, pTransform->scale.y * 0.5f, 0.25f));
             Collider collider_ = Collider(obb, fence);
             colliderComponent.AddSubCollider(collider_);
             actorManager->AddComponent(fence, colliderComponent);
@@ -111,8 +131,10 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         }
     }
     MemoryManager::Get()->ReleaseFrame(frame);
+}
 
-
+void Scene::CreateEffectActors()
+{
     // Temp fix, EffectComponent is to big to be created on the stack
     // TODO: use the scratch memory for this
     {
@@ -133,14 +155,17 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         actorManager->AddComponent<EffectComponent>(box, *effect);
         delete effect;
     }
+}
 
+void Scene::CreatePortalActors(const char* portalActorFile, const char* portalInstancesFile)
+{
     // Create the portals
-    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
-    File portalsFile = PlatformReadFile("data/entities/portals.txt", SCRATCH_MEMORY);
-    reader = FileReader(&portalsFile);
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    File portalsFile = PlatformReadFile(portalInstancesFile, SCRATCH_MEMORY);
+    FileReader reader = FileReader(&portalsFile);
     while (const char* line = reader.GetNextLine())
     {
-        Actor* portalVisual = actorManager->CreateActorFromFile("data/xml/portal.xml");
+        Actor* portalVisual = actorManager->CreateActorFromFile(portalActorFile);
         TransformComponent* pTransform = portalVisual->GetComponent<TransformComponent>();
         Vector3 pPos, pDst;
         float rPos, rDst;
@@ -149,8 +174,8 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         {
             rDst += 180.0;
             pTransform->position = pPos;
-            pTransform->rotation.y = rPos/180.0f*ANT_PI;
-            
+            pTransform->rotation.y = rPos / 180.0f * ANT_PI;
+
             // TODO: optimice the collider be initialize using euler angles
             Matrix4 rotMat = Matrix4::TransformFromEuler(pTransform->rotation);
             Vector3 front = Matrix4::TransformVector(rotMat, Vector3::forward);
@@ -228,11 +253,14 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         }
     }
     MemoryManager::Get()->ReleaseFrame(frame);
-    
+}
+
+void Scene::CreateEnemyActors(const char* enemyActorFile, const char* enemyInstancesFile)
+{
     // Create the Enemies
-    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
-    File file = PlatformReadFile("data/entities/enemies1.txt", SCRATCH_MEMORY);
-    reader = FileReader(&file);
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    File file = PlatformReadFile(enemyInstancesFile, SCRATCH_MEMORY);
+    FileReader reader = FileReader(&file);
     while (const char* line = reader.GetNextLine())
     {
         char name[256];
@@ -240,7 +268,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         if (sscanf(line, "%s position: [%f, %f, %f]", name, &position.x, &position.y, &position.z) == 4)
         {
             // Create the enemy and position it
-            Actor* enemy = actorManager->CreateActorFromFile("data/xml/enemy.xml");
+            Actor* enemy = actorManager->CreateActorFromFile(enemyActorFile);
             TransformComponent* transform = enemy->GetComponent<TransformComponent>();
             transform->position = position;
 
@@ -254,11 +282,14 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         }
     }
     MemoryManager::Get()->ReleaseFrame(frame);
+}
 
+void Scene::CreateEndTriggerActors(const char* endTriggerInstancesFile)
+{
     // Create the End Trigger
-    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
-    file = PlatformReadFile("data/entities/endTriggers.txt", SCRATCH_MEMORY);
-    reader = FileReader(&file);
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    File file = PlatformReadFile(endTriggerInstancesFile, SCRATCH_MEMORY);
+    FileReader reader = FileReader(&file);
     while (const char* line = reader.GetNextLine())
     {
         char name[256];
@@ -285,12 +316,12 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
             AABB aabb;
             aabb.Init(min, max);
             Collider collider(aabb, endTrigger);
-            
+
             ColliderComponent colliderComponent;
             colliderComponent.Init(1, FRAME_MEMORY);
             colliderComponent.AddSubCollider(collider);
             colliderComponent.SetIsTrigger(true);
-            
+
             actorManager->AddComponent<ColliderComponent>(endTrigger, colliderComponent);
         }
         else
@@ -299,11 +330,13 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         }
     }
     MemoryManager::Get()->ReleaseFrame(frame);
+}
 
-    // Create the End Trigger
-    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
-    file = PlatformReadFile("data/entities/deadTriggers.txt", SCRATCH_MEMORY);
-    reader = FileReader(&file);
+void Scene::CreateDeadTriggerActors(const char* deadTriggerInstancesFile)
+{
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    File file = PlatformReadFile(deadTriggerInstancesFile, SCRATCH_MEMORY);
+    FileReader reader = FileReader(&file);
     while (const char* line = reader.GetNextLine())
     {
         char name[256];
@@ -344,11 +377,14 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         }
     }
     MemoryManager::Get()->ReleaseFrame(frame);
+}
 
+void Scene::CreateAmmoActors(const char* ammoActorFile, const char* ammoInstancesFile)
+{
     // Create the Ammos
-    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
-    file = PlatformReadFile("data/entities/ammos.txt", SCRATCH_MEMORY);
-    reader = FileReader(&file);
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    File file = PlatformReadFile(ammoInstancesFile, SCRATCH_MEMORY);
+    FileReader reader = FileReader(&file);
     while (const char* line = reader.GetNextLine())
     {
         char name[256];
@@ -356,7 +392,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         Vector3 scale;
         if (sscanf(line, "[[%f, %f, %f], [%f, %f, %f]]", &position.x, &position.y, &position.z, &scale.x, &scale.y, &scale.z) == 6)
         {
-            Actor* ammo = actorManager->CreateActorFromFile("data/xml/ammo.xml");
+            Actor* ammo = actorManager->CreateActorFromFile(ammoActorFile);
             TransformComponent* transform = ammo->GetComponent<TransformComponent>();
             transform->position = position;
         }
@@ -366,11 +402,14 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         }
     }
     MemoryManager::Get()->ReleaseFrame(frame);
+}
 
+void Scene::CreateHealActors(const char* healActorFile, const char* healInstancesFile)
+{
     // Create the Heals
-    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
-    file = PlatformReadFile("data/entities/heals.txt", SCRATCH_MEMORY);
-    reader = FileReader(&file);
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    File file = PlatformReadFile(healInstancesFile, SCRATCH_MEMORY);
+    FileReader reader = FileReader(&file);
     while (const char* line = reader.GetNextLine())
     {
         char name[256];
@@ -378,7 +417,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         Vector3 scale;
         if (sscanf(line, "[[%f, %f, %f], [%f, %f, %f]]", &position.x, &position.y, &position.z, &scale.x, &scale.y, &scale.z) == 6)
         {
-            Actor* ammo = actorManager->CreateActorFromFile("data/xml/heal.xml");
+            Actor* ammo = actorManager->CreateActorFromFile(healActorFile);
             TransformComponent* transform = ammo->GetComponent<TransformComponent>();
             transform->position = position;
         }
@@ -388,12 +427,10 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
         }
     }
     MemoryManager::Get()->ReleaseFrame(frame);
+}
 
-    // Create the player
-    Actor* player = actorManager->CreateActorFromFile("data/xml/player.xml");
-    
-    actorManager->InitializeNewComponents();
-
+void Scene::CreateLights(const char* lightsInstancesFile)
+{
     // Add Lights
     DirectionalLight light;
     light.ambient = Vector4(0.1, 0.1, 0.05, 0);
@@ -407,9 +444,9 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     PointLight pointLights[8];
     int lightsCount = 0;
 
-    frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
-    file = PlatformReadFile("data/entities/Lights.txt", SCRATCH_MEMORY);
-    reader = FileReader(&file);
+    Frame frame = MemoryManager::Get()->GetFrame(SCRATCH_MEMORY);
+    File file = PlatformReadFile(lightsInstancesFile, SCRATCH_MEMORY);
+    FileReader reader = FileReader(&file);
     while (const char* line = reader.GetNextLine())
     {
         ASSERT(lightsCount < 8);
@@ -423,7 +460,7 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
             pointLight.diffuse = Vector4(1.2, 2.5, 1.25, 1);
             pointLight.specular = Vector4(0.1, 0.0, 0.3, 1);
             pointLight.position = position;
-            pointLight.range = scale.x*2.5f;
+            pointLight.range = scale.x * 2.5f;
             pointLight.att = Vector3();
             pointLights[lightsCount++] = pointLight;
         }
@@ -435,8 +472,4 @@ void Scene::Load(ActorManager* actorManager_, const char* filepath)
     MemoryManager::Get()->ReleaseFrame(frame);
 
     GraphicsManager::Get()->AddPointLights(pointLights, lightsCount);
-}
-
-void Scene::Unload()
-{
 }
