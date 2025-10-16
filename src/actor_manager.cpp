@@ -82,6 +82,16 @@ static i32 GetChildElementCount(tinyxml2::XMLElement* parent) {
     return count;
 }
 
+void ActorManager::InitializeNewComponents()
+{
+    for (i32 i = 0; i < componentsToInit.size; ++i)
+    {
+        componentsToInit[i]->OnInit(this);
+        componentsToInit[i]->initialized = true;
+    }
+    componentsToInit.Clear();
+}
+
 Actor *ActorManager::CreateActorFromFile(const char* filepath)
 {
     tinyxml2::XMLDocument doc;
@@ -554,14 +564,3 @@ Actor *ActorManager::CreateActorFromFile(const char* filepath)
     }
     return actor;
 }
-
-void ActorManager::InitializeNewComponents()
-{
-    for (i32 i = 0; i < componentsToInit.size; ++i)
-    {
-        componentsToInit[i]->OnInit(this);
-        componentsToInit[i]->initialized = true;
-    }
-    componentsToInit.Clear();
-}
-
