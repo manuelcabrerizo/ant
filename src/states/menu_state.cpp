@@ -96,9 +96,9 @@ void MenuState::OnRender()
 
     float ratioX = windowWidth / 1920.0f;
     float ratioY = windowHeight / 1080.0f;
-    float positionX = (windowWidth * 0.5f) - (700 * ratioX);
+    float positionX = (windowWidth * 0.5f) - (550 * ratioX);
     float positionY = windowHeight - (300 * ratioY);
-    textRenderer.DrawString("FPS GAME DEMO", Vector2(positionX, positionY), 6.0f*ratioX, Vector3(0.75, 0.25f, 1.0f));
+    textRenderer.DrawString("BLOOD CAVE", Vector2(positionX, positionY), 6.0f*ratioX, Vector3(1.0, 0.25f, 0.25f));
 
     GraphicsManager::Get()->SetRasterizerStateCullBack();
     GraphicsManager::Get()->SetDepthStencilOn();
