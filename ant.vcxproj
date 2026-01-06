@@ -335,6 +335,7 @@
   <ItemGroup>
     <None Include="src\actor_manager.tpp" />
     <None Include="src\component_list.tpp" />
+    <None Include="README.md" />
     <None Include="src\ui_button.tpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
