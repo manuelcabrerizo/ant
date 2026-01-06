@@ -19,3 +19,5 @@ Features:
 	-	Particle System
 	-	Assets Managers
 	-	PostProcess Effects
+
+Download the last Version from Releases
