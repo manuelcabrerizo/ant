@@ -16,4 +16,6 @@ Features:
 	-	Unity like ECS architecture
 	-	Animation System
 	-	Collision System
+	-	Particle System
 	-	Assets Managers
+	-	PostProcess Effects
